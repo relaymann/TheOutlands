@@ -73,6 +73,11 @@ configurations {
 
 dependencies {
     // Optional integrations belong here only after their compatibility is verified.
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
 }
 
 def generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {

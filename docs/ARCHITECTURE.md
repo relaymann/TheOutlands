@@ -21,9 +21,17 @@
 
 The initial 1,000 blocks return zero escalation. Beyond that, the continuous value grows logarithmically and the internal milestone tier grows at doubling-distance intervals. Neither calculation has a content cap.
 
-### Snapshot manager
+### Horror director
 
-`HorrorProgressionManager` keeps a lightweight in-memory snapshot for each online player. Snapshots are refreshed once per second and removed on logout. They are derived data, not permanent player memory.
+`HorrorDirector` evaluates a player's current snapshot and transient pacing state once per second. It builds pressure gradually, enforces a distance-scaled quiet period, filters event families by minimum distance/pressure/cooldown, and proposes one weighted event at a time.
+
+Current event IDs are encounter-family placeholders, not implemented scares. A selected proposal does not yet spawn anything or send client effects. Dedicated event executors will own those actions in a later step.
+
+The director keeps a short recent-event memory to reduce repetition. Cooldowns and pacing are per player, so one player's encounter does not force another player into the same experience.
+
+### Snapshot and runtime state manager
+
+`HorrorProgressionManager` keeps the latest derived snapshot, director state, and last proposal for each online player. These are runtime values; they are removed on logout and recomputed after login. Persistent discoveries and story progress will use saved player/world data.
 
 ### Event hook
 
@@ -32,11 +40,11 @@ The initial 1,000 blocks return zero escalation. Beyond that, the continuous val
 ## Planned subsystem boundaries
 
 - `horror`: distance, intensity, encounter budgets, escalation profiles.
-- `event`: event definitions, eligibility, scheduling, cooldowns, outcomes.
+- `event`: event definitions, scheduling, cooldowns, and event executors.
 - `entity`: entity registration, AI goals, behavior profiles, apostle systems.
 - `world`: anomaly placement, protected-area checks, world-border calculations.
 - `worldgen`: Fear biome, structures, features, placement rules, data generation.
-- `memory`: persistent player discoveries, encounter history, world-level story flags.
+- `memory`: persistent player discoveries, encounter history, and world-level story flags.
 - `investigation`: clues, evidence, coordinate puzzles, ARG progression.
 - `network`: synchronization for player-specific visual/audio events and shared state.
 - `client`: rendering, audio presentation, effects, and client-only presentation code.

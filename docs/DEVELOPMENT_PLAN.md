@@ -7,14 +7,17 @@
 - [x] Implement an unbounded distance-based progression calculation.
 - [x] Evaluate server-side progression once per second for Overworld players.
 - [x] Document current lore, architecture, and engineering constraints.
-- [ ] Verify the Gradle build in CI and fix integration issues.
+- [x] Verify the initial Gradle build in GitHub Actions.
 
 ## Phase 1 — Horror director
 
-- [ ] Event definitions with eligibility predicates and outcomes.
-- [ ] Per-player and per-area cooldowns and encounter budgets.
-- [ ] Pacing controller that alternates pressure with breathing room.
-- [ ] Context inputs: distance, biome, time, weather, player history, recent events, and nearby players.
+- [x] Event definitions with distance, pressure, weight, and cooldown metadata.
+- [x] Per-player pacing state and event cooldown tracking.
+- [x] Pacing controller with distance-scaled quiet periods and pressure buildup.
+- [x] Weighted event proposal with recent-event repetition protection.
+- [x] Unit tests for opening-range protection, pacing, cooldowns, and safe selection.
+- [ ] Event executors that turn selected proposals into actual world/client experiences.
+- [ ] Context inputs: biome, time, weather, player history, recent discoveries, and nearby players.
 - [ ] Debug-only inspection command for progression and event eligibility.
 
 ## Phase 2 — Null
