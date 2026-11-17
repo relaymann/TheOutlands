@@ -10,17 +10,16 @@
 - [x] Context inputs: biome, day/night, weather, nearby players, and health.
 - [x] Executable server-side encounters for all six initial event families.
 - [x] Player-targeted sound, particles, and messages.
-- [x] Temporary Null watcher silhouette with bounded lifetime and no combat AI.
-- [x] Operator debug command: `/theoutlands debug`.
-- [x] JUnit Platform launcher runtime dependency and cooldown-boundary test.
-- [ ] Verify Gradle build/tests in CI; resolve any compile or runtime issues before advancing.
+- [x] Operator debug command.
+- [ ] Verify full Gradle build/tests and dedicated-server smoke test.
 
 ## Phase 2 — Null
-- [ ] Dedicated registered Null entity, custom model/renderer, and animation.
-- [ ] Watcher/stalker AI with distant observation, rare interventions, and retreat behavior.
-- [ ] Long-range appearances without constant harassment.
-- [ ] Null's apostles and subordinate concepts.
-- [ ] Multiplayer-aware target selection and persistent story state.
+- [x] Dedicated registered Null entity with a player-proportioned humanoid renderer.
+- [x] Pure-black 64x64 skin with exactly two white eyes and no other facial detail.
+- [x] Temporary observer sightings with bounded lifetime and no combat.
+- [ ] Advanced watcher/stalker AI, retreat behavior, and long-range appearances.
+- [ ] Custom animations, persistent story state, and Null's apostles.
+- [ ] Multiplayer-aware target selection and story progression.
 
 ## Phase 3 — Fear
 - [ ] First appearance milestone and adaptive multiplayer dialogue.
