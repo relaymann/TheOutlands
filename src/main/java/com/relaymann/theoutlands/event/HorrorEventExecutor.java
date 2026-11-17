@@ -33,7 +33,7 @@ public final class HorrorEventExecutor {
                 level.sendParticles(player, ParticleTypes.ASH, true, x, y + 1.0D, z, 10, 0.35D, 0.8D, 0.35D, 0.01D);
             }
             case "environmental_distortion" -> {
-                player.playNotifySound(SoundEvents.AMBIENT_CAVE, SoundSource.AMBIENT, 0.9F, 0.45F);
+                player.playNotifySound(SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.9F, 0.45F);
                 level.sendParticles(player, ParticleTypes.PORTAL, true, player.getX(), player.getY() + 1.0D,
                         player.getZ(), 24, 0.7D, 0.9D, 0.7D, 0.025D);
                 level.sendParticles(player, ParticleTypes.SMOKE, true, x, y, z, 12, 0.5D, 0.4D, 0.5D, 0.01D);
