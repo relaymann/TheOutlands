@@ -1,68 +1,50 @@
 # Development plan
 
 ## Phase 0 — Foundation
+- [x] NeoForge 1.21.1 / Java 21 / Gradle project and metadata.
+- [x] Unbounded distance progression from original shared Overworld spawn.
+- [x] Server-side progression evaluation once per second.
 
-- [x] Establish NeoForge 1.21.1 / Java 21 / Gradle project.
-- [x] Add mod metadata and client/server run configurations.
-- [x] Implement an unbounded distance-based progression calculation.
-- [x] Evaluate server-side progression once per second for Overworld players.
-- [x] Document current lore, architecture, and engineering constraints.
-- [x] Verify the initial Gradle build in GitHub Actions.
-
-## Phase 1 — Horror director
-
-- [x] Event definitions with distance, pressure, weight, and cooldown metadata.
-- [x] Per-player pacing state and event cooldown tracking.
-- [x] Pacing controller with distance-scaled quiet periods and pressure buildup.
-- [x] Weighted event proposal with recent-event repetition protection.
-- [x] Unit tests for opening-range protection, pacing, cooldowns, and safe selection.
-- [ ] Event executors that turn selected proposals into actual world/client experiences.
-- [ ] Context inputs: biome, time, weather, player history, recent discoveries, and nearby players.
-- [ ] Debug-only inspection command for progression and event eligibility.
+## Phase 1 — Horror director and first encounters
+- [x] Per-player pressure, quiet periods, cooldowns, weighted selection, and recent-event memory.
+- [x] Context inputs: biome, day/night, weather, nearby players, and health.
+- [x] Executable server-side encounters for all six initial event families.
+- [x] Player-targeted sound, particles, and messages.
+- [x] Temporary Null watcher silhouette with bounded lifetime and no combat AI.
+- [x] Operator debug command: `/theoutlands debug`.
+- [x] JUnit Platform launcher runtime dependency and cooldown-boundary test.
+- [ ] Verify Gradle build/tests in CI; resolve any compile or runtime issues before advancing.
 
 ## Phase 2 — Null
-
-- [ ] Null entity registration and visual identity.
-- [ ] Watcher/stalker AI with distant observation and rare interventions.
-- [ ] Long-range appearance rules without making Null a constant nuisance.
-- [ ] Null's apostle framework and first subordinate concepts.
-- [ ] Multiplayer-aware targeting and persistence.
+- [ ] Dedicated registered Null entity, custom model/renderer, and animation.
+- [ ] Watcher/stalker AI with distant observation, rare interventions, and retreat behavior.
+- [ ] Long-range appearances without constant harassment.
+- [ ] Null's apostles and subordinate concepts.
+- [ ] Multiplayer-aware target selection and persistent story state.
 
 ## Phase 3 — Fear
-
-- [ ] Fear introduction milestone and adaptive single-/multiplayer dialogue.
-- [ ] Fear forest biome and biome ambience.
-- [ ] Fear-exclusive structures and environmental effects.
+- [ ] First appearance milestone and adaptive multiplayer dialogue.
+- [ ] Fear forest biome, ambience, exclusive structures, and environmental effects.
 - [ ] Increased entity/event activity with controlled spawn budgets.
-- [ ] Confirm whether 15,000 blocks is the first appearance and 100,000 is the full territory milestone.
+- [ ] Validate 15,000-block introduction and 100,000-block full territory.
 
 ## Phase 4 — Death / death.jar
-
-- [ ] Death entity and persistent hunter AI.
-- [ ] Tracking, misdirection, pressure, escape windows, and attack commitment.
-- [ ] death.jar ARG clue chain and reveal.
-- [ ] Multiplayer hunt rules and fairness safeguards.
+- [ ] Hunter AI, tracking, misdirection, escape windows, and attack commitment.
+- [ ] death.jar ARG clue chain and reveal; multiplayer fairness safeguards.
 
 ## Phase 5 — The Almighty
+- [ ] Territory from configured world-border center and size.
+- [ ] Entity exclusion for the final 5,000-block region.
+- [ ] Border encounter, presence, and finale.
 
-- [ ] Border-relative final territory calculations.
-- [ ] Entity exclusion rules for the final 5,000-block region.
-- [ ] The Almighty's presence and final encounter.
-- [ ] Endgame revelations and possible outcomes.
-
-## Phase 6 — World and ARG content
-
-- [ ] Vanilla-compatible anomaly structures.
-- [ ] Evidence, books, signs, coordinate puzzles, and connected clues.
-- [ ] Safe world modification rules that protect player builds.
-- [ ] Audio, visual effects, and client-side presentation.
-- [ ] Content variation for long-term exploration.
+## Phase 6 — World and ARG
+- [ ] Vanilla-compatible anomaly structures, evidence, books, signs, and coordinate puzzles.
+- [ ] Safe world modification rules protecting player builds.
+- [ ] Custom audio/visual content and long-term variation.
 
 ## Release gates
-
-- [ ] Client and dedicated-server smoke tests pass.
-- [ ] Multiplayer synchronization and player-specific events pass.
-- [ ] No unbounded chunk/entity scans or uncontrolled world writes.
-- [ ] World-border behavior works with custom border settings.
-- [ ] Full audit for correctness, performance, compatibility, and regressions.
-- [ ] Build artifact and installation instructions verified.
+- [ ] Client and dedicated-server startup smoke tests.
+- [ ] Multiplayer synchronization and player-specific event tests.
+- [ ] Performance audit: no unbounded scans, forced chunk loads, or uncontrolled world writes.
+- [ ] Non-default world-border tests and full regression audit.
+- [ ] Verified release artifact and installation instructions.

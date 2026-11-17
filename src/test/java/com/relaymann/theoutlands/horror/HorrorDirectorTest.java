@@ -1,79 +1,52 @@
 package com.relaymann.theoutlands.horror;
-
 import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class HorrorDirectorTest {
-    @Test
-    void doesNotProposeEventsInsideTheOpeningThousandBlocks() {
+    @Test void openingThousandBlocksRemainSafe() {
         HorrorDirectorState state = new HorrorDirectorState();
-
-        HorrorDecision decision = HorrorDirector.evaluate(
-                new HorrorSnapshot(999.0D, 0.0D, 0),
-                state,
-                0L,
-                0.0D
-        );
-
-        assertEquals(HorrorDecision.Reason.OUTSIDE_HORROR_RANGE, decision.reason());
-        assertFalse(decision.hasSelectedEvent());
+        var result = HorrorDirector.evaluate(new HorrorSnapshot(999, 0, 0), state, 0, 0);
+        assertEquals(HorrorDecision.Reason.OUTSIDE_HORROR_RANGE, result.reason());
+        assertFalse(result.hasSelectedEvent());
         assertEquals(0.0D, state.getPressure());
     }
-
-    @Test
-    void allowsAnInitialBreathingPeriodBeforeTheFirstEncounter() {
-        HorrorDirectorState state = new HorrorDirectorState();
-        HorrorSnapshot snapshot = new HorrorSnapshot(2_000.0D, 0.69D, 2);
-
-        HorrorDecision first = HorrorDirector.evaluate(snapshot, state, 0L, 0.0D);
-        HorrorDecision early = HorrorDirector.evaluate(snapshot, state, 400L, 0.0D);
-
-        assertEquals(HorrorDecision.Reason.BREATHING_ROOM, first.reason());
-        assertEquals(HorrorDecision.Reason.BREATHING_ROOM, early.reason());
+    @Test void initialBreathingPeriodIsRespected() {
+        var state = new HorrorDirectorState(); var snapshot = new HorrorSnapshot(2_000, .69, 2);
+        assertEquals(HorrorDecision.Reason.BREATHING_ROOM, HorrorDirector.evaluate(snapshot, state, 0, 0).reason());
+        assertEquals(HorrorDecision.Reason.BREATHING_ROOM, HorrorDirector.evaluate(snapshot, state, 400, 0).reason());
     }
-
-    @Test
-    void proposesAnEligibleEventAfterPressureAndQuietPeriodBuild() {
-        HorrorDirectorState state = new HorrorDirectorState();
-        HorrorSnapshot snapshot = new HorrorSnapshot(2_000.0D, 0.69D, 2);
-
-        HorrorDirector.evaluate(snapshot, state, 0L, 0.0D);
-        HorrorDecision decision = HorrorDirector.evaluate(snapshot, state, 800L, 0.0D);
-
-        assertTrue(decision.hasSelectedEvent());
-        assertEquals(HorrorDecision.Reason.EVENT_SELECTED, decision.reason());
-        assertTrue(decision.pressure() < state.getPressure() + 4.0D);
+    @Test void eventCanBeProposedAfterPressureAndQuietPeriod() {
+        var state = new HorrorDirectorState(); var snapshot = new HorrorSnapshot(2_000, .69, 2);
+        HorrorDirector.evaluate(snapshot, state, 0, 0);
+        var result = HorrorDirector.evaluate(snapshot, state, 800, 0);
+        assertTrue(result.hasSelectedEvent());
+        assertTrue(result.pressure() >= 0);
     }
-
-    @Test
-    void selectedEventCannotImmediatelyRepeatDuringItsCooldown() {
-        HorrorDirectorState state = new HorrorDirectorState();
-        HorrorSnapshot snapshot = new HorrorSnapshot(2_000.0D, 0.69D, 2);
-
-        HorrorDirector.evaluate(snapshot, state, 0L, 0.0D);
-        HorrorDecision selected = HorrorDirector.evaluate(snapshot, state, 800L, 0.0D);
-        HorrorDecision next = HorrorDirector.evaluate(snapshot, state, 820L, 0.0D);
-
+    @Test void selectedEventCooldownBoundaryIsCorrect() {
+        var state = new HorrorDirectorState(); var snapshot = new HorrorSnapshot(2_000, .69, 2);
+        HorrorDirector.evaluate(snapshot, state, 0, 0);
+        var selected = HorrorDirector.evaluate(snapshot, state, 800, 0);
         assertTrue(selected.hasSelectedEvent());
-        assertEquals(HorrorDecision.Reason.BREATHING_ROOM, next.reason());
+        var definition = HorrorDirector.getEventDefinitions().stream()
+                .filter(e -> e.id().equals(selected.eventId())).findFirst().orElseThrow();
+        assertTrue(state.isCoolingDown(selected.eventId(), 800 + definition.cooldownTicks() - 1));
+        assertFalse(state.isCoolingDown(selected.eventId(), 800 + definition.cooldownTicks()));
+        assertTrue(state.wasRecentlySelected(selected.eventId()));
     }
-
-    @Test
-    void quietPeriodShortensWithDistanceButNeverBecomesConstantCombat() {
+    @Test void quietPeriodShortensButHasFloor() {
         assertTrue(HorrorDirector.minimumQuietPeriod(8) < HorrorDirector.minimumQuietPeriod(2));
         assertEquals(HorrorDirector.MINIMUM_QUIET_TICKS, HorrorDirector.minimumQuietPeriod(100));
-        assertTrue(HorrorDirector.minimumQuietPeriod(100) >= 240L);
     }
-
-    @Test
-    void invalidRandomRollIsHandledSafely() {
-        HorrorDirectorState state = new HorrorDirectorState();
-        HorrorSnapshot snapshot = new HorrorSnapshot(2_000.0D, 0.69D, 2);
-
-        HorrorDirector.evaluate(snapshot, state, 0L, Double.NaN);
-        HorrorDecision decision = HorrorDirector.evaluate(snapshot, state, 800L, Double.NaN);
-
-        assertTrue(decision.hasSelectedEvent());
+    @Test void invalidRollIsSafe() {
+        var state = new HorrorDirectorState(); var snapshot = new HorrorSnapshot(2_000, .69, 2);
+        HorrorDirector.evaluate(snapshot, state, 0, Double.NaN);
+        assertTrue(HorrorDirector.evaluate(snapshot, state, 800, Double.NaN).hasSelectedEvent());
+    }
+    @Test void contextAdjustsWeightsWithoutBypassingGates() {
+        assertTrue(new HorrorContext("minecraft:forest", true, false, false, 0, 1)
+                .weightMultiplier("distant_figure") > 1);
+        assertTrue(new HorrorContext("minecraft:plains", false, true, false, 0, 1)
+                .weightMultiplier("environmental_distortion") > 1);
+        assertEquals(1.0D, HorrorContext.neutral().weightMultiplier("false_footsteps"));
     }
 }

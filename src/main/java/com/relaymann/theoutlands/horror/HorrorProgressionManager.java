@@ -1,57 +1,44 @@
 package com.relaymann.theoutlands.horror;
 
+import com.relaymann.theoutlands.event.HorrorEventExecutor;
+import com.relaymann.theoutlands.event.NullWatcherManager;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
-
+import net.minecraft.world.phys.AABB;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Holds derived progression snapshots and transient encounter pacing state for online players.
- *
- * <p>All writes are made from server gameplay events. World mutations remain server-thread-only.</p>
- */
+/** Server-side derived progression, local context, and transient encounter state. */
 public final class HorrorProgressionManager {
     private static final Map<UUID, HorrorSnapshot> SNAPSHOTS = new ConcurrentHashMap<>();
-    private static final Map<UUID, HorrorDirectorState> DIRECTOR_STATES = new ConcurrentHashMap<>();
-    private static final Map<UUID, HorrorDecision> LAST_DECISIONS = new ConcurrentHashMap<>();
-
-    private HorrorProgressionManager() {
-    }
+    private static final Map<UUID, HorrorDirectorState> STATES = new ConcurrentHashMap<>();
+    private static final Map<UUID, HorrorDecision> DECISIONS = new ConcurrentHashMap<>();
+    private HorrorProgressionManager() {}
 
     public static void update(ServerPlayer player) {
-        UUID playerId = player.getUUID();
+        UUID id = player.getUUID();
         HorrorSnapshot snapshot = DistanceProgression.createSnapshot(player);
-        HorrorDirectorState state = DIRECTOR_STATES.computeIfAbsent(playerId, ignored -> new HorrorDirectorState());
-        HorrorDecision decision = HorrorDirector.evaluate(
-                snapshot,
-                state,
-                player.serverLevel().getGameTime(),
-                player.getRandom().nextDouble()
-        );
-
-        SNAPSHOTS.put(playerId, snapshot);
-        LAST_DECISIONS.put(playerId, decision);
+        HorrorDirectorState state = STATES.computeIfAbsent(id, ignored -> new HorrorDirectorState());
+        var level = player.serverLevel();
+        var key = BuiltInRegistries.BIOME.getKey(level.getBiome(player.blockPosition()).value());
+        long time = level.getDayTime() % 24000L;
+        int nearby = level.getEntitiesOfClass(ServerPlayer.class,
+                new AABB(player.blockPosition()).inflate(48.0D),
+                other -> !other.getUUID().equals(id)).size();
+        float health = player.getMaxHealth() <= 0.0F ? 1.0F : player.getHealth() / player.getMaxHealth();
+        HorrorContext context = new HorrorContext(key == null ? "unknown" : key.toString(),
+                time >= 13000L && time <= 23000L, level.isRaining(), level.isThundering(), nearby, health);
+        HorrorDecision decision = HorrorDirector.evaluate(snapshot, state, context,
+                level.getGameTime(), player.getRandom().nextDouble());
+        SNAPSHOTS.put(id, snapshot);
+        DECISIONS.put(id, decision);
+        if (decision.hasSelectedEvent()) HorrorEventExecutor.execute(player, decision);
+        NullWatcherManager.tick(level);
     }
-
-    public static Optional<HorrorSnapshot> getSnapshot(UUID playerId) {
-        return Optional.ofNullable(SNAPSHOTS.get(playerId));
-    }
-
-    public static Optional<HorrorDecision> getLastDecision(UUID playerId) {
-        return Optional.ofNullable(LAST_DECISIONS.get(playerId));
-    }
-
-    public static void remove(UUID playerId) {
-        SNAPSHOTS.remove(playerId);
-        DIRECTOR_STATES.remove(playerId);
-        LAST_DECISIONS.remove(playerId);
-    }
-
-    public static void clear() {
-        SNAPSHOTS.clear();
-        DIRECTOR_STATES.clear();
-        LAST_DECISIONS.clear();
-    }
+    public static Optional<HorrorSnapshot> getSnapshot(UUID id) { return Optional.ofNullable(SNAPSHOTS.get(id)); }
+    public static Optional<HorrorDecision> getLastDecision(UUID id) { return Optional.ofNullable(DECISIONS.get(id)); }
+    public static void remove(UUID id) { SNAPSHOTS.remove(id); STATES.remove(id); DECISIONS.remove(id); }
+    public static void clear() { SNAPSHOTS.clear(); STATES.clear(); DECISIONS.clear(); NullWatcherManager.clear(); }
 }
