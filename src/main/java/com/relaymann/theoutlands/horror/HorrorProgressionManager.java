@@ -2,7 +2,7 @@ package com.relaymann.theoutlands.horror;
 
 import com.relaymann.theoutlands.event.HorrorEventExecutor;
 import com.relaymann.theoutlands.event.NullWatcherManager;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.AABB;
 import java.util.Map;
@@ -22,7 +22,7 @@ public final class HorrorProgressionManager {
         HorrorSnapshot snapshot = DistanceProgression.createSnapshot(player);
         HorrorDirectorState state = STATES.computeIfAbsent(id, ignored -> new HorrorDirectorState());
         var level = player.serverLevel();
-        var key = BuiltInRegistries.BIOME.getKey(level.getBiome(player.blockPosition()).value());
+        var key = level.registryAccess().registryOrThrow(Registries.BIOME).getKey(level.getBiome(player.blockPosition()).value());
         long time = level.getDayTime() % 24000L;
         int nearby = level.getEntitiesOfClass(ServerPlayer.class,
                 new AABB(player.blockPosition()).inflate(48.0D),

@@ -21,7 +21,7 @@ public final class HorrorEventExecutor {
         double y = player.getY() + 0.2D;
         switch (decision.eventId()) {
             case "ambient_displacement" -> {
-                player.playNotifySound(SoundEvents.AMBIENT_CAVE, SoundSource.AMBIENT, 0.55F, 0.65F);
+                player.playNotifySound(SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.55F, 0.65F);
                 level.sendParticles(player, ParticleTypes.SMOKE, true, x, y, z, 5, 0.25D, 0.35D, 0.25D, 0.005D);
             }
             case "false_footsteps" -> {
