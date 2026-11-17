@@ -32,7 +32,7 @@ public final class ServerHorrorEvents {
             return;
         }
 
-        if (player.serverLevel().dimension() != Level.OVERWORLD) {
+        if (!player.serverLevel().dimension().equals(Level.OVERWORLD)) {
             return;
         }
 
