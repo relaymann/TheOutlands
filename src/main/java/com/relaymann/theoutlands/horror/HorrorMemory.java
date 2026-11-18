@@ -12,9 +12,8 @@ import java.util.List;
 /**
  * Persistent per-player encounter and discovery history.
  *
- * <p>Data is stored in NeoForge's entity persistent compound, which is saved with
- * the player. The encounter list is intentionally bounded while the total counter
- * and unique discovery list are retained.</p>
+ * <p>Data is stored in NeoForge's persistent player entity compound. The recent
+ * encounter list is bounded while the lifetime counter and unique discoveries remain.</p>
  */
 public final class HorrorMemory {
     private static final String ROOT = "theoutlands_memory";
@@ -30,11 +29,11 @@ public final class HorrorMemory {
     }
 
     static void recordEncounter(CompoundTag persistentData, String eventId, long gameTime) {
-        if (persistentData == null || eventId == null || eventId.isBlank()) return;
-        CompoundTag memory = getOrCreateMemory(persistentData);
-        ListTag encounters = getOrCreateList(memory, ENCOUNTERS);
-        encounters.add(StringTag.valueOf(eventId));
-        while (encounters.size() > MAX_RECENT_ENCOUNTERS) encounters.remove(0);
+        if (persistentData == null || !HorrorMemoryPolicy.isValidId(eventId)) return;
+        CompoundTag memory = getMemory(persistentData);
+        List<String> recent = readStringList(memory, ENCOUNTERS);
+        writeStringList(memory, ENCOUNTERS,
+                HorrorMemoryPolicy.appendEncounter(recent, eventId, MAX_RECENT_ENCOUNTERS));
         memory.putInt("total_encounters", memory.getInt("total_encounters") + 1);
         memory.putLong("last_encounter_game_time", gameTime);
         persistentData.put(ROOT, memory);
@@ -45,11 +44,10 @@ public final class HorrorMemory {
     }
 
     static void recordDiscovery(CompoundTag persistentData, String discoveryId) {
-        if (persistentData == null || discoveryId == null || discoveryId.isBlank()) return;
-        CompoundTag memory = getOrCreateMemory(persistentData);
-        ListTag discoveries = getOrCreateList(memory, DISCOVERIES);
-        StringTag value = StringTag.valueOf(discoveryId);
-        if (!discoveries.contains(value)) discoveries.add(value);
+        if (persistentData == null || !HorrorMemoryPolicy.isValidId(discoveryId)) return;
+        CompoundTag memory = getMemory(persistentData);
+        writeStringList(memory, DISCOVERIES,
+                HorrorMemoryPolicy.addUnique(readStringList(memory, DISCOVERIES), discoveryId));
         persistentData.put(ROOT, memory);
     }
 
@@ -58,7 +56,7 @@ public final class HorrorMemory {
     }
 
     static boolean hasEncountered(CompoundTag persistentData, String eventId) {
-        return readStringList(persistentData, ENCOUNTERS).contains(eventId);
+        return readStringList(getMemory(persistentData), ENCOUNTERS).contains(eventId);
     }
 
     public static boolean hasDiscovered(ServerPlayer player, String discoveryId) {
@@ -66,16 +64,15 @@ public final class HorrorMemory {
     }
 
     static boolean hasDiscovered(CompoundTag persistentData, String discoveryId) {
-        return readStringList(persistentData, DISCOVERIES).contains(discoveryId);
+        return readStringList(getMemory(persistentData), DISCOVERIES).contains(discoveryId);
     }
 
     public static int totalEncounters(ServerPlayer player) {
-        return totalEncounters(player.getPersistentData());
+        return getMemory(player.getPersistentData()).getInt("total_encounters");
     }
 
     static int totalEncounters(CompoundTag persistentData) {
-        CompoundTag memory = getMemory(persistentData);
-        return memory.getInt("total_encounters");
+        return getMemory(persistentData).getInt("total_encounters");
     }
 
     public static long lastEncounterGameTime(ServerPlayer player) {
@@ -83,11 +80,11 @@ public final class HorrorMemory {
     }
 
     public static List<String> recentEncounters(ServerPlayer player) {
-        return readStringList(player.getPersistentData(), ENCOUNTERS);
+        return readStringList(getMemory(player.getPersistentData()), ENCOUNTERS);
     }
 
     public static List<String> discoveries(ServerPlayer player) {
-        return readStringList(player.getPersistentData(), DISCOVERIES);
+        return readStringList(getMemory(player.getPersistentData()), DISCOVERIES);
     }
 
     /** Copies story memory when NeoForge replaces the player entity during respawn. */
@@ -101,22 +98,16 @@ public final class HorrorMemory {
         return persistentData.getCompound(ROOT);
     }
 
-    private static CompoundTag getOrCreateMemory(CompoundTag persistentData) {
-        return getMemory(persistentData);
-    }
-
-    private static ListTag getOrCreateList(CompoundTag memory, String key) {
-        if (memory.contains(key, Tag.TAG_LIST)) return memory.getList(key, Tag.TAG_STRING);
-        ListTag list = new ListTag();
-        memory.put(key, list);
-        return list;
-    }
-
-    private static List<String> readStringList(CompoundTag persistentData, String key) {
-        CompoundTag memory = getMemory(persistentData);
+    private static List<String> readStringList(CompoundTag memory, String key) {
         ListTag list = memory.getList(key, Tag.TAG_STRING);
         List<String> values = new ArrayList<>(list.size());
         for (int i = 0; i < list.size(); i++) values.add(list.getString(i));
-        return List.copyOf(values);
+        return values;
+    }
+
+    private static void writeStringList(CompoundTag memory, String key, List<String> values) {
+        ListTag list = new ListTag();
+        for (String value : values) list.add(StringTag.valueOf(value));
+        memory.put(key, list);
     }
 }
