@@ -33,7 +33,8 @@ public final class HorrorProgressionManager {
         float health = player.getMaxHealth() <= 0.0F ? 1.0F : player.getHealth() / player.getMaxHealth();
         int encounterCount = HorrorMemory.totalEncounters(player);
         boolean hasSeenNull = HorrorMemory.hasDiscovered(player, "null_first_sighting");
-        boolean hasMetFear = HorrorMemory.hasDiscovered(player, "fear_first_introduction");\n        HorrorContext context = new HorrorContext(key == null ? "unknown" : key.toString(),
+        boolean hasMetFear = HorrorMemory.hasDiscovered(player, "fear_first_introduction");
+        HorrorContext context = new HorrorContext(key == null ? "unknown" : key.toString(),
                 time >= 13000L && time <= 23000L, level.isRaining(), level.isThundering(),
                 nearby, health, encounterCount, hasSeenNull, hasMetFear);
         HorrorSettings settings = new HorrorSettings(OutlandsConfig.HORROR_INTENSITY.get(),
