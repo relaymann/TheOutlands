@@ -12,10 +12,19 @@ public final class HorrorDirector {
             new HorrorEventDefinition("false_footsteps", 1_500, 11, 6, 1_600, 4),
             new HorrorEventDefinition("distant_figure", 2_500, 12, 5, 2_400, 5),
             new HorrorEventDefinition("unexplained_message", 1_500, 12, 4, 2_400, 4),
+            new HorrorEventDefinition("wrong_sounds", 3_000, 12, 5, 2_600, 4),
+            new HorrorEventDefinition("observer", 4_000, 13, 4, 3_200, 5),
             new HorrorEventDefinition("environmental_distortion", 5_000, 13, 4, 3_000, 6),
+            new HorrorEventDefinition("missing_terrain", 6_000, 14, 3, 3_800, 6),
+            new HorrorEventDefinition("fake_structure", 7_000, 15, 2, 4_800, 7),
             new HorrorEventDefinition("hostile_warning", 8_000, 14, 3, 3_600, 7),
-            new HorrorEventDefinition("false_death", 12_000, 17, 1, 7_200, 10),
             new HorrorEventDefinition("the_return", 8_000, 15, 2, 5_000, 8),
+            new HorrorEventDefinition("repeated_location", 9_000, 15, 2, 5_400, 7),
+            new HorrorEventDefinition("silent_world", 10_000, 16, 2, 6_000, 8),
+            new HorrorEventDefinition("entity_imitation", 11_000, 16, 2, 6_200, 8),
+            new HorrorEventDefinition("false_death", 12_000, 17, 1, 7_200, 10),
+            new HorrorEventDefinition("distant_scream", 13_000, 17, 2, 6_800, 9),
+            new HorrorEventDefinition("false_player", 14_000, 18, 1, 7_500, 10),
             new HorrorEventDefinition("direct_intervention", 15_000, 16, 1, 6_000, 10));
     private HorrorDirector() {}
     public static List<HorrorEventDefinition> getEventDefinitions() { return EVENTS; }

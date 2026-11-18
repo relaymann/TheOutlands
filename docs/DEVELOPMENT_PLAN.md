@@ -15,7 +15,8 @@
 - [x] Configurable horror intensity, event frequency, and event enablement.
 - [x] Persistent player encounter counts, recent history, and discovery storage API.
 - [x] Player history influences event selection.
-- [ ] Expand to the complete 12+ event catalog, including visual and world-generation event families.
+- [x] Expand the director catalog to 18 event families with unique gates, cooldowns, context weighting, and bounded player-local effects.
+- [ ] Finish true client-side audio muting, terrain afterimages, fake-player rendering, and world-generation event variants (current cues are deliberately non-destructive approximations).
 
 ## Phase 2 — Null
 - [x] Dedicated registered Null entity with a player-proportioned humanoid renderer.
@@ -30,7 +31,7 @@
 - [x] Pure geometry for the Almighty's final 5,000-block region using the live configured border center and size.
 - [x] Unit tests for shifted centers, non-default sizes, sides, corners, and boundaries.
 - [x] Server-side entity exclusion from the Almighty territory (players and the tagged Almighty are exempt).
-- [ ] Fear introduction, Fear forest biome, structures, ambience, and exclusive events.
+- [ ] Fear introduction encounter, registered Fear entity, Fear forest biome, structures, ambience, and exclusive events.
 - [ ] Death hunter AI, territory, structures, and death.jar clue chain.
 - [ ] Almighty encounter and endgame.
 

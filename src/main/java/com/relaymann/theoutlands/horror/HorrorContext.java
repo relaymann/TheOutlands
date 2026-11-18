@@ -34,6 +34,14 @@ public record HorrorContext(String biomeId, boolean night, boolean raining, bool
         if ("the_return".equals(id) && hasSeenNull) weight *= 1.6D;
         if ("unexplained_message".equals(id) && night) weight *= 1.2D;
         if ("unexplained_message".equals(id) && previousEncounterCount >= 5) weight *= 1.25D;
+        if ("wrong_sounds".equals(id) && night) weight *= 1.35D;
+        if ("observer".equals(id) && biomeId.contains("forest")) weight *= 1.4D;
+        if ("missing_terrain".equals(id) && thundering) weight *= 1.35D;
+        if ("fake_structure".equals(id) && previousEncounterCount >= 4) weight *= 1.25D;
+        if ("silent_world".equals(id) && nearbyPlayers == 0) weight *= 1.5D;
+        if ("entity_imitation".equals(id) && nearbyPlayers > 0) weight *= 1.15D;
+        if ("distant_scream".equals(id) && (night || biomeId.contains("forest"))) weight *= 1.4D;
+        if ("false_player".equals(id) && hasSeenNull) weight *= 1.3D;
         return weight;
     }
 }

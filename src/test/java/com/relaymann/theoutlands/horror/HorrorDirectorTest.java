@@ -1,6 +1,8 @@
 package com.relaymann.theoutlands.horror;
 
 import org.junit.jupiter.api.Test;
+import java.util.Set;
+import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
 class HorrorDirectorTest {
@@ -57,7 +59,6 @@ class HorrorDirectorTest {
         assertTrue(seen.weightMultiplier("distant_figure") < unseen.weightMultiplier("distant_figure"));
         assertTrue(unseen.weightMultiplier("false_death") < 1.0D);
     }
-
     @Test void settingsCanTuneOrDisableDirectorWithoutLoadingNeoForgeConfig() {
         var state = new HorrorDirectorState();
         var snapshot = new HorrorSnapshot(2_000, .69, 2);
@@ -66,12 +67,11 @@ class HorrorDirectorTest {
         var result = HorrorDirector.evaluate(snapshot, state, HorrorContext.neutral(), 800, 0, disabled);
         assertEquals(HorrorDecision.Reason.NO_ELIGIBLE_EVENT, result.reason());
     }
-
-    @Test void expandedEventsHaveUniqueIdsAndRealExecutors() {
-        var events = HorrorDirector.getEventDefinitions();
-        assertEquals(events.size(), events.stream().map(HorrorEventDefinition::id).distinct().count());
-        assertTrue(events.stream().anyMatch(e -> e.id().equals("false_death")));
-        assertTrue(events.stream().anyMatch(e -> e.id().equals("unexplained_message")));
-        assertTrue(events.stream().anyMatch(e -> e.id().equals("the_return")));
+    @Test void expandedEventsHaveUniqueIdsAndConcreteExecutionCoverage() {
+        var ids = HorrorDirector.getEventDefinitions().stream().map(HorrorEventDefinition::id).collect(Collectors.toSet());
+        assertEquals(HorrorDirector.getEventDefinitions().size(), ids.size());
+        assertTrue(ids.containsAll(Set.of("false_death", "unexplained_message", "the_return",
+                "false_player", "wrong_sounds", "missing_terrain", "observer", "fake_structure",
+                "repeated_location", "silent_world", "entity_imitation", "distant_scream")));
     }
 }
