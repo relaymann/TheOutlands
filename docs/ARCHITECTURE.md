@@ -30,7 +30,7 @@ Server-side entity lifecycle enforcement now rejects non-player entities when th
 ## Null's visual identity and sightings
 Null is a dedicated registered entity, not an Enderman or disguised player. The renderer uses vanilla humanoid/player proportions with a 64x64 custom skin. The PNG is 64x64 RGBA, fully opaque black except for eight white pixels forming two separated 2x2 eye marks on the front of the head.
 
-The current sighting manager creates temporary invulnerable, silent Null entities at safe positions in already-loaded chunks. They watch the target, disappear after sustained eye contact or close approach, and can relocate to another safe hiding position while unobserved. This remains an initial stalker behavior, not the finished long-range stalking intelligence or final animation suite.
+The current sighting manager creates temporary invulnerable, silent Null entities at safe positions in already-loaded chunks. They watch the target, disappear after sustained eye contact or close approach, and relocate to another safe hiding position while unobserved. Repeated sightings adapt the next appearance: Null gradually appears closer, remains longer, and relocates more frequently within bounded limits. This remains an initial stalker behavior, not the finished long-range stalking intelligence or final animation suite.
 
 Operators can use `/theoutlands debug` (permission level 2) to inspect spawn distance, escalation tier, pressure, the latest director result, border distance, and apostle milestone eligibility.
 

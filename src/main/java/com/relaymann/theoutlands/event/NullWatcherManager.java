@@ -2,6 +2,8 @@ package com.relaymann.theoutlands.event;
 
 import com.relaymann.theoutlands.entity.NullEntity;
 import com.relaymann.theoutlands.entity.OutlandsEntities;
+import com.relaymann.theoutlands.horror.HorrorMemory;
+import com.relaymann.theoutlands.horror.NullStalkingProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -16,14 +18,14 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Manages short-lived Null sightings. Sightings can relocate to another safe,
- * loaded hiding position while the target is not looking, and disappear when
- * approached or observed for long enough.
+ * Manages short-lived Null sightings. Sightings relocate to safe, loaded hiding
+ * positions while the target is not looking, disappear when approached or observed,
+ * and gradually become closer and more persistent after repeated encounters.
  */
 public final class NullWatcherManager {
-    private static final long LIFETIME = 260L;
+    private static final long BASE_LIFETIME = 260L;
     private static final long EYE_CONTACT_DELAY = 12L;
-    private static final long RELOCATION_INTERVAL = 75L;
+    private static final long BASE_RELOCATION_INTERVAL = 75L;
     private static final double LOOK_DOT_THRESHOLD = 0.965D;
     private static final double APPROACH_DISTANCE_SQR = 5.0D * 5.0D;
     private static final Map<UUID, ActiveWatcher> ACTIVE = new HashMap<>();
@@ -36,7 +38,12 @@ public final class NullWatcherManager {
         if (ACTIVE.values().stream().anyMatch(watcher ->
                 watcher.level == level && watcher.playerId.equals(playerId))) return;
 
-        BlockPos feet = findSafeHidingPosition(player);
+        int priorSightings = (int) HorrorMemory.recentEncounters(player).stream()
+                .filter(id -> id.equals("distant_figure") || id.equals("the_return")).count();
+        priorSightings = Math.max(0, priorSightings - 1);
+        NullStalkingProfile profile = NullStalkingProfile.fromPreviousSightings(priorSightings);
+
+        BlockPos feet = findSafeHidingPosition(player, profile);
         if (feet == null) return;
         NullEntity watcher = OutlandsEntities.NULL.get().create(level);
         if (watcher == null) return;
@@ -49,8 +56,8 @@ public final class NullWatcherManager {
 
         if (level.addFreshEntity(watcher)) {
             long now = level.getGameTime();
-            ACTIVE.put(watcher.getUUID(), new ActiveWatcher(
-                    level, watcher.getUUID(), playerId, now + LIFETIME, now));
+            ACTIVE.put(watcher.getUUID(), new ActiveWatcher(level, watcher.getUUID(), playerId,
+                    now + profile.lifetimeTicks(), now, profile));
         }
     }
 
@@ -91,8 +98,8 @@ public final class NullWatcherManager {
             }
 
             watcher.lookedAtSince = -1L;
-            if (level.getGameTime() - watcher.lastRelocatedAt >= RELOCATION_INTERVAL) {
-                BlockPos hidingPosition = findSafeHidingPosition(target);
+            if (level.getGameTime() - watcher.lastRelocatedAt >= watcher.profile.relocationIntervalTicks()) {
+                BlockPos hidingPosition = findSafeHidingPosition(target, watcher.profile);
                 if (hidingPosition != null && !isLookingAtPosition(target, hidingPosition)) {
                     entity.moveTo(hidingPosition.getX() + 0.5D, hidingPosition.getY(),
                             hidingPosition.getZ() + 0.5D, target.getYRot() + 180.0F, 0.0F);
@@ -102,11 +109,12 @@ public final class NullWatcherManager {
         }
     }
 
-    private static BlockPos findSafeHidingPosition(ServerPlayer player) {
+    private static BlockPos findSafeHidingPosition(ServerPlayer player, NullStalkingProfile profile) {
         ServerLevel level = player.serverLevel();
         double yaw = Math.toRadians(player.getYRot());
         double angle = yaw + (player.getRandom().nextDouble() - 0.5D) * 0.9D;
-        double distance = 20.0D + player.getRandom().nextDouble() * 12.0D;
+        double distance = profile.minimumDistance()
+                + player.getRandom().nextDouble() * (profile.maximumDistance() - profile.minimumDistance());
         double x = player.getX() - Math.sin(angle) * distance;
         double z = player.getZ() + Math.cos(angle) * distance;
         int bx = (int) Math.floor(x);
@@ -152,16 +160,18 @@ public final class NullWatcherManager {
         private final UUID entityId;
         private final UUID playerId;
         private final long expiresAt;
+        private final NullStalkingProfile profile;
         private long lookedAtSince = -1L;
         private long lastRelocatedAt;
 
         private ActiveWatcher(ServerLevel level, UUID entityId, UUID playerId,
-                              long expiresAt, long lastRelocatedAt) {
+                              long expiresAt, long lastRelocatedAt, NullStalkingProfile profile) {
             this.level = level;
             this.entityId = entityId;
             this.playerId = playerId;
             this.expiresAt = expiresAt;
             this.lastRelocatedAt = lastRelocatedAt;
+            this.profile = profile;
         }
     }
 }

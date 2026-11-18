@@ -22,6 +22,7 @@
 - [x] Temporary observer sightings with bounded lifetime and eye-contact disappearance.
 - [x] Safe hiding-position selection in already-loaded chunks.
 - [x] Close-approach disappearance and periodic relocation while unobserved.
+- [x] Bounded stalking adaptation based on previous Null sightings.
 - [ ] Long-range stalking, behavior adaptation, false sightings, and coordinated multiplayer encounters.
 - [ ] Custom animations, persistent story state, and Null's apostles.
 
