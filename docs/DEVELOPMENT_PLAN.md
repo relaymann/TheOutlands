@@ -17,9 +17,10 @@
 ## Phase 2 — Null
 - [x] Dedicated registered Null entity with a player-proportioned humanoid renderer.
 - [x] Temporary observer sightings with bounded lifetime and eye-contact disappearance.
-- [ ] Advanced watcher/stalker AI, relocation, retreat behavior, and long-range appearances.
+- [x] Safe hiding-position selection in already-loaded chunks.
+- [x] Close-approach disappearance and periodic relocation while unobserved.
+- [ ] Long-range stalking, behavior adaptation, false sightings, and coordinated multiplayer encounters.
 - [ ] Custom animations, persistent story state, and Null's apostles.
-- [ ] Multiplayer-aware target selection and story progression.
 
 ## Phase 3 — Territory and apostles
 - [x] Pure geometry for the Almighty's final 5,000-block region using the live configured border center and size.

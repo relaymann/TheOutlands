@@ -15,11 +15,17 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
-/** Creates temporary Null sightings that vanish after sustained eye contact. */
+/**
+ * Manages short-lived Null sightings. Sightings can relocate to another safe,
+ * loaded hiding position while the target is not looking, and disappear when
+ * approached or observed for long enough.
+ */
 public final class NullWatcherManager {
     private static final long LIFETIME = 260L;
     private static final long EYE_CONTACT_DELAY = 12L;
+    private static final long RELOCATION_INTERVAL = 75L;
     private static final double LOOK_DOT_THRESHOLD = 0.965D;
+    private static final double APPROACH_DISTANCE_SQR = 5.0D * 5.0D;
     private static final Map<UUID, ActiveWatcher> ACTIVE = new HashMap<>();
 
     private NullWatcherManager() {}
@@ -30,36 +36,21 @@ public final class NullWatcherManager {
         if (ACTIVE.values().stream().anyMatch(watcher ->
                 watcher.level == level && watcher.playerId.equals(playerId))) return;
 
-        double yaw = Math.toRadians(player.getYRot());
-        double angle = yaw + (player.getRandom().nextDouble() - 0.5D) * 0.9D;
-        double distance = 20.0D + player.getRandom().nextDouble() * 9.0D;
-        double x = player.getX() - Math.sin(angle) * distance;
-        double z = player.getZ() + Math.cos(angle) * distance;
-        int bx = (int) Math.floor(x);
-        int bz = (int) Math.floor(z);
-        BlockPos column = new BlockPos(bx, player.blockPosition().getY(), bz);
-        if (!level.hasChunkAt(column)) return;
-
-        int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, bx, bz);
-        BlockPos feet = new BlockPos(bx, y, bz);
-        if (y >= level.getMaxBuildHeight() - 2
-                || !level.getBlockState(feet.below()).isFaceSturdy(level, feet.below(), Direction.UP)
-                || !level.getFluidState(feet).isEmpty()
-                || !level.getBlockState(feet).isAir()
-                || !level.getBlockState(feet.above()).isAir()
-                || !level.getBlockState(feet.above(2)).isAir()) return;
-
+        BlockPos feet = findSafeHidingPosition(player);
+        if (feet == null) return;
         NullEntity watcher = OutlandsEntities.NULL.get().create(level);
         if (watcher == null) return;
-        watcher.moveTo(x + 0.5D, y, z + 0.5D, player.getYRot() + 180.0F, 0.0F);
+        watcher.moveTo(feet.getX() + 0.5D, feet.getY(), feet.getZ() + 0.5D,
+                player.getYRot() + 180.0F, 0.0F);
         watcher.setInvulnerable(true);
         watcher.setSilent(true);
         watcher.setPersistenceRequired();
         watcher.addTag("theoutlands_null_watcher");
 
         if (level.addFreshEntity(watcher)) {
+            long now = level.getGameTime();
             ACTIVE.put(watcher.getUUID(), new ActiveWatcher(
-                    level, watcher.getUUID(), playerId, level.getGameTime() + LIFETIME));
+                    level, watcher.getUUID(), playerId, now + LIFETIME, now));
         }
     }
 
@@ -78,23 +69,72 @@ public final class NullWatcherManager {
 
             var trackedPlayer = level.getPlayerByUUID(watcher.playerId);
             if (!(trackedPlayer instanceof ServerPlayer target)
-                    || !target.isAlive() || !isLookingAt(target, entity)) {
-                watcher.lookedAtSince = -1L;
-                continue;
-            }
-            if (watcher.lookedAtSince < 0L) {
-                watcher.lookedAtSince = level.getGameTime();
-            } else if (level.getGameTime() - watcher.lookedAtSince >= EYE_CONTACT_DELAY) {
+                    || !target.isAlive() || target.isRemoved()) {
                 entity.discard();
                 it.remove();
+                continue;
+            }
+
+            if (target.distanceToSqr(entity) <= APPROACH_DISTANCE_SQR) {
+                entity.discard();
+                it.remove();
+                continue;
+            }
+
+            if (isLookingAt(target, entity)) {
+                if (watcher.lookedAtSince < 0L) watcher.lookedAtSince = level.getGameTime();
+                if (level.getGameTime() - watcher.lookedAtSince >= EYE_CONTACT_DELAY) {
+                    entity.discard();
+                    it.remove();
+                }
+                continue;
+            }
+
+            watcher.lookedAtSince = -1L;
+            if (level.getGameTime() - watcher.lastRelocatedAt >= RELOCATION_INTERVAL) {
+                BlockPos hidingPosition = findSafeHidingPosition(target);
+                if (hidingPosition != null && !isLookingAtPosition(target, hidingPosition)) {
+                    entity.moveTo(hidingPosition.getX() + 0.5D, hidingPosition.getY(),
+                            hidingPosition.getZ() + 0.5D, target.getYRot() + 180.0F, 0.0F);
+                    watcher.lastRelocatedAt = level.getGameTime();
+                }
             }
         }
+    }
+
+    private static BlockPos findSafeHidingPosition(ServerPlayer player) {
+        ServerLevel level = player.serverLevel();
+        double yaw = Math.toRadians(player.getYRot());
+        double angle = yaw + (player.getRandom().nextDouble() - 0.5D) * 0.9D;
+        double distance = 20.0D + player.getRandom().nextDouble() * 12.0D;
+        double x = player.getX() - Math.sin(angle) * distance;
+        double z = player.getZ() + Math.cos(angle) * distance;
+        int bx = (int) Math.floor(x);
+        int bz = (int) Math.floor(z);
+        BlockPos column = new BlockPos(bx, player.blockPosition().getY(), bz);
+        if (!level.hasChunkAt(column)) return null;
+
+        int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, bx, bz);
+        BlockPos feet = new BlockPos(bx, y, bz);
+        if (y >= level.getMaxBuildHeight() - 2
+                || !level.getBlockState(feet.below()).isFaceSturdy(level, feet.below(), Direction.UP)
+                || !level.getFluidState(feet).isEmpty()
+                || !level.getBlockState(feet).isAir()
+                || !level.getBlockState(feet.above()).isAir()
+                || !level.getBlockState(feet.above(2)).isAir()) return null;
+        return feet;
     }
 
     private static boolean isLookingAt(ServerPlayer player, Entity entity) {
         if (player.distanceToSqr(entity) > 64.0D * 64.0D || !player.hasLineOfSight(entity)) return false;
         Vec3 target = entity.position().add(0.0D, entity.getBbHeight() * 0.5D, 0.0D)
                 .subtract(player.getEyePosition());
+        return target.lengthSqr() < 1.0E-6D
+                || player.getLookAngle().dot(target.normalize()) >= LOOK_DOT_THRESHOLD;
+    }
+
+    private static boolean isLookingAtPosition(ServerPlayer player, BlockPos position) {
+        Vec3 target = Vec3.atCenterOf(position).subtract(player.getEyePosition());
         return target.lengthSqr() < 1.0E-6D
                 || player.getLookAngle().dot(target.normalize()) >= LOOK_DOT_THRESHOLD;
     }
@@ -113,12 +153,15 @@ public final class NullWatcherManager {
         private final UUID playerId;
         private final long expiresAt;
         private long lookedAtSince = -1L;
+        private long lastRelocatedAt;
 
-        private ActiveWatcher(ServerLevel level, UUID entityId, UUID playerId, long expiresAt) {
+        private ActiveWatcher(ServerLevel level, UUID entityId, UUID playerId,
+                              long expiresAt, long lastRelocatedAt) {
             this.level = level;
             this.entityId = entityId;
             this.playerId = playerId;
             this.expiresAt = expiresAt;
+            this.lastRelocatedAt = lastRelocatedAt;
         }
     }
 }
