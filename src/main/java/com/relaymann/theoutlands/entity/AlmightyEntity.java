@@ -2,10 +2,10 @@ package com.relaymann.theoutlands.entity;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerBossEvent;
-import net.minecraft.server.level.BossEvent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.BossEvent;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -16,7 +16,6 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
 
 /** The Almighty's endgame manifestation and final boss encounter. */
 public final class AlmightyEntity extends Monster {
@@ -68,7 +67,6 @@ public final class AlmightyEntity extends Monster {
                     double dz = player.getZ() - getZ();
                     double length = Math.max(0.001D, Math.sqrt(dx * dx + dz * dz));
                     player.push(dx / length * 1.25D, 0.42D, dz / length * 1.25D);
-                    player.hurtMarked = true;
                 }
             }
             level().playSound(null, blockPosition(), SoundEvents.WARDEN_ROAR,

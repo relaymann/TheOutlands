@@ -20,12 +20,12 @@ public final class DeathHuntManager {
     private DeathHuntManager() {}
 
     public static void evaluate(ServerPlayer player) {
+        updateClueInventory(player);
         var level = player.serverLevel();
         if (DistanceProgression.horizontalDistanceFromWorldSpawn(player)
                 < OutlandsConfig.DEATH_FIRST_APPEARANCE_DISTANCE.get()
                 || AlmightyTerritory.contains(level, player.getX(), player.getZ())) return;
 
-        updateClueInventory(player);
         long now = level.getGameTime();
         if (now - HorrorMemory.lastDeathSpawn(player) < RESPAWN_DELAY) return;
         if (!level.getEntitiesOfClass(DeathEntity.class,
