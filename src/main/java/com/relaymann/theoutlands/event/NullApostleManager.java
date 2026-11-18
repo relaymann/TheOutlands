@@ -5,6 +5,8 @@ import com.relaymann.theoutlands.entity.OutlandsEntities;
 import com.relaymann.theoutlands.horror.AlmightyTerritory;
 import com.relaymann.theoutlands.horror.DistanceProgression;
 import com.relaymann.theoutlands.horror.HorrorMemory;
+import com.relaymann.theoutlands.sound.OutlandsSounds;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -42,7 +44,6 @@ public final class NullApostleManager {
         if (apostle == null) return;
         apostle.moveTo(position.getX() + 0.5D, position.getY(), position.getZ() + 0.5D,
                 player.getYRot() + 180.0F, 0.0F);
-        apostle.setSilent(true);
         apostle.setBlessedPlayer(player.getUUID());
         apostle.setNoAi(true);
         // Apostles are mortal and intentionally fragile compared with Null.
@@ -85,6 +86,8 @@ public final class NullApostleManager {
             if (player.hasLineOfSight(apostle) && isLookingAt(player, apostle)) {
                 if (active.lookedAtSince < 0L) active.lookedAtSince = level.getGameTime();
                 if (level.getGameTime() - active.lookedAtSince >= 18L) {
+                    level.playSound(player, apostle.blockPosition(), OutlandsSounds.NULL_APOSTLE_DEPARTURE.get(),
+                            SoundSource.HOSTILE, 0.22F, 0.72F + player.getRandom().nextFloat() * 0.12F);
                     apostle.discard();
                     it.remove();
                 }

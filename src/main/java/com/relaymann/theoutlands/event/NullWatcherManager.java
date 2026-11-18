@@ -48,7 +48,6 @@ public final class NullWatcherManager {
         watcher.moveTo(feet.getX() + 0.5D, feet.getY(), feet.getZ() + 0.5D,
                 player.getYRot() + 180.0F, 0.0F);
         watcher.setInvulnerable(true);
-        watcher.setSilent(true);
         watcher.setPersistenceRequired();
         watcher.addTag("theoutlands_null_watcher");
         if (level.addFreshEntity(watcher)) {
