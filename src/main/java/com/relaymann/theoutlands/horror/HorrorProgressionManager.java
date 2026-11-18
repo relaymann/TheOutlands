@@ -35,7 +35,6 @@ public final class HorrorProgressionManager {
         SNAPSHOTS.put(id, snapshot);
         DECISIONS.put(id, decision);
         if (decision.hasSelectedEvent()) HorrorEventExecutor.execute(player, decision);
-        NullWatcherManager.tick(level);
     }
     public static Optional<HorrorSnapshot> getSnapshot(UUID id) { return Optional.ofNullable(SNAPSHOTS.get(id)); }
     public static Optional<HorrorDecision> getLastDecision(UUID id) { return Optional.ofNullable(DECISIONS.get(id)); }
