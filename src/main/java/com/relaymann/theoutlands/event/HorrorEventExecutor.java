@@ -7,6 +7,8 @@ import com.relaymann.theoutlands.horror.HorrorEventCatalog;
 import com.relaymann.theoutlands.horror.HorrorMemory;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -37,8 +39,14 @@ public final class HorrorEventExecutor {
                 particles(player, ParticleTypes.SMOKE, x, y, z, 3, 0.18D, 0.25D, 0.18D, 0.002D);
             }
             case "false_footsteps" -> {
-                sound(player, SoundEvents.GRASS_STEP, SoundSource.BLOCKS, 0.55F, 0.78F);
-                sound(player, SoundEvents.GRAVEL_STEP, SoundSource.BLOCKS, 0.28F, 0.86F);
+                double stepAngle = random.nextDouble() * Math.PI * 2.0D;
+                double stepDistance = 5.0D + random.nextDouble() * 4.0D;
+                double stepX = player.getX() + Math.cos(stepAngle) * stepDistance;
+                double stepZ = player.getZ() + Math.sin(stepAngle) * stepDistance;
+                positionalSound(player, SoundEvents.GRASS_STEP, SoundSource.BLOCKS, 0.48F, 0.78F,
+                        stepX, player.getY(), stepZ);
+                positionalSound(player, SoundEvents.GRAVEL_STEP, SoundSource.BLOCKS, 0.22F, 0.86F,
+                        stepX + Math.cos(stepAngle) * 1.8D, player.getY(), stepZ + Math.sin(stepAngle) * 1.8D);
             }
             case "distant_figure", "observer", "false_player" -> {
                 spawnNullWatcher(player);
@@ -49,8 +57,12 @@ public final class HorrorEventExecutor {
                 particles(player, ParticleTypes.ASH, x, y + 0.5D, z, 2, 0.12D, 0.2D, 0.12D, 0.0D);
             }
             case "wrong_sounds" -> {
-                sound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.28F, 1.7F);
-                sound(player, SoundEvents.GRAVEL_STEP, SoundSource.BLOCKS, 0.2F, 0.55F);
+                double behindX = player.getX() + Math.sin(Math.toRadians(player.getYRot())) * 7.0D;
+                double behindZ = player.getZ() - Math.cos(Math.toRadians(player.getYRot())) * 7.0D;
+                positionalSound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.24F, 1.7F,
+                        behindX, player.getY() + 1.0D, behindZ);
+                positionalSound(player, SoundEvents.GRAVEL_STEP, SoundSource.BLOCKS, 0.2F, 0.55F,
+                        behindX + 1.5D, player.getY(), behindZ - 1.5D);
             }
             case "environmental_distortion" -> {
                 sound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.5F, 0.45F);
@@ -73,16 +85,32 @@ public final class HorrorEventExecutor {
             }
             case "false_death" -> sound(player, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.18F, 0.55F);
             case "distant_scream" -> {
-                sound(player, SoundEvents.WARDEN_ROAR, SoundSource.HOSTILE, 0.22F, 0.62F);
+                double screamAngle = random.nextDouble() * Math.PI * 2.0D;
+                double screamDistance = 26.0D + random.nextDouble() * 14.0D;
+                double screamX = player.getX() + Math.cos(screamAngle) * screamDistance;
+                double screamZ = player.getZ() + Math.sin(screamAngle) * screamDistance;
+                positionalSound(player, SoundEvents.WARDEN_ROAR, SoundSource.HOSTILE, 0.2F, 0.62F,
+                        screamX, player.getY() + random.nextDouble() * 5.0D - 2.0D, screamZ);
                 particles(player, ParticleTypes.SOUL, x, y + 1.0D, z, 2, 0.12D, 0.3D, 0.12D, 0.0D);
             }
-            case "fear_whisper" -> sound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.2F, 0.55F);
+            case "fear_whisper" -> {
+                double whisperX = player.getX() + Math.sin(Math.toRadians(player.getYRot())) * 1.4D;
+                double whisperZ = player.getZ() - Math.cos(Math.toRadians(player.getYRot())) * 1.4D;
+                positionalSound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.18F, 0.55F,
+                        whisperX, player.getY() + 1.2D, whisperZ);
+            }
             case "fear_presence" -> {
                 FearEncounterManager.showPresence(player);
                 particles(player, ParticleTypes.REVERSE_PORTAL, x, y + 1.0D, z, 8, 0.18D, 0.5D, 0.18D, 0.004D);
                 sound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.28F, 0.4F);
             }
-            case "fear_call" -> sound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.28F, 0.35F);
+            case "fear_call" -> {
+                double callAngle = Math.toRadians(player.getYRot());
+                double callX = player.getX() - Math.sin(callAngle) * 30.0D;
+                double callZ = player.getZ() + Math.cos(callAngle) * 30.0D;
+                positionalSound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.22F, 0.35F,
+                        callX, player.getY() + 2.0D, callZ);
+            }
             case "direct_intervention" -> {
                 sound(player, SoundEvents.WARDEN_ROAR, SoundSource.HOSTILE, 0.3F, 0.55F);
                 // Rare, intentional character dialogue; ordinary events never narrate themselves.
@@ -145,5 +173,17 @@ public final class HorrorEventExecutor {
     }
     private static void sound(ServerPlayer player, SoundEvent sound, SoundSource source, float volume, float pitch) {
         if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) player.playNotifySound(sound, source, volume, pitch);
+    }
+
+    /**
+     * Sends a sound packet only to its intended player while retaining a real world
+     * position. The client therefore gets directional distance attenuation without
+     * leaking a private encounter sound to nearby players.
+     */
+    private static void positionalSound(ServerPlayer player, SoundEvent sound, SoundSource source,
+                                        float volume, float pitch, double x, double y, double z) {
+        if (!OutlandsConfig.HORROR_AUDIO_ENABLED.get()) return;
+        player.connection.send(new ClientboundSoundPacket(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound),
+                source, x, y, z, volume, pitch, player.getRandom().nextLong()));
     }
 }

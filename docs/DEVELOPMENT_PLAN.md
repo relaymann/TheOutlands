@@ -76,7 +76,7 @@
 
 - [ ] Client-side localized ambient audio attenuation (the current hush is a restrained visual cue, not a true audio mute).
 - [ ] Client-only terrain afterimages and silhouette misdirection.
-- [ ] Directional positional audio for player-specific distant sounds.
+- [x] Directional positional audio for player-specific footsteps, wrong-place sounds, distant screams, whispers, and calls (sent only to the target player's connection).
 - [ ] Fear forest biome, structures, ambience, and full territory behavior.
 - [ ] Death hunter AI, territory, structures, and death.jar clue chain.
 - [ ] The Almighty's full encounter and endgame.
