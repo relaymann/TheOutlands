@@ -58,6 +58,15 @@ class HorrorDirectorTest {
         assertTrue(unseen.weightMultiplier("false_death") < 1.0D);
     }
 
+    @Test void settingsCanTuneOrDisableDirectorWithoutLoadingNeoForgeConfig() {
+        var state = new HorrorDirectorState();
+        var snapshot = new HorrorSnapshot(2_000, .69, 2);
+        var disabled = new HorrorSettings(1.0D, 1.0D, false);
+        HorrorDirector.evaluate(snapshot, state, HorrorContext.neutral(), 0, 0, disabled);
+        var result = HorrorDirector.evaluate(snapshot, state, HorrorContext.neutral(), 800, 0, disabled);
+        assertEquals(HorrorDecision.Reason.NO_ELIGIBLE_EVENT, result.reason());
+    }
+
     @Test void expandedEventsHaveUniqueIdsAndRealExecutors() {
         var events = HorrorDirector.getEventDefinitions();
         assertEquals(events.size(), events.stream().map(HorrorEventDefinition::id).distinct().count());

@@ -1,5 +1,6 @@
 package com.relaymann.theoutlands.horror;
 
+import com.relaymann.theoutlands.OutlandsConfig;
 import com.relaymann.theoutlands.event.HorrorEventExecutor;
 import com.relaymann.theoutlands.event.NullWatcherManager;
 import net.minecraft.core.registries.Registries;
@@ -34,8 +35,10 @@ public final class HorrorProgressionManager {
         HorrorContext context = new HorrorContext(key == null ? "unknown" : key.toString(),
                 time >= 13000L && time <= 23000L, level.isRaining(), level.isThundering(),
                 nearby, health, encounterCount, hasSeenNull);
+        HorrorSettings settings = new HorrorSettings(OutlandsConfig.HORROR_INTENSITY.get(),
+                OutlandsConfig.EVENT_FREQUENCY.get(), OutlandsConfig.EVENTS_ENABLED.get());
         HorrorDecision decision = HorrorDirector.evaluate(snapshot, state, context,
-                level.getGameTime(), player.getRandom().nextDouble());
+                level.getGameTime(), player.getRandom().nextDouble(), settings);
         SNAPSHOTS.put(id, snapshot);
         DECISIONS.put(id, decision);
         if (decision.hasSelectedEvent()) HorrorEventExecutor.execute(player, decision);

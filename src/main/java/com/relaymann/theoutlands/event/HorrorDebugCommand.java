@@ -5,6 +5,7 @@ import com.relaymann.theoutlands.TheOutlands;
 import com.relaymann.theoutlands.horror.AlmightyTerritory;
 import com.relaymann.theoutlands.horror.ApostleProgression;
 import com.relaymann.theoutlands.horror.HorrorProgressionManager;
+import com.relaymann.theoutlands.OutlandsConfig;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -35,7 +36,10 @@ public final class HorrorDebugCommand {
                             player.serverLevel(), player.getX(), player.getZ());
                     boolean almightyLand = AlmightyTerritory.contains(
                             player.serverLevel(), player.getX(), player.getZ());
-                    var apostles = ApostleProgression.evaluate(s.distanceFromSpawn(), almightyLand);
+                    var apostles = ApostleProgression.evaluate(s.distanceFromSpawn(), almightyLand,
+                            OutlandsConfig.FEAR_FIRST_APPEARANCE_DISTANCE.get(),
+                            OutlandsConfig.DEATH_FIRST_APPEARANCE_DISTANCE.get(),
+                            OutlandsConfig.FEAR_FULL_TERRITORY_DISTANCE.get());
                     context.getSource().sendSuccess(() -> Component.literal(String.format(
                             "The Outlands | spawn distance %.1f | tier %d | pressure %.2f | %s%s | border distance %.1f | Null eligible %s | Fear intro %s | Fear territory %s | Death intro %s | Death territory %s | Almighty territory %s",
                             s.distanceFromSpawn(), s.escalationTier(), d.pressure(), d.reason(),

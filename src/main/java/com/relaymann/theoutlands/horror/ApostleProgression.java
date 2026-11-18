@@ -1,14 +1,8 @@
 package com.relaymann.theoutlands.horror;
 
-import com.relaymann.theoutlands.OutlandsConfig;
-
 /**
  * Canonical distance milestones for the apostle storyline.
- *
- * <p>These milestones unlock story/territory systems; they do not cap the general
- * horror escalation. The Almighty's border region always takes precedence over
- * Death's territory. Fear's forest territory is a distinct biome region that may
- * exist as an enclave within the broader outer progression.</p>
+ * These are story gates, not a cap on general horror escalation.
  */
 public final class ApostleProgression {
     public static final double FEAR_FIRST_APPEARANCE_DISTANCE = 15_000.0D;
@@ -19,17 +13,19 @@ public final class ApostleProgression {
     }
 
     public static Snapshot evaluate(double distanceFromSpawn, boolean almightyTerritory) {
+        return evaluate(distanceFromSpawn, almightyTerritory,
+                FEAR_FIRST_APPEARANCE_DISTANCE, DEATH_FIRST_APPEARANCE_DISTANCE,
+                FEAR_FULL_TERRITORY_DISTANCE);
+    }
+
+    public static Snapshot evaluate(double distanceFromSpawn, boolean almightyTerritory,
+                                    double fearFirstAppearance, double deathFirstAppearance,
+                                    double fearFullTerritory) {
         double distance = Double.isFinite(distanceFromSpawn) ? Math.max(0.0D, distanceFromSpawn) : 0.0D;
-        boolean almighty = almightyTerritory;
-        boolean deathUnlocked = distance >= OutlandsConfig.DEATH_FIRST_APPEARANCE_DISTANCE.get();
-        return new Snapshot(
-                true,
-                distance >= OutlandsConfig.FEAR_FIRST_APPEARANCE_DISTANCE.get(),
-                distance >= OutlandsConfig.FEAR_FULL_TERRITORY_DISTANCE.get(),
-                deathUnlocked,
-                deathUnlocked && !almighty,
-                almighty
-        );
+        boolean deathUnlocked = distance >= deathFirstAppearance;
+        return new Snapshot(true, distance >= fearFirstAppearance,
+                distance >= fearFullTerritory, deathUnlocked,
+                deathUnlocked && !almightyTerritory, almightyTerritory);
     }
 
     public record Snapshot(
