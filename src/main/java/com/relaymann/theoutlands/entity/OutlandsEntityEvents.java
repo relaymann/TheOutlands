@@ -11,6 +11,7 @@ public final class OutlandsEntityEvents {
 
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent event) {
-        event.put(OutlandsEntities.NULL.get(), NullEntity.createAttributes().build());\n        event.put(OutlandsEntities.FEAR.get(), FearEntity.createAttributes().build());
+        event.put(OutlandsEntities.NULL.get(), NullEntity.createAttributes().build());
+        event.put(OutlandsEntities.FEAR.get(), FearEntity.createAttributes().build());
     }
 }

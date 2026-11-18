@@ -1,6 +1,7 @@
 package com.relaymann.theoutlands.entity;
 
-import com.relaymann.theoutlands.TheOutlands;\nimport com.relaymann.theoutlands.entity.FearEntity;
+import com.relaymann.theoutlands.TheOutlands;
+import com.relaymann.theoutlands.entity.FearEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;

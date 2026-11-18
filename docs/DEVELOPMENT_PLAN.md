@@ -31,7 +31,8 @@
 - [x] Pure geometry for the Almighty's final 5,000-block region using the live configured border center and size.
 - [x] Unit tests for shifted centers, non-default sizes, sides, corners, and boundaries.
 - [x] Server-side entity exclusion from the Almighty territory (players and the tagged Almighty are exempt).
-- [x] Fear first-meeting gate, persistent one-time discovery, registered manifestation entity, dedicated renderer/texture, and timed cleanup.\n- [ ] Fear forest biome, structures, ambience, full territory behavior, and exclusive events.
+- [x] Fear first-meeting gate, persistent one-time discovery, registered manifestation entity, dedicated renderer/texture, and timed cleanup.
+- [ ] Fear forest biome, structures, ambience, full territory behavior, and exclusive events.
 - [ ] Death hunter AI, territory, structures, and death.jar clue chain.
 - [ ] Almighty encounter and endgame.
 
