@@ -17,7 +17,6 @@ public final class HorrorDirector {
             new HorrorEventDefinition("environmental_distortion", 5_000, 13, 4, 3_000, 6),
             new HorrorEventDefinition("missing_terrain", 6_000, 14, 3, 3_800, 6),
             new HorrorEventDefinition("fake_structure", 7_000, 15, 2, 4_800, 7),
-            new HorrorEventDefinition("hostile_warning", 8_000, 14, 3, 3_600, 7),
             new HorrorEventDefinition("the_return", 8_000, 15, 2, 5_000, 8),
             new HorrorEventDefinition("repeated_location", 9_000, 15, 2, 5_400, 7),
             new HorrorEventDefinition("silent_world", 10_000, 16, 2, 6_000, 8),
@@ -28,22 +27,22 @@ public final class HorrorDirector {
             new HorrorEventDefinition("direct_intervention", 15_000, 16, 1, 6_000, 10),
             new HorrorEventDefinition("fear_whisper", 15_000, 14, 2, 5_000, 5),
             new HorrorEventDefinition("fear_presence", 20_000, 16, 1, 8_000, 8),
-            new HorrorEventDefinition("fear_call", 40_000, 17, 1, 10_000, 9));
+            new HorrorEventDefinition("fear_call", 40_000, 17, 1, 10_000, 9),
+            new HorrorEventDefinition("familiar_echo", 1_000, 16, 2, 8_000, 5),
+            new HorrorEventDefinition("environmental_hush", 2_000, 19, 1, 12_000, 8),
+            new HorrorEventDefinition("almighty_influence", 50_000, 35, 1, 24_000, 12));
     private HorrorDirector() {}
     public static List<HorrorEventDefinition> getEventDefinitions() { return EVENTS; }
 
     public static HorrorDecision evaluate(HorrorSnapshot snapshot, HorrorDirectorState state, long time, double roll) {
         return evaluate(snapshot, state, HorrorContext.neutral(), time, roll, HorrorSettings.DEFAULT);
     }
-
     public static HorrorDecision evaluate(HorrorSnapshot snapshot, HorrorDirectorState state,
                                           HorrorContext context, long time, double roll) {
         return evaluate(snapshot, state, context, time, roll, HorrorSettings.DEFAULT);
     }
-
     public static HorrorDecision evaluate(HorrorSnapshot snapshot, HorrorDirectorState state,
-                                          HorrorContext context, long time, double roll,
-                                          HorrorSettings settings) {
+                                          HorrorContext context, long time, double roll, HorrorSettings settings) {
         if (snapshot == null || state == null || context == null || settings == null)
             throw new IllegalArgumentException("Missing director input");
         double distance = snapshot.distanceFromSpawn();
@@ -55,10 +54,9 @@ public final class HorrorDirector {
         updatePressure(state, time, snapshot.escalationValue(), true, settings.intensity());
         if (time - state.lastEncounterGameTime() < minimumQuietPeriod(snapshot.escalationTier()))
             return HorrorDecision.withoutEvent(HorrorDecision.Reason.BREATHING_ROOM, state.pressure());
-        if (!settings.eventsEnabled())
-            return HorrorDecision.withoutEvent(HorrorDecision.Reason.NO_ELIGIBLE_EVENT, state.pressure());
-        if (state.pressure() < EVENT_PRESSURE_THRESHOLD)
-            return HorrorDecision.withoutEvent(HorrorDecision.Reason.BUILDING_PRESSURE, state.pressure());
+        if (!settings.eventsEnabled() || state.pressure() < EVENT_PRESSURE_THRESHOLD)
+            return HorrorDecision.withoutEvent(settings.eventsEnabled() ? HorrorDecision.Reason.BUILDING_PRESSURE
+                    : HorrorDecision.Reason.NO_ELIGIBLE_EVENT, state.pressure());
 
         List<Weighted> eligible = new ArrayList<>();
         double total = 0;
@@ -68,6 +66,7 @@ public final class HorrorDirector {
             if ("the_return".equals(event.id()) && !context.hasSeenNull()) continue;
             if (event.id().startsWith("fear_") && !context.hasMetFear()) continue;
             if ("false_death".equals(event.id()) && context.previousEncounterCount() < 2) continue;
+            if ("almighty_influence".equals(event.id()) && !context.nearAlmightyTerritory()) continue;
             double weight = event.weight() * context.weightMultiplier(event.id()) * settings.eventFrequency();
             if (weight > 0 && Double.isFinite(weight)) { eligible.add(new Weighted(event, weight)); total += weight; }
         }
@@ -89,7 +88,6 @@ public final class HorrorDirector {
     public static long minimumQuietPeriod(int tier) {
         return Math.max(MINIMUM_QUIET_TICKS, MAXIMUM_QUIET_TICKS - (long) Math.max(0, tier) * 70L);
     }
-
     private static void updatePressure(HorrorDirectorState state, long time, double escalation,
                                        boolean active, double intensity) {
         long previous = state.lastEvaluationGameTime();
@@ -100,7 +98,6 @@ public final class HorrorDirector {
         double distanceGain = Math.min(0.45D, Math.log1p(Math.max(0, escalation)) * 0.06D);
         state.setPressure(state.pressure() + (0.35D + distanceGain) * seconds * intensity);
     }
-
     private static long safeAdd(long a, long b) { return b > 0 && a > Long.MAX_VALUE - b ? Long.MAX_VALUE : a + b; }
     private record Weighted(HorrorEventDefinition event, double weight) {}
 }

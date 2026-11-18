@@ -7,13 +7,11 @@ public final class HorrorEventCatalog {
     private static final Set<String> IDS = Set.of(
             "ambient_displacement", "false_footsteps", "distant_figure", "unexplained_message",
             "wrong_sounds", "observer", "environmental_distortion", "missing_terrain",
-            "fake_structure", "the_return", "repeated_location",
-            "silent_world", "entity_imitation", "false_death", "distant_scream",
-            "false_player", "direct_intervention", "fear_whisper", "fear_presence", "fear_call");
+            "fake_structure", "the_return", "repeated_location", "silent_world",
+            "entity_imitation", "false_death", "distant_scream", "false_player",
+            "direct_intervention", "fear_whisper", "fear_presence", "fear_call",
+            "familiar_echo", "environmental_hush", "almighty_influence");
 
     private HorrorEventCatalog() {}
-
-    public static Set<String> ids() {
-        return IDS;
-    }
+    public static Set<String> ids() { return IDS; }
 }

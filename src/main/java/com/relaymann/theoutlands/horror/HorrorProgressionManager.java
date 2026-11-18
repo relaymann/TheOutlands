@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** Server-side derived progression, local context, and transient encounter state. */
+/** Server-side derived progression, behavioral memory, and player-local encounter state. */
 public final class HorrorProgressionManager {
     private static final Map<UUID, HorrorSnapshot> SNAPSHOTS = new ConcurrentHashMap<>();
     private static final Map<UUID, HorrorDirectorState> STATES = new ConcurrentHashMap<>();
@@ -23,6 +23,8 @@ public final class HorrorProgressionManager {
         UUID id = player.getUUID();
         HorrorSnapshot snapshot = DistanceProgression.createSnapshot(player);
         FearEncounterManager.evaluate(player);
+        HorrorMemory.recordBehaviorSample(player);
+        boolean revisited = HorrorMemory.recordLocation(player);
         HorrorDirectorState state = STATES.computeIfAbsent(id, ignored -> new HorrorDirectorState());
         var level = player.serverLevel();
         var key = level.registryAccess().registryOrThrow(Registries.BIOME).getKey(level.getBiome(player.blockPosition()).value());
@@ -34,9 +36,25 @@ public final class HorrorProgressionManager {
         int encounterCount = HorrorMemory.totalEncounters(player);
         boolean hasSeenNull = HorrorMemory.hasDiscovered(player, "null_first_sighting");
         boolean hasMetFear = HorrorMemory.hasDiscovered(player, "fear_first_introduction");
+        double borderDistance = AlmightyTerritory.distanceInsideBorder(level, player.getX(), player.getZ());
+        boolean nearAlmighty = Double.isFinite(borderDistance)
+                && borderDistance >= -128.0D
+                && borderDistance <= OutlandsConfig.ALMIGHTY_TERRITORY_DEPTH.get() + 1_200.0D
+                && level.getGameTime() - HorrorMemory.lastAlmightySign(player) >= 24_000L;
         HorrorContext context = new HorrorContext(key == null ? "unknown" : key.toString(),
                 time >= 13000L && time <= 23000L, level.isRaining(), level.isThundering(),
-                nearby, health, encounterCount, hasSeenNull, hasMetFear);
+                nearby, health, encounterCount, hasSeenNull, hasMetFear,
+                HorrorMemory.lookBackCount(player), HorrorMemory.pauseCount(player), nearAlmighty);
+
+        // A return to a remembered area can trigger a one-player-only distortion.
+        long now = level.getGameTime();
+        if (revisited && snapshot.escalationValue() > 0.0D
+                && now - HorrorMemory.lastFamiliarDistortion(player) >= 6_000L
+                && player.getRandom().nextInt(4) == 0) {
+            HorrorEventExecutor.executeFamiliarPlaceDistortion(player);
+            HorrorMemory.setLastFamiliarDistortion(player, now);
+        }
+
         HorrorSettings settings = new HorrorSettings(OutlandsConfig.HORROR_INTENSITY.get(),
                 OutlandsConfig.EVENT_FREQUENCY.get(), OutlandsConfig.EVENTS_ENABLED.get());
         HorrorDecision decision = HorrorDirector.evaluate(snapshot, state, context,

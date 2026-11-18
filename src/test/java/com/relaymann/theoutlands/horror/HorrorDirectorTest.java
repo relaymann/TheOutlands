@@ -59,6 +59,24 @@ class HorrorDirectorTest {
         assertTrue(seen.weightMultiplier("distant_figure") < unseen.weightMultiplier("distant_figure"));
         assertTrue(unseen.weightMultiplier("false_death") < 1.0D);
     }
+    @Test void almightyInfluenceRequiresBorderTerritoryContext() {
+        var snapshot = new HorrorSnapshot(50_000, 3.0, 6);
+        var outside = new HorrorDirectorState();
+        outside.setPressure(50.0D);
+        outside.setLastEvaluationGameTime(0);
+        outside.setLastEncounterGameTime(0);
+        var outsideResult = HorrorDirector.evaluate(snapshot, outside, new HorrorContext("minecraft:plains", false, false, false, 0, 1), 800, Math.nextDown(1.0));
+        assertNotEquals("almighty_influence", outsideResult.eventId());
+
+        var inside = new HorrorDirectorState();
+        var context = new HorrorContext("minecraft:plains", false, false, false, 0, 1, 0, false, false, 0, 0, true);
+        inside.setPressure(50.0D);
+        inside.setLastEvaluationGameTime(0);
+        inside.setLastEncounterGameTime(0);
+        var insideResult = HorrorDirector.evaluate(snapshot, inside, context, 800, Math.nextDown(1.0));
+        assertEquals("almighty_influence", insideResult.eventId());
+    }
+
     @Test void settingsCanTuneOrDisableDirectorWithoutLoadingNeoForgeConfig() {
         var state = new HorrorDirectorState();
         var snapshot = new HorrorSnapshot(2_000, .69, 2);
@@ -71,7 +89,7 @@ class HorrorDirectorTest {
         var ids = HorrorDirector.getEventDefinitions().stream().map(HorrorEventDefinition::id).collect(Collectors.toSet());
         assertEquals(HorrorDirector.getEventDefinitions().size(), ids.size());
         assertEquals(ids, HorrorEventCatalog.ids());
-        assertTrue(ids.containsAll(Set.of("false_death", "unexplained_message", "the_return",
+        assertTrue(ids.containsAll(Set.of("false_death", "unexplained_message", "the_return", "familiar_echo", "environmental_hush", "almighty_influence",
                 "false_player", "wrong_sounds", "missing_terrain", "observer", "fake_structure", "fear_whisper", "fear_presence", "fear_call",
                 "repeated_location", "silent_world", "entity_imitation", "distant_scream")));
     }

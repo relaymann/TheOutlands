@@ -15,34 +15,30 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * Manages short-lived Null sightings. Sightings relocate to safe, loaded hiding
- * positions while the target is not looking, disappear when approached or observed,
- * and gradually become closer and more persistent after repeated encounters.
- */
+/** Player-specific Null sightings that adapt to remembered places and observed behavior. */
 public final class NullWatcherManager {
     private static final long EYE_CONTACT_DELAY = 12L;
     private static final double LOOK_DOT_THRESHOLD = 0.965D;
     private static final double APPROACH_DISTANCE_SQR = 5.0D * 5.0D;
     private static final Map<UUID, ActiveWatcher> ACTIVE = new HashMap<>();
-
     private NullWatcherManager() {}
 
     public static void spawn(ServerPlayer player) {
         ServerLevel level = player.serverLevel();
         UUID playerId = player.getUUID();
-        if (ACTIVE.values().stream().anyMatch(watcher ->
-                watcher.level == level && watcher.playerId.equals(playerId))) return;
+        if (ACTIVE.values().stream().anyMatch(watcher -> watcher.level == level && watcher.playerId.equals(playerId))) return;
 
         int priorSightings = (int) HorrorMemory.recentEncounters(player).stream()
-                .filter(id -> id.equals("distant_figure") || id.equals("the_return")).count();
-        priorSightings = Math.max(0, priorSightings - 1);
-        NullStalkingProfile profile = NullStalkingProfile.fromPreviousSightings(priorSightings);
+                .filter(id -> id.equals("distant_figure") || id.equals("the_return") || id.equals("observer")).count();
+        NullStalkingProfile profile = NullStalkingProfile.fromPlayerHistory(priorSightings,
+                HorrorMemory.lookBackCount(player), HorrorMemory.pauseCount(player), HorrorMemory.flightCount(player));
 
-        BlockPos feet = findSafeHidingPosition(player, profile);
+        BlockPos feet = findRememberedHidingPosition(player, profile);
+        if (feet == null) feet = findSafeHidingPosition(player, profile);
         if (feet == null) return;
         NullEntity watcher = OutlandsEntities.NULL.get().create(level);
         if (watcher == null) return;
@@ -52,7 +48,6 @@ public final class NullWatcherManager {
         watcher.setSilent(true);
         watcher.setPersistenceRequired();
         watcher.addTag("theoutlands_null_watcher");
-
         if (level.addFreshEntity(watcher)) {
             long now = level.getGameTime();
             ACTIVE.put(watcher.getUUID(), new ActiveWatcher(level, watcher.getUUID(), playerId,
@@ -61,7 +56,6 @@ public final class NullWatcherManager {
         }
     }
 
-    /** Visits only managed watcher UUIDs; safe when several players update together. */
     public static void tick(ServerLevel level) {
         Iterator<Map.Entry<UUID, ActiveWatcher>> it = ACTIVE.entrySet().iterator();
         while (it.hasNext()) {
@@ -73,33 +67,24 @@ public final class NullWatcherManager {
                 it.remove();
                 continue;
             }
-
             var trackedPlayer = level.getPlayerByUUID(watcher.playerId);
-            if (!(trackedPlayer instanceof ServerPlayer target)
-                    || !target.isAlive() || target.isRemoved()) {
-                entity.discard();
-                it.remove();
-                continue;
+            if (!(trackedPlayer instanceof ServerPlayer target) || !target.isAlive() || target.isRemoved()) {
+                entity.discard(); it.remove(); continue;
             }
-
             if (target.distanceToSqr(entity) <= APPROACH_DISTANCE_SQR) {
-                entity.discard();
-                it.remove();
-                continue;
+                entity.discard(); it.remove(); continue;
             }
-
             if (isLookingAt(target, entity)) {
                 if (watcher.lookedAtSince < 0L) watcher.lookedAtSince = level.getGameTime();
                 if (level.getGameTime() - watcher.lookedAtSince >= EYE_CONTACT_DELAY) {
-                    entity.discard();
-                    it.remove();
+                    entity.discard(); it.remove();
                 }
                 continue;
             }
-
             watcher.lookedAtSince = -1L;
             if (level.getGameTime() - watcher.lastRelocatedAt >= watcher.profile.relocationIntervalTicks()) {
-                BlockPos hidingPosition = findSafeHidingPosition(target, watcher.profile);
+                BlockPos hidingPosition = findRememberedHidingPosition(target, watcher.profile);
+                if (hidingPosition == null) hidingPosition = findSafeHidingPosition(target, watcher.profile);
                 if (hidingPosition != null && !isLookingAtPosition(target, hidingPosition)) {
                     entity.moveTo(hidingPosition.getX() + 0.5D, hidingPosition.getY(),
                             hidingPosition.getZ() + 0.5D, target.getYRot() + 180.0F, 0.0F);
@@ -109,12 +94,30 @@ public final class NullWatcherManager {
         }
     }
 
+    /** Null may reuse the player's own remembered places, but only in already-loaded chunks. */
+    private static BlockPos findRememberedHidingPosition(ServerPlayer player, NullStalkingProfile profile) {
+        List<BlockPos> remembered = HorrorMemory.rememberedLocations(player);
+        if (remembered.isEmpty()) return null;
+        ServerLevel level = player.serverLevel();
+        for (int i = remembered.size() - 1; i >= 0; i--) {
+            BlockPos rememberedCell = remembered.get(i);
+            if (!level.hasChunkAt(rememberedCell)) continue;
+            double distance = Math.sqrt(player.position().distanceToSqr(rememberedCell.getX() + 16.5D,
+                    player.getY(), rememberedCell.getZ() + 16.5D));
+            if (distance < profile.minimumDistance() || distance > profile.maximumDistance() + 28.0D) continue;
+            int x = rememberedCell.getX() + 16;
+            int z = rememberedCell.getZ() + 16;
+            int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+            BlockPos candidate = new BlockPos(x, y, z);
+            if (isSafeStandingPosition(level, candidate)) return candidate;
+        }
+        return null;
+    }
+
     private static BlockPos findSafeHidingPosition(ServerPlayer player, NullStalkingProfile profile) {
         ServerLevel level = player.serverLevel();
         double yaw = Math.toRadians(player.getYRot());
         BlockPos visibleFallback = null;
-
-        // Prefer already-loaded natural cover. No chunk is requested or generated here.
         for (int attempt = 0; attempt < 10; attempt++) {
             double angle = yaw + (player.getRandom().nextDouble() - 0.5D)
                     * (attempt < 5 ? 1.2D : Math.PI * 2.0D);
@@ -124,40 +127,36 @@ public final class NullWatcherManager {
             int bz = (int) Math.floor(player.getZ() + Math.cos(angle) * distance);
             BlockPos column = new BlockPos(bx, player.blockPosition().getY(), bz);
             if (!level.hasChunkAt(column)) continue;
-
             int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, bx, bz);
             BlockPos feet = new BlockPos(bx, y, bz);
-            if (y >= level.getMaxBuildHeight() - 2
-                    || !level.getBlockState(feet.below()).isFaceSturdy(level, feet.below(), Direction.UP)
-                    || !level.getFluidState(feet).isEmpty()
-                    || !level.getBlockState(feet).isAir()
-                    || !level.getBlockState(feet.above()).isAir()
-                    || !level.getBlockState(feet.above(2)).isAir()) continue;
-
+            if (!isSafeStandingPosition(level, feet)) continue;
             if (visibleFallback == null) visibleFallback = feet;
-            Vec3 eye = player.getEyePosition();
             Vec3 target = Vec3.atCenterOf(feet).add(0.0D, 0.9D, 0.0D);
-            boolean concealed = level.clip(new ClipContext(eye, target,
+            boolean concealed = level.clip(new ClipContext(player.getEyePosition(), target,
                     ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player)).getType() == HitResult.Type.BLOCK;
             if (concealed) return feet;
         }
         return visibleFallback;
     }
 
+    private static boolean isSafeStandingPosition(ServerLevel level, BlockPos feet) {
+        return feet.getY() < level.getMaxBuildHeight() - 2
+                && level.getBlockState(feet.below()).isFaceSturdy(level, feet.below(), Direction.UP)
+                && level.getFluidState(feet).isEmpty()
+                && level.getBlockState(feet).isAir()
+                && level.getBlockState(feet.above()).isAir()
+                && level.getBlockState(feet.above(2)).isAir();
+    }
+
     private static boolean isLookingAt(ServerPlayer player, Entity entity) {
         if (player.distanceToSqr(entity) > 64.0D * 64.0D || !player.hasLineOfSight(entity)) return false;
-        Vec3 target = entity.position().add(0.0D, entity.getBbHeight() * 0.5D, 0.0D)
-                .subtract(player.getEyePosition());
-        return target.lengthSqr() < 1.0E-6D
-                || player.getLookAngle().dot(target.normalize()) >= LOOK_DOT_THRESHOLD;
+        Vec3 target = entity.position().add(0.0D, entity.getBbHeight() * 0.5D, 0.0D).subtract(player.getEyePosition());
+        return target.lengthSqr() < 1.0E-6D || player.getLookAngle().dot(target.normalize()) >= LOOK_DOT_THRESHOLD;
     }
-
     private static boolean isLookingAtPosition(ServerPlayer player, BlockPos position) {
         Vec3 target = Vec3.atCenterOf(position).subtract(player.getEyePosition());
-        return target.lengthSqr() < 1.0E-6D
-                || player.getLookAngle().dot(target.normalize()) >= LOOK_DOT_THRESHOLD;
+        return target.lengthSqr() < 1.0E-6D || player.getLookAngle().dot(target.normalize()) >= LOOK_DOT_THRESHOLD;
     }
-
     public static void clear() {
         for (ActiveWatcher watcher : ACTIVE.values()) {
             Entity entity = watcher.level.getEntity(watcher.entityId);
@@ -165,7 +164,6 @@ public final class NullWatcherManager {
         }
         ACTIVE.clear();
     }
-
     private static final class ActiveWatcher {
         private final ServerLevel level;
         private final UUID entityId;
@@ -174,15 +172,10 @@ public final class NullWatcherManager {
         private final NullStalkingProfile profile;
         private long lookedAtSince = -1L;
         private long lastRelocatedAt;
-
-        private ActiveWatcher(ServerLevel level, UUID entityId, UUID playerId,
-                              long expiresAt, long lastRelocatedAt, NullStalkingProfile profile) {
-            this.level = level;
-            this.entityId = entityId;
-            this.playerId = playerId;
-            this.expiresAt = expiresAt;
-            this.lastRelocatedAt = lastRelocatedAt;
-            this.profile = profile;
+        private ActiveWatcher(ServerLevel level, UUID entityId, UUID playerId, long expiresAt,
+                              long lastRelocatedAt, NullStalkingProfile profile) {
+            this.level = level; this.entityId = entityId; this.playerId = playerId;
+            this.expiresAt = expiresAt; this.lastRelocatedAt = lastRelocatedAt; this.profile = profile;
         }
     }
 }

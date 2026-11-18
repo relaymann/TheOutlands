@@ -6,7 +6,7 @@ The Overworld begins as recognizable vanilla Minecraft. Once players travel beyo
 
 ## Project status
 
-Early foundation — the initial mod framework and distance-progression model are being established. This repository is not yet a playable horror release.
+The current foundation includes distance-based horror progression, a player-specific encounter director, persistent ARG discoveries, Null watcher sightings, Fear's first encounter, and the **The World Remembers** milestone: coarse location memory, behavioral tracking, adaptive Null stalking, familiar-place anomalies, restrained environmental cues, and rare Almighty influence. This is an active development build, not yet a finished release.
 
 ## Technical target
 
@@ -26,6 +26,11 @@ Early foundation — the initial mod framework and distance-progression model ar
 - Combine grounded encounters with supernatural world manipulation.
 - Make the Overworld the primary experience all the way to the world's configured border.
 - Support multiplayer with player-specific experiences alongside shared world events.
+- Persist bounded, per-player behavioral and location memory across logout and respawn.
+- Keep familiar-place anomalies private to the returning player and never overwrite player-built blocks.
+- Make Null adapt to prior sightings, look-backs, pauses, and repeated locations.
+- Keep horror cues sparse and diegetic; ordinary events never explain themselves in chat or actionbar.
+- Gate rare Almighty influence by proximity to the configured world-border territory.
 
 ## Known hierarchy
 

@@ -24,6 +24,15 @@ class NullStalkingProfileTest {
     }
 
     @Test
+    void behaviorChangesNullsDistanceAndRelocationPattern() {
+        var calm = NullStalkingProfile.fromPlayerHistory(0, 0, 0, 0);
+        var watched = NullStalkingProfile.fromPlayerHistory(0, 10, 10, 20);
+        assertTrue(watched.minimumDistance() < calm.minimumDistance());
+        assertTrue(watched.relocationIntervalTicks() < calm.relocationIntervalTicks());
+        assertTrue(watched.lifetimeTicks() >= calm.lifetimeTicks());
+    }
+
+    @Test
     void adaptationHasSafeBounds() {
         var repeated = NullStalkingProfile.fromPreviousSightings(Integer.MAX_VALUE);
         assertEquals(140L, repeated.lifetimeTicks());
