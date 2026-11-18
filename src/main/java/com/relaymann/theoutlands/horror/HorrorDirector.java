@@ -25,7 +25,10 @@ public final class HorrorDirector {
             new HorrorEventDefinition("false_death", 12_000, 17, 1, 7_200, 10),
             new HorrorEventDefinition("distant_scream", 13_000, 17, 2, 6_800, 9),
             new HorrorEventDefinition("false_player", 14_000, 18, 1, 7_500, 10),
-            new HorrorEventDefinition("direct_intervention", 15_000, 16, 1, 6_000, 10));
+            new HorrorEventDefinition("direct_intervention", 15_000, 16, 1, 6_000, 10),
+            new HorrorEventDefinition("fear_whisper", 15_000, 14, 2, 5_000, 5),
+            new HorrorEventDefinition("fear_presence", 20_000, 16, 1, 8_000, 8),
+            new HorrorEventDefinition("fear_call", 40_000, 17, 1, 10_000, 9));
     private HorrorDirector() {}
     public static List<HorrorEventDefinition> getEventDefinitions() { return EVENTS; }
 
@@ -62,7 +65,7 @@ public final class HorrorDirector {
         for (HorrorEventDefinition event : EVENTS) {
             if (distance < event.minimumDistance() || state.pressure() < event.minimumPressure()
                     || state.isCoolingDown(event.id(), time) || state.wasRecentlySelected(event.id())) continue;
-            if ("the_return".equals(event.id()) && !context.hasSeenNull()) continue;
+            if ("the_return".equals(event.id()) && !context.hasSeenNull()) continue;\n            if (event.id().startsWith("fear_") && !context.hasMetFear()) continue;
             if ("false_death".equals(event.id()) && context.previousEncounterCount() < 2) continue;
             double weight = event.weight() * context.weightMultiplier(event.id()) * settings.eventFrequency();
             if (weight > 0 && Double.isFinite(weight)) { eligible.add(new Weighted(event, weight)); total += weight; }

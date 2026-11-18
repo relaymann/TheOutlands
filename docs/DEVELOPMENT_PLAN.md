@@ -35,7 +35,7 @@
 - [x] Unit tests for shifted centers, non-default sizes, sides, corners, and boundaries.
 - [x] Server-side entity exclusion from the Almighty territory (players and the tagged Almighty are exempt).
 - [x] Fear first-meeting gate, persistent one-time discovery, registered manifestation entity, dedicated renderer/texture, and timed cleanup.
-- [ ] Fear forest biome, structures, ambience, full territory behavior, and exclusive events.
+- [x] Fear-specific post-introduction encounter gates and three dedicated event families (whisper, presence, call) with player-local effects.\n- [ ] Fear forest biome, structures, ambience, full territory behavior, and fully developed exclusive events.
 - [ ] Death hunter AI, territory, structures, and death.jar clue chain.
 - [ ] Almighty encounter and endgame.
 

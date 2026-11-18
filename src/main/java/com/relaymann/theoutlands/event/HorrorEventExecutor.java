@@ -105,6 +105,18 @@ public final class HorrorEventExecutor {
                 spawnNullWatcher(player);
                 player.displayClientMessage(Component.literal("Someone is standing where you were looking."), true);
             }
+            case "fear_whisper" -> {
+                sound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.3F, 0.55F);
+                player.displayClientMessage(Component.literal("§5[?] §7I remember you."), true);
+            }
+            case "fear_presence" -> {
+                particles(player, ParticleTypes.REVERSE_PORTAL, x, y + 1.0D, z, 18, 0.25D, 0.8D, 0.25D, 0.01D);
+                sound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.45F, 0.4F);
+            }
+            case "fear_call" -> {
+                sound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.5F, 0.35F);
+                player.displayClientMessage(Component.literal("Something is calling you further out."), true);
+            }
             case "direct_intervention" -> {
                 sound(player, SoundEvents.WARDEN_ROAR, SoundSource.HOSTILE, 0.65F, 0.55F);
                 player.sendSystemMessage(Component.literal("§8[Null] §7I know where you are."));

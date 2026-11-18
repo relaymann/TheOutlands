@@ -3,10 +3,15 @@ package com.relaymann.theoutlands.horror;
 /** Player-local conditions and remembered history supplied to the Horror Director. */
 public record HorrorContext(String biomeId, boolean night, boolean raining, boolean thundering,
                             int nearbyPlayers, float healthFraction,
-                            int previousEncounterCount, boolean hasSeenNull) {
+                            int previousEncounterCount, boolean hasSeenNull, boolean hasMetFear) {
     public HorrorContext(String biomeId, boolean night, boolean raining, boolean thundering,
                          int nearbyPlayers, float healthFraction) {
-        this(biomeId, night, raining, thundering, nearbyPlayers, healthFraction, 0, false);
+        this(biomeId, night, raining, thundering, nearbyPlayers, healthFraction, 0, false, false);
+    }
+
+    public HorrorContext(String biomeId, boolean night, boolean raining, boolean thundering,
+                         int nearbyPlayers, float healthFraction, int previousEncounterCount, boolean hasSeenNull) {
+        this(biomeId, night, raining, thundering, nearbyPlayers, healthFraction, previousEncounterCount, hasSeenNull, false);
     }
 
     public HorrorContext {
@@ -17,7 +22,7 @@ public record HorrorContext(String biomeId, boolean night, boolean raining, bool
     }
 
     public static HorrorContext neutral() {
-        return new HorrorContext("unknown", false, false, false, 0, 1.0F, 0, false);
+        return new HorrorContext("unknown", false, false, false, 0, 1.0F, 0, false, false);
     }
 
     public double weightMultiplier(String id) {
@@ -42,6 +47,8 @@ public record HorrorContext(String biomeId, boolean night, boolean raining, bool
         if ("entity_imitation".equals(id) && nearbyPlayers > 0) weight *= 1.15D;
         if ("distant_scream".equals(id) && (night || biomeId.contains("forest"))) weight *= 1.4D;
         if ("false_player".equals(id) && hasSeenNull) weight *= 1.3D;
+        if (id.startsWith("fear_") && hasMetFear && night) weight *= 1.25D;
+        if ("fear_presence".equals(id) && nearbyPlayers == 0) weight *= 1.2D;
         return weight;
     }
 }

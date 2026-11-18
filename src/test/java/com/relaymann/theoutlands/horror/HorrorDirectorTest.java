@@ -72,7 +72,7 @@ class HorrorDirectorTest {
         assertEquals(HorrorDirector.getEventDefinitions().size(), ids.size());
         assertEquals(ids, HorrorEventCatalog.ids());
         assertTrue(ids.containsAll(Set.of("false_death", "unexplained_message", "the_return",
-                "false_player", "wrong_sounds", "missing_terrain", "observer", "fake_structure",
+                "false_player", "wrong_sounds", "missing_terrain", "observer", "fake_structure", "fear_whisper", "fear_presence", "fear_call",
                 "repeated_location", "silent_world", "entity_imitation", "distant_scream")));
     }
 }

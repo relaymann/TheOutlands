@@ -9,7 +9,7 @@ public final class HorrorEventCatalog {
             "wrong_sounds", "observer", "environmental_distortion", "missing_terrain",
             "fake_structure", "hostile_warning", "the_return", "repeated_location",
             "silent_world", "entity_imitation", "false_death", "distant_scream",
-            "false_player", "direct_intervention");
+            "false_player", "direct_intervention", "fear_whisper", "fear_presence", "fear_call");
 
     private HorrorEventCatalog() {}
 
