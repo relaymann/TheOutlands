@@ -32,8 +32,7 @@ public final class HorrorProgressionManager {
                 other -> !other.getUUID().equals(id)).size();
         float health = player.getMaxHealth() <= 0.0F ? 1.0F : player.getHealth() / player.getMaxHealth();
         int encounterCount = HorrorMemory.totalEncounters(player);
-        boolean hasSeenNull = HorrorMemory.hasEncountered(player, "distant_figure")
-                || HorrorMemory.hasEncountered(player, "the_return");
+        boolean hasSeenNull = HorrorMemory.hasDiscovered(player, "null_first_sighting");
         HorrorContext context = new HorrorContext(key == null ? "unknown" : key.toString(),
                 time >= 13000L && time <= 23000L, level.isRaining(), level.isThundering(),
                 nearby, health, encounterCount, hasSeenNull);

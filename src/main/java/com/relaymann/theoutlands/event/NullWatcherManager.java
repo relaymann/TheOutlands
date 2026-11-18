@@ -57,6 +57,7 @@ public final class NullWatcherManager {
             long now = level.getGameTime();
             ACTIVE.put(watcher.getUUID(), new ActiveWatcher(level, watcher.getUUID(), playerId,
                     now + profile.lifetimeTicks(), now, profile));
+            HorrorMemory.recordDiscovery(player, "null_first_sighting");
         }
     }
 
