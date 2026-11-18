@@ -15,7 +15,7 @@
 - [x] Configurable horror intensity, event frequency, and event enablement.
 - [x] Persistent player encounter counts, recent history, and discovery storage API.
 - [x] Player history influences event selection.
-- [x] Expand the director catalog to 18 event families with unique gates, cooldowns, context weighting, and bounded player-local effects.
+- [x] Expand the director catalog to 21 event families (including three Fear-specific post-introduction families) with unique gates, cooldowns, context weighting, and bounded player-local effects.
 - [x] All 18 director IDs have explicit server-side handlers, and tests assert the catalog and handler sets match.
 - [ ] Finish true client-side audio muting, terrain afterimages, fake-player rendering, and world-generation event variants (current cues are deliberately non-destructive approximations).
 
