@@ -3,6 +3,7 @@ package com.relaymann.theoutlands.event;
 import com.mojang.brigadier.Command;
 import com.relaymann.theoutlands.TheOutlands;
 import com.relaymann.theoutlands.horror.AlmightyTerritory;
+import com.relaymann.theoutlands.horror.ApostleProgression;
 import com.relaymann.theoutlands.horror.HorrorProgressionManager;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -34,11 +35,17 @@ public final class HorrorDebugCommand {
                             player.serverLevel(), player.getX(), player.getZ());
                     boolean almightyLand = AlmightyTerritory.contains(
                             player.serverLevel(), player.getX(), player.getZ());
+                    var apostles = ApostleProgression.evaluate(s.distanceFromSpawn(), almightyLand);
                     context.getSource().sendSuccess(() -> Component.literal(String.format(
-                            "The Outlands | spawn distance %.1f | tier %d | pressure %.2f | %s%s | border distance %.1f | Almighty territory %s",
+                            "The Outlands | spawn distance %.1f | tier %d | pressure %.2f | %s%s | border distance %.1f | Null eligible %s | Fear intro %s | Fear territory %s | Death intro %s | Death territory %s | Almighty territory %s",
                             s.distanceFromSpawn(), s.escalationTier(), d.pressure(), d.reason(),
                             d.eventId() == null ? "" : " (" + d.eventId() + ")",
-                            borderDistance, almightyLand ? "YES" : "no")), false);
+                            borderDistance, apostles.nullMayAppear() ? "YES" : "no",
+                            apostles.fearIntroductionUnlocked() ? "YES" : "no",
+                            apostles.fearFullTerritoryUnlocked() ? "YES" : "no",
+                            apostles.deathIntroductionUnlocked() ? "YES" : "no",
+                            apostles.deathTerritoryActive() ? "YES" : "no",
+                            apostles.almightyTerritoryActive() ? "YES" : "no")), false);
                     return Command.SINGLE_SUCCESS;
                 })));
     }

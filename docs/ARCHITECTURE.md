@@ -9,25 +9,30 @@ The original shared Overworld spawn is the fixed distance origin. The first 1,00
 
 The director evaluates once per second, builds per-player pressure, enforces a distance-scaled quiet period, and selects weighted encounters. Context includes biome, night/day, rain, thunder, nearby-player count, and health. Context changes weights only; it cannot bypass minimum distance, pressure, cooldown, or quiet-period gates.
 
-Selected encounters execute on the logical server. Ambient displacement, false footsteps, distant figures, environmental distortion, hostile warnings, and direct intervention produce player-targeted audio, particles, and/or messages. Events do not alter blocks or force-load chunks.
+Selected encounters execute on the logical server. Ambient displacement, false footsteps, distant figures, environmental distortion, hostile warnings, direct intervention, private unexplained messages, false-death messages, and returning-observer encounters are executable. These events do not alter blocks or force-load chunks.
+
+## Apostle milestone model
+`ApostleProgression` centralizes the canonical story thresholds: Fear's first appearance at 15,000 blocks, Death's first appearance at 50,000 blocks, and Fear's full-territory milestone at 100,000 blocks. Null remains eligible at any distance. The Almighty's final territory overrides Death's territory. These are progression gates, not a cap on general horror escalation.
+
+This milestone model is currently used for operator diagnostics. It does not yet spawn Fear or Death, generate the Fear biome, or persist apostle story encounters.
 
 ## Almighty border geometry
-`AlmightyTerritory` measures the inward distance to the nearest edge of the live square world border. It reads the border's configured center and size from the level and defines the final 5,000-block strip on all four sides, including corners. Positions outside the border are excluded. The geometry is isolated and unit-tested against shifted centers, non-default sizes, all sides, corners, and boundary conditions.
+`AlmightyTerritory` measures the inward distance to the nearest edge of the live square world border. It reads the border's configured center and size from the level and defines the final 5,000-block strip on all four sides, including corners. Positions outside the border are excluded. The geometry is isolated and unit-tested against shifted centers, non-default sizes, all sides, and boundary conditions.
 
 This is currently a geometry and diagnostics foundation. It does not yet enforce entity exclusion or implement the Almighty encounter.
 
-## Null's visual identity
-Null is a dedicated registered entity, not an Enderman or disguised player. The renderer uses the vanilla humanoid/player body proportions with a 64x64 custom skin. The intended texture is opaque pure black across the entire body and head, with exactly two white eye marks on the front of the head. No clothing, armor, pupils, or additional facial features are present.
+## Null's visual identity and sightings
+Null is a dedicated registered entity, not an Enderman or disguised player. The renderer uses vanilla humanoid/player proportions with a 64x64 custom skin. The PNG is 64x64 RGBA, fully opaque black except for eight white pixels forming two separated 2x2 eye marks on the front of the head.
 
-The current sighting behavior creates a temporary invulnerable, silent Null that watches nearby players without attacking or wandering. This is an initial observer behavior, not the finished long-range stalking system or final animation suite.
+The current sighting manager creates temporary invulnerable, silent Null entities at safe positions in already-loaded chunks. They watch the target, disappear after sustained eye contact or close approach, and can relocate to another safe hiding position while unobserved. This remains an initial stalker behavior, not the finished long-range stalking intelligence or final animation suite.
 
-Operators can use `/theoutlands debug` (permission level 2) to inspect spawn distance, escalation tier, pressure, the latest director result, signed distance to the configured border, and whether the player is inside the Almighty's final region.
+Operators can use `/theoutlands debug` (permission level 2) to inspect spawn distance, escalation tier, pressure, the latest director result, border distance, and apostle milestone eligibility.
 
 ## Multiplayer and performance
 The server owns selection and execution. Targeted effects go only to the selected player. Progression runs once per second and performs one bounded nearby-player query. Watcher cleanup visits only tracked UUIDs. No chunk is force-loaded and no player-built blocks are modified.
 
 ## Planned
-Null's advanced stalker AI, custom animations, apostles, persistent player memories, Fear biome/structures, Death hunter, entity exclusion from the Almighty territory, configured-border-relative finale, custom audio, and ARG content remain future work.
+Advanced Null behavior adaptation, false sightings, custom animations, persistent player memories, Null's apostles, Fear and Death entities, Fear biome/structures, Death hunting AI, entity exclusion from the Almighty territory, configured-border-relative finale, custom audio, and ARG content remain future work.
 
 ## Testing
-Pure tests cover opening-range protection, pacing, cooldown boundaries, safe random rolls, contextual weighting, and Almighty territory geometry. Client/server and multiplayer smoke tests remain release requirements.
+Pure tests cover opening-range protection, pacing, cooldown boundaries, safe random rolls, contextual weighting, Almighty territory geometry, and apostle milestone boundaries. Client/server and multiplayer smoke tests remain release requirements.
