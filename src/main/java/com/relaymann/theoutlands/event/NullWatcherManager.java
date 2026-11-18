@@ -42,7 +42,7 @@ public final class NullWatcherManager {
 
         int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, bx, bz);
         BlockPos feet = new BlockPos(bx, y, bz);
-        if (y >= level.getMaxY() - 2
+        if (y >= level.getMaxBuildHeight() - 2
                 || !level.getBlockState(feet.below()).isFaceSturdy(level, feet.below(), Direction.UP)
                 || !level.getFluidState(feet).isEmpty()
                 || !level.getBlockState(feet).isAir()
@@ -76,8 +76,9 @@ public final class NullWatcherManager {
                 continue;
             }
 
-            ServerPlayer target = level.getPlayerByUUID(watcher.playerId);
-            if (target == null || !target.isAlive() || !isLookingAt(target, entity)) {
+            var trackedPlayer = level.getPlayerByUUID(watcher.playerId);
+            if (!(trackedPlayer instanceof ServerPlayer target)
+                    || !target.isAlive() || !isLookingAt(target, entity)) {
                 watcher.lookedAtSince = -1L;
                 continue;
             }
