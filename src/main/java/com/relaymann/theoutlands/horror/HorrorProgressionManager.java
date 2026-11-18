@@ -28,14 +28,19 @@ public final class HorrorProgressionManager {
                 new AABB(player.blockPosition()).inflate(48.0D),
                 other -> !other.getUUID().equals(id)).size();
         float health = player.getMaxHealth() <= 0.0F ? 1.0F : player.getHealth() / player.getMaxHealth();
+        int encounterCount = HorrorMemory.totalEncounters(player);
+        boolean hasSeenNull = HorrorMemory.hasEncountered(player, "distant_figure")
+                || HorrorMemory.hasEncountered(player, "the_return");
         HorrorContext context = new HorrorContext(key == null ? "unknown" : key.toString(),
-                time >= 13000L && time <= 23000L, level.isRaining(), level.isThundering(), nearby, health);
+                time >= 13000L && time <= 23000L, level.isRaining(), level.isThundering(),
+                nearby, health, encounterCount, hasSeenNull);
         HorrorDecision decision = HorrorDirector.evaluate(snapshot, state, context,
                 level.getGameTime(), player.getRandom().nextDouble());
         SNAPSHOTS.put(id, snapshot);
         DECISIONS.put(id, decision);
         if (decision.hasSelectedEvent()) HorrorEventExecutor.execute(player, decision);
     }
+
     public static Optional<HorrorSnapshot> getSnapshot(UUID id) { return Optional.ofNullable(SNAPSHOTS.get(id)); }
     public static Optional<HorrorDecision> getLastDecision(UUID id) { return Optional.ofNullable(DECISIONS.get(id)); }
     public static void remove(UUID id) { SNAPSHOTS.remove(id); STATES.remove(id); DECISIONS.remove(id); }

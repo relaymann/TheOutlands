@@ -46,6 +46,8 @@ public final class HorrorDirector {
         for (HorrorEventDefinition event : EVENTS) {
             if (distance < event.minimumDistance() || state.pressure() < event.minimumPressure()
                     || state.isCoolingDown(event.id(), time) || state.wasRecentlySelected(event.id())) continue;
+            if ("the_return".equals(event.id()) && !context.hasSeenNull()) continue;
+            if ("false_death".equals(event.id()) && context.previousEncounterCount() < 2) continue;
             double weight = event.weight() * context.weightMultiplier(event.id()) * OutlandsConfig.EVENT_FREQUENCY.get();
             if (weight > 0 && Double.isFinite(weight)) { eligible.add(new Weighted(event, weight)); total += weight; }
         }
