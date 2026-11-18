@@ -4,6 +4,9 @@
 - Minecraft Java 1.21.1; NeoForge 21.1.266; Java 21; ModDevGradle.
 - Mod id: `theoutlands`; package: `com.relaymann.theoutlands`.
 
+## Configuration
+The common config exposes horror intensity, event frequency, event enablement, opening anomaly distance, Fear and Death milestone distances, Fear's full-territory distance, Almighty border depth, Null sightings, and horror audio. Defaults preserve the canonical design values. The server-authoritative director and border calculations read the configured values.
+
 ## Implemented systems
 The original shared Overworld spawn is the fixed distance origin. The first 1,000 horizontal blocks remain outside the horror range. Escalation grows continuously beyond it without an arbitrary content cap.
 

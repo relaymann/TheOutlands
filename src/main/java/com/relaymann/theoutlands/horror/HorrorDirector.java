@@ -1,5 +1,6 @@
 package com.relaymann.theoutlands.horror;
 
+import com.relaymann.theoutlands.OutlandsConfig;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public final class HorrorDirector {
                                           HorrorContext context, long time, double roll) {
         if (snapshot == null || state == null || context == null) throw new IllegalArgumentException("Missing director input");
         double distance = snapshot.distanceFromSpawn();
-        if (!Double.isFinite(distance) || distance <= DistanceProgression.FIRST_ANOMALY_DISTANCE) {
+        if (!Double.isFinite(distance) || distance <= DistanceProgression.firstAnomalyDistance()) {
             updatePressure(state, time, 0, false);
             return HorrorDecision.withoutEvent(HorrorDecision.Reason.OUTSIDE_HORROR_RANGE, state.pressure());
         }
@@ -35,6 +36,8 @@ public final class HorrorDirector {
         updatePressure(state, time, snapshot.escalationValue(), true);
         if (time - state.lastEncounterGameTime() < minimumQuietPeriod(snapshot.escalationTier()))
             return HorrorDecision.withoutEvent(HorrorDecision.Reason.BREATHING_ROOM, state.pressure());
+        if (!OutlandsConfig.EVENTS_ENABLED.get())
+            return HorrorDecision.withoutEvent(HorrorDecision.Reason.NO_ELIGIBLE_EVENT, state.pressure());
         if (state.pressure() < EVENT_PRESSURE_THRESHOLD)
             return HorrorDecision.withoutEvent(HorrorDecision.Reason.BUILDING_PRESSURE, state.pressure());
 
@@ -43,7 +46,7 @@ public final class HorrorDirector {
         for (HorrorEventDefinition event : EVENTS) {
             if (distance < event.minimumDistance() || state.pressure() < event.minimumPressure()
                     || state.isCoolingDown(event.id(), time) || state.wasRecentlySelected(event.id())) continue;
-            double weight = event.weight() * context.weightMultiplier(event.id());
+            double weight = event.weight() * context.weightMultiplier(event.id()) * OutlandsConfig.EVENT_FREQUENCY.get();
             if (weight > 0 && Double.isFinite(weight)) { eligible.add(new Weighted(event, weight)); total += weight; }
         }
         if (eligible.isEmpty()) return HorrorDecision.withoutEvent(HorrorDecision.Reason.NO_ELIGIBLE_EVENT, state.pressure());
@@ -70,7 +73,7 @@ public final class HorrorDirector {
         double seconds = ticks / 20.0D;
         if (!active) { state.setPressure(state.pressure() - seconds * 0.5D); return; }
         double distanceGain = Math.min(0.45D, Math.log1p(Math.max(0, escalation)) * 0.06D);
-        state.setPressure(state.pressure() + (0.35D + distanceGain) * seconds);
+        state.setPressure(state.pressure() + (0.35D + distanceGain) * seconds * OutlandsConfig.HORROR_INTENSITY.get());
     }
     private static long safeAdd(long a, long b) { return b > 0 && a > Long.MAX_VALUE - b ? Long.MAX_VALUE : a + b; }
     private record Weighted(HorrorEventDefinition event, double weight) {}

@@ -1,5 +1,6 @@
 package com.relaymann.theoutlands.horror;
 
+import com.relaymann.theoutlands.OutlandsConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -18,6 +19,10 @@ public final class DistanceProgression {
     private DistanceProgression() {
     }
 
+    public static double firstAnomalyDistance() {
+        return OutlandsConfig.FIRST_ANOMALY_DISTANCE.get();
+    }
+
     public static double horizontalDistanceFromWorldSpawn(ServerPlayer player) {
         ServerLevel overworld = player.getServer().overworld();
         BlockPos spawn = overworld.getSharedSpawnPos();
@@ -26,28 +31,18 @@ public final class DistanceProgression {
         return Math.hypot(player.getX() - spawnCenterX, player.getZ() - spawnCenterZ);
     }
 
-    /**
-     * Returns zero through the opening 1,000 blocks, then an unbounded logarithmic
-     * escalation value. This avoids a hard cap at any arbitrary distance.
-     */
+    /** Returns zero through the configured opening range, then an unbounded logarithmic escalation value. */
     public static double escalationValue(double distanceFromSpawn) {
-        if (!Double.isFinite(distanceFromSpawn) || distanceFromSpawn <= FIRST_ANOMALY_DISTANCE) {
-            return 0.0D;
-        }
-
-        return Math.log1p((distanceFromSpawn - FIRST_ANOMALY_DISTANCE) / FIRST_ANOMALY_DISTANCE);
+        double openingRange = firstAnomalyDistance();
+        if (!Double.isFinite(distanceFromSpawn) || distanceFromSpawn <= openingRange) return 0.0D;
+        return Math.log1p((distanceFromSpawn - openingRange) / openingRange);
     }
 
-    /**
-     * Returns an unbounded, doubling-distance milestone index. It is not a content
-     * ceiling; new milestones can continue to be added at greater distances.
-     */
+    /** Returns an unbounded, doubling-distance milestone index. */
     public static int escalationTier(double distanceFromSpawn) {
-        if (!Double.isFinite(distanceFromSpawn) || distanceFromSpawn <= FIRST_ANOMALY_DISTANCE) {
-            return 0;
-        }
-
-        double ratio = distanceFromSpawn / FIRST_ANOMALY_DISTANCE;
+        double openingRange = firstAnomalyDistance();
+        if (!Double.isFinite(distanceFromSpawn) || distanceFromSpawn <= openingRange) return 0;
+        double ratio = distanceFromSpawn / openingRange;
         return 1 + (int) Math.floor(Math.log(ratio) / LOG_TWO);
     }
 

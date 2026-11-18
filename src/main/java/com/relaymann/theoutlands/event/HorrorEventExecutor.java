@@ -1,5 +1,6 @@
 package com.relaymann.theoutlands.event;
 
+import com.relaymann.theoutlands.OutlandsConfig;
 import com.relaymann.theoutlands.horror.HorrorDecision;
 import com.relaymann.theoutlands.horror.HorrorMemory;
 import net.minecraft.core.particles.ParticleTypes;
@@ -23,7 +24,7 @@ public final class HorrorEventExecutor {
         double y = player.getY() + 0.2D;
         switch (decision.eventId()) {
             case "ambient_displacement" -> {
-                player.playNotifySound(SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.55F, 0.65F);
+                playSound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.55F, 0.65F);
                 level.sendParticles(player, ParticleTypes.SMOKE, true, x, y, z, 5, 0.25D, 0.35D, 0.25D, 0.005D);
             }
             case "false_footsteps" -> {
@@ -31,7 +32,7 @@ public final class HorrorEventExecutor {
                 player.playNotifySound(SoundEvents.GRAVEL_STEP, SoundSource.BLOCKS, 0.45F, 0.86F);
             }
             case "distant_figure" -> {
-                NullWatcherManager.spawn(player);
+                if (OutlandsConfig.NULL_SIGHTINGS_ENABLED.get()) NullWatcherManager.spawn(player);
                 level.sendParticles(player, ParticleTypes.ASH, true, x, y + 1.0D, z, 10, 0.35D, 0.8D, 0.35D, 0.01D);
             }
             case "unexplained_message" -> player.sendSystemMessage(
@@ -61,6 +62,13 @@ public final class HorrorEventExecutor {
                         player.getZ(), 36, 0.8D, 1.0D, 0.8D, 0.04D);
             }
             default -> { /* Unknown IDs fail closed. */ }
+        }
+    }
+
+    private static void playSound(ServerPlayer player, net.minecraft.sounds.SoundEvent sound,
+                                  SoundSource source, float volume, float pitch) {
+        if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) {
+            player.playNotifySound(sound, source, volume, pitch);
         }
     }
 }
