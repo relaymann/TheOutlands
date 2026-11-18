@@ -70,6 +70,7 @@ class HorrorDirectorTest {
     @Test void expandedEventsHaveUniqueIdsAndConcreteExecutionCoverage() {
         var ids = HorrorDirector.getEventDefinitions().stream().map(HorrorEventDefinition::id).collect(Collectors.toSet());
         assertEquals(HorrorDirector.getEventDefinitions().size(), ids.size());
+        assertEquals(ids, com.relaymann.theoutlands.event.HorrorEventExecutor.supportedEventIds());
         assertTrue(ids.containsAll(Set.of("false_death", "unexplained_message", "the_return",
                 "false_player", "wrong_sounds", "missing_terrain", "observer", "fake_structure",
                 "repeated_location", "silent_world", "entity_imitation", "distant_scream")));

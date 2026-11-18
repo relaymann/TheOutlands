@@ -16,6 +16,7 @@
 - [x] Persistent player encounter counts, recent history, and discovery storage API.
 - [x] Player history influences event selection.
 - [x] Expand the director catalog to 18 event families with unique gates, cooldowns, context weighting, and bounded player-local effects.
+- [x] All 18 director IDs have explicit server-side handlers, and tests assert the catalog and handler sets match.
 - [ ] Finish true client-side audio muting, terrain afterimages, fake-player rendering, and world-generation event variants (current cues are deliberately non-destructive approximations).
 
 ## Phase 2 — Null
@@ -24,7 +25,8 @@
 - [x] Safe hiding-position selection in already-loaded chunks.
 - [x] Close-approach disappearance and periodic relocation while unobserved.
 - [x] Bounded stalking adaptation based on previous Null sightings.
-- [x] Long-range observer placements (34–46 blocks initially), cover-aware placement in already-loaded terrain, and bounded closer/more persistent adaptation.\n- [ ] False sightings, building-aware placement, and coordinated multiplayer encounters.
+- [x] Long-range observer placements (34–46 blocks initially), cover-aware placement in already-loaded terrain, and bounded closer/more persistent adaptation.
+- [ ] False sightings, building-aware placement, and coordinated multiplayer encounters.
 - [ ] Custom animations, persistent story state, and Null's apostles.
 
 ## Phase 3 — Territory and apostles
