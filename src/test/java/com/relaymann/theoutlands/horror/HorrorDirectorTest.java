@@ -51,7 +51,7 @@ class HorrorDirectorTest {
         assertEquals(1.0D, HorrorContext.neutral().weightMultiplier("false_footsteps"));
     }
     @Test void playerHistoryChangesEncounterWeightsAndGatesTheReturn() {
-        var unseen = new HorrorContext("minecraft:plains", false, false, false, 0, 1, 8, false);
+        var unseen = new HorrorContext("minecraft:plains", false, false, false, 0, 1, 1, false);
         var seen = new HorrorContext("minecraft:plains", false, false, false, 0, 1, 8, true);
         assertTrue(seen.weightMultiplier("the_return") > unseen.weightMultiplier("the_return"));
         assertTrue(seen.weightMultiplier("distant_figure") < unseen.weightMultiplier("distant_figure"));

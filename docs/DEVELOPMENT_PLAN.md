@@ -12,6 +12,9 @@
 - [x] Additional private unexplained-message, false-death, and returning-observer encounters.
 - [x] Player-targeted sound, particles, and messages.
 - [x] Operator debug command.
+- [x] Configurable horror intensity, event frequency, and event enablement.
+- [x] Persistent player encounter counts, recent history, and discovery storage API.
+- [x] Player history influences event selection.
 - [ ] Expand to the complete 12+ event catalog, including visual and world-generation event families.
 
 ## Phase 2 — Null
@@ -40,7 +43,8 @@
 - [ ] Custom models, textures, rigs, and smooth encounter animations.
 - [ ] Dynamic original audio and territory ambience.
 - [ ] Player-specific perceptions, shared events, coordinated encounters, and persistence.
-- [ ] Configurable intensity, event rates, and progression.
+- [x] Configurable intensity, event rates, and progression milestones.
+- [x] Configurable Null sightings, horror audio, and Almighty territory depth.
 - [ ] Performance, compatibility, and release audits.
 
 ## Release gates

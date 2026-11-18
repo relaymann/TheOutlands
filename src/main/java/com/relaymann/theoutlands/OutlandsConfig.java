@@ -34,7 +34,7 @@ public final class OutlandsConfig {
         BUILDER.push("progression");
         FIRST_ANOMALY_DISTANCE = BUILDER
                 .comment("Horizontal distance from original shared Overworld spawn where horror begins.")
-                .defineInRange("firstAnomalyDistance", 1_000.0D, 0.0D, 30_000_000.0D);
+                .defineInRange("firstAnomalyDistance", 1_000.0D, 1.0D, 30_000_000.0D);
         FEAR_FIRST_APPEARANCE_DISTANCE = BUILDER
                 .comment("Distance milestone for Fear's first story appearance.")
                 .defineInRange("fearFirstAppearanceDistance", 15_000.0D, 1_000.0D, 30_000_000.0D);
