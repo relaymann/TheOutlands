@@ -28,7 +28,7 @@ The Almighty is the mastermind behind the events and the ultimate authority in t
 
 The final 5,000-block region before the world's configured border is The Almighty's land. No other entity may enter this territory; this exclusion includes Null, Null's apostles, Fear, Death, and ordinary hostile entities. The player may enter. The Almighty waits at the world border.
 
-The Almighty's power includes creating a mod and inserting it into an existing world. This is how Death was made. The eventual ARG should reveal this gradually rather than explain it in an introductory book.
+The Almighty's power includes creating a mod and inserting it into an existing world. This is how Death was made. The player reaches the final borderland, where the Almighty manifests as the endgame boss. The death.jar artifact chain begins revealing the installation trail; the final encounter and ending must complete the revelation without turning it into an introductory lore dump.
 
 ### Null — First Apostle
 
@@ -50,7 +50,7 @@ Single-player introduction:
 
 In multiplayer, the dialogue adapts naturally to address the group rather than treating several players as one person.
 
-Fear controls a forest biome called **Fear**. It should be a distinct ecosystem, not merely a renamed dark forest. It has increased entity activity, more frequent events, unusual environmental effects, and structures exclusive to Fear's influence.
+Fear controls a forest territory called **Fear**. It should become a distinct ecosystem, not merely a renamed dark forest: increased entity activity, more frequent events, unusual environmental effects, and structures exclusive to his influence. The current implementation begins with a territory overlay on existing forest biomes at the full-territory milestone; it is not yet a separate generated biome.
 
 **Provisional distance reconciliation:** the first personal appearance can occur after 15,000 blocks, while the Fear biome's broader/full territorial presence and major escalation can begin around 100,000 blocks. This reconciles the two distances mentioned so far, but requires confirmation before becoming final canon.
 
@@ -60,7 +60,7 @@ Death is the final apostle beneath The Almighty. The Almighty created Death by m
 
 Death first appears around 50,000 blocks. He is a hunter and pursuer who enjoys toying with prey before devouring them. He should track and pressure targets over time, use misdirection, sometimes allow an apparent escape, and choose when to commit to a dangerous attack. Avoid making him teleport directly behind players on a predictable timer.
 
-The name **death.jar** is a key meta-ARG clue. It should be discovered through environmental evidence, in-world records, and connected clues rather than exposed immediately.
+The name **death.jar** is a key meta-ARG clue. The first implemented chain is discovered through three rare artifacts: `death.jar`, `manifest.txt`, and `author.dat`. The next artifact is only released after the previous one is found and Death manifests again. These fragments are the beginning of the chain, not the complete ARG.
 
 Death's territory extends outward until the final 5,000-block region belonging exclusively to The Almighty.
 
@@ -74,7 +74,7 @@ Null's apostles are a separate subordinate group. Null is the only named apostle
 - **Beyond 1,000:** continuous escalation begins.
 - **Around 15,000:** proposed first Fear appearance (provisional reconciliation).
 - **Around 50,000:** Death's first appearance.
-- **Around 100,000:** proposed full Fear biome/territory escalation (provisional reconciliation).
+- **Around 100,000:** full Fear forest-territory escalation (current overlay implementation; a dedicated generated biome remains future work).
 - **Final 5,000 blocks before the configured world border:** The Almighty's exclusive land.
 - **At the border:** The Almighty is waiting.
 

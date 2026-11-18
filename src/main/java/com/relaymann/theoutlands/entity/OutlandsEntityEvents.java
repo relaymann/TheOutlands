@@ -13,5 +13,7 @@ public final class OutlandsEntityEvents {
     public static void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(OutlandsEntities.NULL.get(), NullEntity.createAttributes().build());
         event.put(OutlandsEntities.FEAR.get(), FearEntity.createAttributes().build());
+        event.put(OutlandsEntities.DEATH.get(), DeathEntity.createAttributes().build());
+        event.put(OutlandsEntities.ALMIGHTY.get(), AlmightyEntity.createAttributes().build());
     }
 }

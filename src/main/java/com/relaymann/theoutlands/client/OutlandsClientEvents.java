@@ -2,7 +2,6 @@ package com.relaymann.theoutlands.client;
 
 import com.relaymann.theoutlands.TheOutlands;
 import com.relaymann.theoutlands.entity.OutlandsEntities;
-import com.relaymann.theoutlands.client.FearRenderer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
@@ -15,11 +14,15 @@ public final class OutlandsClientEvents {
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(OutlandsEntities.NULL.get(), NullRenderer::new);
         event.registerEntityRenderer(OutlandsEntities.FEAR.get(), FearRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.DEATH.get(), DeathRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.ALMIGHTY.get(), AlmightyRenderer::new);
     }
 
     @SubscribeEvent
     public static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(NullRenderer.LAYER, NullRenderer::createBodyLayer);
         event.registerLayerDefinition(FearRenderer.LAYER, FearRenderer::createBodyLayer);
+        event.registerLayerDefinition(DeathRenderer.LAYER, DeathRenderer::createBodyLayer);
+        event.registerLayerDefinition(AlmightyRenderer.LAYER, AlmightyRenderer::createBodyLayer);
     }
 }

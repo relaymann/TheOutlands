@@ -1,0 +1,8 @@
+{
+  "item.theoutlands.death_jar": "death.jar",
+  "item.theoutlands.death_jar.lore": "A file with no creator. The timestamp is newer than this world.",
+  "item.theoutlands.death_manifest": "manifest.txt",
+  "item.theoutlands.death_manifest.lore": "ENTITY: DEATH\nSOURCE: theoutlands\nAUTHOR: [REDACTED]",
+  "item.theoutlands.almighty_fragment": "author.dat",
+  "item.theoutlands.almighty_fragment.lore": "The file was not found in the mod. It was written into the world."
+}

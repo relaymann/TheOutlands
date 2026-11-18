@@ -17,7 +17,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.phys.AABB;
 
-/** Executes player-local horror cues without narrating events or changing player-built blocks. */
+/** Executes player-local horror cues without narrating events or changing server-world blocks. */
 public final class HorrorEventExecutor {
     private HorrorEventExecutor() {}
 
@@ -50,6 +50,7 @@ public final class HorrorEventExecutor {
             }
             case "distant_figure", "observer", "false_player" -> {
                 spawnNullWatcher(player);
+                ClientAfterimageManager.showSilhouette(player);
                 particles(player, ParticleTypes.ASH, x, y + 1.0D, z, 4, 0.2D, 0.55D, 0.2D, 0.002D);
             }
             case "unexplained_message" -> {
@@ -69,8 +70,10 @@ public final class HorrorEventExecutor {
                 particles(player, ParticleTypes.PORTAL, player.getX(), player.getY() + 1.0D, player.getZ(), 10, 0.5D, 0.65D, 0.5D, 0.008D);
                 particles(player, ParticleTypes.SMOKE, x, y, z, 5, 0.3D, 0.3D, 0.3D, 0.002D);
             }
-            case "missing_terrain", "fake_structure", "repeated_location" ->
-                    particles(player, ParticleTypes.REVERSE_PORTAL, x, y + 0.2D, z, 5, 0.25D, 0.35D, 0.25D, 0.003D);
+            case "missing_terrain", "fake_structure", "repeated_location" -> {
+                ClientAfterimageManager.showTerrainAfterimage(player);
+                particles(player, ParticleTypes.REVERSE_PORTAL, x, y + 0.2D, z, 5, 0.25D, 0.35D, 0.25D, 0.003D);
+            }
             case "the_return" -> {
                 spawnNullWatcher(player);
                 sound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.38F, 0.42F);
@@ -123,21 +126,22 @@ public final class HorrorEventExecutor {
         }
     }
 
-    /** Revisited locations leave a private, non-destructive visual/audio trace. */
     public static void executeFamiliarPlaceDistortion(ServerPlayer player) {
         var level = player.serverLevel();
         BlockPos chosen = null;
         var remembered = HorrorMemory.rememberedLocations(player);
         for (int i = remembered.size() - 1; i >= 0; i--) {
             BlockPos candidate = remembered.get(i).offset(16, 0, 16);
-            if (level.hasChunkAt(candidate) && player.position().distanceToSqr(candidate.getX() + 16.5D, candidate.getY() + 0.5D, candidate.getZ() + 16.5D) <= 48.0D * 48.0D) {
+            if (level.hasChunkAt(candidate) && player.position().distanceToSqr(candidate.getX() + 16.5D,
+                    candidate.getY() + 0.5D, candidate.getZ() + 16.5D) <= 48.0D * 48.0D) {
                 chosen = candidate;
                 break;
             }
         }
         if (chosen != null) {
-            double y = Math.max(level.getMinBuildHeight() + 1, Math.min(level.getMaxBuildHeight() - 2, chosen.getY() + 1.0D));
-            particles(player, ParticleTypes.ASH, chosen.getX() + 0.5D, y, chosen.getZ() + 0.5D,
+            double py = Math.max(level.getMinBuildHeight() + 1,
+                    Math.min(level.getMaxBuildHeight() - 2, chosen.getY() + 1.0D));
+            particles(player, ParticleTypes.ASH, chosen.getX() + 0.5D, py, chosen.getZ() + 0.5D,
                     5, 0.18D, 0.35D, 0.18D, 0.001D);
         }
         sound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.16F, 0.72F);
@@ -147,7 +151,7 @@ public final class HorrorEventExecutor {
         double borderDepth = AlmightyTerritory.distanceInsideBorder(player.serverLevel(), player.getX(), player.getZ());
         if (!Double.isFinite(borderDepth)) return;
         sound(player, SoundEvents.WARDEN_ROAR, SoundSource.HOSTILE, 0.12F, 0.35F);
-        if (borderDepth > com.relaymann.theoutlands.OutlandsConfig.ALMIGHTY_TERRITORY_DEPTH.get()) {
+        if (borderDepth > OutlandsConfig.ALMIGHTY_TERRITORY_DEPTH.get()) {
             Mob influenced = player.serverLevel().getEntitiesOfClass(Mob.class,
                     new AABB(player.blockPosition()).inflate(24.0D), Mob::isAlive).stream().findFirst().orElse(null);
             if (influenced != null) {
@@ -174,12 +178,6 @@ public final class HorrorEventExecutor {
     private static void sound(ServerPlayer player, SoundEvent sound, SoundSource source, float volume, float pitch) {
         if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) player.playNotifySound(sound, source, volume, pitch);
     }
-
-    /**
-     * Sends a sound packet only to its intended player while retaining a real world
-     * position. The client therefore gets directional distance attenuation without
-     * leaking a private encounter sound to nearby players.
-     */
     private static void positionalSound(ServerPlayer player, SoundEvent sound, SoundSource source,
                                         float volume, float pitch, double x, double y, double z) {
         if (!OutlandsConfig.HORROR_AUDIO_ENABLED.get()) return;

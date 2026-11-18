@@ -1,8 +1,11 @@
 package com.relaymann.theoutlands.horror;
 
 import com.relaymann.theoutlands.OutlandsConfig;
-import com.relaymann.theoutlands.event.HorrorEventExecutor;
+import com.relaymann.theoutlands.event.AlmightyEncounterManager;
+import com.relaymann.theoutlands.event.DeathHuntManager;
+import com.relaymann.theoutlands.event.FearTerritoryManager;
 import com.relaymann.theoutlands.event.FearEncounterManager;
+import com.relaymann.theoutlands.event.HorrorEventExecutor;
 import com.relaymann.theoutlands.event.NullWatcherManager;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerPlayer;
@@ -23,6 +26,9 @@ public final class HorrorProgressionManager {
         UUID id = player.getUUID();
         HorrorSnapshot snapshot = DistanceProgression.createSnapshot(player);
         FearEncounterManager.evaluate(player);
+        FearTerritoryManager.tick(player);
+        DeathHuntManager.evaluate(player);
+        AlmightyEncounterManager.evaluate(player);
         HorrorMemory.recordBehaviorSample(player);
         boolean revisited = HorrorMemory.recordLocation(player);
         HorrorDirectorState state = STATES.computeIfAbsent(id, ignored -> new HorrorDirectorState());
@@ -46,7 +52,6 @@ public final class HorrorProgressionManager {
                 nearby, health, encounterCount, hasSeenNull, hasMetFear,
                 HorrorMemory.lookBackCount(player), HorrorMemory.pauseCount(player), nearAlmighty);
 
-        // A return to a remembered area can trigger a one-player-only distortion.
         long now = level.getGameTime();
         if (revisited && snapshot.escalationValue() > 0.0D
                 && now - HorrorMemory.lastFamiliarDistortion(player) >= 6_000L

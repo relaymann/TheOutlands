@@ -1,0 +1,56 @@
+package com.relaymann.theoutlands.event;
+
+import com.relaymann.theoutlands.OutlandsConfig;
+import com.relaymann.theoutlands.entity.AlmightyEntity;
+import com.relaymann.theoutlands.entity.OutlandsEntities;
+import com.relaymann.theoutlands.horror.AlmightyTerritory;
+import com.relaymann.theoutlands.horror.HorrorMemory;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.AABB;
+
+/** Starts the one-time endgame encounter when a player enters the Almighty's borderland. */
+public final class AlmightyEncounterManager {
+    private AlmightyEncounterManager() {}
+
+    public static void evaluate(ServerPlayer player) {
+        var level = player.serverLevel();
+        double depth = AlmightyTerritory.distanceInsideBorder(level, player.getX(), player.getZ());
+        if (!Double.isFinite(depth) || depth < 0.0D
+                || depth > OutlandsConfig.ALMIGHTY_TERRITORY_DEPTH.get()) return;
+
+        var nearby = level.getEntitiesOfClass(AlmightyEntity.class,
+                new AABB(player.blockPosition()).inflate(256.0D), AlmightyEntity::isAlive);
+        if (!nearby.isEmpty()) {
+            HorrorMemory.recordDiscovery(player, "almighty_encounter_started");
+            nearby.get(0).setTarget(player);
+            return;
+        }
+        if (HorrorMemory.hasDiscovered(player, "almighty_encounter_started")) return;
+
+        var border = level.getWorldBorder();
+        double dx = border.getCenterX() - player.getX();
+        double dz = border.getCenterZ() - player.getZ();
+        double length = Math.max(0.001D, Math.sqrt(dx * dx + dz * dz));
+        double x = player.getX() + dx / length * 18.0D;
+        double z = player.getZ() + dz / length * 18.0D;
+        BlockPos column = BlockPos.containing(x, player.getY(), z);
+        if (!level.hasChunkAt(column)) return;
+        int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, column.getX(), column.getZ());
+        BlockPos spawn = new BlockPos(column.getX(), y, column.getZ());
+        if (!AlmightyTerritory.contains(level, spawn.getX() + 0.5D, spawn.getZ() + 0.5D)) return;
+
+        AlmightyEntity boss = OutlandsEntities.ALMIGHTY.get().create(level);
+        if (boss == null) return;
+        boss.moveTo(spawn.getX() + 0.5D, spawn.getY(), spawn.getZ() + 0.5D,
+                player.getYRot() + 180.0F, 0.0F);
+        boss.setTarget(player);
+        if (!level.noCollision(boss, boss.getBoundingBox()) || !level.addFreshEntity(boss)) return;
+
+        HorrorMemory.recordDiscovery(player, "almighty_encounter_started");
+        level.playSound(null, spawn, SoundEvents.WARDEN_ROAR, SoundSource.HOSTILE, 1.0F, 0.35F);
+    }
+}

@@ -12,7 +12,7 @@ The original shared Overworld spawn is the fixed distance origin. The first 1,00
 
 The director evaluates once per second, builds per-player pressure, enforces a distance-scaled quiet period, and selects weighted encounters. Context includes biome, night/day, rain, thunder, nearby-player count, and health. Context changes weights only; it cannot bypass minimum distance, pressure, cooldown, or quiet-period gates.
 
-Selected encounters execute on the logical server. Ambient displacement, false footsteps, distant figures, environmental distortion, hostile warnings, direct intervention, private unexplained messages, false-death messages, and returning-observer encounters are executable. These events do not alter blocks or force-load chunks.
+Selected encounters execute on the logical server. Ambient displacement, false footsteps, distant figures, environmental distortion, direct intervention, private unexplained messages, false-death cues, and returning-observer encounters are executable. Ordinary scares do not narrate themselves in chat or actionbar. Directional sound packets are sent only to the target player. Client afterimages temporarily send fake block states to that player's connection and restore the current server block state; the server world and other clients are never changed. All illusion placement checks loaded chunks.
 
 ## Persistent player memory
 `HorrorMemory` stores a bounded recent encounter list, a lifetime encounter count, last encounter game time, and unique discovery identifiers in NeoForge's persistent player entity data. Encounter execution records the event immediately. Story memory is copied when the player entity is replaced during respawn. The discovery API is ready for future structure and ARG clue integrations.
@@ -20,12 +20,12 @@ Selected encounters execute on the logical server. Ambient displacement, false f
 ## Apostle milestone model
 `ApostleProgression` centralizes the canonical story thresholds: Fear's first appearance at 15,000 blocks, Death's first appearance at 50,000 blocks, and Fear's full-territory milestone at 100,000 blocks. Null remains eligible at any distance. The Almighty's final territory overrides Death's territory. These are progression gates, not a cap on general horror escalation.
 
-This milestone model is currently used for operator diagnostics. It does not yet spawn Fear or Death, generate the Fear biome, or persist apostle story encounters.
+Fear's first encounter remains a player-specific story milestone. At the full-territory distance, forest-tagged vanilla biomes receive a player-local Fear domain overlay: nearby mobs sometimes turn toward the player, ash drifts through the trees, and quiet positional ambience appears at a distance. This first pass does not yet add a new worldgen biome or Fear-exclusive structures. Death is spawned as a persistent hunter after the configured 50,000-block milestone; his spawn cooldown and clue discoveries persist in player data.
 
 ## Almighty border geometry
 `AlmightyTerritory` measures the inward distance to the nearest edge of the live square world border. It reads the border's configured center and size from the level and defines the final 5,000-block strip on all four sides, including corners. Positions outside the border are excluded. The geometry is isolated and unit-tested against shifted centers, non-default sizes, all sides, and boundary conditions.
 
-Server-side entity lifecycle enforcement now rejects non-player entities when they attempt to join inside the final region and discards non-exempt entities that cross into it later. Players remain able to enter for the endgame. The future Almighty entity can opt in using the dedicated `theoutlands_almighty` entity tag. The Almighty encounter itself remains unimplemented.
+Server-side entity lifecycle enforcement now rejects non-player entities when they attempt to join inside the final region and discards non-exempt entities that cross into it later. Players remain able to enter for the endgame. The registered Almighty entity opts in using the dedicated `theoutlands_almighty` entity tag. Entering the borderland starts a one-time boss encounter with a server boss bar, melee pressure, and escalating area pulses. The entity remains inside the configured borderland and ordinary entities remain excluded.
 
 ## Null's visual identity and sightings
 Null is a dedicated registered entity, not an Enderman or disguised player. The renderer uses vanilla humanoid/player proportions with a 64x64 custom skin. The PNG is 64x64 RGBA, fully opaque black except for eight white pixels forming two separated 2x2 eye marks on the front of the head.

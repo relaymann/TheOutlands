@@ -175,6 +175,18 @@ public final class HorrorMemory {
         data.put(ROOT, memory);
     }
 
+    public static long lastDeathSpawn(ServerPlayer player) {
+        CompoundTag memory = getMemory(player.getPersistentData());
+        return memory.contains("last_death_spawn") ? memory.getLong("last_death_spawn") : -12_000L;
+    }
+
+    public static void setLastDeathSpawn(ServerPlayer player, long time) {
+        CompoundTag data = player.getPersistentData();
+        CompoundTag memory = getMemory(data);
+        memory.putLong("last_death_spawn", time);
+        data.put(ROOT, memory);
+    }
+
     public static void copy(ServerPlayer original, ServerPlayer replacement) {
         CompoundTag originalMemory = getMemory(original.getPersistentData());
         if (!originalMemory.isEmpty()) replacement.getPersistentData().put(ROOT, originalMemory.copy());

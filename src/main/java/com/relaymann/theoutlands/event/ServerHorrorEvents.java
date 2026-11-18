@@ -21,23 +21,22 @@ public final class ServerHorrorEvents {
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         if (!(event.getEntity() instanceof ServerPlayer player)
                 || player.tickCount % 20 != 0
-                || !player.serverLevel().dimension().equals(Level.OVERWORLD)) {
-            return;
-        }
+                || !player.serverLevel().dimension().equals(Level.OVERWORLD)) return;
         HorrorProgressionManager.update(player);
     }
 
-    /** Watcher eye-contact and lifetime checks run every server tick, independent of player progression updates. */
     @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
         for (ServerLevel level : event.getServer().getAllLevels()) {
             NullWatcherManager.tick(level);
             FearEncounterManager.tick(level);
+            ClientAfterimageManager.tick(level);
         }
     }
 
     @SubscribeEvent
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) ClientAfterimageManager.clear(player);
         HorrorProgressionManager.remove(event.getEntity().getUUID());
     }
 
@@ -53,5 +52,7 @@ public final class ServerHorrorEvents {
     public static void onServerStopping(ServerStoppingEvent event) {
         HorrorProgressionManager.clear();
         FearEncounterManager.clear();
+        DeathHuntManager.clear();
+        ClientAfterimageManager.clear();
     }
 }
