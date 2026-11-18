@@ -9,9 +9,10 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.levelgen.Heightmap;\nimport net.minecraft.world.level.ClipContext;
-import net.minecraft.world.phys.Vec3;\nimport net.minecraft.world.phys.HitResult;
-
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -23,9 +24,7 @@ import java.util.UUID;
  * and gradually become closer and more persistent after repeated encounters.
  */
 public final class NullWatcherManager {
-    private static final long BASE_LIFETIME = 260L;
     private static final long EYE_CONTACT_DELAY = 12L;
-    private static final long BASE_RELOCATION_INTERVAL = 75L;
     private static final double LOOK_DOT_THRESHOLD = 0.965D;
     private static final double APPROACH_DISTANCE_SQR = 5.0D * 5.0D;
     private static final Map<UUID, ActiveWatcher> ACTIVE = new HashMap<>();
@@ -116,7 +115,8 @@ public final class NullWatcherManager {
 
         // Prefer already-loaded natural cover. No chunk is requested or generated here.
         for (int attempt = 0; attempt < 10; attempt++) {
-            double angle = yaw + (player.getRandom().nextDouble() - 0.5D) * (attempt < 5 ? 1.2D : Math.PI * 2.0D);
+            double angle = yaw + (player.getRandom().nextDouble() - 0.5D)
+                    * (attempt < 5 ? 1.2D : Math.PI * 2.0D);
             double distance = profile.minimumDistance()
                     + player.getRandom().nextDouble() * (profile.maximumDistance() - profile.minimumDistance());
             int bx = (int) Math.floor(player.getX() - Math.sin(angle) * distance);
@@ -143,3 +143,45 @@ public final class NullWatcherManager {
         return visibleFallback;
     }
 
+    private static boolean isLookingAt(ServerPlayer player, Entity entity) {
+        if (player.distanceToSqr(entity) > 64.0D * 64.0D || !player.hasLineOfSight(entity)) return false;
+        Vec3 target = entity.position().add(0.0D, entity.getBbHeight() * 0.5D, 0.0D)
+                .subtract(player.getEyePosition());
+        return target.lengthSqr() < 1.0E-6D
+                || player.getLookAngle().dot(target.normalize()) >= LOOK_DOT_THRESHOLD;
+    }
+
+    private static boolean isLookingAtPosition(ServerPlayer player, BlockPos position) {
+        Vec3 target = Vec3.atCenterOf(position).subtract(player.getEyePosition());
+        return target.lengthSqr() < 1.0E-6D
+                || player.getLookAngle().dot(target.normalize()) >= LOOK_DOT_THRESHOLD;
+    }
+
+    public static void clear() {
+        for (ActiveWatcher watcher : ACTIVE.values()) {
+            Entity entity = watcher.level.getEntity(watcher.entityId);
+            if (entity != null) entity.discard();
+        }
+        ACTIVE.clear();
+    }
+
+    private static final class ActiveWatcher {
+        private final ServerLevel level;
+        private final UUID entityId;
+        private final UUID playerId;
+        private final long expiresAt;
+        private final NullStalkingProfile profile;
+        private long lookedAtSince = -1L;
+        private long lastRelocatedAt;
+
+        private ActiveWatcher(ServerLevel level, UUID entityId, UUID playerId,
+                              long expiresAt, long lastRelocatedAt, NullStalkingProfile profile) {
+            this.level = level;
+            this.entityId = entityId;
+            this.playerId = playerId;
+            this.expiresAt = expiresAt;
+            this.lastRelocatedAt = lastRelocatedAt;
+            this.profile = profile;
+        }
+    }
+}
