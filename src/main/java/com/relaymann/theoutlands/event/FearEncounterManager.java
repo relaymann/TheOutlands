@@ -38,7 +38,10 @@ public final class FearEncounterManager {
   fear.addTag("theoutlands_fear_manifestation");if(!level.addFreshEntity(fear))return;
   HorrorMemory.recordDiscovery(player,INTRODUCTION_DISCOVERY);
   Component line=Component.literal("You are the first person to reach me. You are worthy of my fear.");
-  for(ServerPlayer audience:level.players())if(audience.distanceToSqr(player)<=4096.0D){\n   HorrorMemory.recordDiscovery(audience,INTRODUCTION_DISCOVERY);\n   audience.sendSystemMessage(line);\n  }
+  for(ServerPlayer audience:level.players())if(audience.distanceToSqr(player)<=4096.0D){
+   HorrorMemory.recordDiscovery(audience,INTRODUCTION_DISCOVERY);
+   audience.sendSystemMessage(line);
+  }
   ACTIVE.put(fear.getUUID(),new Active(level,fear.getUUID(),level.getGameTime()+LIFETIME));
  }
  public static void tick(ServerLevel level) {
