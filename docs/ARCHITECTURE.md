@@ -25,7 +25,7 @@ This milestone model is currently used for operator diagnostics. It does not yet
 ## Almighty border geometry
 `AlmightyTerritory` measures the inward distance to the nearest edge of the live square world border. It reads the border's configured center and size from the level and defines the final 5,000-block strip on all four sides, including corners. Positions outside the border are excluded. The geometry is isolated and unit-tested against shifted centers, non-default sizes, all sides, and boundary conditions.
 
-This is currently a geometry and diagnostics foundation. It does not yet enforce entity exclusion or implement the Almighty encounter.
+Server-side entity lifecycle enforcement now rejects non-player entities when they attempt to join inside the final region and discards non-exempt entities that cross into it later. Players remain able to enter for the endgame. The future Almighty entity can opt in using the dedicated `theoutlands_almighty` entity tag. The Almighty encounter itself remains unimplemented.
 
 ## Null's visual identity and sightings
 Null is a dedicated registered entity, not an Enderman or disguised player. The renderer uses vanilla humanoid/player proportions with a 64x64 custom skin. The PNG is 64x64 RGBA, fully opaque black except for eight white pixels forming two separated 2x2 eye marks on the front of the head.

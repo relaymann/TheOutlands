@@ -25,7 +25,7 @@
 ## Phase 3 — Territory and apostles
 - [x] Pure geometry for the Almighty's final 5,000-block region using the live configured border center and size.
 - [x] Unit tests for shifted centers, non-default sizes, sides, corners, and boundaries.
-- [ ] Entity exclusion from the Almighty territory.
+- [x] Server-side entity exclusion from the Almighty territory (players and the tagged Almighty are exempt).
 - [ ] Fear introduction, Fear forest biome, structures, ambience, and exclusive events.
 - [ ] Death hunter AI, territory, structures, and death.jar clue chain.
 - [ ] Almighty encounter and endgame.
