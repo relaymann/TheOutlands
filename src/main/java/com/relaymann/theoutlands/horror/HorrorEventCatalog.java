@@ -7,7 +7,7 @@ public final class HorrorEventCatalog {
     private static final Set<String> IDS = Set.of(
             "ambient_displacement", "false_footsteps", "distant_figure", "unexplained_message",
             "wrong_sounds", "observer", "environmental_distortion", "missing_terrain",
-            "fake_structure", "hostile_warning", "the_return", "repeated_location",
+            "fake_structure", "the_return", "repeated_location",
             "silent_world", "entity_imitation", "false_death", "distant_scream",
             "false_player", "direct_intervention", "fear_whisper", "fear_presence", "fear_call");
 

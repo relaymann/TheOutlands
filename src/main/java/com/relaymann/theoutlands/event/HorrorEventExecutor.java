@@ -69,11 +69,6 @@ public final class HorrorEventExecutor {
                 }
                 player.displayClientMessage(Component.literal("Something was standing here."), true);
             }
-            case "hostile_warning" -> {
-                sound(player, SoundEvents.WARDEN_NEARBY_CLOSER, SoundSource.HOSTILE, 0.8F, 0.7F);
-                player.displayClientMessage(Component.literal("Something noticed you."), true);
-                particles(player, ParticleTypes.SOUL, x, y + 0.5D, z, 8, 0.25D, 0.45D, 0.25D, 0.01D);
-            }
             case "the_return" -> {
                 spawnNullWatcher(player);
                 sound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.7F, 0.42F);
