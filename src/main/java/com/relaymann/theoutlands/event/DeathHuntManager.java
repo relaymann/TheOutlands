@@ -83,6 +83,10 @@ public final class DeathHuntManager {
         ItemEntity clue = new ItemEntity(death.level(), death.getX(), death.getY() + 0.8D, death.getZ(),
                 new ItemStack(item));
         clue.setDefaultPickUpDelay();
+        clue.setUnlimitedLifetime();
         death.level().addFreshEntity(clue);
     }
+
+    /** Kept as a lifecycle hook; spawn timing is stored in persistent player data. */
+    public static void clear() {}
 }
