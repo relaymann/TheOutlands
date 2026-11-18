@@ -96,10 +96,10 @@ public final class HorrorMemory {
         long packed = cell.asLong();
         ListTag old = memory.getList(LOCATIONS, Tag.TAG_LONG);
         boolean repeated = old.contains(LongTag.valueOf(packed));
-        if (old.isEmpty() || old.getLong(old.size() - 1) != packed) {
+        if (old.isEmpty() || ((LongTag) old.get(old.size() - 1)).getAsLong() != packed) {
             ListTag updated = new ListTag();
             for (int i = 0; i < old.size(); i++) {
-                long value = old.getLong(i);
+                long value = ((LongTag) old.get(i)).getAsLong();
                 if (value != packed) updated.add(LongTag.valueOf(value));
             }
             updated.add(LongTag.valueOf(packed));
@@ -113,7 +113,7 @@ public final class HorrorMemory {
     public static List<BlockPos> rememberedLocations(ServerPlayer player) {
         ListTag list = getMemory(player.getPersistentData()).getList(LOCATIONS, Tag.TAG_LONG);
         List<BlockPos> positions = new ArrayList<>(list.size());
-        for (int i = 0; i < list.size(); i++) positions.add(BlockPos.of(list.getLong(i)));
+        for (int i = 0; i < list.size(); i++) positions.add(BlockPos.of(((LongTag) list.get(i)).getAsLong()));
         return List.copyOf(positions);
     }
 
