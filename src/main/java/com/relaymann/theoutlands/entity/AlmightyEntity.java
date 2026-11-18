@@ -1,11 +1,16 @@
 package com.relaymann.theoutlands.entity;
 
+import com.relaymann.theoutlands.horror.HorrorMemory;
+import com.relaymann.theoutlands.item.OutlandsItems;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerBossEvent;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.BossEvent;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -13,14 +18,18 @@ import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 
-/** The Almighty's endgame manifestation and final boss encounter. */
+/** The Almighty's endgame manifestation, with escalating phases and a persistent ending clue. */
 public final class AlmightyEntity extends Monster {
     private final ServerBossEvent bossEvent = new ServerBossEvent(
             Component.literal("The Almighty"), BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS);
+    private int lastPhase = 1;
 
     public AlmightyEntity(EntityType<? extends Monster> type, Level level) {
         super(type, level);
@@ -41,52 +50,85 @@ public final class AlmightyEntity extends Monster {
                 .add(Attributes.KNOCKBACK_RESISTANCE, 1.0D);
     }
 
-    @Override
-    protected void registerGoals() {
+    @Override protected void registerGoals() {
         goalSelector.addGoal(1, new FloatGoal(this));
         goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.12D, true));
         goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 96.0F));
         targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
     }
 
-    @Override
-    public void tick() {
+    @Override public void tick() {
         super.tick();
         if (level().isClientSide) return;
-        bossEvent.setProgress(Math.max(0.0F, getHealth() / getMaxHealth()));
-        // Three escalating pressure pulses make the fight change as its health falls.
-        int interval = getHealth() > getMaxHealth() * 0.66F ? 120
-                : getHealth() > getMaxHealth() * 0.33F ? 90 : 65;
-        if (tickCount % interval == 0) {
-            float damage = getHealth() > getMaxHealth() * 0.33F ? 5.0F : 8.0F;
-            for (Player player : level().getEntitiesOfClass(Player.class, getBoundingBox().inflate(7.0D),
-                    Player::isAlive)) {
-                if (player.isCreative() || player.isSpectator()) continue;
-                if (player.hurt(damageSources().mobAttack(this), damage)) {
-                    double dx = player.getX() - getX();
-                    double dz = player.getZ() - getZ();
-                    double length = Math.max(0.001D, Math.sqrt(dx * dx + dz * dz));
-                    player.push(dx / length * 1.25D, 0.42D, dz / length * 1.25D);
-                }
+        float healthRatio = getHealth() / getMaxHealth();
+        bossEvent.setProgress(Math.max(0.0F, healthRatio));
+        int phase = healthRatio > 0.66F ? 1 : healthRatio > 0.33F ? 2 : 3;
+        if (phase != lastPhase) {
+            lastPhase = phase;
+            bossEvent.setColor(phase == 1 ? BossEvent.BossBarColor.PURPLE
+                    : phase == 2 ? BossEvent.BossBarColor.RED : BossEvent.BossBarColor.WHITE);
+            if (level() instanceof ServerLevel server) {
+                server.sendParticles(phase == 3 ? ParticleTypes.SOUL : ParticleTypes.REVERSE_PORTAL,
+                        getX(), getY() + 1.0D, getZ(), 70, 8.0D, 3.0D, 8.0D, 0.04D);
+                server.playSound(null, blockPosition(), SoundEvents.WARDEN_ROAR,
+                        SoundSource.HOSTILE, 1.0F, phase == 3 ? 0.32F : 0.48F);
             }
-            level().playSound(null, blockPosition(), SoundEvents.WARDEN_ROAR,
-                    SoundSource.HOSTILE, 0.7F, getHealth() > getMaxHealth() * 0.33F ? 0.55F : 0.38F);
         }
+
+        int interval = phase == 1 ? 120 : phase == 2 ? 90 : 65;
+        if (tickCount % interval != 0) return;
+        double radius = phase == 1 ? 7.0D : phase == 2 ? 10.0D : 14.0D;
+        float damage = phase == 1 ? 5.0F : phase == 2 ? 7.0F : 9.0F;
+        for (Player player : level().getEntitiesOfClass(Player.class, getBoundingBox().inflate(radius),
+                Player::isAlive)) {
+            if (player.isCreative() || player.isSpectator()) continue;
+            double dx = player.getX() - getX();
+            double dz = player.getZ() - getZ();
+            double length = Math.max(0.001D, Math.sqrt(dx * dx + dz * dz));
+            if (phase == 2) {
+                // The middle phase drags the player inward before the next melee window.
+                player.push(-dx / length * 0.72D, 0.16D, -dz / length * 0.72D);
+            } else if (phase == 3) {
+                // The final phase breaks defensive positioning with a wider shockwave.
+                player.push(dx / length * 1.35D, 0.48D, dz / length * 1.35D);
+            }
+            player.hurt(damageSources().mobAttack(this), damage);
+        }
+        level().playSound(null, blockPosition(), SoundEvents.WARDEN_ROAR,
+                SoundSource.HOSTILE, phase == 3 ? 0.85F : 0.62F, phase == 3 ? 0.38F : 0.56F);
     }
 
-    @Override
-    public void startSeenByPlayer(ServerPlayer player) {
+    @Override public void startSeenByPlayer(ServerPlayer player) {
         super.startSeenByPlayer(player);
         bossEvent.addPlayer(player);
     }
 
-    @Override
-    public void stopSeenByPlayer(ServerPlayer player) {
+    @Override public void stopSeenByPlayer(ServerPlayer player) {
         super.stopSeenByPlayer(player);
         bossEvent.removePlayer(player);
     }
 
+    @Override public void die(DamageSource source) {
+        if (!level().isClientSide && !getPersistentData().getBoolean("outlands_ending_dropped")) {
+            getPersistentData().putBoolean("outlands_ending_dropped", true);
+            ItemEntity page = new ItemEntity(level(), getX(), getY() + 0.8D, getZ(),
+                    new ItemStack(OutlandsItems.THE_LAST_PAGE.get()));
+            page.setDefaultPickUpDelay();
+            page.setUnlimitedLifetime();
+            level().addFreshEntity(page);
+            if (level() instanceof ServerLevel server) {
+                for (ServerPlayer player : server.getEntitiesOfClass(ServerPlayer.class,
+                        new AABB(blockPosition()).inflate(128.0D))) {
+                    HorrorMemory.recordDiscovery(player, "almighty_defeated");
+                    HorrorMemory.recordDiscovery(player, "the_last_page_recovered");
+                    player.sendSystemMessage(Component.literal("§8[The Almighty] §7You found the seam."));
+                }
+            }
+        }
+        super.die(source);
+    }
+
     @Override protected net.minecraft.sounds.SoundEvent getAmbientSound() { return null; }
-    @Override protected net.minecraft.sounds.SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return null; }
+    @Override protected net.minecraft.sounds.SoundEvent getHurtSound(DamageSource source) { return null; }
     @Override protected net.minecraft.sounds.SoundEvent getDeathSound() { return SoundEvents.WARDEN_DEATH; }
 }

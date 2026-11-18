@@ -10,20 +10,17 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 
-/** Death uses a tall, skeletal silhouette until its bespoke model is authored. */
+/** Death's custom charred-bone skin and tall, narrow silhouette. */
 public final class DeathRenderer extends MobRenderer<DeathEntity, HumanoidModel<DeathEntity>> {
     public static final ModelLayerLocation LAYER = new ModelLayerLocation(
             ResourceLocation.fromNamespaceAndPath(TheOutlands.MOD_ID, "death"), "main");
-    private static final ResourceLocation TEXTURE =
-            ResourceLocation.withDefaultNamespace("textures/entity/skeleton/wither_skeleton.png");
-
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(
+            TheOutlands.MOD_ID, "textures/entity/death.png");
     public DeathRenderer(EntityRendererProvider.Context context) {
         super(context, new HumanoidModel<>(context.bakeLayer(LAYER)), 0.42F);
     }
-
     public static LayerDefinition createBodyLayer() {
-        return LayerDefinition.create(HumanoidModel.createMesh(CubeDeformation.NONE, 0.0F), 64, 64);
+        return LayerDefinition.create(HumanoidModel.createMesh(new CubeDeformation(0.02F), 0.0F), 64, 64);
     }
-
     @Override public ResourceLocation getTextureLocation(DeathEntity entity) { return TEXTURE; }
 }

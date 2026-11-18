@@ -187,6 +187,110 @@ public final class HorrorMemory {
         data.put(ROOT, memory);
     }
 
+    private static final String HAUNTED_CELLS = "haunted_cells";
+    private static final int MAX_HAUNTED_CELLS = 16;
+
+    /** Marks a coarse visited cell as haunted; returns true if it was already marked. */
+    public static boolean markHauntedLocation(ServerPlayer player, BlockPos position) {
+        CompoundTag data = player.getPersistentData();
+        CompoundTag memory = getMemory(data);
+        long packed = cellFor(position).asLong();
+        ListTag old = memory.getList(HAUNTED_CELLS, Tag.TAG_LONG);
+        boolean existed = old.contains(LongTag.valueOf(packed));
+        if (!existed) {
+            ListTag updated = new ListTag();
+            for (int i = Math.max(0, old.size() - MAX_HAUNTED_CELLS + 1); i < old.size(); i++)
+                updated.add(old.get(i).copy());
+            updated.add(LongTag.valueOf(packed));
+            memory.put(HAUNTED_CELLS, updated);
+        }
+        data.put(ROOT, memory);
+        return existed;
+    }
+
+    public static boolean isHauntedLocation(ServerPlayer player, BlockPos position) {
+        long packed = cellFor(position).asLong();
+        return getMemory(player.getPersistentData()).getList(HAUNTED_CELLS, Tag.TAG_LONG)
+                .contains(LongTag.valueOf(packed));
+    }
+
+    public static void recordNullObservation(ServerPlayer player, long gameTime) {
+        CompoundTag data = player.getPersistentData();
+        CompoundTag memory = getMemory(data);
+        memory.putInt("null_observations", Math.min(10_000, memory.getInt("null_observations") + 1));
+        memory.putLong("last_null_observation", gameTime);
+        data.put(ROOT, memory);
+    }
+
+    public static int nullObservationCount(ServerPlayer player) {
+        return getMemory(player.getPersistentData()).getInt("null_observations");
+    }
+
+    public static int deathEncounterCount(ServerPlayer player) {
+        return getMemory(player.getPersistentData()).getInt("death_encounters");
+    }
+
+    public static void recordDeathEncounter(ServerPlayer player, long gameTime) {
+        CompoundTag data = player.getPersistentData();
+        CompoundTag memory = getMemory(data);
+        memory.putInt("death_encounters", Math.min(10_000, memory.getInt("death_encounters") + 1));
+        memory.putLong("last_death_spawn", gameTime);
+        data.put(ROOT, memory);
+    }
+
+    public static long lastNullApostleSpawn(ServerPlayer player) {
+        CompoundTag memory = getMemory(player.getPersistentData());
+        return memory.contains("last_null_apostle_spawn") ? memory.getLong("last_null_apostle_spawn") : -24_000L;
+    }
+
+    public static void setLastNullApostleSpawn(ServerPlayer player, long gameTime) {
+        CompoundTag data = player.getPersistentData();
+        CompoundTag memory = getMemory(data);
+        memory.putLong("last_null_apostle_spawn", gameTime);
+        data.put(ROOT, memory);
+    }
+
+    private static final String SLEEP_CELLS = "sleep_cells";
+    private static final String BUILD_CELLS = "build_cells";
+    private static final int MAX_CONTEXT_CELLS = 8;
+
+    public static void recordSleepLocation(ServerPlayer player, BlockPos position) {
+        recordContextCell(player, SLEEP_CELLS, position);
+    }
+
+    public static void recordBuildLocation(ServerPlayer player, BlockPos position) {
+        recordContextCell(player, BUILD_CELLS, position);
+    }
+
+    private static void recordContextCell(ServerPlayer player, String key, BlockPos position) {
+        CompoundTag data = player.getPersistentData();
+        CompoundTag memory = getMemory(data);
+        long packed = cellFor(position).asLong();
+        ListTag old = memory.getList(key, Tag.TAG_LONG);
+        if (old.contains(LongTag.valueOf(packed))) return;
+        ListTag updated = new ListTag();
+        for (int i = Math.max(0, old.size() - MAX_CONTEXT_CELLS + 1); i < old.size(); i++)
+            updated.add(old.get(i).copy());
+        updated.add(LongTag.valueOf(packed));
+        memory.put(key, updated);
+        data.put(ROOT, memory);
+    }
+
+    public static List<BlockPos> rememberedSleepLocations(ServerPlayer player) {
+        return readPositionList(getMemory(player.getPersistentData()), SLEEP_CELLS);
+    }
+
+    public static List<BlockPos> rememberedBuildLocations(ServerPlayer player) {
+        return readPositionList(getMemory(player.getPersistentData()), BUILD_CELLS);
+    }
+
+    private static List<BlockPos> readPositionList(CompoundTag memory, String key) {
+        ListTag list = memory.getList(key, Tag.TAG_LONG);
+        List<BlockPos> positions = new ArrayList<>(list.size());
+        for (int i = 0; i < list.size(); i++) positions.add(BlockPos.of(((LongTag) list.get(i)).getAsLong()));
+        return List.copyOf(positions);
+    }
+
     public static void copy(ServerPlayer original, ServerPlayer replacement) {
         CompoundTag originalMemory = getMemory(original.getPersistentData());
         if (!originalMemory.isEmpty()) replacement.getPersistentData().put(ROOT, originalMemory.copy());

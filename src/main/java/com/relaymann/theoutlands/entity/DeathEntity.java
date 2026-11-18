@@ -1,5 +1,7 @@
 package com.relaymann.theoutlands.entity;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -8,20 +10,28 @@ import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import com.relaymann.theoutlands.horror.AlmightyTerritory;
+import java.util.UUID;
 
-/** Death is a persistent hunter: it stalks, closes distance, and commits only when ready. */
+/** Death is a persistent hunter bound to the player whose trail he is following. */
 public final class DeathEntity extends Monster {
+    private UUID huntTarget;
+    private int farTicks;
+    private long pauseUntilGameTime;
+
     public DeathEntity(EntityType<? extends Monster> type, Level level) {
         super(type, level);
         setPersistenceRequired();
         xpReward = 0;
         addTag("theoutlands_death");
+    }
+
+    public void setHuntTarget(ServerPlayer player) {
+        huntTarget = player.getUUID();
+        setTarget(player);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -30,40 +40,71 @@ public final class DeathEntity extends Monster {
                 .add(Attributes.MOVEMENT_SPEED, 0.29D)
                 .add(Attributes.ATTACK_DAMAGE, 11.0D)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.2D)
-                .add(Attributes.FOLLOW_RANGE, 112.0D)
+                .add(Attributes.FOLLOW_RANGE, 160.0D)
                 .add(Attributes.ARMOR, 8.0D)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 0.65D);
     }
 
-    @Override
-    protected void registerGoals() {
+    @Override protected void registerGoals() {
         goalSelector.addGoal(1, new FloatGoal(this));
         goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.18D, true));
         goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 0.72D));
         goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 48.0F));
         goalSelector.addGoal(9, new RandomLookAroundGoal(this));
-        targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
+        // No nearest-player target goal: Death follows the player whose trail he first picked up.
     }
 
-    @Override
-    public void tick() {
+    @Override public void tick() {
         super.tick();
-        if (level().isClientSide) return;
-        if (getTarget() instanceof ServerPlayer player
-                && AlmightyTerritory.contains(player.serverLevel(), player.getX(), player.getZ())) {
+        if (level().isClientSide || huntTarget == null) return;
+        ServerPlayer target = level().getServer().getPlayerList().getPlayer(huntTarget);
+        if (target == null || !target.isAlive() || target.serverLevel() != level()
+                || AlmightyTerritory.contains(target.serverLevel(), target.getX(), target.getZ())) {
             setTarget(null);
             getNavigation().stop();
+            return;
         }
-        // Death occasionally stops to study a nearby player instead of running a predictable chase loop.
-        if (getTarget() instanceof Player player && distanceToSqr(player) < 22.0D * 22.0D
-                && tickCount % 240 < 28) {
+
+        double distance = distanceToSqr(target);
+        if (distance > 100.0D * 100.0D) farTicks++;
+        else farTicks = 0;
+
+        // When the player seems to have escaped, Death stops pursuing for a while.
+        // He resumes only if the player is still within a plausible hunting radius.
+        if (farTicks >= 60 && pauseUntilGameTime <= level().getGameTime()) {
+            pauseUntilGameTime = level().getGameTime() + 100L + getRandom().nextInt(100);
+            farTicks = 0;
+        }
+        if (level().getGameTime() < pauseUntilGameTime || distance > 160.0D * 160.0D) {
+            setTarget(null);
             getNavigation().stop();
-            getLookControl().setLookAt(player, 24.0F, 24.0F);
-        } else if (getTarget() instanceof Player player && distanceToSqr(player) < 18.0D * 18.0D) {
-            setSprinting(true);
-        } else {
             setSprinting(false);
+            return;
         }
+
+        setTarget(target);
+        // Death sometimes watches instead of attacking, then resumes without a cue.
+        if (distance < 24.0D * 24.0D && tickCount % 360 < 64) {
+            getNavigation().stop();
+            getLookControl().setLookAt(target, 24.0F, 24.0F);
+            setSprinting(false);
+        } else {
+            setSprinting(distance < 18.0D * 18.0D);
+        }
+    }
+
+    @Override public void addAdditionalSaveData(CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        if (huntTarget != null) tag.putUUID("hunt_target", huntTarget);
+        tag.putInt("far_ticks", farTicks);
+        tag.putLong("pause_until_game_time", pauseUntilGameTime);
+    }
+
+    @Override public void readAdditionalSaveData(CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        huntTarget = tag.hasUUID("hunt_target") ? tag.getUUID("hunt_target") : null;
+        farTicks = tag.getInt("far_ticks");
+        pauseUntilGameTime = tag.getLong("pause_until_game_time");
     }
 
     @Override protected net.minecraft.sounds.SoundEvent getAmbientSound() { return null; }

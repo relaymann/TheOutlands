@@ -13,6 +13,7 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -21,7 +22,7 @@ import java.util.UUID;
 
 /** Player-specific Null sightings that adapt to remembered places and observed behavior. */
 public final class NullWatcherManager {
-    private static final long EYE_CONTACT_DELAY = 12L;
+    private static final long EYE_CONTACT_DELAY = 24L;
     private static final double LOOK_DOT_THRESHOLD = 0.965D;
     private static final double APPROACH_DISTANCE_SQR = 5.0D * 5.0D;
     private static final Map<UUID, ActiveWatcher> ACTIVE = new HashMap<>();
@@ -35,6 +36,7 @@ public final class NullWatcherManager {
         int priorSightings = (int) HorrorMemory.recentEncounters(player).stream()
                 .filter(id -> id.equals("distant_figure") || id.equals("the_return") || id.equals("observer")).count();
         priorSightings = Math.max(0, priorSightings - 1); // The triggering encounter was recorded before spawn().
+        priorSightings += HorrorMemory.nullObservationCount(player) / 3;
         NullStalkingProfile profile = NullStalkingProfile.fromPlayerHistory(priorSightings,
                 HorrorMemory.lookBackCount(player), HorrorMemory.pauseCount(player), HorrorMemory.flightCount(player));
 
@@ -78,6 +80,8 @@ public final class NullWatcherManager {
             if (isLookingAt(target, entity)) {
                 if (watcher.lookedAtSince < 0L) watcher.lookedAtSince = level.getGameTime();
                 if (level.getGameTime() - watcher.lookedAtSince >= EYE_CONTACT_DELAY) {
+                    HorrorMemory.recordNullObservation(target, level.getGameTime());
+                    HorrorMemory.recordDiscovery(target, "null_eye_contact");
                     entity.discard(); it.remove();
                 }
                 continue;
@@ -97,7 +101,9 @@ public final class NullWatcherManager {
 
     /** Null may reuse the player's own remembered places, but only in already-loaded chunks. */
     private static BlockPos findRememberedHidingPosition(ServerPlayer player, NullStalkingProfile profile) {
-        List<BlockPos> remembered = HorrorMemory.rememberedLocations(player);
+        List<BlockPos> remembered = new ArrayList<>(HorrorMemory.rememberedLocations(player));
+        remembered.addAll(HorrorMemory.rememberedSleepLocations(player));
+        remembered.addAll(HorrorMemory.rememberedBuildLocations(player));
         if (remembered.isEmpty()) return null;
         ServerLevel level = player.serverLevel();
         for (int i = remembered.size() - 1; i >= 0; i--) {

@@ -60,6 +60,10 @@ public record HorrorContext(String biomeId, boolean night, boolean raining, bool
         if ("familiar_echo".equals(id) && (lookBackCount >= 3 || pauseCount >= 8)) weight *= 1.7D;
         if ("environmental_hush".equals(id) && nearbyPlayers == 0) weight *= 1.35D;
         if ("almighty_influence".equals(id) && nearAlmightyTerritory) weight *= 1.0D;
+        if ("world_inconsistency".equals(id) && previousEncounterCount >= 4) weight *= 1.3D;
+        if ("false_structure".equals(id) && biomeId.contains("forest")) weight *= 1.5D;
+        if ("paranoia_echo".equals(id) && (lookBackCount >= 4 || pauseCount >= 6)) weight *= 1.6D;
+        if ("null_apostle_sign".equals(id) && hasSeenNull) weight *= 1.8D;
         return weight;
     }
 }

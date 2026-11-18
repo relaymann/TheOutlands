@@ -10,10 +10,11 @@ import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.phys.AABB;
 
-/** Player-local environmental behavior for Fear's forest domain. */
+/** Sparse environmental behavior for Fear's forest domain; all cues are target-player specific. */
 public final class FearTerritoryManager {
     private FearTerritoryManager() {}
 
@@ -24,28 +25,42 @@ public final class FearTerritoryManager {
         if (AlmightyTerritory.contains(level, player.getX(), player.getZ())) return;
         var biomeKey = level.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.BIOME)
                 .getKey(level.getBiome(player.blockPosition()).value());
-        if (biomeKey == null || !biomeKey.getPath().contains("forest")) return;
+        if (biomeKey == null || !(biomeKey.getPath().contains("forest")
+                || biomeKey.getPath().equals("fear_forest"))) return;
+        if (level.getGameTime() % 100L != 0L) return;
 
         HorrorMemory.recordDiscovery(player, "fear_forest_entered");
-        // The forest notices the player: nearby mobs occasionally turn toward them without a warning cue.
-        for (Mob mob : level.getEntitiesOfClass(Mob.class,
-                new AABB(player.blockPosition()).inflate(22.0D), Mob::isAlive)) {
-            if (player.getRandom().nextInt(5) == 0) {
-                mob.getLookControl().setLookAt(player, 5.0F, 5.0F);
+        var nearby = level.getEntitiesOfClass(Mob.class,
+                new AABB(player.blockPosition()).inflate(24.0D), Mob::isAlive);
+        if (!nearby.isEmpty() && player.getRandom().nextInt(3) == 0) {
+            Mob chosen = nearby.get(player.getRandom().nextInt(nearby.size()));
+            chosen.getNavigation().stop();
+            chosen.getLookControl().setLookAt(player, 5.0F, 5.0F);
+        }
+
+        // Forest animals occasionally stop behaving naturally, but no mob is forcibly hostile.
+        if (player.getRandom().nextInt(9) == 0) {
+            for (Mob mob : nearby) {
+                if (mob.getType() == EntityType.WOLF || mob.getType() == EntityType.FOX) {
+                    mob.getNavigation().stop();
+                    mob.getLookControl().setLookAt(player, 3.0F, 3.0F);
+                    break;
+                }
             }
         }
 
-        if (player.getRandom().nextInt(7) == 0) {
+        if (player.getRandom().nextInt(6) == 0) {
             double angle = player.getRandom().nextDouble() * Math.PI * 2.0D;
-            double distance = 22.0D + player.getRandom().nextDouble() * 16.0D;
+            double distance = 24.0D + player.getRandom().nextDouble() * 18.0D;
             double x = player.getX() + Math.cos(angle) * distance;
             double z = player.getZ() + Math.sin(angle) * distance;
             player.connection.send(new ClientboundSoundPacket(
                     BuiltInRegistries.SOUND_EVENT.wrapAsHolder(SoundEvents.AMBIENT_CAVE.value()),
-                    SoundSource.AMBIENT, x, player.getY() + 1.0D, z, 0.12F,
-                    0.48F + player.getRandom().nextFloat() * 0.18F, player.getRandom().nextLong()));
-            level.sendParticles(player, ParticleTypes.ASH, true,
-                    x, player.getY() + 2.0D, z, 2, 0.25D, 0.5D, 0.25D, 0.001D);
+                    SoundSource.AMBIENT, x, player.getY() + 1.0D, z, 0.10F,
+                    0.42F + player.getRandom().nextFloat() * 0.16F, player.getRandom().nextLong()));
+            level.sendParticles(player, ParticleTypes.ASH, true, x, player.getY() + 2.0D, z,
+                    3, 0.3D, 0.6D, 0.3D, 0.001D);
         }
+        if (player.getRandom().nextInt(24) == 0) ClientAfterimageManager.showFalseStructure(player);
     }
 }

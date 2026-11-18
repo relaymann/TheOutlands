@@ -45,20 +45,21 @@ public final class DeathHuntManager {
         if (death == null) return;
         death.moveTo(spawn.getX() + 0.5D, spawn.getY(), spawn.getZ() + 0.5D,
                 player.getYRot() + 180.0F, 0.0F);
-        death.setTarget(player);
+        death.setHuntTarget(player);
         if (!level.noCollision(death, death.getBoundingBox()) || !level.addFreshEntity(death)) return;
 
-        HorrorMemory.setLastDeathSpawn(player, now);
+        HorrorMemory.recordDeathEncounter(player, now);
         HorrorMemory.recordDiscovery(player, "death_first_sighting");
         dropNextClue(player, death);
     }
 
     private static void updateClueInventory(ServerPlayer player) {
-        for (ItemStack stack : player.getInventory().items) {
+        java.util.stream.Stream.of(player.getInventory().items, player.getInventory().armor, player.getInventory().offhand)
+                .flatMap(java.util.Collection::stream).forEach(stack -> {
             if (stack.is(OutlandsItems.DEATH_JAR.get())) HorrorMemory.recordDiscovery(player, "death_jar_found");
             if (stack.is(OutlandsItems.DEATH_MANIFEST.get())) HorrorMemory.recordDiscovery(player, "death_manifest_found");
             if (stack.is(OutlandsItems.ALMIGHTY_FRAGMENT.get())) HorrorMemory.recordDiscovery(player, "almighty_fragment_found");
-        }
+        });
     }
 
     private static void dropNextClue(ServerPlayer player, DeathEntity death) {

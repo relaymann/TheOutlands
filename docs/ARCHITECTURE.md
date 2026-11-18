@@ -5,40 +5,51 @@
 - Mod id: `theoutlands`; package: `com.relaymann.theoutlands`.
 
 ## Configuration
-The common config exposes horror intensity, event frequency, event enablement, opening anomaly distance, Fear and Death milestone distances, Fear's full-territory distance, Almighty border depth, Null sightings, and horror audio. Defaults preserve the canonical design values. The server-authoritative director and border calculations read the configured values.
+The common config exposes horror intensity, event frequency, event enablement, opening anomaly distance, Fear and Death milestone distances, Fear's full-territory distance, Almighty border depth, Null sightings, horror audio, and Fear's ambient attenuation. Server-owned progression and border calculations read the configured values. Client-only Fear audio/fog effects read the synchronized common config value.
 
-## Implemented systems
+## Horror director and reality deception
 The original shared Overworld spawn is the fixed distance origin. The first 1,000 horizontal blocks remain outside the horror range. Escalation grows continuously beyond it without an arbitrary content cap.
 
-The director evaluates once per second, builds per-player pressure, enforces a distance-scaled quiet period, and selects weighted encounters. Context includes biome, night/day, rain, thunder, nearby-player count, and health. Context changes weights only; it cannot bypass minimum distance, pressure, cooldown, or quiet-period gates.
+The director evaluates once per second, builds per-player pressure, enforces a distance-scaled quiet period, and selects weighted encounters. Context includes biome, night/day, rain, thunder, nearby-player count, health, prior encounters, look-backs, pauses, and previous Null/Fear discoveries. Context changes weights only; it cannot bypass minimum distance, pressure, cooldown, or quiet-period gates.
 
-Selected encounters execute on the logical server. Ambient displacement, false footsteps, distant figures, environmental distortion, direct intervention, private unexplained messages, false-death cues, and returning-observer encounters are executable. Ordinary scares do not narrate themselves in chat or actionbar. Directional sound packets are sent only to the target player. Client afterimages temporarily send fake block states to that player's connection and restore the current server block state; the server world and other clients are never changed. All illusion placement checks loaded chunks.
+Ordinary encounters never narrate themselves in chat or actionbar. Rare intentional character dialogue is reserved for actual story interventions and the ending.
+
+`ClientAfterimageManager` sends temporary fake block states to one player's connection and restores the current server block state after a bounded lifetime. Terrain afterimages, silhouettes, and broken-arch false structures never write to the logical world. All candidate positions must be in already-loaded chunks. These illusions are not permanent generated structures.
+
+Directional audio packets are sent only to the intended player at actual world coordinates, allowing vanilla distance attenuation. In Fear's distant forest territory, the client locally scales down ambient and weather sound volume and blends fog toward a darker forest palette. These client effects do not alter other players' sound or view.
 
 ## Persistent player memory
-`HorrorMemory` stores a bounded recent encounter list, a lifetime encounter count, last encounter game time, and unique discovery identifiers in NeoForge's persistent player entity data. Encounter execution records the event immediately. Story memory is copied when the player entity is replaced during respawn. The discovery API is ready for future structure and ARG clue integrations.
+`HorrorMemory` stores bounded coarse visited cells, a bounded set of haunted cells, recent encounters, lifetime encounter count, unique discoveries, behavioral samples, bounded coarse sleep/build locations, Null eye-contact observations, Death encounter timing/counts, apostle cooldowns, and clue progression. Null's watcher placement can prefer remembered travel cells, sleeping places, and player-built areas without storing a precise movement trail. It deliberately avoids a precise movement trail. Story memory is copied when the player entity is replaced during respawn.
 
-## Apostle milestone model
-`ApostleProgression` centralizes the canonical story thresholds: Fear's first appearance at 15,000 blocks, Death's first appearance at 50,000 blocks, and Fear's full-territory milestone at 100,000 blocks. Null remains eligible at any distance. The Almighty's final territory overrides Death's territory. These are progression gates, not a cap on general horror escalation.
+Returning to a previously haunted cell can escalate from a terrain afterimage to a false structure. A different player in the same location does not automatically receive the same hallucination.
 
-Fear's first encounter remains a player-specific story milestone. At the full-territory distance, forest-tagged vanilla biomes receive a player-local Fear domain overlay: nearby mobs sometimes turn toward the player, ash drifts through the trees, and quiet positional ambience appears at a distance. This first pass does not yet add a new worldgen biome or Fear-exclusive structures. Death is spawned as a persistent hunter after the configured 50,000-block milestone; his spawn cooldown and clue discoveries persist in player data.
+## Null and Null's apostles
+Null's watcher manager selects safe positions in already-loaded chunks, prefers cover and remembered locations, and relocates while unobserved. Sustained eye contact or close approach ends a sighting. Eye-contact observations are persisted and influence later stalking distance, lifetime, and relocation cadence.
 
-## Almighty border geometry
-`AlmightyTerritory` measures the inward distance to the nearest edge of the live square world border. It reads the border's configured center and size from the level and defines the final 5,000-block strip on all four sides, including corners. Positions outside the border are excluded. The geometry is isolated and unit-tested against shifted centers, non-default sizes, all sides, and boundary conditions.
+Null's unnamed apostles are separate registered observer entities. They are rare, player-specific, require repeated Null observations and sufficient distance from spawn, and disappear after sustained eye contact or close approach. They do not attack or use a predictable chase loop. They are excluded from the Almighty's final territory.
 
-Server-side entity lifecycle enforcement now rejects non-player entities when they attempt to join inside the final region and discards non-exempt entities that cross into it later. Players remain able to enter for the endgame. The registered Almighty entity opts in using the dedicated `theoutlands_almighty` entity tag. Entering the borderland starts a one-time boss encounter with a server boss bar, melee pressure, and escalating area pulses. The entity remains inside the configured borderland and ordinary entities remain excluded.
+## Fear's forest territory
+Fear's first meeting remains a player-specific milestone, with the existing intentional introduction dialogue shared with nearby witnesses. At the full-territory distance, forest biomes receive a sparse environmental overlay: nearby mobs sometimes stop and watch, forest animals occasionally behave unnaturally, ash drifts through the trees, distant sounds occur, and false structures can appear.
 
-## Null's visual identity and sightings
-Null is a dedicated registered entity, not an Enderman or disguised player. The renderer uses vanilla humanoid/player proportions with a 64x64 custom skin. The PNG is 64x64 RGBA, fully opaque black except for eight white pixels forming two separated 2x2 eye marks on the front of the head.
+A separate `theoutlands:fear_forest` biome registry definition and NeoForge biome modifiers are included with dark-forest vegetation and a limited hostile spawn table. The default vanilla Overworld multi-noise biome source is not replaced or rewritten by this mod, so the new biome is not yet naturally selected by vanilla world generation. The distant-territory overlay remains active on existing forest biomes; automatic biome-source integration and permanent Fear structures remain future work.
 
-The current sighting manager creates temporary invulnerable, silent Null entities at safe positions in already-loaded chunks. They watch the target, disappear after sustained eye contact or close approach, and relocate to another safe hiding position while unobserved. Repeated sightings adapt the next appearance: Null gradually appears closer, remains longer, and relocates more frequently within bounded limits. This remains an initial stalker behavior, not the finished long-range stalking intelligence or final animation suite.
+## Death and the death.jar chain
+Death is a persistent hunter bound to the player whose trail he first picks up. He does not retarget random nearby players. He pursues, pauses to study the target, can stop after an apparent escape, and resumes only while the target remains within a bounded hunting radius. His target and pause state are saved with the entity.
 
-Operators can use `/theoutlands debug` (permission level 2) to inspect spawn distance, escalation tier, pressure, the latest director result, border distance, and apostle milestone eligibility.
+The clue sequence is `death.jar` → `manifest.txt` → `author.dat`. Each later artifact is released on a subsequent Death manifestation after the previous artifact has been discovered. The Almighty drops `the_last_page` when defeated. Clue discoveries are stored per player and survive logout/respawn.
+
+## Almighty border geometry and endgame
+`AlmightyTerritory` measures the inward distance to the nearest edge of the live square world border. It reads the border's configured center and size and defines the configured final strip on all four sides, including corners. Positions outside the border are excluded.
+
+Server-side entity lifecycle enforcement rejects non-player entities when they attempt to join inside the final region and discards non-exempt entities that cross into it later. Players and the tagged Almighty are exempt. Entering the borderland starts the one-time encounter.
+
+The Almighty has a server boss bar and three health phases: a close pressure pulse, a wider inward pull, and a final knockback shockwave. Phase changes alter the boss bar, particles, and roar. Defeating him drops the final artifact and records the ending discovery for nearby players. This is the implemented combat/revelation ending beat; a cinematic credits sequence and multi-outcome epilogue remain future work.
+
+## Presentation assets
+Null and Fear retain dedicated 64x64 textures. Death and The Almighty now use original 64x64 pixel textures rather than vanilla entity skins. The entity rigs remain humanoid-based; bespoke geometry, authored animation clips, and original audio recordings are still planned.
 
 ## Multiplayer and performance
-The server owns selection and execution. Targeted effects go only to the selected player. Progression runs once per second and performs one bounded nearby-player query. Watcher cleanup visits only tracked UUIDs. No chunk is force-loaded and no player-built blocks are modified.
+The server owns event selection and entity behavior. Targeted sounds, particles, and block-state afterimages go only to the selected player. Fear's first introduction is a shared story event. Progression runs once per second, and nearby entity/player queries are bounded. Watcher and illusion cleanup visits only tracked UUIDs/positions. No chunk is force-loaded and no player-built blocks are changed.
 
-## Planned
-Advanced Null behavior adaptation, false sightings, custom animations, Null's apostles, Fear and Death entities, Fear biome/structures, Death hunting AI, entity exclusion from the Almighty territory, configured-border-relative finale, custom audio, and ARG content remain future work.
-
-## Testing
-Pure tests cover opening-range protection, pacing, cooldown boundaries, safe random rolls, contextual weighting, persistent player memory, Almighty territory geometry, and apostle milestone boundaries. Client/server and multiplayer smoke tests remain release requirements.
+## Testing and remaining release gates
+Pure tests cover opening-range protection, pacing, cooldown boundaries, safe random rolls, contextual weighting, persistent memory policy, Almighty territory geometry, and apostle milestone boundaries. GitHub Actions runs `clean test build` and publishes the rolling JAR only after success. Dedicated-server startup, full client rendering/audio, multiplayer playtesting, and a full-worldgen compatibility pass remain release gates.

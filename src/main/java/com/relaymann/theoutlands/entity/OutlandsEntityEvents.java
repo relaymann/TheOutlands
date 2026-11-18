@@ -15,5 +15,6 @@ public final class OutlandsEntityEvents {
         event.put(OutlandsEntities.FEAR.get(), FearEntity.createAttributes().build());
         event.put(OutlandsEntities.DEATH.get(), DeathEntity.createAttributes().build());
         event.put(OutlandsEntities.ALMIGHTY.get(), AlmightyEntity.createAttributes().build());
+        event.put(OutlandsEntities.NULL_APOSTLE.get(), NullApostleEntity.createAttributes().build());
     }
 }

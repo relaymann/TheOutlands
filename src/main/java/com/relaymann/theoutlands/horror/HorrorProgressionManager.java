@@ -2,6 +2,7 @@ package com.relaymann.theoutlands.horror;
 
 import com.relaymann.theoutlands.OutlandsConfig;
 import com.relaymann.theoutlands.event.AlmightyEncounterManager;
+import com.relaymann.theoutlands.event.ClientAfterimageManager;
 import com.relaymann.theoutlands.event.DeathHuntManager;
 import com.relaymann.theoutlands.event.FearTerritoryManager;
 import com.relaymann.theoutlands.event.FearEncounterManager;
@@ -30,6 +31,7 @@ public final class HorrorProgressionManager {
         DeathHuntManager.evaluate(player);
         AlmightyEncounterManager.evaluate(player);
         HorrorMemory.recordBehaviorSample(player);
+        if (player.isSleeping()) HorrorMemory.recordSleepLocation(player, player.blockPosition());
         boolean revisited = HorrorMemory.recordLocation(player);
         HorrorDirectorState state = STATES.computeIfAbsent(id, ignored -> new HorrorDirectorState());
         var level = player.serverLevel();
@@ -56,7 +58,9 @@ public final class HorrorProgressionManager {
         if (revisited && snapshot.escalationValue() > 0.0D
                 && now - HorrorMemory.lastFamiliarDistortion(player) >= 6_000L
                 && player.getRandom().nextInt(4) == 0) {
-            HorrorEventExecutor.executeFamiliarPlaceDistortion(player);
+            boolean alreadyHaunted = HorrorMemory.markHauntedLocation(player, player.blockPosition());
+            if (alreadyHaunted) ClientAfterimageManager.showFalseStructure(player);
+            else HorrorEventExecutor.executeFamiliarPlaceDistortion(player);
             HorrorMemory.setLastFamiliarDistortion(player, now);
         }
 

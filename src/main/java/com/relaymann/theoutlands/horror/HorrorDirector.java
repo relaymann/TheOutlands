@@ -30,6 +30,10 @@ public final class HorrorDirector {
             new HorrorEventDefinition("fear_call", 40_000, 17, 1, 10_000, 9),
             new HorrorEventDefinition("familiar_echo", 1_000, 16, 2, 8_000, 5),
             new HorrorEventDefinition("environmental_hush", 2_000, 19, 1, 12_000, 8),
+            new HorrorEventDefinition("world_inconsistency", 6_000, 15, 2, 7_200, 7),
+            new HorrorEventDefinition("false_structure", 8_000, 16, 2, 9_000, 8),
+            new HorrorEventDefinition("paranoia_echo", 10_000, 16, 2, 6_400, 7),
+            new HorrorEventDefinition("null_apostle_sign", 22_000, 23, 1, 22_000, 11),
             new HorrorEventDefinition("almighty_influence", 50_000, 35, 1, 24_000, 12));
     private HorrorDirector() {}
     public static List<HorrorEventDefinition> getEventDefinitions() { return EVENTS; }

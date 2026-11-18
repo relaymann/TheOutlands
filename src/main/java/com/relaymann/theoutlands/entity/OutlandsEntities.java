@@ -27,5 +27,9 @@ public final class OutlandsEntities {
             ENTITY_TYPES.register("almighty", () -> EntityType.Builder.of(AlmightyEntity::new, MobCategory.MONSTER)
                     .sized(1.1F, 3.2F).clientTrackingRange(32).updateInterval(2).build("theoutlands:almighty"));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<NullApostleEntity>> NULL_APOSTLE =
+            ENTITY_TYPES.register("null_apostle", () -> EntityType.Builder.of(NullApostleEntity::new, MobCategory.MONSTER)
+                    .sized(0.6F, 1.8F).clientTrackingRange(16).updateInterval(2).build("theoutlands:null_apostle"));
+
     private OutlandsEntities() {}
 }

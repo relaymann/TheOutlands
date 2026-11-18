@@ -9,6 +9,7 @@ import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
@@ -29,6 +30,7 @@ public final class ServerHorrorEvents {
     public static void onServerTick(ServerTickEvent.Post event) {
         for (ServerLevel level : event.getServer().getAllLevels()) {
             NullWatcherManager.tick(level);
+            NullApostleManager.tick(level);
             FearEncounterManager.tick(level);
             ClientAfterimageManager.tick(level);
         }
@@ -38,6 +40,13 @@ public final class ServerHorrorEvents {
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) ClientAfterimageManager.clear(player);
         HorrorProgressionManager.remove(event.getEntity().getUUID());
+    }
+
+    @SubscribeEvent
+    public static void onBlockPlaced(BlockEvent.EntityPlaceEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            HorrorMemory.recordBuildLocation(player, event.getPos());
+        }
     }
 
     @SubscribeEvent
@@ -52,6 +61,7 @@ public final class ServerHorrorEvents {
     public static void onServerStopping(ServerStoppingEvent event) {
         HorrorProgressionManager.clear();
         FearEncounterManager.clear();
+        NullApostleManager.clear();
         DeathHuntManager.clear();
         ClientAfterimageManager.clear();
     }

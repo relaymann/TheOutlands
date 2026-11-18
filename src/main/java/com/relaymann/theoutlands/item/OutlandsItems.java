@@ -21,5 +21,9 @@ public final class OutlandsItems {
             () -> new ClueItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC),
                     "item.theoutlands.almighty_fragment.lore"));
 
+    public static final DeferredHolder<Item, Item> THE_LAST_PAGE = ITEMS.register("the_last_page",
+            () -> new ClueItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC),
+                    "item.theoutlands.the_last_page.lore"));
+
     private OutlandsItems() {}
 }

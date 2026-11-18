@@ -19,6 +19,7 @@ The experience blends psychological and survival horror. It leans toward meaning
 - Use supernatural manipulation increasingly often, but keep some events grounded and ambiguous.
 - Major encounters should be memorable and consequential, not disposable random spawns.
 - Multiplayer combines shared world events with player-specific perceptions and memories.
+- The world remembers places the player revisits; a location can become increasingly wrong for that player without changing the actual blocks.
 
 ## The hierarchy
 
@@ -26,17 +27,17 @@ The experience blends psychological and survival horror. It leans toward meaning
 
 The Almighty is the mastermind behind the events and the ultimate authority in the world. The Almighty is not merely the strongest monster: the world and its horrors are part of a deliberate design.
 
-The final 5,000-block region before the world's configured border is The Almighty's land. No other entity may enter this territory; this exclusion includes Null, Null's apostles, Fear, Death, and ordinary hostile entities. The player may enter. The Almighty waits at the world border.
+The final configured strip before the world's border is The Almighty's land. No other entity may enter this territory; this exclusion includes Null, Null's apostles, Fear, Death, and ordinary hostile entities. The player may enter. The Almighty waits in the borderland.
 
-The Almighty's power includes creating a mod and inserting it into an existing world. This is how Death was made. The player reaches the final borderland, where the Almighty manifests as the endgame boss. The death.jar artifact chain begins revealing the installation trail; the final encounter and ending must complete the revelation without turning it into an introductory lore dump.
+The Almighty's power includes creating a mod and inserting it into an existing world. This is how Death was made. The player reaches the final borderland, where the Almighty manifests as the endgame boss. His encounter escalates through three phases. Defeating him reveals the final artifact, `the_last_page`, and the line: “You found the seam.” The last page is a revelation fragment, not a complete explanation of the entire story.
 
 ### Null — First Apostle
 
 Null is primarily the watcher and stalker associated with spawn. He observes, follows, and studies players, but can intervene directly and dispatch his own apostles.
 
-Null is the only apostle besides The Almighty who commands apostles of his own. Their identities, number, and individual roles remain to be designed.
+Null is the only apostle besides The Almighty who commands apostles of his own. His unnamed apostles are now represented by rare, silent observer entities. They are not ordinary hostile mobs: they watch, relocate when unseen, and disappear after sustained eye contact or close approach. Their identities, number, and individual roles remain open.
 
-Null is not geographically confined to spawn. He can appear in outer regions, including millions of blocks away. His presence should be rare enough to remain unsettling, and his behavior should not be reduced to a simple chase loop.
+Null is not geographically confined to spawn. He can appear in outer regions, including millions of blocks away. His presence should be rare enough to remain unsettling, and his behavior should not be reduced to a simple chase loop. Repeated eye contact, look-backs, pauses, and flight influence his later stalking behavior. He also remembers coarse areas where a player travels, sleeps, and builds, allowing later sightings to feel personally placed rather than randomly spawned.
 
 ### Fear — Second Apostle
 
@@ -50,35 +51,32 @@ Single-player introduction:
 
 In multiplayer, the dialogue adapts naturally to address the group rather than treating several players as one person.
 
-Fear controls a forest territory called **Fear**. It should become a distinct ecosystem, not merely a renamed dark forest: increased entity activity, more frequent events, unusual environmental effects, and structures exclusive to his influence. The current implementation begins with a territory overlay on existing forest biomes at the full-territory milestone; it is not yet a separate generated biome.
+Fear controls a forest territory called **Fear**. At the full-territory milestone, existing forest biomes receive darker fog, quieter ambient/weather audio, strange mob attention, animal behavior changes, drifting ash, distant positional sounds, and occasional false structures. A separate `theoutlands:fear_forest` biome definition and worldgen modifiers are included. The vanilla Overworld biome source is deliberately not replaced, so automatic natural placement of that new biome and permanent Fear structures are not complete yet.
 
-**Provisional distance reconciliation:** the first personal appearance can occur after 15,000 blocks, while the Fear biome's broader/full territorial presence and major escalation can begin around 100,000 blocks. This reconciles the two distances mentioned so far, but requires confirmation before becoming final canon.
+**Distance reconciliation:** Fear's first personal appearance occurs around 15,000 blocks; the broader/full territorial presence begins around 100,000 blocks. These are separate milestones.
 
 ### Death / death.jar — Final Apostle
 
 Death is the final apostle beneath The Almighty. The Almighty created Death by making a mod and inserting it into the world; Death is therefore an installed presence, not a naturally occurring creature.
 
-Death first appears around 50,000 blocks. He is a hunter and pursuer who enjoys toying with prey before devouring them. He should track and pressure targets over time, use misdirection, sometimes allow an apparent escape, and choose when to commit to a dangerous attack. Avoid making him teleport directly behind players on a predictable timer.
+Death first appears around 50,000 blocks. He is a hunter and pursuer who enjoys toying with prey before devouring them. He follows the player whose trail he picked up, studies them, sometimes allows an apparent escape, and may resume the hunt if they remain within range. He does not immediately retarget other players or teleport behind a player on a predictable timer.
 
-The name **death.jar** is a key meta-ARG clue. The first implemented chain is discovered through three rare artifacts: `death.jar`, `manifest.txt`, and `author.dat`. The next artifact is only released after the previous one is found and Death manifests again. These fragments are the beginning of the chain, not the complete ARG.
+The meta-ARG clue sequence is discovered through three rare artifacts: `death.jar`, `manifest.txt`, and `author.dat`. The next artifact is only released after the previous one is found and Death manifests again. Defeating The Almighty reveals a final `the_last_page` artifact. The sequence is the beginning of a larger ARG, not a one-book lore dump.
 
-Death's territory extends outward until the final 5,000-block region belonging exclusively to The Almighty.
-
-### Null's apostles
-
-Null's apostles are a separate subordinate group. Null is the only named apostle, besides The Almighty, who has apostles of his own. They can watch, investigate, track, protect locations, or intervene under Null's direction. Their number and identities remain open.
+Death's territory extends outward until the final configured region belonging exclusively to The Almighty.
 
 ## World geography
 
 - **0–1,000 blocks:** ordinary vanilla baseline.
 - **Beyond 1,000:** continuous escalation begins.
-- **Around 15,000:** proposed first Fear appearance (provisional reconciliation).
+- **Around 15,000:** Fear's first appearance.
+- **Around 22,000 and after repeated Null observations:** rare appearances of Null's unnamed apostles become eligible.
 - **Around 50,000:** Death's first appearance.
-- **Around 100,000:** full Fear forest-territory escalation (current overlay implementation; a dedicated generated biome remains future work).
-- **Final 5,000 blocks before the configured world border:** The Almighty's exclusive land.
-- **At the border:** The Almighty is waiting.
+- **Around 100,000:** full Fear forest-territory overlay.
+- **Final configured border strip:** The Almighty's exclusive land.
+- **At the borderland:** The Almighty waits.
 
-These are story milestones, not isolated difficulty zones. Null can appear far outside spawn territory. Fear's influence can be foreshadowed before the full biome appears. Death can hunt across his territory. Horror continues to escalate between all milestones.
+These are story milestones, not isolated difficulty zones. Null can appear far outside spawn territory. Fear's influence can be foreshadowed before the full territory appears. Death can hunt across his territory. Horror continues to escalate between all milestones.
 
 ## ARG structure
 
@@ -91,7 +89,7 @@ The story should be discovered through interconnected evidence:
 - The death.jar revelation.
 - Evidence of The Almighty's authorship and control.
 
-Do not put the entire hierarchy or explanation in one lore dump. Let players form theories, make connections, and revisit earlier discoveries with new understanding.
+Do not put the entire hierarchy or explanation in one lore dump. Let players form theories, make connections, and revisit earlier discoveries with new understanding. Current clue items are the first connected artifact chain; encrypted files, coordinate puzzles, and permanent story structures remain future expansions.
 
 ## Player experience safeguards
 
@@ -101,3 +99,4 @@ Do not put the entire hierarchy or explanation in one lore dump. Let players for
 - Do not destroy player builds for cheap shock value.
 - Make major events multiplayer-aware and avoid forcing every player to see identical hallucinations.
 - Keep horror intensity configurable where appropriate, without undermining the intended default experience.
+- Never use routine chat/actionbar narration to tell players what they just experienced.

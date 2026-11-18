@@ -6,7 +6,7 @@ The Overworld begins as recognizable vanilla Minecraft. Once players travel beyo
 
 ## Project status
 
-The current foundation includes distance-based horror progression, a player-specific encounter director, persistent ARG discoveries, Null watcher sightings, Fear's first encounter, and the **World Remembers** milestone. The latest major systems add client-only terrain afterimages and silhouette misdirection, positional ambient audio, Fear's forest-territory behavior, Death's persistent hunting AI and three-stage death.jar clue chain, and the Almighty's borderland boss encounter. This remains an experimental development build.
+The current build includes a player-specific horror director, persistent behavioral/location memory, client-only terrain/structure afterimages and silhouettes, positional audio, locally attenuated Fear-territory ambience, adaptive Null stalking that remembers travel, sleep, and building locations, plus rare Null apostle observers, Fear's forest-territory overlay plus a registered Fear biome definition, Death's target-bound hunter AI and death.jar clue chain, and the Almighty's three-phase endgame encounter. It remains an experimental development build.
 
 ## Technical target
 
@@ -36,7 +36,7 @@ The current foundation includes distance-based horror progression, a player-spec
 
 - **The Almighty** — mastermind behind the events; waits in the final 5,000-block region before the configured world border.
 - **Null** — first apostle; primarily watches and stalks around spawn, can intervene, commands apostles of his own, and may appear far beyond his usual territory.
-- **Fear** — second apostle; first appears around 15,000 blocks and exerts a forest-territory overlay around the 100,000-block milestone. A dedicated generated biome and exclusive structures remain future work.
+- **Fear** — second apostle; first appears around 15,000 blocks and exerts a forest-territory overlay around the 100,000-block milestone. A separate Fear biome definition and biome modifiers are included; automatic insertion into vanilla's default biome source and permanent Fear structures remain future work.
 - **Death / death.jar** — final apostle beneath The Almighty; a persistent hunter who stalks and attacks. First appears around 50,000 blocks and advances a three-artifact clue chain.
 
 See [docs/LORE_AND_DESIGN.md](docs/LORE_AND_DESIGN.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), and [docs/DEVELOPMENT_PLAN.md](docs/DEVELOPMENT_PLAN.md).

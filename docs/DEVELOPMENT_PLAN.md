@@ -5,78 +5,66 @@
 - [x] Unbounded distance progression from original shared Overworld spawn.
 - [x] Server-side progression evaluation once per second.
 
-## Phase 1 — Horror director and first encounters
+## Phase 1 — Horror director and psychological deception
 - [x] Per-player pressure, quiet periods, cooldowns, weighted selection, and recent-event memory.
-- [x] Context inputs: biome, day/night, weather, nearby players, and health.
-- [x] Executable server-side encounters for the six original event families.
-- [x] Additional private unexplained-message, false-death, and returning-observer encounters.
-- [x] Player-targeted sound, particles, and messages.
-- [x] Operator debug command.
-- [x] Configurable horror intensity, event frequency, and event enablement.
-- [x] Persistent player encounter counts, recent history, and discovery storage API.
-- [x] Player history influences event selection.
-- [x] Expand the director catalog to 21 event families (including three Fear-specific post-introduction families) with unique gates, cooldowns, context weighting, and bounded player-local effects.
-- [x] All 18 director IDs have explicit server-side handlers, and tests assert the catalog and handler sets match.
-- [ ] Finish true client-side audio muting, terrain afterimages, fake-player rendering, and world-generation event variants (current cues are deliberately non-destructive approximations).
+- [x] Context inputs: biome, day/night, weather, nearby players, health, and player behavior.
+- [x] Executable player-local events for ambient displacement, false footsteps, figures, environmental distortion, and story interventions.
+- [x] Client-only terrain afterimages, silhouettes, and false structure afterimages with server-state restoration.
+- [x] Persistent haunted-place memory and escalating return anomalies.
+- [x] Player-specific hallucinations and sounds that can differ between players sharing a location.
+- [x] No routine chat/actionbar narration for ordinary scares.
+- [x] Operator debug command and configurable pacing.
 
-## Phase 2 — Null
-- [x] Dedicated registered Null entity with a player-proportioned humanoid renderer.
-- [x] Temporary observer sightings with bounded lifetime and eye-contact disappearance.
-- [x] Persistent first-sighting discovery flag shared by all Null watcher event variants.\n- [x] Persistent first-sighting discovery flag shared by all Null watcher event variants.
+## Phase 2 — Null and his apostles
+- [x] Dedicated Null entity, custom texture, and watcher behavior.
 - [x] Safe hiding-position selection in already-loaded chunks.
-- [x] Close-approach disappearance and periodic relocation while unobserved.
-- [x] Bounded stalking adaptation based on previous Null sightings.
-- [x] Long-range observer placements (34–46 blocks initially), cover-aware placement in already-loaded terrain, and bounded closer/more persistent adaptation.
-- [ ] False sightings, building-aware placement, and coordinated multiplayer encounters.
-- [ ] Custom animations, persistent story state, and Null's apostles.
+- [x] Eye-contact and close-approach disappearance; relocation while unobserved.
+- [x] Persistent Null observation memory that influences later stalking profiles.
+- [x] Bounded memory of player travel, sleeping, and block-placement areas to bias future watcher positions.
+- [x] Rare unnamed Null apostle observer entities with their own renderer and player-specific lifecycle.
+- [ ] Distinct named apostles, individual roles, bespoke models, and story structures.
+- [ ] Full building-aware stalking and coordinated multiplayer apostle encounters.
 
-## Phase 3 — Territory and apostles
-- [x] Pure geometry for the Almighty's final 5,000-block region using the live configured border center and size.
-- [x] Unit tests for shifted centers, non-default sizes, sides, corners, and boundaries.
-- [x] Server-side entity exclusion from the Almighty territory (players and the tagged Almighty are exempt).
-- [x] Fear first-meeting gate, persistent one-time discovery, registered manifestation entity, dedicated renderer/texture, and timed cleanup.
-- [x] Fear-specific post-introduction encounter gates and three dedicated event families (whisper, presence, call) with player-local effects.\n- [ ] Fear forest biome, structures, ambience, full territory behavior, and fully developed exclusive events.
-- [ ] Death hunter AI, territory, structures, and death.jar clue chain.
-- [ ] Almighty encounter and endgame.
+## Phase 3 — Fear's territory
+- [x] Fear first-meeting gate, persistent discovery, and dedicated manifestation renderer.
+- [x] Fear's full-territory forest overlay: strange mob attention, animal behavior, ash, positional sounds, and false structures.
+- [x] Client-only forest fog tint and localized ambient/weather attenuation.
+- [x] Registered `theoutlands:fear_forest` biome data, biome tag, vegetation modifier, and hostile spawn modifier.
+- [ ] Integrate Fear biome into the vanilla Overworld biome source without replacing vanilla biome distribution or breaking biome mods.
+- [ ] Permanent Fear-exclusive structures, custom vegetation blocks, and custom Fear creatures.
+- [ ] Bespoke Fear animation set and original audio recordings.
 
-## Phase 4 — World and ARG
-- [ ] Spawn enclosure and three progressive mazes.
-- [ ] Abandoned settlements, underground facilities, apostle structures, and landmarks.
-- [ ] World corruption and reality anomalies.
-- [ ] Persistent ARG discoveries, encrypted records, coordinate puzzles, and lore fragments.
+## Phase 4 — Death and the ARG
+- [x] Persistent Death hunter bound to the player whose trail he picked up.
+- [x] Stalking pauses, apparent escape window, and bounded resume behavior.
+- [x] Persisted target UUID and hunt state.
+- [x] Three-stage clue sequence: `death.jar`, `manifest.txt`, and `author.dat`.
+- [x] Final `the_last_page` artifact from The Almighty encounter.
+- [x] Original 64x64 Death texture.
+- [ ] Permanent abandoned settlements, laboratories, and Death structures.
+- [ ] In-world file-reading interfaces, encrypted records, hidden coordinates, and multi-step puzzles.
+- [ ] Bespoke Death geometry and authored animations.
 
-## Phase 5 — Advanced presentation and multiplayer
-- [ ] Custom models, textures, rigs, and smooth encounter animations.
-- [ ] Dynamic original audio and territory ambience.
-- [ ] Player-specific perceptions, shared events, coordinated encounters, and persistence.
-- [x] Configurable intensity, event rates, and progression milestones.
-- [x] Configurable Null sightings, horror audio, and Almighty territory depth.
-- [ ] Performance, compatibility, and release audits.
+## Phase 5 — The Almighty and endgame
+- [x] Configured-border-relative exclusive territory and entity exclusion.
+- [x] One-time Almighty encounter and server boss bar.
+- [x] Three escalating combat phases with distinct area attacks and phase transitions.
+- [x] Original 64x64 Almighty texture and enlarged silhouette.
+- [x] Ending discovery and final artifact drop.
+- [ ] Bespoke boss rig, animations, arena/environment sequence, and cinematic finale.
+- [ ] Full epilogue, alternate outcomes, and multiplayer ending synchronization.
 
-## Release gates
-- [ ] Client and dedicated-server startup smoke tests.
-- [ ] Multiplayer synchronization and player-specific event tests.
-- [ ] Performance audit: no unbounded scans, forced chunk loads, or uncontrolled world writes.
-- [ ] Non-default world-border tests and full regression audit.
-- [ ] Verified release artifact and installation instructions.
+## Phase 6 — Release and compatibility
+- [x] Rolling direct-download GitHub Release with checksum.
+- [x] CI build and unit-test gate before publishing.
+- [ ] Dedicated-server startup smoke test.
+- [ ] Client rendering/audio test on Minecraft 1.21.1 NeoForge 21.1.266.
+- [ ] Multiplayer test for private hallucinations, shared story beats, and disconnect/respawn cleanup.
+- [ ] Performance and worldgen compatibility audit.
+- [ ] Full regression pass on a copied survival world.
 
-
-## Current milestone — The World Remembers
-
-- [x] Persist bounded coarse location history in each player's saved data.
-- [x] Track look-backs, pauses, and sprinting without recording an exact movement trail.
-- [x] Trigger rare, player-only familiar-place anomalies on revisits without changing blocks.
-- [x] Adapt Null's distance and relocation cadence to previous sightings and player behavior.
-- [x] Allow Null to reuse remembered locations only when their chunks are already loaded and a safe standing position exists.
-- [x] Add sparse environmental cues without ordinary chat/actionbar narration.
-- [x] Add rare Almighty influence gated by the configured border territory, including subtle nearby-mob interference.
-- [x] Add regression tests for behavior adaptation and Almighty territory gating.
-
-## Remaining presentation work
-
-- [ ] Client-side localized ambient audio attenuation (the current hush is a restrained visual cue, not a true audio mute).
-- [ ] Client-only terrain afterimages and silhouette misdirection.
-- [x] Directional positional audio for player-specific footsteps, wrong-place sounds, distant screams, whispers, and calls (sent only to the target player's connection).
-- [ ] Fear forest biome, structures, ambience, and full territory behavior.
-- [ ] Death hunter AI, territory, structures, and death.jar clue chain.
-- [ ] The Almighty's full encounter and endgame.
+## Explicit exclusions
+- No spawn enclosure or progressive mazes from the separate Under The Bedrock project.
+- No destructive rewriting of player-built blocks.
+- No ordinary scare narration in chat or actionbar.
+- No arbitrary cap on horror escalation before the configured world border.

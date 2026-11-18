@@ -16,6 +16,7 @@ public final class OutlandsConfig {
     public static final ModConfigSpec.BooleanValue EVENTS_ENABLED;
     public static final ModConfigSpec.BooleanValue NULL_SIGHTINGS_ENABLED;
     public static final ModConfigSpec.BooleanValue HORROR_AUDIO_ENABLED;
+    public static final ModConfigSpec.BooleanValue FEAR_AMBIENT_ATTENUATION;
     public static final ModConfigSpec SPEC;
 
     static {
@@ -56,6 +57,9 @@ public final class OutlandsConfig {
         HORROR_AUDIO_ENABLED = BUILDER
                 .comment("Enables horror encounter sound effects.")
                 .define("horrorAudioEnabled", true);
+        FEAR_AMBIENT_ATTENUATION = BUILDER
+                .comment("Locally attenuates ambient and weather audio in Fear's distant forest territory.")
+                .define("fearAmbientAttenuation", true);
         BUILDER.pop();
 
         SPEC = BUILDER.build();

@@ -5,6 +5,7 @@ import com.relaymann.theoutlands.entity.OutlandsEntities;
 import com.relaymann.theoutlands.item.OutlandsItems;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.common.Mod;
 import org.slf4j.Logger;
 
@@ -15,6 +16,7 @@ public final class TheOutlands {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public TheOutlands(IEventBus modEventBus, ModContainer modContainer) {
+        modContainer.registerConfig(ModConfig.Type.COMMON, OutlandsConfig.SPEC);
         OutlandsEntities.ENTITY_TYPES.register(modEventBus);
         OutlandsItems.ITEMS.register(modEventBus);
         LOGGER.info("The Outlands is loading. The world is still ordinary.");

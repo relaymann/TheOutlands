@@ -121,6 +121,30 @@ public final class HorrorEventExecutor {
                 particles(player, ParticleTypes.PORTAL, player.getX(), player.getY() + 1.0D, player.getZ(), 12, 0.45D, 0.65D, 0.45D, 0.01D);
             }
             case "familiar_echo" -> executeFamiliarPlaceDistortion(player);
+            case "world_inconsistency" -> {
+                ClientAfterimageManager.showTerrainAfterimage(player);
+                if (random.nextBoolean()) ClientAfterimageManager.showFalseStructure(player);
+                positionalSound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT,
+                        0.14F, 0.48F, x + 12.0D, y, z - 9.0D);
+            }
+            case "false_structure" -> {
+                ClientAfterimageManager.showFalseStructure(player);
+                positionalSound(player, SoundEvents.GRAVEL_STEP, SoundSource.BLOCKS, 0.16F, 0.58F, x, y, z);
+            }
+            case "paranoia_echo" -> {
+                ClientAfterimageManager.showSilhouette(player);
+                double back = Math.toRadians(player.getYRot());
+                positionalSound(player, SoundEvents.GRASS_STEP, SoundSource.BLOCKS, 0.18F, 0.7F,
+                        player.getX() + Math.sin(back) * 5.5D, player.getY(),
+                        player.getZ() - Math.cos(back) * 5.5D);
+            }
+            case "null_apostle_sign" -> {
+                NullApostleManager.spawn(player);
+                ClientAfterimageManager.showSilhouette(player);
+                ClientAfterimageManager.showFalseStructure(player);
+                positionalSound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT,
+                        0.11F, 0.42F, x - 18.0D, y + 2.0D, z + 18.0D);
+            }
             case "almighty_influence" -> executeAlmightyInfluence(player);
             default -> { }
         }
