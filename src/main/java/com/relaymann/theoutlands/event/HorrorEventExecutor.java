@@ -110,6 +110,7 @@ public final class HorrorEventExecutor {
                 player.displayClientMessage(Component.literal("§5[?] §7I remember you."), true);
             }
             case "fear_presence" -> {
+                FearEncounterManager.showPresence(player);
                 particles(player, ParticleTypes.REVERSE_PORTAL, x, y + 1.0D, z, 18, 0.25D, 0.8D, 0.25D, 0.01D);
                 sound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.45F, 0.4F);
             }
