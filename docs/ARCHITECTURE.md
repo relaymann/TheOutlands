@@ -11,6 +11,9 @@ The director evaluates once per second, builds per-player pressure, enforces a d
 
 Selected encounters execute on the logical server. Ambient displacement, false footsteps, distant figures, environmental distortion, hostile warnings, direct intervention, private unexplained messages, false-death messages, and returning-observer encounters are executable. These events do not alter blocks or force-load chunks.
 
+## Persistent player memory
+`HorrorMemory` stores a bounded recent encounter list, a lifetime encounter count, last encounter game time, and unique discovery identifiers in NeoForge's persistent player entity data. Encounter execution records the event immediately. Story memory is copied when the player entity is replaced during respawn. The discovery API is ready for future structure and ARG clue integrations.
+
 ## Apostle milestone model
 `ApostleProgression` centralizes the canonical story thresholds: Fear's first appearance at 15,000 blocks, Death's first appearance at 50,000 blocks, and Fear's full-territory milestone at 100,000 blocks. Null remains eligible at any distance. The Almighty's final territory overrides Death's territory. These are progression gates, not a cap on general horror escalation.
 
@@ -32,7 +35,7 @@ Operators can use `/theoutlands debug` (permission level 2) to inspect spawn dis
 The server owns selection and execution. Targeted effects go only to the selected player. Progression runs once per second and performs one bounded nearby-player query. Watcher cleanup visits only tracked UUIDs. No chunk is force-loaded and no player-built blocks are modified.
 
 ## Planned
-Advanced Null behavior adaptation, false sightings, custom animations, persistent player memories, Null's apostles, Fear and Death entities, Fear biome/structures, Death hunting AI, entity exclusion from the Almighty territory, configured-border-relative finale, custom audio, and ARG content remain future work.
+Advanced Null behavior adaptation, false sightings, custom animations, Null's apostles, Fear and Death entities, Fear biome/structures, Death hunting AI, entity exclusion from the Almighty territory, configured-border-relative finale, custom audio, and ARG content remain future work.
 
 ## Testing
-Pure tests cover opening-range protection, pacing, cooldown boundaries, safe random rolls, contextual weighting, Almighty territory geometry, and apostle milestone boundaries. Client/server and multiplayer smoke tests remain release requirements.
+Pure tests cover opening-range protection, pacing, cooldown boundaries, safe random rolls, contextual weighting, persistent player memory, Almighty territory geometry, and apostle milestone boundaries. Client/server and multiplayer smoke tests remain release requirements.

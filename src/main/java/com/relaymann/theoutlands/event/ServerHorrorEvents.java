@@ -1,6 +1,7 @@
 package com.relaymann.theoutlands.event;
 
 import com.relaymann.theoutlands.TheOutlands;
+import com.relaymann.theoutlands.horror.HorrorMemory;
 import com.relaymann.theoutlands.horror.HorrorProgressionManager;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -37,6 +38,14 @@ public final class ServerHorrorEvents {
     @SubscribeEvent
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
         HorrorProgressionManager.remove(event.getEntity().getUUID());
+    }
+
+    @SubscribeEvent
+    public static void onPlayerClone(PlayerEvent.Clone event) {
+        if (event.getOriginal() instanceof ServerPlayer original
+                && event.getEntity() instanceof ServerPlayer replacement) {
+            HorrorMemory.copy(original, replacement);
+        }
     }
 
     @SubscribeEvent

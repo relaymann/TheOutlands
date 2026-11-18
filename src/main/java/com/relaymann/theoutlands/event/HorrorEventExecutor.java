@@ -1,6 +1,7 @@
 package com.relaymann.theoutlands.event;
 
 import com.relaymann.theoutlands.horror.HorrorDecision;
+import com.relaymann.theoutlands.horror.HorrorMemory;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -12,6 +13,7 @@ public final class HorrorEventExecutor {
     private HorrorEventExecutor() {}
     public static void execute(ServerPlayer player, HorrorDecision decision) {
         if (decision == null || !decision.hasSelectedEvent()) return;
+        HorrorMemory.recordEncounter(player, decision.eventId());
         var level = player.serverLevel();
         var random = player.getRandom();
         double angle = random.nextDouble() * Math.PI * 2.0D;
