@@ -24,7 +24,7 @@
 - [x] Safe hiding-position selection in already-loaded chunks.
 - [x] Close-approach disappearance and periodic relocation while unobserved.
 - [x] Bounded stalking adaptation based on previous Null sightings.
-- [ ] Long-range stalking, behavior adaptation, false sightings, and coordinated multiplayer encounters.
+- [x] Long-range observer placements (34–46 blocks initially), cover-aware placement in already-loaded terrain, and bounded closer/more persistent adaptation.\n- [ ] False sightings, building-aware placement, and coordinated multiplayer encounters.
 - [ ] Custom animations, persistent story state, and Null's apostles.
 
 ## Phase 3 — Territory and apostles
