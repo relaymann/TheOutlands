@@ -1,7 +1,7 @@
 package com.relaymann.theoutlands.horror;
 
 import com.relaymann.theoutlands.OutlandsConfig;
-import com.relaymann.theoutlands.event.HorrorEventExecutor;
+import com.relaymann.theoutlands.event.HorrorEventExecutor;\nimport com.relaymann.theoutlands.event.FearEncounterManager;
 import com.relaymann.theoutlands.event.NullWatcherManager;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerPlayer;
@@ -20,7 +20,7 @@ public final class HorrorProgressionManager {
 
     public static void update(ServerPlayer player) {
         UUID id = player.getUUID();
-        HorrorSnapshot snapshot = DistanceProgression.createSnapshot(player);
+        HorrorSnapshot snapshot = DistanceProgression.createSnapshot(player);\n        FearEncounterManager.evaluate(player);
         HorrorDirectorState state = STATES.computeIfAbsent(id, ignored -> new HorrorDirectorState());
         var level = player.serverLevel();
         var key = level.registryAccess().registryOrThrow(Registries.BIOME).getKey(level.getBiome(player.blockPosition()).value());

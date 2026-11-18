@@ -1,6 +1,6 @@
 package com.relaymann.theoutlands.entity;
 
-import com.relaymann.theoutlands.TheOutlands;
+import com.relaymann.theoutlands.TheOutlands;\nimport com.relaymann.theoutlands.entity.FearEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -16,6 +16,11 @@ public final class OutlandsEntities {
                     .clientTrackingRange(12)
                     .updateInterval(2)
                     .build("theoutlands:null"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<FearEntity>> FEAR =
+            ENTITY_TYPES.register("fear", () -> EntityType.Builder.of(FearEntity::new, MobCategory.MONSTER)
+                    .sized(0.6F, 1.95F).clientTrackingRange(16).updateInterval(2)
+                    .build("theoutlands:fear"));
 
     private OutlandsEntities() {}
 }

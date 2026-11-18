@@ -31,7 +31,7 @@ public final class ServerHorrorEvents {
     @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
         for (ServerLevel level : event.getServer().getAllLevels()) {
-            NullWatcherManager.tick(level);
+            NullWatcherManager.tick(level);\n            FearEncounterManager.tick(level);
         }
     }
 
@@ -50,6 +50,6 @@ public final class ServerHorrorEvents {
 
     @SubscribeEvent
     public static void onServerStopping(ServerStoppingEvent event) {
-        HorrorProgressionManager.clear();
+        HorrorProgressionManager.clear();\n        FearEncounterManager.clear();
     }
 }
