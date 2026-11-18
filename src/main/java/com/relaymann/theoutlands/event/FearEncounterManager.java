@@ -13,8 +13,11 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -22,6 +25,7 @@ import java.util.UUID;
 public final class FearEncounterManager {
     private static final String INTRODUCTION_DISCOVERY = "fear_first_introduction";
     private static final long LIFETIME_TICKS = 160L;
+    private static final double AUDIENCE_RADIUS_SQR = 64.0D * 64.0D;
     private static final Map<UUID, ActiveManifestation> ACTIVE = new HashMap<>();
 
     private FearEncounterManager() {}
@@ -39,13 +43,25 @@ public final class FearEncounterManager {
     private static void introduce(ServerPlayer player) {
         FearEntity fear = spawnManifestation(player);
         if (fear == null) return;
-        HorrorMemory.recordDiscovery(player, INTRODUCTION_DISCOVERY);
-        Component line = Component.literal("You are the first person to reach me. You are worthy of my fear.");
-        for (ServerPlayer audience : player.serverLevel().players()) {
-            if (audience.distanceToSqr(player) <= 64.0D * 64.0D) {
-                HorrorMemory.recordDiscovery(audience, INTRODUCTION_DISCOVERY);
-                audience.sendSystemMessage(line);
-            }
+
+        // The first manifestation is a shared story beat for everyone who can witness it.
+        List<ServerPlayer> audience = new ArrayList<>();
+        for (ServerPlayer candidate : player.serverLevel().players()) {
+            if (candidate.distanceToSqr(player) <= AUDIENCE_RADIUS_SQR) audience.add(candidate);
+        }
+        if (audience.stream().noneMatch(candidate -> candidate.getUUID().equals(player.getUUID()))) {
+            audience.add(player);
+        }
+
+        boolean group = audience.size() > 1;
+        Component firstLine = Component.literal(group
+                ? "You are the first people to reach me."
+                : "You are the first person to reach me.");
+        Component secondLine = Component.literal("You are worthy of my fear.");
+        for (ServerPlayer witness : audience) {
+            HorrorMemory.recordDiscovery(witness, INTRODUCTION_DISCOVERY);
+            witness.sendSystemMessage(firstLine);
+            witness.sendSystemMessage(secondLine);
         }
     }
 
@@ -54,27 +70,45 @@ public final class FearEncounterManager {
         spawnManifestation(player);
     }
 
+    /**
+     * Fear appears several blocks ahead and above the target, facing down toward them.
+     * The location is only accepted inside an already-loaded chunk and if the entity
+     * has a collision-free bounding box; this never causes chunk generation.
+     */
     private static FearEntity spawnManifestation(ServerPlayer player) {
         ServerLevel level = player.serverLevel();
         UUID playerId = player.getUUID();
         if (ACTIVE.values().stream().anyMatch(active ->
                 active.level == level && active.playerId.equals(playerId))) return null;
 
-        float yaw = player.getYRot();
-        double angle = Math.toRadians(yaw);
-        double x = player.getX() - Math.sin(angle) * 3.5D;
-        double z = player.getZ() + Math.cos(angle) * 3.5D;
-        double y = player.getY() + 1.6D;
-        if (!level.hasChunkAt(BlockPos.containing(x, y, z))) return null;
+        double yawRadians = Math.toRadians(player.getYRot());
+        double forwardX = -Math.sin(yawRadians);
+        double forwardZ = Math.cos(yawRadians);
+        double x = player.getX() + forwardX * 4.0D;
+        double z = player.getZ() + forwardZ * 4.0D;
+        double y = player.getY() + 2.8D;
+        BlockPos position = BlockPos.containing(x, y, z);
+        if (!level.hasChunkAt(position) || !level.hasChunkAt(position.below())) return null;
 
         FearEntity fear = OutlandsEntities.FEAR.get().create(level);
         if (fear == null) return null;
-        fear.moveTo(x, y, z, yaw + 180.0F, 0.0F);
+
+        double dx = player.getX() - x;
+        double dz = player.getZ() - z;
+        double horizontalDistance = Math.max(0.001D, Math.sqrt(dx * dx + dz * dz));
+        double dy = player.getEyeY() - (y + fear.getEyeHeight());
+        float facingYaw = (float) (Math.toDegrees(Math.atan2(-dx, dz)));
+        float facingPitch = (float) -Math.toDegrees(Math.atan2(dy, horizontalDistance));
+
+        fear.moveTo(x, y, z, facingYaw, facingPitch);
+        fear.setYHeadRot(facingYaw);
+        fear.setYBodyRot(facingYaw);
         fear.setInvulnerable(true);
         fear.setSilent(true);
         fear.setNoAi(true);
         fear.setNoGravity(true);
         fear.addTag("theoutlands_fear_manifestation");
+        if (!level.noCollision(fear, fear.getBoundingBox())) return null;
         if (!level.addFreshEntity(fear)) return null;
 
         ACTIVE.put(fear.getUUID(), new ActiveManifestation(level, fear.getUUID(), playerId,
