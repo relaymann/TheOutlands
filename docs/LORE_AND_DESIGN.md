@@ -37,6 +37,10 @@ Null is primarily the watcher and stalker associated with spawn. He observes, fo
 
 Null is the only apostle besides The Almighty who commands apostles of his own. His unnamed apostles are now represented by rare, silent observer entities. They are not ordinary hostile mobs: they watch, relocate when unseen, and disappear after sustained eye contact or close approach. Their identities, number, and individual roles remain open.
 
+**Appearance and hierarchy:** Every apostle serving Null is a completely black, featureless humanoid silhouette. They have no eyes, mouth, markings, glow, or other visible details. They share a uniform appearance rather than having individual faces or decorative variants. They are materially weaker than Null: an apostle has 18 health and no armor, while Null has 80 health and 20 armor. Apostles are mortal and are not invulnerable.
+
+**Null's blessing:** The apostles do not see with eyes. Null grants each one a supernatural blessing that lets it sense the specific player it has been sent to observe, even without ordinary line of sight. This is how they know where to appear and how they can relocate around the player. The blessing does not make them omnipotent: they remain fragile, can be killed, and vanish if the player catches them watching for long enough or gets too close.
+
 Null is not geographically confined to spawn. He can appear in outer regions, including millions of blocks away. His presence should be rare enough to remain unsettling, and his behavior should not be reduced to a simple chase loop. Repeated eye contact, look-backs, pauses, and flight influence his later stalking behavior. He also remembers coarse areas where a player travels, sleeps, and builds, allowing later sightings to feel personally placed rather than randomly spawned.
 
 ### Fear — Second Apostle
