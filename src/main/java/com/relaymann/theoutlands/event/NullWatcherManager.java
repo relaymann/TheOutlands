@@ -34,6 +34,7 @@ public final class NullWatcherManager {
 
         int priorSightings = (int) HorrorMemory.recentEncounters(player).stream()
                 .filter(id -> id.equals("distant_figure") || id.equals("the_return") || id.equals("observer")).count();
+        priorSightings = Math.max(0, priorSightings - 1); // The triggering encounter was recorded before spawn().
         NullStalkingProfile profile = NullStalkingProfile.fromPlayerHistory(priorSightings,
                 HorrorMemory.lookBackCount(player), HorrorMemory.pauseCount(player), HorrorMemory.flightCount(player));
 

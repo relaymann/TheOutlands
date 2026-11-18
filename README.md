@@ -6,7 +6,7 @@ The Overworld begins as recognizable vanilla Minecraft. Once players travel beyo
 
 ## Project status
 
-The current foundation includes distance-based horror progression, a player-specific encounter director, persistent ARG discoveries, Null watcher sightings, Fear's first encounter, and the **The World Remembers** milestone: coarse location memory, behavioral tracking, adaptive Null stalking, familiar-place anomalies, restrained environmental cues, and rare Almighty influence. This is an active development build, not yet a finished release.
+The current foundation includes distance-based horror progression, a player-specific encounter director, persistent ARG discoveries, Null watcher sightings, Fear's first encounter, and the **World Remembers** milestone: coarse location memory, behavioral tracking, adaptive Null stalking, familiar-place anomalies, restrained environmental cues, and rare Almighty influence. This is an active development build, not yet a finished release.
 
 ## Technical target
 

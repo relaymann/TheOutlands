@@ -102,7 +102,7 @@ public final class HorrorEventExecutor {
         var remembered = HorrorMemory.rememberedLocations(player);
         for (int i = remembered.size() - 1; i >= 0; i--) {
             BlockPos candidate = remembered.get(i).offset(16, 0, 16);
-            if (level.hasChunkAt(candidate) && candidate.distToCenterSqr(player.position()) <= 48.0D * 48.0D) {
+            if (level.hasChunkAt(candidate) && player.position().distanceToSqr(candidate.getX() + 16.5D, candidate.getY() + 0.5D, candidate.getZ() + 16.5D) <= 48.0D * 48.0D) {
                 chosen = candidate;
                 break;
             }
