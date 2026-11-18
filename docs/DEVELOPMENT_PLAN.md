@@ -21,7 +21,7 @@
 
 ## Phase 2 — Null
 - [x] Dedicated registered Null entity with a player-proportioned humanoid renderer.
-- [x] Temporary observer sightings with bounded lifetime and eye-contact disappearance.
+- [x] Temporary observer sightings with bounded lifetime and eye-contact disappearance.\n- [x] Persistent first-sighting discovery flag shared by all Null watcher event variants.
 - [x] Safe hiding-position selection in already-loaded chunks.
 - [x] Close-approach disappearance and periodic relocation while unobserved.
 - [x] Bounded stalking adaptation based on previous Null sightings.
