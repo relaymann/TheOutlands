@@ -8,38 +8,39 @@
 ## Phase 1 — Horror director and first encounters
 - [x] Per-player pressure, quiet periods, cooldowns, weighted selection, and recent-event memory.
 - [x] Context inputs: biome, day/night, weather, nearby players, and health.
-- [x] Executable server-side encounters for all six initial event families.
+- [x] Executable server-side encounters for the six original event families.
+- [x] Additional private unexplained-message, false-death, and returning-observer encounters.
 - [x] Player-targeted sound, particles, and messages.
 - [x] Operator debug command.
-- [ ] Verify full Gradle build/tests and dedicated-server smoke test.
+- [ ] Expand to the complete 12+ event catalog, including visual and world-generation event families.
 
 ## Phase 2 — Null
 - [x] Dedicated registered Null entity with a player-proportioned humanoid renderer.
-- [x] Pure-black 64x64 skin with exactly two white eyes and no other facial detail.
-- [x] Temporary observer sightings with bounded lifetime and no combat.
-- [ ] Advanced watcher/stalker AI, retreat behavior, and long-range appearances.
+- [x] Temporary observer sightings with bounded lifetime and eye-contact disappearance.
+- [ ] Advanced watcher/stalker AI, relocation, retreat behavior, and long-range appearances.
 - [ ] Custom animations, persistent story state, and Null's apostles.
 - [ ] Multiplayer-aware target selection and story progression.
 
-## Phase 3 — Fear
-- [ ] First appearance milestone and adaptive multiplayer dialogue.
-- [ ] Fear forest biome, ambience, exclusive structures, and environmental effects.
-- [ ] Increased entity/event activity with controlled spawn budgets.
-- [ ] Validate 15,000-block introduction and 100,000-block full territory.
+## Phase 3 — Territory and apostles
+- [x] Pure geometry for the Almighty's final 5,000-block region using the live configured border center and size.
+- [x] Unit tests for shifted centers, non-default sizes, sides, corners, and boundaries.
+- [ ] Entity exclusion from the Almighty territory.
+- [ ] Fear introduction, Fear forest biome, structures, ambience, and exclusive events.
+- [ ] Death hunter AI, territory, structures, and death.jar clue chain.
+- [ ] Almighty encounter and endgame.
 
-## Phase 4 — Death / death.jar
-- [ ] Hunter AI, tracking, misdirection, escape windows, and attack commitment.
-- [ ] death.jar ARG clue chain and reveal; multiplayer fairness safeguards.
+## Phase 4 — World and ARG
+- [ ] Spawn enclosure and three progressive mazes.
+- [ ] Abandoned settlements, underground facilities, apostle structures, and landmarks.
+- [ ] World corruption and reality anomalies.
+- [ ] Persistent ARG discoveries, encrypted records, coordinate puzzles, and lore fragments.
 
-## Phase 5 — The Almighty
-- [ ] Territory from configured world-border center and size.
-- [ ] Entity exclusion for the final 5,000-block region.
-- [ ] Border encounter, presence, and finale.
-
-## Phase 6 — World and ARG
-- [ ] Vanilla-compatible anomaly structures, evidence, books, signs, and coordinate puzzles.
-- [ ] Safe world modification rules protecting player builds.
-- [ ] Custom audio/visual content and long-term variation.
+## Phase 5 — Advanced presentation and multiplayer
+- [ ] Custom models, textures, rigs, and smooth encounter animations.
+- [ ] Dynamic original audio and territory ambience.
+- [ ] Player-specific perceptions, shared events, coordinated encounters, and persistence.
+- [ ] Configurable intensity, event rates, and progression.
+- [ ] Performance, compatibility, and release audits.
 
 ## Release gates
 - [ ] Client and dedicated-server startup smoke tests.

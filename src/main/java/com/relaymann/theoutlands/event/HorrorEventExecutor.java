@@ -32,6 +32,8 @@ public final class HorrorEventExecutor {
                 NullWatcherManager.spawn(player);
                 level.sendParticles(player, ParticleTypes.ASH, true, x, y + 1.0D, z, 10, 0.35D, 0.8D, 0.35D, 0.01D);
             }
+            case "unexplained_message" -> player.sendSystemMessage(
+                    Component.literal("§8[???] §7You have been here before."));
             case "environmental_distortion" -> {
                 player.playNotifySound(SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.9F, 0.45F);
                 level.sendParticles(player, ParticleTypes.PORTAL, true, player.getX(), player.getY() + 1.0D,
@@ -42,6 +44,13 @@ public final class HorrorEventExecutor {
                 player.playNotifySound(SoundEvents.WARDEN_NEARBY_CLOSER, SoundSource.HOSTILE, 0.8F, 0.7F);
                 player.displayClientMessage(Component.literal("Something noticed you."), true);
                 level.sendParticles(player, ParticleTypes.SOUL, true, x, y + 0.5D, z, 8, 0.25D, 0.45D, 0.25D, 0.01D);
+            }
+            case "false_death" -> player.displayClientMessage(
+                    Component.literal("You died."), false);
+            case "the_return" -> {
+                NullWatcherManager.spawn(player);
+                player.playNotifySound(SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.7F, 0.42F);
+                player.displayClientMessage(Component.literal("Something you left behind has returned."), true);
             }
             case "direct_intervention" -> {
                 player.playNotifySound(SoundEvents.WARDEN_ROAR, SoundSource.HOSTILE, 0.65F, 0.55F);

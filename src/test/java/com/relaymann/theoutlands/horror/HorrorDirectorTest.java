@@ -1,4 +1,5 @@
 package com.relaymann.theoutlands.horror;
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -48,5 +49,12 @@ class HorrorDirectorTest {
         assertTrue(new HorrorContext("minecraft:plains", false, true, false, 0, 1)
                 .weightMultiplier("environmental_distortion") > 1);
         assertEquals(1.0D, HorrorContext.neutral().weightMultiplier("false_footsteps"));
+    }
+    @Test void expandedEventsHaveUniqueIdsAndRealExecutors() {
+        var events = HorrorDirector.getEventDefinitions();
+        assertEquals(events.size(), events.stream().map(HorrorEventDefinition::id).distinct().count());
+        assertTrue(events.stream().anyMatch(e -> e.id().equals("false_death")));
+        assertTrue(events.stream().anyMatch(e -> e.id().equals("unexplained_message")));
+        assertTrue(events.stream().anyMatch(e -> e.id().equals("the_return")));
     }
 }

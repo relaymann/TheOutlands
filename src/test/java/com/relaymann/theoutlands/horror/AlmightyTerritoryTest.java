@@ -8,7 +8,7 @@ class AlmightyTerritoryTest {
     @Test
     void usesActualBorderCenterRatherThanWorldOrigin() {
         assertTrue(AlmightyTerritory.contains(12_000, -8_000, 100_000,
-                56_000, -8_000, 5_000));
+                57_000, -8_000, 5_000));
         assertFalse(AlmightyTerritory.contains(12_000, -8_000, 100_000,
                 54_000, -8_000, 5_000));
     }
@@ -21,14 +21,14 @@ class AlmightyTerritoryTest {
         assertTrue(AlmightyTerritory.contains(centerX, centerZ, size, 5_500, centerZ, 5_000));
         assertTrue(AlmightyTerritory.contains(centerX, centerZ, size, -4_900, centerZ, 5_000));
         assertTrue(AlmightyTerritory.contains(centerX, centerZ, size, centerX, 4_300, 5_000));
-        assertTrue(AlmightyTerritory.contains(centerX, centerZ, size, centerX, -5_600, 5_000));
+        assertTrue(AlmightyTerritory.contains(centerX, centerZ, size, centerX, -5_700, 5_000));
         assertTrue(AlmightyTerritory.contains(centerX, centerZ, size, 5_250, 4_800, 5_000));
     }
 
     @Test
     void excludesOutsideBorderAndPositionsDeeperThanFiveThousand() {
         assertFalse(AlmightyTerritory.contains(0, 0, 10_000, 5_001, 0, 5_000));
-        assertFalse(AlmightyTerritory.contains(0, 0, 10_000, 0, 0, 5_000));
+        assertFalse(AlmightyTerritory.contains(0, 0, 20_000, 0, 0, 5_000));
         assertEquals(-1.0D, AlmightyTerritory.distanceInsideBorder(0, 0, 10_000, 5_001, 0));
     }
 

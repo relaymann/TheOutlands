@@ -11,8 +11,11 @@ public final class HorrorDirector {
             new HorrorEventDefinition("ambient_displacement", 1_000, 10, 8, 1_200, 3),
             new HorrorEventDefinition("false_footsteps", 1_500, 11, 6, 1_600, 4),
             new HorrorEventDefinition("distant_figure", 2_500, 12, 5, 2_400, 5),
+            new HorrorEventDefinition("unexplained_message", 1_500, 12, 4, 2_400, 4),
             new HorrorEventDefinition("environmental_distortion", 5_000, 13, 4, 3_000, 6),
             new HorrorEventDefinition("hostile_warning", 8_000, 14, 3, 3_600, 7),
+            new HorrorEventDefinition("false_death", 12_000, 17, 1, 7_200, 10),
+            new HorrorEventDefinition("the_return", 8_000, 15, 2, 5_000, 8),
             new HorrorEventDefinition("direct_intervention", 15_000, 16, 1, 6_000, 10));
     private HorrorDirector() {}
     public static List<HorrorEventDefinition> getEventDefinitions() { return EVENTS; }

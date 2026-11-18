@@ -1,4 +1,5 @@
 package com.relaymann.theoutlands.horror;
+
 public record HorrorContext(String biomeId, boolean night, boolean raining, boolean thundering,
                             int nearbyPlayers, float healthFraction) {
     public HorrorContext {
@@ -14,6 +15,9 @@ public record HorrorContext(String biomeId, boolean night, boolean raining, bool
         if ("hostile_warning".equals(id) && healthFraction <= 0.35F) weight *= 1.5D;
         if ("direct_intervention".equals(id) && nearbyPlayers > 0) weight *= 0.8D;
         if ("ambient_displacement".equals(id) && biomeId.contains("forest")) weight *= 1.2D;
+        if ("false_death".equals(id) && healthFraction < 0.5F) weight *= 1.2D;
+        if ("the_return".equals(id) && nearbyPlayers == 0) weight *= 1.25D;
+        if ("unexplained_message".equals(id) && night) weight *= 1.2D;
         return weight;
     }
 }
