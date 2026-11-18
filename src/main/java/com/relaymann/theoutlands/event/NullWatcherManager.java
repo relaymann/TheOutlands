@@ -108,6 +108,7 @@ public final class NullWatcherManager {
             if (distance < profile.minimumDistance() || distance > profile.maximumDistance() + 28.0D) continue;
             int x = rememberedCell.getX() + 16;
             int z = rememberedCell.getZ() + 16;
+            if (!level.hasChunkAt(new BlockPos(x, player.blockPosition().getY(), z))) continue;
             int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
             BlockPos candidate = new BlockPos(x, y, z);
             if (isSafeStandingPosition(level, candidate)) return candidate;
