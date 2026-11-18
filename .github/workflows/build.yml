@@ -1,4 +1,4 @@
-name: Build
+name: Build and publish mod
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -28,5 +28,45 @@ jobs:
         with:
           gradle-version: '9.2.1'
 
-      - name: Build mod
-        run: gradle --no-daemon build
+      - name: Build and test mod
+        run: gradle --no-daemon clean test build
+
+      - name: Prepare release files
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t jars < <(find build/libs -maxdepth 1 -type f -name '*.jar' ! -name '*-sources.jar' ! -name '*-javadoc.jar' ! -name '*-dev*.jar' | sort)
+          if [ "${#jars[@]}" -ne 1 ]; then
+            echo "Expected exactly one distributable mod JAR, found ${#jars[@]}:"
+            printf '%s\n' "${jars[@]}"
+            exit 1
+          fi
+          mkdir -p release
+          cp "${jars[0]}" release/TheOutlands.jar
+          cd release
+          sha256sum TheOutlands.jar > TheOutlands.jar.sha256
+          test -s TheOutlands.jar
+          ls -lh TheOutlands.jar TheOutlands.jar.sha256
+
+      - name: Publish rolling download release
+        if: github.event_name != 'pull_request'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest The Outlands build
+          body: |
+            Automatically updated from the latest successful build of the `main` branch.
+
+            **Minecraft:** Java Edition 1.21.1
+            **Mod loader:** NeoForge 21.1.266
+            **Java:** 21
+
+            This is an experimental development build. Back up worlds before testing.
+            Download `TheOutlands.jar` and place it in your Minecraft instance's `mods` folder.
+          files: |
+            release/TheOutlands.jar
+            release/TheOutlands.jar.sha256
+          overwrite_files: true
+          fail_on_unmatched_files: true
+          make_latest: true

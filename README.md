@@ -41,6 +41,17 @@ The current foundation includes distance-based horror progression, a player-spec
 
 See [docs/LORE_AND_DESIGN.md](docs/LORE_AND_DESIGN.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), and [docs/DEVELOPMENT_PLAN.md](docs/DEVELOPMENT_PLAN.md).
 
+## Download and install
+
+The latest successful build is published automatically to the rolling **Latest The Outlands build** GitHub Release. The download is a direct JAR asset, not a temporary Actions artifact.
+
+- [Download TheOutlands.jar](https://github.com/relaymann/TheOutlands/releases/latest/download/TheOutlands.jar)
+- [View the latest release and SHA-256 checksum](https://github.com/relaymann/TheOutlands/releases/latest)
+
+Install it in the `mods` folder of a Minecraft Java Edition **1.21.1** instance using **NeoForge 21.1.266** and **Java 21**. Remove older copies of The Outlands first so only one version is loaded. Back up worlds before using experimental builds.
+
+A release is published only after the build and tests pass on `main`. Pull requests run the build but do not publish downloads.
+
 ## Development
 
 Requirements:
