@@ -307,7 +307,8 @@ public final class HorrorMemory {
     }
 
     private static final String SLEEP_CELLS = "sleep_cells";
-    private static final String BUILD_CELLS = "build_cells";\n    private static final String DEATH_CELLS = "death_cells";
+    private static final String BUILD_CELLS = "build_cells";
+    private static final String DEATH_CELLS = "death_cells";
     private static final int MAX_CONTEXT_CELLS = 8;
 
     public static void recordSleepLocation(ServerPlayer player, BlockPos position) {
