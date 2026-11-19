@@ -13,6 +13,8 @@ import java.util.UUID;
 public final class NullApostleEntity extends Monster {
     private static final String BLESSED_PLAYER_TAG = "NullBlessedPlayer";
     private UUID blessedPlayer;
+    private long temporaryExpiresAt = -1L;
+    public void setTemporaryExpiresAt(long gameTime) { temporaryExpiresAt = gameTime; }
     public NullApostleEntity(EntityType<? extends Monster> type, Level level) {
         super(type, level); setPersistenceRequired(); setNoGravity(true); xpReward = 0;
         addTag("theoutlands_null_apostle");
@@ -26,13 +28,22 @@ public final class NullApostleEntity extends Monster {
     public void setBlessedPlayer(UUID playerId) { blessedPlayer = playerId; }
     public boolean isBlessedTo(UUID playerId) { return blessedPlayer != null && blessedPlayer.equals(playerId); }
     @Override public void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag); if (blessedPlayer != null) tag.putUUID(BLESSED_PLAYER_TAG, blessedPlayer);
+        super.addAdditionalSaveData(tag);
+        if (blessedPlayer != null) tag.putUUID(BLESSED_PLAYER_TAG, blessedPlayer);
+        if (temporaryExpiresAt >= 0L) tag.putLong("outlands_temporary_expires_at", temporaryExpiresAt);
     }
     @Override public void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag); blessedPlayer = tag.hasUUID(BLESSED_PLAYER_TAG) ? tag.getUUID(BLESSED_PLAYER_TAG) : null;
+        super.readAdditionalSaveData(tag);
+        blessedPlayer = tag.hasUUID(BLESSED_PLAYER_TAG) ? tag.getUUID(BLESSED_PLAYER_TAG) : null;
+        temporaryExpiresAt = tag.contains("outlands_temporary_expires_at") ? tag.getLong("outlands_temporary_expires_at") : level().getGameTime() + 180L;
     }
     @Override protected void registerGoals() {}
-    @Override public void tick() { super.tick(); setNoGravity(true); setDeltaMovement(0.0D, 0.0D, 0.0D); }
+    @Override public void tick() {
+        super.tick();
+        if (!level().isClientSide && temporaryExpiresAt >= 0L && level().getGameTime() >= temporaryExpiresAt) { discard(); return; }
+        setNoGravity(true);
+        setDeltaMovement(0.0D, 0.0D, 0.0D);
+    }
     @Override protected net.minecraft.sounds.SoundEvent getAmbientSound() { return OutlandsSounds.NULL_APOSTLE_WHISPER.get(); }
     @Override protected net.minecraft.sounds.SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return OutlandsSounds.NULL_APOSTLE_WHISPER.get(); }
     @Override protected net.minecraft.sounds.SoundEvent getDeathSound() { return OutlandsSounds.NULL_APOSTLE_DEPARTURE.get(); }

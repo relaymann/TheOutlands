@@ -52,6 +52,7 @@ public final class NullApostleManager {
             apostle.moveTo(position.getX() + 0.5D, position.getY(), position.getZ() + 0.5D,
                     player.getYRot() + 180.0F, 0.0F);
             apostle.setBlessedPlayer(player.getUUID());
+            apostle.setTemporaryExpiresAt(now + 180L);
             apostle.setNoAi(true);
             // Apostles are mortal and intentionally fragile compared with Null.
             apostle.setInvulnerable(false);

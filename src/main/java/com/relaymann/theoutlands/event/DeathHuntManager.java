@@ -67,27 +67,27 @@ public final class DeathHuntManager {
     private static void dropNextClue(ServerPlayer player, DeathEntity death) {
         if (!HorrorMemory.hasDiscovered(player, "death_jar_found")
                 && !HorrorMemory.hasDiscovered(player, "death_jar_dropped")) {
-            drop(death, OutlandsItems.DEATH_JAR.get());
-            HorrorMemory.recordDiscovery(player, "death_jar_dropped");
+            if (drop(death, OutlandsItems.DEATH_JAR.get()))
+                HorrorMemory.recordDiscovery(player, "death_jar_dropped");
         } else if (HorrorMemory.hasDiscovered(player, "death_jar_found")
                 && !HorrorMemory.hasDiscovered(player, "death_manifest_found")
                 && !HorrorMemory.hasDiscovered(player, "death_manifest_dropped")) {
-            drop(death, OutlandsItems.DEATH_MANIFEST.get());
-            HorrorMemory.recordDiscovery(player, "death_manifest_dropped");
+            if (drop(death, OutlandsItems.DEATH_MANIFEST.get()))
+                HorrorMemory.recordDiscovery(player, "death_manifest_dropped");
         } else if (HorrorMemory.hasDiscovered(player, "death_manifest_found")
                 && !HorrorMemory.hasDiscovered(player, "almighty_fragment_found")
                 && !HorrorMemory.hasDiscovered(player, "almighty_fragment_dropped")) {
-            drop(death, OutlandsItems.ALMIGHTY_FRAGMENT.get());
-            HorrorMemory.recordDiscovery(player, "almighty_fragment_dropped");
+            if (drop(death, OutlandsItems.ALMIGHTY_FRAGMENT.get()))
+                HorrorMemory.recordDiscovery(player, "almighty_fragment_dropped");
         }
     }
 
-    private static void drop(DeathEntity death, net.minecraft.world.item.Item item) {
+    private static boolean drop(DeathEntity death, net.minecraft.world.item.Item item) {
         ItemEntity clue = new ItemEntity(death.level(), death.getX(), death.getY() + 0.8D, death.getZ(),
                 new ItemStack(item));
         clue.setDefaultPickUpDelay();
         clue.setUnlimitedLifetime();
-        death.level().addFreshEntity(clue);
+        return death.level().addFreshEntity(clue);
     }
 
     /** Kept as a lifecycle hook; spawn timing is stored in persistent player data. */

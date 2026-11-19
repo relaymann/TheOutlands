@@ -51,9 +51,10 @@ public final class NullWatcherManager {
                 player.getYRot() + 180.0F, 0.0F);
         watcher.setInvulnerable(true);
         watcher.setPersistenceRequired();
+        long now = level.getGameTime();
+        watcher.setTemporaryExpiresAt(now + profile.lifetimeTicks());
         watcher.addTag("theoutlands_null_watcher");
         if (level.addFreshEntity(watcher)) {
-            long now = level.getGameTime();
             ACTIVE.put(watcher.getUUID(), new ActiveWatcher(level, watcher.getUUID(), playerId,
                     now + profile.lifetimeTicks(), now, profile,
                     HorrorMemory.nullObservationCount(player) >= 5 || priorSightings >= 7));

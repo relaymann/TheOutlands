@@ -21,6 +21,9 @@ public final class DeathEntity extends Monster {
     private UUID huntTarget;
     private int farTicks;
     private long pauseUntilGameTime;
+    private long temporaryExpiresAt = -1L;
+
+    public void setTemporaryExpiresAt(long gameTime) { temporaryExpiresAt = gameTime; }
 
     public DeathEntity(EntityType<? extends Monster> type, Level level) {
         super(type, level);
@@ -56,7 +59,9 @@ public final class DeathEntity extends Monster {
 
     @Override public void tick() {
         super.tick();
-        if (level().isClientSide || huntTarget == null) return;
+        if (level().isClientSide) return;
+        if (temporaryExpiresAt >= 0L && level().getGameTime() >= temporaryExpiresAt) { discard(); return; }
+        if (huntTarget == null) return;
         ServerPlayer target = level().getServer().getPlayerList().getPlayer(huntTarget);
         if (target == null || !target.isAlive() || target.serverLevel() != level()
                 || AlmightyTerritory.contains(target.serverLevel(), target.getX(), target.getZ())) {
@@ -98,6 +103,7 @@ public final class DeathEntity extends Monster {
         if (huntTarget != null) tag.putUUID("hunt_target", huntTarget);
         tag.putInt("far_ticks", farTicks);
         tag.putLong("pause_until_game_time", pauseUntilGameTime);
+        if (temporaryExpiresAt >= 0L) tag.putLong("outlands_temporary_expires_at", temporaryExpiresAt);
     }
 
     @Override public void readAdditionalSaveData(CompoundTag tag) {
@@ -105,6 +111,8 @@ public final class DeathEntity extends Monster {
         huntTarget = tag.hasUUID("hunt_target") ? tag.getUUID("hunt_target") : null;
         farTicks = tag.getInt("far_ticks");
         pauseUntilGameTime = tag.getLong("pause_until_game_time");
+        temporaryExpiresAt = tag.contains("outlands_temporary_expires_at") ? tag.getLong("outlands_temporary_expires_at")
+                : (getTags().contains("theoutlands_aggressive_jumpscare") ? level().getGameTime() + 14L : -1L);
     }
 
     @Override protected net.minecraft.sounds.SoundEvent getAmbientSound() { return null; }

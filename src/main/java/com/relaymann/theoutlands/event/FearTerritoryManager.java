@@ -27,7 +27,9 @@ public final class FearTerritoryManager {
                 .getKey(level.getBiome(player.blockPosition()).value());
         if (biomeKey == null || !(biomeKey.getPath().contains("forest")
                 || biomeKey.getPath().equals("fear_forest"))) return;
-        if (level.getGameTime() % 100L != 0L) return;
+        // This method is called on the player's 20-tick progression cadence; use
+        // that same clock so an offset world time cannot suppress the event forever.
+        if (player.tickCount % 100 != 0) return;
 
         HorrorMemory.recordDiscovery(player, "fear_forest_entered");
         var nearby = level.getEntitiesOfClass(Mob.class,
@@ -54,7 +56,7 @@ public final class FearTerritoryManager {
             double distance = 24.0D + player.getRandom().nextDouble() * 18.0D;
             double x = player.getX() + Math.cos(angle) * distance;
             double z = player.getZ() + Math.sin(angle) * distance;
-            player.connection.send(new ClientboundSoundPacket(
+            if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) player.connection.send(new ClientboundSoundPacket(
                     BuiltInRegistries.SOUND_EVENT.wrapAsHolder(SoundEvents.AMBIENT_CAVE.value()),
                     SoundSource.AMBIENT, x, player.getY() + 1.0D, z, 0.10F,
                     0.42F + player.getRandom().nextFloat() * 0.16F, player.getRandom().nextLong()));

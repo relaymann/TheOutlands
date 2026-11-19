@@ -1,6 +1,7 @@
 package com.relaymann.theoutlands.entity;
 
 import com.relaymann.theoutlands.sound.OutlandsSounds;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -12,6 +13,8 @@ import net.minecraft.world.level.Level;
 
 /** Null's dedicated humanoid entity. His renderer gives him an ordinary player silhouette. */
 public final class NullEntity extends Monster {
+    private long temporaryExpiresAt = -1L;
+    public void setTemporaryExpiresAt(long gameTime) { temporaryExpiresAt = gameTime; }
     public NullEntity(EntityType<? extends Monster> type, Level level) {
         super(type, level);
         this.setPersistenceRequired();
@@ -25,6 +28,18 @@ public final class NullEntity extends Monster {
     @Override protected void registerGoals() {
         this.goalSelector.addGoal(1, new LookAtPlayerGoal(this, Player.class, 64.0F, 1.0F));
         this.goalSelector.addGoal(2, new RandomLookAroundGoal(this));
+    }
+    @Override public void tick() {
+        super.tick();
+        if (!level().isClientSide && temporaryExpiresAt >= 0L && level().getGameTime() >= temporaryExpiresAt) discard();
+    }
+    @Override public void addAdditionalSaveData(CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        if (temporaryExpiresAt >= 0L) tag.putLong("outlands_temporary_expires_at", temporaryExpiresAt);
+    }
+    @Override public void readAdditionalSaveData(CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        temporaryExpiresAt = tag.contains("outlands_temporary_expires_at") ? tag.getLong("outlands_temporary_expires_at") : level().getGameTime() + 260L;
     }
     @Override protected net.minecraft.sounds.SoundEvent getAmbientSound() { return OutlandsSounds.NULL_PRESENCE.get(); }
     @Override protected net.minecraft.sounds.SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return OutlandsSounds.NULL_PRESENCE.get(); }

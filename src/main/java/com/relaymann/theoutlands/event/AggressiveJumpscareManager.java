@@ -88,6 +88,9 @@ public final class AggressiveJumpscareManager {
             entity.setSilent(true);
             entity.setNoAi(true);
             entity.setNoGravity(true);
+            long expiresAt = level.getGameTime() + ENTITY_LIFETIME_TICKS;
+            if (entity instanceof DeathEntity deathEntity) deathEntity.setTemporaryExpiresAt(expiresAt);
+            else if (entity instanceof FearEntity fearEntity) fearEntity.setTemporaryExpiresAt(expiresAt);
             entity.addTag("theoutlands_aggressive_jumpscare");
             if (!level.noCollision(entity, entity.getBoundingBox())) {
                 entity.discard();

@@ -108,6 +108,7 @@ public final class FearEncounterManager {
         fear.setSilent(true);
         fear.setNoAi(true);
         fear.setNoGravity(true);
+        fear.setTemporaryExpiresAt(level.getGameTime() + LIFETIME_TICKS);
         fear.addTag("theoutlands_fear_manifestation");
         if (!level.noCollision(fear, fear.getBoundingBox())) return null;
         if (!level.addFreshEntity(fear)) return null;
