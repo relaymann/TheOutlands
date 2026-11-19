@@ -77,7 +77,8 @@ public final class HorrorDirector {
             if (event.id().startsWith("fear_") && !context.hasMetFear()) continue;
             if ("false_death".equals(event.id()) && context.previousEncounterCount() < 2) continue;
             if ("almighty_influence".equals(event.id()) && !context.nearAlmightyTerritory()) continue;
-            double weight = event.weight() * context.weightMultiplier(event.id()) * settings.eventFrequency();
+            double stageScale = HiddenHorrorStage.fromProgress(context.previousEncounterCount(), snapshot.escalationTier(), context.lookBackCount(), context.pauseCount()).weightScale();
+            double weight = event.weight() * context.weightMultiplier(event.id()) * settings.eventFrequency() * stageScale;
             if (weight > 0 && Double.isFinite(weight)) { eligible.add(new Weighted(event, weight)); total += weight; }
         }
         if (eligible.isEmpty()) return HorrorDecision.withoutEvent(HorrorDecision.Reason.NO_ELIGIBLE_EVENT, state.pressure());
