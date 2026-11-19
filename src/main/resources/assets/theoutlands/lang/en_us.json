@@ -1,4 +1,7 @@
 {
+  "entity.theoutlands.hunter": "Hunter",
+  "entity.theoutlands.burrower": "Burrower",
+  "entity.theoutlands.mimic": "Mimic",
   "item.theoutlands.death_jar": "death.jar",
   "item.theoutlands.death_jar.lore": "A file with no creator. The timestamp is newer than this world.",
   "item.theoutlands.death_manifest": "manifest.txt",
