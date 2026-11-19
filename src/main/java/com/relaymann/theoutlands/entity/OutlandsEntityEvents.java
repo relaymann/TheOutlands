@@ -22,5 +22,7 @@ public final class OutlandsEntityEvents {
         event.put(OutlandsEntities.HUNTER.get(), HunterEntity.createAttributes().build());
         event.put(OutlandsEntities.BURROWER.get(), BurrowerEntity.createAttributes().build());
         event.put(OutlandsEntities.MIMIC.get(), MimicEntity.createAttributes().build());
+        event.put(OutlandsEntities.STILLBORN_STATUE.get(), StillbornStatueEntity.createAttributes().build());
+        event.put(OutlandsEntities.AGITATED_ONE.get(), AgitatedOneEntity.createAttributes().build());
     }
 }
