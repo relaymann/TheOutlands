@@ -9,7 +9,7 @@ import net.minecraft.world.level.Level;
 public final class FearEntity extends Monster {
  private long temporaryExpiresAt = -1L;
  public void setTemporaryExpiresAt(long gameTime) { temporaryExpiresAt = gameTime; }
- public FearEntity(EntityType<? extends Monster> type, Level level) { super(type, level); setPersistenceRequired(); xpReward=0; setNoGravity(true); }
+ public FearEntity(EntityType<? extends Monster> type, Level level) { super(type, level); xpReward=0; setNoGravity(true); }
  public static AttributeSupplier.Builder createAttributes() {
   return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH,100.0D).add(Attributes.MOVEMENT_SPEED,0.0D)
    .add(Attributes.FOLLOW_RANGE,96.0D).add(Attributes.ARMOR,20.0D).add(Attributes.KNOCKBACK_RESISTANCE,1.0D);
