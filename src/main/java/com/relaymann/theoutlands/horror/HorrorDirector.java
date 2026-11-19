@@ -34,7 +34,13 @@ public final class HorrorDirector {
             new HorrorEventDefinition("false_structure", 8_000, 16, 2, 9_000, 8),
             new HorrorEventDefinition("paranoia_echo", 10_000, 16, 2, 6_400, 7),
             new HorrorEventDefinition("null_apostle_sign", 22_000, 23, 1, 22_000, 11),
-            new HorrorEventDefinition("almighty_influence", 50_000, 35, 1, 24_000, 12));
+            new HorrorEventDefinition("almighty_influence", 50_000, 35, 1, 24_000, 12),
+            new HorrorEventDefinition("wall_knock", 1_000, 12, 3, 3_600, 5),
+            new HorrorEventDefinition("behind_steps", 2_500, 13, 3, 4_200, 6),
+            new HorrorEventDefinition("breathing_presence", 4_000, 15, 2, 6_000, 7),
+            new HorrorEventDefinition("door_afterimage", 1_500, 12, 3, 4_000, 5),
+            new HorrorEventDefinition("false_wakeup", 8_000, 18, 1, 12_000, 10),
+            new HorrorEventDefinition("mimic_activity", 5_000, 15, 2, 6_500, 7));
     private HorrorDirector() {}
     public static List<HorrorEventDefinition> getEventDefinitions() { return EVENTS; }
 

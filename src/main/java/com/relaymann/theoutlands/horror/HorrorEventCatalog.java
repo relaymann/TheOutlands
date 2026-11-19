@@ -11,7 +11,8 @@ public final class HorrorEventCatalog {
             "entity_imitation", "false_death", "distant_scream", "false_player",
             "direct_intervention", "fear_whisper", "fear_presence", "fear_call",
             "familiar_echo", "environmental_hush", "almighty_influence", "world_inconsistency",
-            "false_structure", "paranoia_echo", "null_apostle_sign");
+            "false_structure", "paranoia_echo", "null_apostle_sign", "wall_knock", "behind_steps", "breathing_presence",
+            "door_afterimage", "false_wakeup", "mimic_activity");
 
     private HorrorEventCatalog() {}
     public static Set<String> ids() { return IDS; }

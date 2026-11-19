@@ -34,6 +34,34 @@ public final class HorrorEventExecutor {
         double y = player.getY() + 0.2D;
 
         switch (decision.eventId()) {
+            case "wall_knock" -> {
+                double a=random.nextDouble()*Math.PI*2.0D; double d=4.0D+random.nextDouble()*5.0D;
+                double nx=player.getX()+Math.cos(a)*d, nz=player.getZ()+Math.sin(a)*d;
+                positionalSound(player, SoundEvents.WOODEN_DOOR, SoundSource.BLOCKS, 0.34F, 0.65F+random.nextFloat()*0.3F, nx, player.getY()+1.0D, nz);
+                if(random.nextBoolean()) positionalSound(player, SoundEvents.WOODEN_BUTTON_CLICK_ON, SoundSource.BLOCKS, 0.2F, 0.8F, nx+1.0D, player.getY(), nz);
+            }
+            case "behind_steps" -> {
+                double yaw=Math.toRadians(player.getYRot()); double bx=player.getX()-Math.sin(yaw)*5.0D, bz=player.getZ()+Math.cos(yaw)*5.0D;
+                positionalSound(player, SoundEvents.GRAVEL_STEP, SoundSource.BLOCKS, 0.38F, 0.7F, bx, player.getY(), bz);
+                positionalSound(player, SoundEvents.GRASS_STEP, SoundSource.BLOCKS, 0.22F, 0.6F, bx-0.8D, player.getY(), bz+0.8D);
+            }
+            case "breathing_presence" -> {
+                double yaw=Math.toRadians(player.getYRot()); double bx=player.getX()+Math.sin(yaw)*2.0D, bz=player.getZ()-Math.cos(yaw)*2.0D;
+                positionalSound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.22F, 0.5F, bx, player.getY()+1.0D, bz);
+                particles(player, ParticleTypes.ASH, bx, player.getY()+1.4D, bz, 2, 0.04D, 0.08D, 0.04D, 0.0D);
+            }
+            case "door_afterimage" -> ClientAfterimageManager.showDoorAfterimage(player);
+            case "false_wakeup" -> {
+                ClientAfterimageManager.showTerrainAfterimage(player);
+                sound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.2F, 0.45F);
+                particles(player, ParticleTypes.SMOKE, player.getX(), player.getY()+1.0D, player.getZ(), 6, 0.2D, 0.3D, 0.2D, 0.0D);
+            }
+            case "mimic_activity" -> {
+                double a=random.nextDouble()*Math.PI*2.0D; double d=8.0D+random.nextDouble()*12.0D;
+                double mx=player.getX()+Math.cos(a)*d, mz=player.getZ()+Math.sin(a)*d;
+                positionalSound(player, SoundEvents.STONE_BREAK, SoundSource.BLOCKS, 0.18F, 0.65F, mx, player.getY(), mz);
+                positionalSound(player, SoundEvents.WOODEN_DOOR, SoundSource.BLOCKS, 0.16F, 0.7F, mx+2.0D, player.getY(), mz+1.0D);
+            }
             case "ambient_displacement" -> {
                 sound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.42F, 0.65F);
                 particles(player, ParticleTypes.SMOKE, x, y, z, 3, 0.18D, 0.25D, 0.18D, 0.002D);
