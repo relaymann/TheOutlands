@@ -12,6 +12,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.phys.AABB;
 
 /** Sparse environmental behavior for Fear's forest domain; all cues are target-player specific. */
@@ -32,8 +33,10 @@ public final class FearTerritoryManager {
         if (player.tickCount % 100 != 0) return;
 
         HorrorMemory.recordDiscovery(player, "fear_forest_entered");
+        // Fear disturbs nearby wildlife, not hostile hunters or other Outlands entities.
         var nearby = level.getEntitiesOfClass(Mob.class,
-                new AABB(player.blockPosition()).inflate(24.0D), Mob::isAlive);
+                new AABB(player.blockPosition()).inflate(24.0D),
+                mob -> mob.isAlive() && mob.getType().getCategory() == MobCategory.CREATURE);
         if (!nearby.isEmpty() && player.getRandom().nextInt(3) == 0) {
             Mob chosen = nearby.get(player.getRandom().nextInt(nearby.size()));
             chosen.getNavigation().stop();
