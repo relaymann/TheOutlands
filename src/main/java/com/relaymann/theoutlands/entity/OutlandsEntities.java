@@ -31,5 +31,17 @@ public final class OutlandsEntities {
             ENTITY_TYPES.register("null_apostle", () -> EntityType.Builder.of(NullApostleEntity::new, MobCategory.MONSTER)
                     .sized(0.6F, 1.8F).clientTrackingRange(16).updateInterval(2).build("theoutlands:null_apostle"));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<CaveJarEntity>> CAVE_JAR =
+            ENTITY_TYPES.register("cave_jar", () -> EntityType.Builder.of(CaveJarEntity::new, MobCategory.MONSTER)
+                    .sized(0.95F, 2.65F).clientTrackingRange(16).updateInterval(2).build("theoutlands:cave_jar"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<StalkerEntity>> STALKER =
+            ENTITY_TYPES.register("stalker", () -> EntityType.Builder.of(StalkerEntity::new, MobCategory.MONSTER)
+                    .sized(0.72F, 2.35F).clientTrackingRange(24).updateInterval(2).build("theoutlands:stalker"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<ObserverEntity>> OBSERVER =
+            ENTITY_TYPES.register("observer", () -> EntityType.Builder.of(ObserverEntity::new, MobCategory.MONSTER)
+                    .sized(0.7F, 2.25F).clientTrackingRange(20).updateInterval(2).build("theoutlands:observer"));
+
     private OutlandsEntities() {}
 }
