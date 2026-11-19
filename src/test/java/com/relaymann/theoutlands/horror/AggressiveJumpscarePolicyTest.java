@@ -28,9 +28,9 @@ class AggressiveJumpscarePolicyTest {
         double atUnlock = AggressiveJumpscarePolicy.chancePerEvaluation(11_000.0D);
         double atMidpoint = AggressiveJumpscarePolicy.chancePerEvaluation(55_500.0D);
         double atExtremeDistance = AggressiveJumpscarePolicy.chancePerEvaluation(1_000_000.0D);
-        assertEquals(0.0008D, atUnlock, 0.000001D);
+        assertEquals(0.00004D, atUnlock, 0.0000001D);
         assertTrue(atMidpoint > atUnlock);
         assertTrue(atExtremeDistance > atMidpoint);
-        assertEquals(0.003D, atExtremeDistance, 0.000001D);
+        assertEquals(0.00015D, atExtremeDistance, 0.0000001D);
     }
 }

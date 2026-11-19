@@ -11,12 +11,12 @@ public final class AggressiveJumpscarePolicy {
         return Double.isFinite(distance) && distance >= MINIMUM_DISTANCE;
     }
 
-    /** Probability per 20-second progression evaluation; capped to keep scares uncommon. */
+    /** Probability per one-second progression evaluation; capped to keep scares uncommon. */
     public static double chancePerEvaluation(double distance) {
         if (!isUnlocked(distance)) return 0.0D;
         double progress = Math.max(0.0D, Math.min(1.0D,
                 (distance - MINIMUM_DISTANCE) / 89_000.0D));
-        return 0.0008D + progress * 0.0022D;
+        return 0.00004D + progress * 0.00011D;
     }
 
     public static boolean shouldAttempt(double distance, boolean fearIntroduced,
