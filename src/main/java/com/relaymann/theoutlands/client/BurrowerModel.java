@@ -3,7 +3,7 @@ import com.relaymann.theoutlands.entity.BurrowerEntity;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.model.PartPose;
+import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.util.Mth;
 import com.mojang.blaze3d.vertex.PoseStack;
