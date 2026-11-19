@@ -99,6 +99,32 @@ public final class ClientAfterimageManager {
         sendFake(player, pos, fake, duration);
     }
 
+    /** A rare, oversized horizon figure rendered as a temporary player-only block afterimage. */
+    public static void showHorizonGiant(ServerPlayer player) {
+        ServerLevel level = player.serverLevel();
+        double yaw = Math.toRadians(player.getYRot());
+        double distance = 34.0D + player.getRandom().nextDouble() * 12.0D;
+        int x = (int) Math.floor(player.getX() - Math.sin(yaw) * distance);
+        int z = (int) Math.floor(player.getZ() + Math.cos(yaw) * distance);
+        BlockPos column = new BlockPos(x, player.blockPosition().getY(), z);
+        if (!level.hasChunkAt(column)) return;
+        int ground = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+        BlockState shadow = Blocks.BLACK_CONCRETE.defaultBlockState();
+        for (int y = 0; y < 10; y++) {
+            int halfWidth = y < 2 ? 2 : y < 7 ? 1 : 0;
+            for (int dx = -halfWidth; dx <= halfWidth; dx++) {
+                BlockPos pos = new BlockPos(x + dx, ground + y, z);
+                if (level.hasChunkAt(pos) && level.getBlockState(pos).isAir()) sendFake(player, pos, shadow, 46);
+            }
+        }
+        for (int y = 4; y <= 6; y++) {
+            for (int dx : new int[]{-3, 3}) {
+                BlockPos pos = new BlockPos(x + dx, ground + y, z);
+                if (level.hasChunkAt(pos) && level.getBlockState(pos).isAir()) sendFake(player, pos, shadow, 46);
+            }
+        }
+    }
+
     /** A distant silhouette occupies the edge of the player's view for less than two seconds. */
     public static void showSilhouette(ServerPlayer player) {
         ServerLevel level = player.serverLevel();
