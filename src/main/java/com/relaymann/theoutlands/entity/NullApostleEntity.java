@@ -17,7 +17,7 @@ public final class NullApostleEntity extends Monster {
     private long temporaryExpiresAt = -1L;
     public void setTemporaryExpiresAt(long gameTime) { temporaryExpiresAt = gameTime; }
     public NullApostleEntity(EntityType<? extends Monster> type, Level level) {
-        super(type, level); setPersistenceRequired(); setNoGravity(true); xpReward = 0;
+        super(type, level); setNoGravity(true); xpReward = 0;
         addTag("theoutlands_null_apostle");
     }
     public static AttributeSupplier.Builder createAttributes() {
