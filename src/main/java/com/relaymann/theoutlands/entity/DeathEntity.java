@@ -61,7 +61,13 @@ public final class DeathEntity extends Monster {
         super.tick();
         if (level().isClientSide) return;
         if (temporaryExpiresAt >= 0L && level().getGameTime() >= temporaryExpiresAt) { discard(); return; }
-        if (huntTarget == null) return;
+        if (huntTarget == null) {
+            // A naturally spawned Death chooses a nearby non-creative player as its first trail.
+            Player nearest = level().getNearestPlayer(getX(), getY(), getZ(), 72.0D,
+                    player -> player.isAlive() && !player.isCreative() && !player.isSpectator());
+            if (!(nearest instanceof ServerPlayer serverPlayer)) return;
+            huntTarget = serverPlayer.getUUID();
+        }
         ServerPlayer target = level().getServer().getPlayerList().getPlayer(huntTarget);
         if (target == null || !target.isAlive() || target.serverLevel() != level()
                 || AlmightyTerritory.contains(target.serverLevel(), target.getX(), target.getZ())) {
