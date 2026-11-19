@@ -29,6 +29,7 @@ public final class ObserverEntity extends Monster {
     }
     private final class AdvanceUnseenGoal extends Goal {
         private int repathDelay;
+        private int attackCooldown;
         private AdvanceUnseenGoal() { setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK)); }
         @Override public boolean canUse() {
             return getTarget() instanceof Player player && player.isAlive()
@@ -44,7 +45,11 @@ public final class ObserverEntity extends Monster {
                 repathDelay = 8 + getRandom().nextInt(8);
                 getNavigation().moveTo(player, 1.12D);
             }
-            if (distanceToSqr(player) < 3.2D) doHurtTarget(player);
+            if (attackCooldown > 0) attackCooldown--;
+            if (distanceToSqr(player) < 3.2D && attackCooldown == 0) {
+                doHurtTarget(player);
+                attackCooldown = 24;
+            }
         }
         @Override public void stop() { getNavigation().stop(); }
     }
