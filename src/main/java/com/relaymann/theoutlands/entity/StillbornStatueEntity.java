@@ -52,7 +52,7 @@ public final class StillbornStatueEntity extends Monster {
             getLookControl().setLookAt(p, 45.0F, 45.0F);
             if (p.hasLineOfSight(StillbornStatueEntity.this)) {
                 stalking = false; entityData.set(DATA_STALKING, false); stillnessTicks++; getNavigation().stop(); setDeltaMovement(0, getDeltaMovement().y, 0);
-                if (stillnessTicks > 100 && distanceToSqr(p) < 16.0D) setTarget(null);
+                // It does not abandon a nearby watched target; it waits for a genuine loss of sight.
                 return;
             }
             stillnessTicks = 0; stalking = true; entityData.set(DATA_STALKING, true);
