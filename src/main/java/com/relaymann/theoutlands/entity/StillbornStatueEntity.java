@@ -1,6 +1,9 @@
 package com.relaymann.theoutlands.entity;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -16,6 +19,7 @@ import java.util.EnumSet;
 
 /** A stone sentinel that advances only while its chosen prey cannot see it. */
 public final class StillbornStatueEntity extends Monster {
+    private static final EntityDataAccessor<Boolean> DATA_STALKING = SynchedEntityData.defineId(StillbornStatueEntity.class, EntityDataSerializers.BOOLEAN);
     private int stillnessTicks;
     private int strikeCooldown;
     private boolean stalking;
@@ -25,6 +29,10 @@ public final class StillbornStatueEntity extends Monster {
                 .add(Attributes.MOVEMENT_SPEED, 0.30D).add(Attributes.FOLLOW_RANGE, 42.0D)
                 .add(Attributes.ATTACK_DAMAGE, 9.0D).add(Attributes.ARMOR, 8.0D)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 0.85D);
+    }
+    @Override protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_STALKING, false);
     }
     @Override protected void registerGoals() {
         goalSelector.addGoal(1, new WatcherAdvanceGoal());
@@ -43,11 +51,11 @@ public final class StillbornStatueEntity extends Monster {
             Player p = (Player)getTarget();
             getLookControl().setLookAt(p, 45.0F, 45.0F);
             if (p.hasLineOfSight(StillbornStatueEntity.this)) {
-                stalking = false; stillnessTicks++; getNavigation().stop(); setDeltaMovement(0, getDeltaMovement().y, 0);
+                stalking = false; entityData.set(DATA_STALKING, false); stillnessTicks++; getNavigation().stop(); setDeltaMovement(0, getDeltaMovement().y, 0);
                 if (stillnessTicks > 100 && distanceToSqr(p) < 16.0D) setTarget(null);
                 return;
             }
-            stillnessTicks = 0; stalking = true;
+            stillnessTicks = 0; stalking = true; entityData.set(DATA_STALKING, true);
             if (--repath <= 0) { repath = 6 + getRandom().nextInt(7); getNavigation().moveTo(p, 1.22D); }
             if (strikeCooldown > 0) strikeCooldown--;
             if (distanceToSqr(p) < 3.4D && strikeCooldown == 0) {
@@ -55,9 +63,9 @@ public final class StillbornStatueEntity extends Monster {
                 playSound(OutlandsSounds.STILLBORN_STRIKE.get(), 0.9F, 0.8F + getRandom().nextFloat() * 0.15F);
             }
         }
-        @Override public void stop() { stalking = false; getNavigation().stop(); }
+        @Override public void stop() { stalking = false; entityData.set(DATA_STALKING, false); getNavigation().stop(); }
     }
-    public boolean isStalking() { return stalking; }
+    public boolean isStalking() { return entityData.get(DATA_STALKING); }
     public float getStiffness(float partialTick) { return stalking ? 0.0F : 1.0F; }
     @Override public void tick() { super.tick(); if (!level().isClientSide && getTarget() instanceof Player p && distanceToSqr(p) > 1600.0D) setTarget(null); }
     @Override public void addAdditionalSaveData(CompoundTag tag) { super.addAdditionalSaveData(tag); tag.putInt("stillness", stillnessTicks); tag.putInt("strike_cd", strikeCooldown); tag.putBoolean("stalking", stalking); }
