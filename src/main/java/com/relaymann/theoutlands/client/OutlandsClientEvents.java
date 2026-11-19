@@ -17,6 +17,9 @@ public final class OutlandsClientEvents {
         event.registerEntityRenderer(OutlandsEntities.DEATH.get(), DeathRenderer::new);
         event.registerEntityRenderer(OutlandsEntities.ALMIGHTY.get(), AlmightyRenderer::new);
         event.registerEntityRenderer(OutlandsEntities.NULL_APOSTLE.get(), NullApostleRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.CAVE_JAR.get(), CaveJarRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.STALKER.get(), StalkerRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.OBSERVER.get(), ObserverRenderer::new);
     }
 
     @SubscribeEvent
@@ -26,5 +29,8 @@ public final class OutlandsClientEvents {
         event.registerLayerDefinition(DeathRenderer.LAYER, DeathRenderer::createBodyLayer);
         event.registerLayerDefinition(AlmightyRenderer.LAYER, AlmightyRenderer::createBodyLayer);
         event.registerLayerDefinition(NullApostleRenderer.LAYER, NullApostleRenderer::createBodyLayer);
+        event.registerLayerDefinition(CaveJarRenderer.LAYER, CaveJarRenderer::createBodyLayer);
+        event.registerLayerDefinition(StalkerRenderer.LAYER, StalkerRenderer::createBodyLayer);
+        event.registerLayerDefinition(ObserverRenderer.LAYER, ObserverRenderer::createBodyLayer);
     }
 }
