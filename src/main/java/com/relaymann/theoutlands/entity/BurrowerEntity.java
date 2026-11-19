@@ -40,18 +40,22 @@ public final class BurrowerEntity extends Monster {
                 submerged=true;setInvisible(true);setSprinting(false);
             }
             if(submerged && d<20.0D){
-                submerged=false;setInvisible(false);revealCooldown=65;
+                submerged=false;setInvisible(false);setSilent(false);revealCooldown=65;
                 playSound(OutlandsSounds.BURROWER_RISE.get(),1.1F,0.82F+getRandom().nextFloat()*0.18F);
+                // A short, low lunge makes the reveal an actual ambush rather than a visual toggle.
+                net.minecraft.world.phys.Vec3 direction = player.position().subtract(position()).normalize();
+                setDeltaMovement(getDeltaMovement().add(direction.x * 0.58D, 0.24D, direction.z * 0.58D));
+                hasImpulse = true;
                 setSprinting(true);
             }
             if(!submerged && revealCooldown==0 && d>100.0D && !hasLineOfSight(player)){
                 submerged=true;setInvisible(true);
             }
-        } else if(submerged){submerged=false;setInvisible(false);}
-        if(submerged){setSprinting(false);}
+        } else if(submerged){submerged=false;setInvisible(false);setSilent(false);}
+        if(submerged){setSprinting(false);setSilent(true);}
     }
     @Override public void addAdditionalSaveData(CompoundTag tag){super.addAdditionalSaveData(tag);tag.putBoolean("submerged",submerged);tag.putInt("reveal_cd",revealCooldown);}
-    @Override public void readAdditionalSaveData(CompoundTag tag){super.readAdditionalSaveData(tag);submerged=tag.getBoolean("submerged");revealCooldown=tag.getInt("reveal_cd");setInvisible(submerged);}
+    @Override public void readAdditionalSaveData(CompoundTag tag){super.readAdditionalSaveData(tag);submerged=tag.getBoolean("submerged");revealCooldown=tag.getInt("reveal_cd");setInvisible(submerged);setSilent(submerged);}
     @Override protected SoundEvent getAmbientSound(){return null;}
     @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source){return OutlandsSounds.BURROWER_RISE.get();}
     @Override protected SoundEvent getDeathSound(){return null;}
