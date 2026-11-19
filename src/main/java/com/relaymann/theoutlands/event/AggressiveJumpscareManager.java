@@ -13,6 +13,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
 
 import java.util.HashMap;
@@ -53,7 +54,7 @@ public final class AggressiveJumpscareManager {
             player.playNotifySound(useDeath ? SoundEvents.ENDERMAN_SCREAM : SoundEvents.WARDEN_ROAR,
                     SoundSource.HOSTILE, useDeath ? 0.95F : 0.85F, useDeath ? 0.78F : 0.62F);
         }
-        ACTIVE.put(scare.getUUID(), new ActiveScare(level, scare.getUUID(), now + ENTITY_LIFETIME_TICKS));
+        ACTIVE.put(scare.getUUID(), new ActiveScare(level, scare.getUUID(), player.getUUID(), now + ENTITY_LIFETIME_TICKS));
     }
 
     private static Entity spawnCloseManifestation(ServerPlayer player, boolean death) {
@@ -72,7 +73,7 @@ public final class AggressiveJumpscareManager {
             BlockPos position = BlockPos.containing(x, player.getY(), z);
             if (!level.hasChunkAt(position) || !level.hasChunkAt(position.above())) continue;
 
-            Entity entity = death ? OutlandsEntities.DEATH.get().create(level)
+            Mob entity = death ? OutlandsEntities.DEATH.get().create(level)
                     : OutlandsEntities.FEAR.get().create(level);
             if (entity == null) return null;
 
@@ -114,7 +115,7 @@ public final class AggressiveJumpscareManager {
         Iterator<Map.Entry<UUID, ActiveScare>> iterator = ACTIVE.entrySet().iterator();
         while (iterator.hasNext()) {
             ActiveScare active = iterator.next().getValue();
-            if (active.level.getServer().getPlayerList().getPlayer(player.getUUID()) != null) continue;
+            if (!active.playerId.equals(player.getUUID())) continue;
             Entity entity = active.level.getEntity(active.entityId);
             if (entity != null) entity.discard();
             iterator.remove();
@@ -129,5 +130,5 @@ public final class AggressiveJumpscareManager {
         ACTIVE.clear();
     }
 
-    private record ActiveScare(ServerLevel level, UUID entityId, long expiresAt) {}
+    private record ActiveScare(ServerLevel level, UUID entityId, UUID playerId, long expiresAt) {}
 }
