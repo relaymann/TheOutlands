@@ -7,6 +7,7 @@ public final class ObserverModel extends HumanoidModel<ObserverEntity> {
  public ObserverModel(ModelPart root){super(root);}
  @Override public void setupAnim(ObserverEntity e,float swing,float amount,float age,float yaw,float pitch){
   super.setupAnim(e,swing,amount,age,yaw,pitch);
+  body.xScale=0.88F; body.yScale=1.08F; head.xScale=0.92F;
   float still=(float)Math.sin(age*0.035F)*0.012F;
   body.xRot=0.015F; body.yRot=still;
   rightArm.xRot=-0.035F; leftArm.xRot=-0.035F;
