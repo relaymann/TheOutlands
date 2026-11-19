@@ -1,6 +1,7 @@
 package com.relaymann.theoutlands.client;
 import com.relaymann.theoutlands.entity.HunterEntity;
 import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
@@ -12,7 +13,7 @@ import net.minecraft.client.renderer.RenderType;
 /** Custom narrow predator silhouette with a ribbed torso, hooked forearms and angular skull. */
 public final class HunterModel extends EntityModel<HunterEntity> {
  private final ModelPart root,head,torso,leftArm,rightArm,leftLeg,rightLeg,spine;
- public HunterModel(ModelPart root){this.root=root;head=root.getChild("head");torso=root.getChild("torso");leftArm=root.getChild("left_arm");rightArm=root.getChild("right_arm");leftLeg=root.getChild("left_leg");rightLeg=root.getChild("right_leg");spine=root.getChild("spine");}
+ public HunterModel(ModelPart root){super(RenderType::entityCutoutNoCull);this.root=root;head=root.getChild("head");torso=root.getChild("torso");leftArm=root.getChild("left_arm");rightArm=root.getChild("right_arm");leftLeg=root.getChild("left_leg");rightLeg=root.getChild("right_leg");spine=root.getChild("spine");}
  public static LayerDefinition createBodyLayer(){
   MeshDefinition m=new MeshDefinition();PartDefinition r=m.getRoot();
   r.addOrReplaceChild("head",CubeListBuilder.create().texOffs(0,0).addBox(-3,-8,-3,6,7,6).texOffs(0,14).addBox(-2,-3,-5,4,2,3),PartPose.offset(0,-12,0));
