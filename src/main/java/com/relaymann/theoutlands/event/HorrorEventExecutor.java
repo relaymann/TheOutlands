@@ -199,7 +199,29 @@ public final class HorrorEventExecutor {
                 ClientAfterimageManager.showFalseStructure(player);
                 positionalSound(player, SoundEvents.GRAVEL_STEP, SoundSource.BLOCKS, 0.14F, 0.52F, x - 9.0D, y, z + 12.0D);
             }
-            case "false_base" -> {\n                ClientAfterimageManager.showFalseStructure(player);\n                ClientAfterimageManager.showTerrainAfterimage(player);\n                positionalSound(player, SoundEvents.WOODEN_DOOR_OPEN, SoundSource.BLOCKS, 0.13F, 0.45F, player.getX() + 26.0D, y, player.getZ() - 22.0D);\n            }\n            case "horizon_wrongness" -> {\n                ClientAfterimageManager.showSilhouette(player);\n                ClientAfterimageManager.showFalseStructure(player);\n                positionalSound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.12F, 0.38F, player.getX() - 32.0D, y + 8.0D, player.getZ() + 28.0D);\n            }\n            case "black_room_threshold" -> {\n                ClientAfterimageManager.showFalseStructure(player);\n                ClientAfterimageManager.showDoorAfterimage(player);\n                positionalSound(player, SoundEvents.WOODEN_DOOR_OPEN, SoundSource.BLOCKS, 0.12F, 0.4F, player.getX() + 18.0D, y, player.getZ() + 18.0D);\n                sound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.1F, 0.35F);\n            }\n            case "fear_landscape" -> {\n                ClientAfterimageManager.showTerrainAfterimage(player);\n                ClientAfterimageManager.showSilhouette(player);\n                particles(player, ParticleTypes.REVERSE_PORTAL, player.getX(), player.getY() + 1.0D, player.getZ(), 6, 0.35D, 0.45D, 0.35D, 0.003D);\n                sound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.15F, 0.32F);\n            }\n            case "silence_break" -> {
+            case "false_base" -> {
+                ClientAfterimageManager.showFalseStructure(player);
+                ClientAfterimageManager.showTerrainAfterimage(player);
+                positionalSound(player, SoundEvents.WOODEN_DOOR_OPEN, SoundSource.BLOCKS, 0.13F, 0.45F, player.getX() + 26.0D, y, player.getZ() - 22.0D);
+            }
+            case "horizon_wrongness" -> {
+                ClientAfterimageManager.showSilhouette(player);
+                ClientAfterimageManager.showFalseStructure(player);
+                positionalSound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.12F, 0.38F, player.getX() - 32.0D, y + 8.0D, player.getZ() + 28.0D);
+            }
+            case "black_room_threshold" -> {
+                ClientAfterimageManager.showFalseStructure(player);
+                ClientAfterimageManager.showDoorAfterimage(player);
+                positionalSound(player, SoundEvents.WOODEN_DOOR_OPEN, SoundSource.BLOCKS, 0.12F, 0.4F, player.getX() + 18.0D, y, player.getZ() + 18.0D);
+                sound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.1F, 0.35F);
+            }
+            case "fear_landscape" -> {
+                ClientAfterimageManager.showTerrainAfterimage(player);
+                ClientAfterimageManager.showSilhouette(player);
+                particles(player, ParticleTypes.REVERSE_PORTAL, player.getX(), player.getY() + 1.0D, player.getZ(), 6, 0.35D, 0.45D, 0.35D, 0.003D);
+                sound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.15F, 0.32F);
+            }
+            case "silence_break" -> {
                 sound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.08F, 0.25F);
                 particles(player, ParticleTypes.SMOKE, x, y + 1.0D, z, 2, 0.1D, 0.2D, 0.1D, 0.0D);
                 positionalSound(player, SoundEvents.WOODEN_DOOR_OPEN, SoundSource.BLOCKS, 0.1F, 0.75F, x + 7.0D, y, z + 5.0D);

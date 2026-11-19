@@ -79,7 +79,11 @@ public record HorrorContext(String biomeId, boolean night, boolean raining, bool
         if ("impossible_corridor".equals(id) && (lookBackCount >= 3 || pauseCount >= 5)) weight *= 1.4D;
         if ("memory_intrusion".equals(id) && previousEncounterCount >= 5) weight *= 1.25D;
         if ("distant_door".equals(id) && night) weight *= 1.3D;
-        if ("silence_break".equals(id) && nearbyPlayers == 0) weight *= 1.45D;\n        if ("horizon_wrongness".equals(id) && (lookBackCount >= 3 || pauseCount >= 6)) weight *= 1.5D;\n        if ("false_base".equals(id) && previousEncounterCount >= 10) weight *= 1.2D;\n        if ("black_room_threshold".equals(id) && nearbyPlayers == 0) weight *= 1.35D;\n        if ("fear_landscape".equals(id) && hasMetFear && night) weight *= 1.35D;
+        if ("silence_break".equals(id) && nearbyPlayers == 0) weight *= 1.45D;
+        if ("horizon_wrongness".equals(id) && (lookBackCount >= 3 || pauseCount >= 6)) weight *= 1.5D;
+        if ("false_base".equals(id) && previousEncounterCount >= 10) weight *= 1.2D;
+        if ("black_room_threshold".equals(id) && nearbyPlayers == 0) weight *= 1.35D;
+        if ("fear_landscape".equals(id) && hasMetFear && night) weight *= 1.35D;
         return weight;
     }
 }
