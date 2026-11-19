@@ -1,5 +1,8 @@
 {
  "null_presence":{"sounds":[{"name":"theoutlands:null_presence","volume":0.18}]},
  "null_apostle_whisper":{"sounds":[{"name":"theoutlands:null_presence","volume":0.16,"pitch":0.62}]},
- "null_apostle_departure":{"sounds":[{"name":"theoutlands:null_presence","volume":0.20,"pitch":1.32}]}
+ "null_apostle_departure":{"sounds":[{"name":"theoutlands:null_presence","volume":0.20,"pitch":1.32}]},
+ "hunter_stalk":{"sounds":[{"name":"theoutlands:hunter_stalk","volume":0.8}]},
+ "burrower_rise":{"sounds":[{"name":"theoutlands:burrower_rise","volume":0.9}]},
+ "mimic_reveal":{"sounds":[{"name":"theoutlands:mimic_reveal","volume":0.85}]}
 }
