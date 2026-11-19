@@ -215,7 +215,7 @@ public final class HorrorEventExecutor {
                 positionalSound(player, SoundEvents.WOODEN_DOOR_OPEN, SoundSource.BLOCKS, 0.12F, 0.4F, player.getX() + 18.0D, y, player.getZ() + 18.0D);
                 sound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.1F, 0.35F);
             }
-            case "fear_landscape" -> {
+            case "horizon_giant" -> {\n                ClientAfterimageManager.showHorizonGiant(player);\n                sound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.12F, 0.3F);\n            }\n            case "fear_landscape" -> {
                 ClientAfterimageManager.showTerrainAfterimage(player);
                 ClientAfterimageManager.showSilhouette(player);
                 particles(player, ParticleTypes.REVERSE_PORTAL, player.getX(), player.getY() + 1.0D, player.getZ(), 6, 0.35D, 0.45D, 0.35D, 0.003D);
