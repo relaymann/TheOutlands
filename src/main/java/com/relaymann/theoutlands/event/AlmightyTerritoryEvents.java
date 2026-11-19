@@ -51,12 +51,8 @@ public final class AlmightyTerritoryEvents {
 
     private static boolean isExempt(Entity entity) {
         if (entity instanceof Player || entity.getTags().contains(ALMIGHTY_ENTITY_TAG)) return true;
-        if (entity instanceof ItemEntity item) {
-            return item.getItem().is(OutlandsItems.DEATH_JAR.get())
-                    || item.getItem().is(OutlandsItems.DEATH_MANIFEST.get())
-                    || item.getItem().is(OutlandsItems.ALMIGHTY_FRAGMENT.get())
-                    || item.getItem().is(OutlandsItems.THE_LAST_PAGE.get());
-        }
+        // Keep player drops and story clues intact inside the boss territory.
+        if (entity instanceof ItemEntity) return true;
         return false;
     }
 }
