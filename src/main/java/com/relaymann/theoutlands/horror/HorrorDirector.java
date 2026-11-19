@@ -49,7 +49,7 @@ public final class HorrorDirector {
             new HorrorEventDefinition("false_base", 11_000, 19, 1, 18_000, 11),
             new HorrorEventDefinition("horizon_wrongness", 8_000, 18, 1, 14_000, 9),
             new HorrorEventDefinition("black_room_threshold", 18_000, 22, 1, 24_000, 14),
-            new HorrorEventDefinition("fear_landscape", 25_000, 22, 1, 20_000, 12));
+            new HorrorEventDefinition("fear_landscape", 25_000, 22, 1, 20_000, 12),\n            new HorrorEventDefinition("horizon_giant", 28_000, 24, 1, 28_000, 13));
     private HorrorDirector() {}
     public static List<HorrorEventDefinition> getEventDefinitions() { return EVENTS; }
 
