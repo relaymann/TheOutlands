@@ -8,7 +8,6 @@ import com.relaymann.theoutlands.horror.DistanceProgression;
 import com.relaymann.theoutlands.horror.FearEncounterPolicy;
 import com.relaymann.theoutlands.horror.HorrorMemory;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -53,16 +52,11 @@ public final class FearEncounterManager {
             audience.add(player);
         }
 
-        boolean group = audience.size() > 1;
-        Component firstLine = Component.literal(group
-                ? "You are the first people to reach me."
-                : "You are the first person to reach me.");
-        Component secondLine = Component.literal("You are worthy of my fear.");
+        // The first meeting is communicated entirely through the manifestation and
+        // environment. Horror events must never narrate themselves in chat.
         for (ServerPlayer witness : audience) {
             HorrorMemory.recordDiscovery(witness, INTRODUCTION_DISCOVERY);
             HorrorMemory.setLastAggressiveJumpscare(witness, witness.serverLevel().getGameTime());
-            witness.sendSystemMessage(firstLine);
-            witness.sendSystemMessage(secondLine);
         }
     }
 
