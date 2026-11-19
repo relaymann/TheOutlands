@@ -119,7 +119,7 @@ public final class NullWatcherManager {
     private static BlockPos findRememberedHidingPosition(ServerPlayer player, NullStalkingProfile profile) {
         List<BlockPos> remembered = new ArrayList<>(HorrorMemory.rememberedLocations(player));
         remembered.addAll(HorrorMemory.rememberedSleepLocations(player));
-        remembered.addAll(HorrorMemory.rememberedBuildLocations(player));
+        remembered.addAll(HorrorMemory.rememberedBuildLocations(player));\n        remembered.addAll(HorrorMemory.rememberedDeathLocations(player));
         if (remembered.isEmpty()) return null;
         ServerLevel level = player.serverLevel();
         for (int i = remembered.size() - 1; i >= 0; i--) {
