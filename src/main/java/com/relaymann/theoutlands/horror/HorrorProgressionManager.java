@@ -2,6 +2,7 @@ package com.relaymann.theoutlands.horror;
 
 import com.relaymann.theoutlands.OutlandsConfig;
 import com.relaymann.theoutlands.event.AlmightyEncounterManager;
+import com.relaymann.theoutlands.event.AggressiveJumpscareManager;
 import com.relaymann.theoutlands.event.ClientAfterimageManager;
 import com.relaymann.theoutlands.event.DeathHuntManager;
 import com.relaymann.theoutlands.event.FearTerritoryManager;
