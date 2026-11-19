@@ -319,6 +319,10 @@ public final class HorrorMemory {
         recordContextCell(player, BUILD_CELLS, position);
     }
 
+    public static void recordDeathLocation(ServerPlayer player, BlockPos position) {
+        recordContextCell(player, DEATH_CELLS, position);
+    }
+
     private static void recordContextCell(ServerPlayer player, String key, BlockPos position) {
         CompoundTag data = player.getPersistentData();
         CompoundTag memory = getMemory(data);
@@ -344,6 +348,10 @@ public final class HorrorMemory {
 
     public static List<BlockPos> rememberedBuildLocations(ServerPlayer player) {
         return readPositionList(getMemory(player.getPersistentData()), BUILD_CELLS);
+    }
+
+    public static List<BlockPos> rememberedDeathLocations(ServerPlayer player) {
+        return readPositionList(getMemory(player.getPersistentData()), DEATH_CELLS);
     }
 
     private static List<BlockPos> readPositionList(CompoundTag memory, String key) {
