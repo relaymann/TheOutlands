@@ -5,4 +5,9 @@
  "hunter_stalk":{"sounds":[{"name":"theoutlands:hunter_stalk","volume":0.8}]},
  "burrower_rise":{"sounds":[{"name":"theoutlands:burrower_rise","volume":0.9}]},
  "mimic_reveal":{"sounds":[{"name":"theoutlands:mimic_reveal","volume":0.85}]}
+,
+ "stillborn_stone":{"sounds":[{"name":"theoutlands:stillborn_stone","volume":0.75}]},
+ "stillborn_strike":{"sounds":[{"name":"theoutlands:stillborn_strike","volume":0.9}]},
+ "agitated_warning":{"sounds":[{"name":"theoutlands:agitated_warning","volume":0.85}]},
+ "agitated_charge":{"sounds":[{"name":"theoutlands:agitated_charge","volume":0.95}]}
 }
