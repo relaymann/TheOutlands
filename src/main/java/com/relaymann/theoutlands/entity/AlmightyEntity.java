@@ -115,6 +115,7 @@ public final class AlmightyEntity extends Monster {
                     new ItemStack(OutlandsItems.THE_LAST_PAGE.get()));
             page.setDefaultPickUpDelay();
             page.setUnlimitedLifetime();
+            page.setInvulnerable(true);
             boolean dropped = level().addFreshEntity(page);
             if (dropped) getPersistentData().putBoolean("outlands_ending_dropped", true);
             if (level() instanceof ServerLevel server) {

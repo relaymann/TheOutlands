@@ -87,6 +87,7 @@ public final class DeathHuntManager {
                 new ItemStack(item));
         clue.setDefaultPickUpDelay();
         clue.setUnlimitedLifetime();
+        clue.setInvulnerable(true);
         return death.level().addFreshEntity(clue);
     }
 

@@ -2,7 +2,6 @@ package com.relaymann.theoutlands.event;
 
 import com.relaymann.theoutlands.TheOutlands;
 import com.relaymann.theoutlands.horror.AlmightyTerritory;
-import com.relaymann.theoutlands.item.OutlandsItems;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -19,7 +18,7 @@ import net.neoforged.neoforge.event.tick.EntityTickEvent;
  * <p>Players may enter because they are the story's intended visitors. The Almighty
  * is identified by a dedicated entity tag so its future implementation can opt in
  * without coupling this rule to an entity class that does not exist yet. Every other
- * entity is rejected on entry and removed if it crosses into the region later.</p>
+ * non-item entity is rejected on entry and removed if it crosses into the region later.</p>
  */
 @EventBusSubscriber(modid = TheOutlands.MOD_ID)
 public final class AlmightyTerritoryEvents {
