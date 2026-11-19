@@ -55,8 +55,20 @@ public final class HunterEntity extends Monster {
                 setDeltaMovement(getDeltaMovement().add(dir.x*0.72D,0.38D,dir.z*0.72D));
                 hasImpulse=true; pounceCooldown=90+getRandom().nextInt(45);
             }
-        } else if (hasMemory && searchTicks++ < 80 && tickCount % 20 == 0) {
-            getNavigation().moveTo(memoryX,memoryY,memoryZ,0.95D);
+        } else if (hasMemory) {
+            searchTicks++;
+            if (searchTicks <= 100 && tickCount % 18 == 0) {
+                // Sweep around the last confirmed position instead of walking into one blocked point.
+                double offsetX = getRandom().nextInt(17) - 8;
+                double offsetZ = getRandom().nextInt(17) - 8;
+                getNavigation().moveTo(memoryX + offsetX, memoryY, memoryZ + offsetZ, 0.92D);
+            }
+            if (searchTicks > 100) {
+                hasMemory = false;
+                searchTicks = 0;
+                getNavigation().stop();
+                setSprinting(false);
+            }
         }
     }
     @Override protected SoundEvent getAmbientSound(){return OutlandsSounds.HUNTER_STALK.get();}
