@@ -64,7 +64,7 @@ public final class DeathEntity extends Monster {
         if (huntTarget == null) {
             // A naturally spawned Death chooses a nearby non-creative player as its first trail.
             Player nearest = level().getNearestPlayer(getX(), getY(), getZ(), 72.0D,
-                    player -> player.isAlive() && !player.isCreative() && !player.isSpectator());
+                    entity -> entity instanceof Player player && player.isAlive() && !player.isCreative() && !player.isSpectator());
             if (!(nearest instanceof ServerPlayer serverPlayer)) return;
             huntTarget = serverPlayer.getUUID();
         }
