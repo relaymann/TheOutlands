@@ -60,6 +60,7 @@ public final class FearEncounterManager {
         Component secondLine = Component.literal("You are worthy of my fear.");
         for (ServerPlayer witness : audience) {
             HorrorMemory.recordDiscovery(witness, INTRODUCTION_DISCOVERY);
+            HorrorMemory.setLastAggressiveJumpscare(witness, witness.serverLevel().getGameTime());
             witness.sendSystemMessage(firstLine);
             witness.sendSystemMessage(secondLine);
         }

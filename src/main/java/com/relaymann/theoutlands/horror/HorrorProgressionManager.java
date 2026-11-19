@@ -30,6 +30,7 @@ public final class HorrorProgressionManager {
         FearTerritoryManager.tick(player);
         DeathHuntManager.evaluate(player);
         AlmightyEncounterManager.evaluate(player);
+        AggressiveJumpscareManager.evaluate(player, snapshot.distanceFromSpawn());
         HorrorMemory.recordBehaviorSample(player);
         if (player.isSleeping()) HorrorMemory.recordSleepLocation(player, player.blockPosition());
         boolean revisited = HorrorMemory.recordLocation(player);

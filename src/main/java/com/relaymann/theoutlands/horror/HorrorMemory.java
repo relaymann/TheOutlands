@@ -180,6 +180,19 @@ public final class HorrorMemory {
         return memory.contains("last_death_spawn") ? memory.getLong("last_death_spawn") : -12_000L;
     }
 
+    public static long lastAggressiveJumpscare(ServerPlayer player) {
+        CompoundTag memory = getMemory(player.getPersistentData());
+        return memory.contains("last_aggressive_jumpscare")
+                ? memory.getLong("last_aggressive_jumpscare") : -36_000L;
+    }
+
+    public static void setLastAggressiveJumpscare(ServerPlayer player, long gameTime) {
+        CompoundTag data = player.getPersistentData();
+        CompoundTag memory = getMemory(data);
+        memory.putLong("last_aggressive_jumpscare", gameTime);
+        data.put(ROOT, memory);
+    }
+
     public static void setLastDeathSpawn(ServerPlayer player, long time) {
         CompoundTag data = player.getPersistentData();
         CompoundTag memory = getMemory(data);

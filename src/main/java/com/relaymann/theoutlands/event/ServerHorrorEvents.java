@@ -32,13 +32,17 @@ public final class ServerHorrorEvents {
             NullWatcherManager.tick(level);
             NullApostleManager.tick(level);
             FearEncounterManager.tick(level);
+            AggressiveJumpscareManager.tick(level);
             ClientAfterimageManager.tick(level);
         }
     }
 
     @SubscribeEvent
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) ClientAfterimageManager.clear(player);
+        if (event.getEntity() instanceof ServerPlayer player) {
+            ClientAfterimageManager.clear(player);
+            AggressiveJumpscareManager.clear(player);
+        }
         HorrorProgressionManager.remove(event.getEntity().getUUID());
     }
 
@@ -61,6 +65,7 @@ public final class ServerHorrorEvents {
     public static void onServerStopping(ServerStoppingEvent event) {
         HorrorProgressionManager.clear();
         FearEncounterManager.clear();
+        AggressiveJumpscareManager.clear();
         NullApostleManager.clear();
         DeathHuntManager.clear();
         ClientAfterimageManager.clear();

@@ -48,8 +48,10 @@ public final class DeathHuntManager {
         death.setHuntTarget(player);
         if (!level.noCollision(death, death.getBoundingBox()) || !level.addFreshEntity(death)) return;
 
+        boolean firstDeathEncounter = !HorrorMemory.hasDiscovered(player, "death_first_sighting");
         HorrorMemory.recordDeathEncounter(player, now);
         HorrorMemory.recordDiscovery(player, "death_first_sighting");
+        if (firstDeathEncounter) HorrorMemory.setLastAggressiveJumpscare(player, now);
         dropNextClue(player, death);
     }
 
