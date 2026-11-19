@@ -9,7 +9,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -144,8 +143,7 @@ public final class HorrorEventExecutor {
             }
             case "direct_intervention" -> {
                 sound(player, SoundEvents.WARDEN_ROAR, SoundSource.HOSTILE, 0.3F, 0.55F);
-                // Rare, intentional character dialogue; ordinary events never narrate themselves.
-                player.sendSystemMessage(Component.literal("§8[Null] §7I know where you are."));
+                // Keep horror diegetic: do not explain or narrate events in chat.
                 particles(player, ParticleTypes.PORTAL, player.getX(), player.getY() + 1.0D, player.getZ(), 12, 0.45D, 0.65D, 0.45D, 0.01D);
             }
             case "familiar_echo" -> executeFamiliarPlaceDistortion(player);
