@@ -4,7 +4,6 @@ import com.relaymann.theoutlands.OutlandsConfig;
 import com.relaymann.theoutlands.horror.HorrorMemory;
 import com.relaymann.theoutlands.item.OutlandsItems;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -123,7 +122,7 @@ public final class AlmightyEntity extends Monster {
                         new AABB(blockPosition()).inflate(128.0D))) {
                     HorrorMemory.recordDiscovery(player, "almighty_defeated");
                     if (dropped) HorrorMemory.recordDiscovery(player, "the_last_page_dropped");
-                    player.sendSystemMessage(Component.literal("§8[The Almighty] §7The seam has opened."));
+                    // The ending is conveyed by the dropped page and the world, not narrator chat.
                 }
             }
         }
