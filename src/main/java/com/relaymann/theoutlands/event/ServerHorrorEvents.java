@@ -57,6 +57,13 @@ public final class ServerHorrorEvents {
     }
 
     @SubscribeEvent
+    public static void onLivingDeath(LivingDeathEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            HorrorMemory.recordDeathLocation(player, player.blockPosition());
+        }
+    }
+
+    @SubscribeEvent
     public static void onPlayerClone(PlayerEvent.Clone event) {
         if (event.getOriginal() instanceof ServerPlayer original
                 && event.getEntity() instanceof ServerPlayer replacement) {
