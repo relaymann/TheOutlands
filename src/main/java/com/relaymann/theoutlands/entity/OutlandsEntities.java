@@ -43,5 +43,15 @@ public final class OutlandsEntities {
             ENTITY_TYPES.register("observer", () -> EntityType.Builder.of(ObserverEntity::new, MobCategory.MONSTER)
                     .sized(0.7F, 2.25F).clientTrackingRange(20).updateInterval(2).build("theoutlands:observer"));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<HunterEntity>> HUNTER =
+            ENTITY_TYPES.register("hunter", () -> EntityType.Builder.of(HunterEntity::new, MobCategory.MONSTER)
+                    .sized(0.78F, 2.45F).clientTrackingRange(24).updateInterval(2).build("theoutlands:hunter"));
+    public static final DeferredHolder<EntityType<?>, EntityType<BurrowerEntity>> BURROWER =
+            ENTITY_TYPES.register("burrower", () -> EntityType.Builder.of(BurrowerEntity::new, MobCategory.MONSTER)
+                    .sized(1.25F, 1.15F).clientTrackingRange(20).updateInterval(2).build("theoutlands:burrower"));
+    public static final DeferredHolder<EntityType<?>, EntityType<MimicEntity>> MIMIC =
+            ENTITY_TYPES.register("mimic", () -> EntityType.Builder.of(MimicEntity::new, MobCategory.MONSTER)
+                    .sized(0.72F, 2.35F).clientTrackingRange(20).updateInterval(2).build("theoutlands:mimic"));
+
     private OutlandsEntities() {}
 }
