@@ -17,7 +17,7 @@ public final class FearEntity extends Monster {
  @Override protected void registerGoals() { }
  @Override public void tick() { super.tick(); if (!level().isClientSide && temporaryExpiresAt >= 0L && level().getGameTime() >= temporaryExpiresAt) { discard(); return; } setNoGravity(true); setDeltaMovement(0.0D,0.0D,0.0D); }
  @Override public void addAdditionalSaveData(CompoundTag tag) { super.addAdditionalSaveData(tag); if (temporaryExpiresAt >= 0L) tag.putLong("outlands_temporary_expires_at", temporaryExpiresAt); }
- @Override public void readAdditionalSaveData(CompoundTag tag) { super.readAdditionalSaveData(tag); temporaryExpiresAt = tag.contains("outlands_temporary_expires_at") ? tag.getLong("outlands_temporary_expires_at") : level().getGameTime() + 160L; }
+ @Override public void readAdditionalSaveData(CompoundTag tag) { super.readAdditionalSaveData(tag); temporaryExpiresAt = tag.contains("outlands_temporary_expires_at") ? tag.getLong("outlands_temporary_expires_at") : -1L; }
  @Override protected net.minecraft.sounds.SoundEvent getAmbientSound(){return null;}
  @Override protected net.minecraft.sounds.SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source){return null;}
  @Override protected net.minecraft.sounds.SoundEvent getDeathSound(){return null;}
