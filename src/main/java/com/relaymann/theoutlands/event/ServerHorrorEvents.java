@@ -20,8 +20,9 @@ public final class ServerHorrorEvents {
 
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Post event) {
-        if (!(event.getEntity() instanceof ServerPlayer player)
-                || player.tickCount % 20 != 0
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        FootstepEchoManager.tick(player);
+        if (player.tickCount % 20 != 0
                 || !player.serverLevel().dimension().equals(Level.OVERWORLD)) return;
         HorrorProgressionManager.update(player);
     }
@@ -42,6 +43,7 @@ public final class ServerHorrorEvents {
         if (event.getEntity() instanceof ServerPlayer player) {
             ClientAfterimageManager.clear(player);
             AggressiveJumpscareManager.clear(player);
+            FootstepEchoManager.clear(player);
         }
         HorrorProgressionManager.remove(event.getEntity().getUUID());
     }
