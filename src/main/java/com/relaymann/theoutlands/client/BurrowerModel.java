@@ -1,6 +1,7 @@
 package com.relaymann.theoutlands.client;
 import com.relaymann.theoutlands.entity.BurrowerEntity;
 import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.PartPose;
 import net.minecraft.client.model.geom.builders.*;
@@ -9,7 +10,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 /** Low-slung digging beast with a plated back, wedge skull and oversized digging claws. */
 public final class BurrowerModel extends EntityModel<BurrowerEntity> {
  private final ModelPart root,head,body,leftClaw,rightClaw,leftRear,rightRear,plates;
- public BurrowerModel(ModelPart root){this.root=root;head=root.getChild("head");body=root.getChild("body");leftClaw=root.getChild("left_claw");rightClaw=root.getChild("right_claw");leftRear=root.getChild("left_rear");rightRear=root.getChild("right_rear");plates=root.getChild("plates");}
+ public BurrowerModel(ModelPart root){super(RenderType::entityCutoutNoCull);this.root=root;head=root.getChild("head");body=root.getChild("body");leftClaw=root.getChild("left_claw");rightClaw=root.getChild("right_claw");leftRear=root.getChild("left_rear");rightRear=root.getChild("right_rear");plates=root.getChild("plates");}
  public static LayerDefinition createBodyLayer(){
   MeshDefinition m=new MeshDefinition();PartDefinition r=m.getRoot();
   r.addOrReplaceChild("body",CubeListBuilder.create().texOffs(0,0).addBox(-6,-5,-9,12,9,18).texOffs(0,28).addBox(-5,-7,-6,10,3,12),PartPose.offset(0,4,0));
