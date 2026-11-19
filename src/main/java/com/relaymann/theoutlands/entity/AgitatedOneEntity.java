@@ -1,6 +1,9 @@
 package com.relaymann.theoutlands.entity;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -16,6 +19,8 @@ import com.relaymann.theoutlands.sound.OutlandsSounds;
 
 /** A volatile predator that escalates from twitching vigilance to sustained, telegraphed charges. */
 public final class AgitatedOneEntity extends Monster {
+    private static final EntityDataAccessor<Integer> DATA_AGITATION = SynchedEntityData.defineId(AgitatedOneEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> DATA_CHARGING = SynchedEntityData.defineId(AgitatedOneEntity.class, EntityDataSerializers.BOOLEAN);
     private int agitation;
     private int chargeCooldown;
     private int attackWindup;
@@ -26,6 +31,11 @@ public final class AgitatedOneEntity extends Monster {
                 .add(Attributes.MOVEMENT_SPEED, 0.28D).add(Attributes.FOLLOW_RANGE, 38.0D)
                 .add(Attributes.ATTACK_DAMAGE, 7.0D).add(Attributes.ARMOR, 3.0D)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 0.25D);
+    }
+    @Override protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_AGITATION, 0);
+        builder.define(DATA_CHARGING, false);
     }
     @Override protected void registerGoals() {
         goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.12D, true));
@@ -53,14 +63,18 @@ public final class AgitatedOneEntity extends Monster {
                 hasImpulse = true; charging = true; chargeCooldown = 100; agitation = Math.max(20, agitation - 25);
                 playSound(OutlandsSounds.AGITATED_CHARGE.get(), 1.0F, 0.9F + getRandom().nextFloat() * 0.1F);
             }
+            entityData.set(DATA_AGITATION, agitation);
+            entityData.set(DATA_CHARGING, charging);
             setSprinting(agitation > 45 || charging);
             if (charging && onGround() && chargeCooldown < 78) charging = false;
         } else {
             agitation = Math.max(0, agitation - 1); charging = false; attackWindup = 0;
+            entityData.set(DATA_AGITATION, agitation);
+            entityData.set(DATA_CHARGING, false);
         }
     }
-    public int getAgitation() { return agitation; }
-    public boolean isCharging() { return charging; }
+    public int getAgitation() { return entityData.get(DATA_AGITATION); }
+    public boolean isCharging() { return entityData.get(DATA_CHARGING); }
     @Override public void addAdditionalSaveData(CompoundTag tag) { super.addAdditionalSaveData(tag); tag.putInt("agitation", agitation); tag.putInt("charge_cd", chargeCooldown); tag.putInt("windup", attackWindup); tag.putBoolean("charging", charging); }
     @Override public void readAdditionalSaveData(CompoundTag tag) { super.readAdditionalSaveData(tag); agitation=tag.getInt("agitation"); chargeCooldown=tag.getInt("charge_cd"); attackWindup=tag.getInt("windup"); charging=tag.getBoolean("charging"); }
     @Override protected SoundEvent getAmbientSound() { return null; }
