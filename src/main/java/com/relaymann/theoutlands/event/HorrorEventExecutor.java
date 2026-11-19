@@ -37,7 +37,7 @@ public final class HorrorEventExecutor {
             case "wall_knock" -> {
                 double a=random.nextDouble()*Math.PI*2.0D; double d=4.0D+random.nextDouble()*5.0D;
                 double nx=player.getX()+Math.cos(a)*d, nz=player.getZ()+Math.sin(a)*d;
-                positionalSound(player, SoundEvents.WOODEN_DOOR, SoundSource.BLOCKS, 0.34F, 0.65F+random.nextFloat()*0.3F, nx, player.getY()+1.0D, nz);
+                positionalSound(player, SoundEvents.WOODEN_DOOR_OPEN, SoundSource.BLOCKS, 0.34F, 0.65F+random.nextFloat()*0.3F, nx, player.getY()+1.0D, nz);
                 if(random.nextBoolean()) positionalSound(player, SoundEvents.WOODEN_BUTTON_CLICK_ON, SoundSource.BLOCKS, 0.2F, 0.8F, nx+1.0D, player.getY(), nz);
             }
             case "behind_steps" -> {
@@ -60,7 +60,7 @@ public final class HorrorEventExecutor {
                 double a=random.nextDouble()*Math.PI*2.0D; double d=8.0D+random.nextDouble()*12.0D;
                 double mx=player.getX()+Math.cos(a)*d, mz=player.getZ()+Math.sin(a)*d;
                 positionalSound(player, SoundEvents.STONE_BREAK, SoundSource.BLOCKS, 0.18F, 0.65F, mx, player.getY(), mz);
-                positionalSound(player, SoundEvents.WOODEN_DOOR, SoundSource.BLOCKS, 0.16F, 0.7F, mx+2.0D, player.getY(), mz+1.0D);
+                positionalSound(player, SoundEvents.WOODEN_DOOR_OPEN, SoundSource.BLOCKS, 0.16F, 0.7F, mx+2.0D, player.getY(), mz+1.0D);
             }
             case "ambient_displacement" -> {
                 sound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.42F, 0.65F);
