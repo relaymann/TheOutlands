@@ -45,7 +45,11 @@ public final class HorrorDirector {
             new HorrorEventDefinition("impossible_corridor", 7_000, 20, 1, 16_000, 10),
             new HorrorEventDefinition("distant_door", 2_000, 14, 2, 5_000, 6),
             new HorrorEventDefinition("memory_intrusion", 6_000, 17, 1, 11_000, 8),
-            new HorrorEventDefinition("silence_break", 2_000, 16, 2, 9_000, 7),\n            new HorrorEventDefinition("false_base", 11_000, 19, 1, 18_000, 11),\n            new HorrorEventDefinition("horizon_wrongness", 8_000, 18, 1, 14_000, 9),\n            new HorrorEventDefinition("black_room_threshold", 18_000, 22, 1, 24_000, 14),\n            new HorrorEventDefinition("fear_landscape", 25_000, 22, 1, 20_000, 12));
+            new HorrorEventDefinition("silence_break", 2_000, 16, 2, 9_000, 7),
+            new HorrorEventDefinition("false_base", 11_000, 19, 1, 18_000, 11),
+            new HorrorEventDefinition("horizon_wrongness", 8_000, 18, 1, 14_000, 9),
+            new HorrorEventDefinition("black_room_threshold", 18_000, 22, 1, 24_000, 14),
+            new HorrorEventDefinition("fear_landscape", 25_000, 22, 1, 20_000, 12));
     private HorrorDirector() {}
     public static List<HorrorEventDefinition> getEventDefinitions() { return EVENTS; }
 
