@@ -64,6 +64,41 @@ public final class ClientAfterimageManager {
         if (placed < 5) return;
     }
 
+    /**
+     * Brief player-private Black Room illusion. The room is deliberately open at one side:
+     * it never teleports, cages, or changes the authoritative world.
+     */
+    public static void showBlackRoom(ServerPlayer player) {
+        ServerLevel level = player.serverLevel();
+        BlockPos origin = player.blockPosition();
+        int radius = 7;
+        int baseY = Math.max(level.getMinBuildHeight() + 2, Math.min(level.getMaxBuildHeight() - 6, origin.getY() - 1));
+        BlockState wall = Blocks.BLACK_STAINED_GLASS.defaultBlockState();
+        BlockState dark = Blocks.BLACK_CONCRETE.defaultBlockState();
+        for (int y = 0; y < 4; y++) {
+            for (int offset = -radius; offset <= radius; offset++) {
+                // Leave a broad, obvious opening in the north wall so the illusion is escapable.
+                if (y < 3 && Math.abs(offset) <= 1) continue;
+                sendBlackRoomBlock(player, new BlockPos(origin.getX() + offset, baseY + y, origin.getZ() - radius), wall, 100);
+                sendBlackRoomBlock(player, new BlockPos(origin.getX() + offset, baseY + y, origin.getZ() + radius), wall, 100);
+                sendBlackRoomBlock(player, new BlockPos(origin.getX() - radius, baseY + y, origin.getZ() + offset), wall, 100);
+                sendBlackRoomBlock(player, new BlockPos(origin.getX() + radius, baseY + y, origin.getZ() + offset), wall, 100);
+            }
+        }
+        // A small, distant black shape gives the eye something to settle on in the empty room.
+        for (int y = 0; y < 2; y++) {
+            sendBlackRoomBlock(player, origin.offset(0, y, radius - 2), dark, 100);
+        }
+    }
+
+    private static void sendBlackRoomBlock(ServerPlayer player, BlockPos pos, BlockState fake, int duration) {
+        ServerLevel level = player.serverLevel();
+        if (!level.hasChunkAt(pos)) return;
+        BlockState original = level.getBlockState(pos);
+        if (!original.isAir() || original.hasBlockEntity()) return;
+        sendFake(player, pos, fake, duration);
+    }
+
     /** A distant silhouette occupies the edge of the player's view for less than two seconds. */
     public static void showSilhouette(ServerPlayer player) {
         ServerLevel level = player.serverLevel();
