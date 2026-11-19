@@ -36,7 +36,7 @@ public final class NullApostleEntity extends Monster {
     @Override public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         blessedPlayer = tag.hasUUID(BLESSED_PLAYER_TAG) ? tag.getUUID(BLESSED_PLAYER_TAG) : null;
-        temporaryExpiresAt = tag.contains("outlands_temporary_expires_at") ? tag.getLong("outlands_temporary_expires_at") : level().getGameTime() + 180L;
+        temporaryExpiresAt = tag.contains("outlands_temporary_expires_at") ? tag.getLong("outlands_temporary_expires_at") : -1L;
     }
     @Override protected void registerGoals() {}
     @Override public void tick() {
