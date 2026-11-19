@@ -4,6 +4,7 @@ import com.relaymann.theoutlands.OutlandsConfig;
 import com.relaymann.theoutlands.horror.HorrorMemory;
 import com.relaymann.theoutlands.item.OutlandsItems;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
