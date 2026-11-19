@@ -68,13 +68,19 @@ class HorrorDirectorTest {
         var outsideResult = HorrorDirector.evaluate(snapshot, outside, new HorrorContext("minecraft:plains", false, false, false, 0, 1), 800, Math.nextDown(1.0));
         assertNotEquals("almighty_influence", outsideResult.eventId());
 
-        var inside = new HorrorDirectorState();
         var context = new HorrorContext("minecraft:plains", false, false, false, 0, 1, 0, false, false, 0, 0, true);
-        inside.setPressure(50.0D);
-        inside.setLastEvaluationGameTime(0);
-        inside.setLastEncounterGameTime(0);
-        var insideResult = HorrorDirector.evaluate(snapshot, inside, context, 800, Math.nextDown(1.0));
-        assertEquals("almighty_influence", insideResult.eventId());
+        boolean selectedInsideTerritory = false;
+        // Weighted selection does not promise the last event is selected at a near-1 roll.
+        // Sweep deterministic rolls to test the territory gate rather than ordering/weight assumptions.
+        for (int i = 0; i < 10_000 && !selectedInsideTerritory; i++) {
+            var inside = new HorrorDirectorState();
+            inside.setPressure(50.0D);
+            inside.setLastEvaluationGameTime(0);
+            inside.setLastEncounterGameTime(0);
+            var insideResult = HorrorDirector.evaluate(snapshot, inside, context, 800, i / 10_000.0D);
+            selectedInsideTerritory = "almighty_influence".equals(insideResult.eventId());
+        }
+        assertTrue(selectedInsideTerritory, "Almighty influence should become eligible inside border territory");
     }
 
     @Test void settingsCanTuneOrDisableDirectorWithoutLoadingNeoForgeConfig() {
