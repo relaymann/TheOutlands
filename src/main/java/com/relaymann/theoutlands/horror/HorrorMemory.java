@@ -131,9 +131,12 @@ public final class HorrorMemory {
         double speed = player.getDeltaMovement().horizontalDistanceSqr();
         if (player.onGround() && speed < 0.0009D && !player.isPassenger()) {
             memory.putInt("pause_samples", Math.min(10_000, memory.getInt("pause_samples") + 1));
-        }
-        if (player.isSprinting() && speed > 0.02D) {
+        } else if (speed > 0.0009D && player.isSprinting()) {
+            memory.putInt("sprint_samples", Math.min(10_000, memory.getInt("sprint_samples") + 1));
+            // Preserve the legacy counter so existing Null stalking profiles keep their behavior.
             memory.putInt("flight_samples", Math.min(10_000, memory.getInt("flight_samples") + 1));
+        } else if (speed > 0.0009D) {
+            memory.putInt("walk_samples", Math.min(10_000, memory.getInt("walk_samples") + 1));
         }
         memory.putInt("look_backs", Math.min(10_000, memory.getInt("look_backs")));
         data.put(ROOT, memory);
@@ -145,6 +148,18 @@ public final class HorrorMemory {
 
     public static int pauseCount(ServerPlayer player) {
         return getMemory(player.getPersistentData()).getInt("pause_samples");
+    }
+
+    /** Number of sampled walking intervals, capped at 10,000 in persistent memory. */
+    public static int walkCount(ServerPlayer player) {
+        return getMemory(player.getPersistentData()).getInt("walk_samples");
+    }
+
+    /** Number of sampled sprinting intervals, with a legacy fallback for existing worlds. */
+    public static int sprintCount(ServerPlayer player) {
+        CompoundTag memory = getMemory(player.getPersistentData());
+        return memory.contains("sprint_samples")
+                ? memory.getInt("sprint_samples") : memory.getInt("flight_samples");
     }
 
     public static int flightCount(ServerPlayer player) {
@@ -308,10 +323,15 @@ public final class HorrorMemory {
         CompoundTag memory = getMemory(data);
         long packed = cellFor(position).asLong();
         ListTag old = memory.getList(key, Tag.TAG_LONG);
-        if (old.contains(LongTag.valueOf(packed))) return;
+        // Refresh recency when a known bed/base cell is used again. Repeated samples
+        // in the same most-recent cell are a no-op, keeping NBT writes bounded.
+        if (!old.isEmpty() && old.getLong(old.size() - 1) == packed) return;
         ListTag updated = new ListTag();
-        for (int i = Math.max(0, old.size() - MAX_CONTEXT_CELLS + 1); i < old.size(); i++)
-            updated.add(old.get(i).copy());
+        for (int i = 0; i < old.size(); i++) {
+            long existing = old.getLong(i);
+            if (existing != packed && updated.size() < MAX_CONTEXT_CELLS - 1)
+                updated.add(LongTag.valueOf(existing));
+        }
         updated.add(LongTag.valueOf(packed));
         memory.put(key, updated);
         data.put(ROOT, memory);
