@@ -11,6 +11,9 @@ public final class OutlandsSounds {
  public static final DeferredHolder<SoundEvent,SoundEvent> NULL_PRESENCE=register("null_presence");
  public static final DeferredHolder<SoundEvent,SoundEvent> NULL_APOSTLE_WHISPER=register("null_apostle_whisper");
  public static final DeferredHolder<SoundEvent,SoundEvent> NULL_APOSTLE_DEPARTURE=register("null_apostle_departure");
+ public static final DeferredHolder<SoundEvent,SoundEvent> HUNTER_STALK=register("hunter_stalk");
+ public static final DeferredHolder<SoundEvent,SoundEvent> BURROWER_RISE=register("burrower_rise");
+ public static final DeferredHolder<SoundEvent,SoundEvent> MIMIC_REVEAL=register("mimic_reveal");
  private static DeferredHolder<SoundEvent,SoundEvent> register(String name){ResourceLocation id=ResourceLocation.fromNamespaceAndPath(TheOutlands.MOD_ID,name);return SOUNDS.register(name,()->SoundEvent.createVariableRangeEvent(id));}
  private OutlandsSounds(){}
 }
