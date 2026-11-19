@@ -39,10 +39,16 @@ public final class MimicEntity extends Monster {
             if(!revealed && d<64.0D){
                 revealed=true;revealCooldown=100;
                 playSound(OutlandsSounds.MIMIC_REVEAL.get(),1.0F,0.92F+getRandom().nextFloat()*0.12F);
+                // A sudden closing movement makes the reveal an actual ambush, without teleporting.
+                if (d > 9.0D) {
+                    net.minecraft.world.phys.Vec3 direction = player.position().subtract(position()).normalize();
+                    setDeltaMovement(getDeltaMovement().add(direction.x * 0.42D, 0.18D, direction.z * 0.42D));
+                    hasImpulse = true;
+                }
             }
             if(!revealed){getNavigation().stop();setSprinting(false);}
             else setSprinting(d>12.0D);
-        }else if(revealed && revealCooldown==0){revealed=false;}
+        }else if(revealed && revealCooldown==0){revealed=false;setSprinting(false);}
     }
     public boolean isRevealed(){return revealed;}
     @Override public void addAdditionalSaveData(CompoundTag tag){super.addAdditionalSaveData(tag);tag.putBoolean("revealed",revealed);tag.putInt("reveal_cd",revealCooldown);}
