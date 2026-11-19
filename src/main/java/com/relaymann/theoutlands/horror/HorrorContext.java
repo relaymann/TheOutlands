@@ -49,6 +49,17 @@ public record HorrorContext(String biomeId, boolean night, boolean raining, bool
         if ("the_return".equals(id) && hasSeenNull) weight *= 1.6D;
         if ("wrong_sounds".equals(id) && night) weight *= 1.35D;
         if ("observer".equals(id) && biomeId.contains("forest")) weight *= 1.4D;
+        // Isolation and familiar routines make subtle events more likely, not louder or more frequent.
+        if (nearbyPlayers == 0 && ("wall_knock".equals(id) || "behind_steps".equals(id)
+                || "breathing_presence".equals(id) || "familiar_echo".equals(id))) weight *= 1.22D;
+        if (night && ("wall_knock".equals(id) || "door_afterimage".equals(id)
+                || "false_wakeup".equals(id))) weight *= 1.18D;
+        if (raining && ("wrong_sounds".equals(id) || "false_footsteps".equals(id))) weight *= 1.18D;
+        if (thundering && ("environmental_distortion".equals(id) || "world_inconsistency".equals(id))) weight *= 1.2D;
+        if (healthFraction < 0.35F && ("false_death".equals(id) || "environmental_hush".equals(id))) weight *= 0.85D;
+        if (previousEncounterCount >= 8 && ("fake_structure".equals(id) || "false_structure".equals(id)
+                || "world_inconsistency".equals(id))) weight *= 1.18D;
+        if (previousEncounterCount >= 15 && ("paranoia_echo".equals(id) || "familiar_echo".equals(id))) weight *= 1.22D;
         if ("missing_terrain".equals(id) && thundering) weight *= 1.35D;
         if ("fake_structure".equals(id) && previousEncounterCount >= 4) weight *= 1.25D;
         if ("silent_world".equals(id) && nearbyPlayers == 0) weight *= 1.5D;

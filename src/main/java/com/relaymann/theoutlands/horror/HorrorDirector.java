@@ -62,7 +62,10 @@ public final class HorrorDirector {
         }
         if (state.lastEncounterGameTime() == Long.MIN_VALUE) state.setLastEncounterGameTime(time);
         updatePressure(state, time, snapshot.escalationValue(), true, settings.intensity());
-        if (time - state.lastEncounterGameTime() < minimumQuietPeriod(snapshot.escalationTier()))
+        // High tiers never eliminate the quiet interval; its slight jitter prevents predictable cadence.
+        long quiet = minimumQuietPeriod(snapshot.escalationTier());
+        quiet = quiet + (long) (quiet * 0.18D * (Math.max(0.0D, Math.min(1.0D, roll))));
+        if (time - state.lastEncounterGameTime() < quiet)
             return HorrorDecision.withoutEvent(HorrorDecision.Reason.BREATHING_ROOM, state.pressure());
         if (!settings.eventsEnabled() || state.pressure() < EVENT_PRESSURE_THRESHOLD)
             return HorrorDecision.withoutEvent(settings.eventsEnabled() ? HorrorDecision.Reason.BUILDING_PRESSURE
