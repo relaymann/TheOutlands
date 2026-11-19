@@ -7,6 +7,7 @@ public final class StalkerModel extends HumanoidModel<StalkerEntity> {
  public StalkerModel(ModelPart root){super(root);}
  @Override public void setupAnim(StalkerEntity e,float swing,float amount,float age,float yaw,float pitch){
   super.setupAnim(e,swing,amount,age,yaw,pitch);
+  body.xScale=0.82F; body.yScale=1.12F; head.xScale=0.88F; rightLeg.yScale=1.08F; leftLeg.yScale=1.08F;
   body.xRot=0.22F; head.xRot-=0.08F;
   float reach=(float)Math.sin(age*0.19F)*0.08F;
   rightArm.xRot-=0.24F+reach; leftArm.xRot-=0.24F-reach;
