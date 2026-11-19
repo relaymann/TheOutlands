@@ -40,6 +40,7 @@ public final class AggressiveJumpscareManager {
         boolean fearIntroduced = HorrorMemory.hasDiscovered(player, "fear_first_introduction");
         boolean deathIntroduced = HorrorMemory.hasDiscovered(player, "death_first_sighting");
         long now = level.getGameTime();
+        if (HorrorMemory.initializeAggressiveJumpscareCooldown(player, now)) return;
         long elapsed = now - HorrorMemory.lastAggressiveJumpscare(player);
         if (!AggressiveJumpscarePolicy.shouldAttempt(distanceFromSpawn, fearIntroduced, deathIntroduced,
                 false, elapsed, player.getRandom().nextDouble())) return;
