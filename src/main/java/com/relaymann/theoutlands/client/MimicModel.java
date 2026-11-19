@@ -1,6 +1,7 @@
 package com.relaymann.theoutlands.client;
 import com.relaymann.theoutlands.entity.MimicEntity;
 import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.PartPose;
 import net.minecraft.client.model.geom.builders.*;
@@ -9,7 +10,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 /** Tall false-human frame with a split chest and arms that unfold during the reveal. */
 public final class MimicModel extends EntityModel<MimicEntity> {
  private final ModelPart root,head,body,leftArm,rightArm,leftLeg,rightLeg,jaw;
- public MimicModel(ModelPart root){this.root=root;head=root.getChild("head");body=root.getChild("body");leftArm=root.getChild("left_arm");rightArm=root.getChild("right_arm");leftLeg=root.getChild("left_leg");rightLeg=root.getChild("right_leg");jaw=root.getChild("jaw");}
+ public MimicModel(ModelPart root){super(RenderType::entityCutoutNoCull);this.root=root;head=root.getChild("head");body=root.getChild("body");leftArm=root.getChild("left_arm");rightArm=root.getChild("right_arm");leftLeg=root.getChild("left_leg");rightLeg=root.getChild("right_leg");jaw=root.getChild("jaw");}
  public static LayerDefinition createBodyLayer(){
   MeshDefinition m=new MeshDefinition();PartDefinition r=m.getRoot();
   r.addOrReplaceChild("head",CubeListBuilder.create().texOffs(0,0).addBox(-3,-8,-3,6,8,6).texOffs(0,14).addBox(-1,-2,-5,2,3,2),PartPose.offset(0,-13,0));
