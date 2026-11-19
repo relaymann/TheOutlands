@@ -75,6 +75,11 @@ public record HorrorContext(String biomeId, boolean night, boolean raining, bool
         if ("false_structure".equals(id) && biomeId.contains("forest")) weight *= 1.5D;
         if ("paranoia_echo".equals(id) && (lookBackCount >= 4 || pauseCount >= 6)) weight *= 1.6D;
         if ("null_apostle_sign".equals(id) && hasSeenNull) weight *= 1.8D;
+        if ("black_room_echo".equals(id) && nearbyPlayers == 0) weight *= 1.35D;
+        if ("impossible_corridor".equals(id) && (lookBackCount >= 3 || pauseCount >= 5)) weight *= 1.4D;
+        if ("memory_intrusion".equals(id) && previousEncounterCount >= 5) weight *= 1.25D;
+        if ("distant_door".equals(id) && night) weight *= 1.3D;
+        if ("silence_break".equals(id) && nearbyPlayers == 0) weight *= 1.45D;
         return weight;
     }
 }

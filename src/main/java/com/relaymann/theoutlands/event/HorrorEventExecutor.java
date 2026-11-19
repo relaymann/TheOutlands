@@ -171,6 +171,39 @@ public final class HorrorEventExecutor {
                 positionalSound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT,
                         0.11F, 0.42F, x - 18.0D, y + 2.0D, z + 18.0D);
             }
+            case "black_room_echo" -> {
+                // Audio-only breadcrumb toward an uncanny, unmarked place; no chat or coordinates.
+                double doorAngle = random.nextDouble() * Math.PI * 2.0D;
+                double doorDistance = 32.0D + random.nextDouble() * 48.0D;
+                double dx = player.getX() + Math.cos(doorAngle) * doorDistance;
+                double dz = player.getZ() + Math.sin(doorAngle) * doorDistance;
+                positionalSound(player, SoundEvents.WOODEN_DOOR_OPEN, SoundSource.BLOCKS, 0.12F, 0.42F, dx, y, dz);
+                positionalSound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.08F, 0.35F, dx, y, dz);
+            }
+            case "impossible_corridor" -> {
+                ClientAfterimageManager.showFalseStructure(player);
+                ClientAfterimageManager.showTerrainAfterimage(player);
+                positionalSound(player, SoundEvents.WOODEN_DOOR_OPEN, SoundSource.BLOCKS, 0.1F, 0.5F,
+                        player.getX() + Math.sin(Math.toRadians(player.getYRot())) * 18.0D, y, z - 18.0D);
+                particles(player, ParticleTypes.ASH, x, y + 1.0D, z, 5, 0.15D, 0.3D, 0.15D, 0.001D);
+            }
+            case "distant_door" -> {
+                double doorAngle = random.nextDouble() * Math.PI * 2.0D;
+                double doorDistance = 12.0D + random.nextDouble() * 24.0D;
+                double dx = player.getX() + Math.cos(doorAngle) * doorDistance;
+                double dz = player.getZ() + Math.sin(doorAngle) * doorDistance;
+                positionalSound(player, SoundEvents.WOODEN_DOOR_OPEN, SoundSource.BLOCKS, 0.22F, 0.58F, dx, y, dz);
+            }
+            case "memory_intrusion" -> {
+                ClientAfterimageManager.showSilhouette(player);
+                ClientAfterimageManager.showFalseStructure(player);
+                positionalSound(player, SoundEvents.GRAVEL_STEP, SoundSource.BLOCKS, 0.14F, 0.52F, x - 9.0D, y, z + 12.0D);
+            }
+            case "silence_break" -> {
+                sound(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.08F, 0.25F);
+                particles(player, ParticleTypes.SMOKE, x, y + 1.0D, z, 2, 0.1D, 0.2D, 0.1D, 0.0D);
+                positionalSound(player, SoundEvents.WOODEN_DOOR_OPEN, SoundSource.BLOCKS, 0.1F, 0.75F, x + 7.0D, y, z + 5.0D);
+            }
             case "almighty_influence" -> executeAlmightyInfluence(player);
             default -> { }
         }

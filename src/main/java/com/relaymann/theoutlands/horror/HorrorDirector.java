@@ -40,7 +40,12 @@ public final class HorrorDirector {
             new HorrorEventDefinition("breathing_presence", 4_000, 15, 2, 6_000, 7),
             new HorrorEventDefinition("door_afterimage", 1_500, 12, 3, 4_000, 5),
             new HorrorEventDefinition("false_wakeup", 8_000, 18, 1, 12_000, 10),
-            new HorrorEventDefinition("mimic_activity", 5_000, 15, 2, 6_500, 7));
+            new HorrorEventDefinition("mimic_activity", 5_000, 15, 2, 6_500, 7),
+            new HorrorEventDefinition("black_room_echo", 3_000, 18, 1, 14_000, 9),
+            new HorrorEventDefinition("impossible_corridor", 7_000, 20, 1, 16_000, 10),
+            new HorrorEventDefinition("distant_door", 2_000, 14, 2, 5_000, 6),
+            new HorrorEventDefinition("memory_intrusion", 6_000, 17, 1, 11_000, 8),
+            new HorrorEventDefinition("silence_break", 2_000, 16, 2, 9_000, 7));
     private HorrorDirector() {}
     public static List<HorrorEventDefinition> getEventDefinitions() { return EVENTS; }
 
