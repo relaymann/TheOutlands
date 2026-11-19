@@ -186,6 +186,16 @@ public final class HorrorMemory {
                 ? memory.getLong("last_aggressive_jumpscare") : -36_000L;
     }
 
+    /** Existing worlds get a quiet grace period when this feature is first introduced. */
+    public static boolean initializeAggressiveJumpscareCooldown(ServerPlayer player, long gameTime) {
+        CompoundTag data = player.getPersistentData();
+        CompoundTag memory = getMemory(data);
+        if (memory.contains("last_aggressive_jumpscare")) return false;
+        memory.putLong("last_aggressive_jumpscare", gameTime);
+        data.put(ROOT, memory);
+        return true;
+    }
+
     public static void setLastAggressiveJumpscare(ServerPlayer player, long gameTime) {
         CompoundTag data = player.getPersistentData();
         CompoundTag memory = getMemory(data);
