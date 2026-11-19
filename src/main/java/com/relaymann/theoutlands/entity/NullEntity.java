@@ -18,7 +18,6 @@ public final class NullEntity extends Monster {
     public void setTemporaryExpiresAt(long gameTime) { temporaryExpiresAt = gameTime; }
     public NullEntity(EntityType<? extends Monster> type, Level level) {
         super(type, level);
-        this.setPersistenceRequired();
         this.xpReward = 0;
     }
     public static AttributeSupplier.Builder createAttributes() {
