@@ -7,6 +7,7 @@ public final class CaveJarModel extends HumanoidModel<CaveJarEntity> {
  public CaveJarModel(ModelPart root){super(root);}
  @Override public void setupAnim(CaveJarEntity e,float swing,float amount,float age,float yaw,float pitch){
   super.setupAnim(e,swing,amount,age,yaw,pitch);
+  body.yScale=1.12F; body.xScale=0.94F; head.xScale=0.86F; head.yScale=0.92F;
   head.xRot+=0.12F; body.xRot=0.16F+(float)Math.sin(age*0.12F)*0.025F;
   rightArm.xRot-=0.42F; leftArm.xRot-=0.42F;
   rightArm.zRot=-0.16F; leftArm.zRot=0.16F;
