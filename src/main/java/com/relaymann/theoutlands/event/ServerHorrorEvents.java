@@ -70,6 +70,7 @@ public final class ServerHorrorEvents {
         AggressiveJumpscareManager.clear();
         NullApostleManager.clear();
         DeathHuntManager.clear();
-        ClientAfterimageManager.clear();\n        FootstepEchoManager.clear();
+        ClientAfterimageManager.clear();
+        FootstepEchoManager.clear();
     }
 }
