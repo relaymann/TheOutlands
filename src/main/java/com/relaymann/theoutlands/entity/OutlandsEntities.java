@@ -53,5 +53,12 @@ public final class OutlandsEntities {
             ENTITY_TYPES.register("mimic", () -> EntityType.Builder.of(MimicEntity::new, MobCategory.MONSTER)
                     .sized(0.72F, 2.35F).clientTrackingRange(20).updateInterval(2).build("theoutlands:mimic"));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<StillbornStatueEntity>> STILLBORN_STATUE =
+            ENTITY_TYPES.register("stillborn_statue", () -> EntityType.Builder.of(StillbornStatueEntity::new, MobCategory.MONSTER)
+                    .sized(0.9F, 2.8F).clientTrackingRange(24).updateInterval(2).build("theoutlands:stillborn_statue"));
+    public static final DeferredHolder<EntityType<?>, EntityType<AgitatedOneEntity>> AGITATED_ONE =
+            ENTITY_TYPES.register("agitated_one", () -> EntityType.Builder.of(AgitatedOneEntity::new, MobCategory.MONSTER)
+                    .sized(0.82F, 2.4F).clientTrackingRange(24).updateInterval(2).build("theoutlands:agitated_one"));
+
     private OutlandsEntities() {}
 }
