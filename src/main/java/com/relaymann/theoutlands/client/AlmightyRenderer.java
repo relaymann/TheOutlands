@@ -3,6 +3,7 @@ package com.relaymann.theoutlands.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.relaymann.theoutlands.TheOutlands;
 import com.relaymann.theoutlands.entity.AlmightyEntity;
+import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;

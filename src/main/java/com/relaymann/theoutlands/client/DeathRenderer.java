@@ -2,6 +2,7 @@ package com.relaymann.theoutlands.client;
 
 import com.relaymann.theoutlands.TheOutlands;
 import com.relaymann.theoutlands.entity.DeathEntity;
+import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;

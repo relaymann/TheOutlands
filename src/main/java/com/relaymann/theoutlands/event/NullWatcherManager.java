@@ -37,10 +37,12 @@ public final class NullWatcherManager {
                 .filter(id -> id.equals("distant_figure") || id.equals("the_return") || id.equals("observer")).count();
         priorSightings = Math.max(0, priorSightings - 1); // The triggering encounter was recorded before spawn().
         priorSightings += HorrorMemory.nullObservationCount(player) / 3;
+        priorSightings += HorrorMemory.nullStalkingCount(player) / 2;
         NullStalkingProfile profile = NullStalkingProfile.fromPlayerHistory(priorSightings,
                 HorrorMemory.lookBackCount(player), HorrorMemory.pauseCount(player), HorrorMemory.flightCount(player));
 
-        BlockPos feet = findRememberedHidingPosition(player, profile);
+        BlockPos rememberedPosition = findRememberedHidingPosition(player, profile);
+        BlockPos feet = rememberedPosition;
         if (feet == null) feet = findSafeHidingPosition(player, profile);
         if (feet == null) return;
         NullEntity watcher = OutlandsEntities.NULL.get().create(level);
@@ -53,8 +55,11 @@ public final class NullWatcherManager {
         if (level.addFreshEntity(watcher)) {
             long now = level.getGameTime();
             ACTIVE.put(watcher.getUUID(), new ActiveWatcher(level, watcher.getUUID(), playerId,
-                    now + profile.lifetimeTicks(), now, profile));
+                    now + profile.lifetimeTicks(), now, profile,
+                    HorrorMemory.nullObservationCount(player) >= 5 || priorSightings >= 7));
+            HorrorMemory.recordNullStalking(player, now);
             HorrorMemory.recordDiscovery(player, "null_first_sighting");
+            if (rememberedPosition != null) HorrorMemory.recordDiscovery(player, "null_found_personal_place");
         }
     }
 
@@ -81,6 +86,17 @@ public final class NullWatcherManager {
                 if (level.getGameTime() - watcher.lookedAtSince >= EYE_CONTACT_DELAY) {
                     HorrorMemory.recordNullObservation(target, level.getGameTime());
                     HorrorMemory.recordDiscovery(target, "null_eye_contact");
+                    if (watcher.staresBack && !watcher.hasStaredBack) {
+                        BlockPos retreat = findSafeHidingPosition(target, watcher.profile);
+                        if (retreat != null && !isLookingAtPosition(target, retreat)) {
+                            entity.moveTo(retreat.getX() + 0.5D, retreat.getY(), retreat.getZ() + 0.5D,
+                                    target.getYRot() + 180.0F, 0.0F);
+                            watcher.lastRelocatedAt = level.getGameTime();
+                            watcher.lookedAtSince = -1L;
+                            watcher.hasStaredBack = true;
+                            continue;
+                        }
+                    }
                     entity.discard(); it.remove();
                 }
                 continue;
@@ -179,10 +195,13 @@ public final class NullWatcherManager {
         private final NullStalkingProfile profile;
         private long lookedAtSince = -1L;
         private long lastRelocatedAt;
+        private final boolean staresBack;
+        private boolean hasStaredBack;
         private ActiveWatcher(ServerLevel level, UUID entityId, UUID playerId, long expiresAt,
-                              long lastRelocatedAt, NullStalkingProfile profile) {
+                              long lastRelocatedAt, NullStalkingProfile profile, boolean staresBack) {
             this.level = level; this.entityId = entityId; this.playerId = playerId;
-            this.expiresAt = expiresAt; this.lastRelocatedAt = lastRelocatedAt; this.profile = profile;
+            this.expiresAt = expiresAt; this.lastRelocatedAt = lastRelocatedAt;
+            this.profile = profile; this.staresBack = staresBack;
         }
     }
 }

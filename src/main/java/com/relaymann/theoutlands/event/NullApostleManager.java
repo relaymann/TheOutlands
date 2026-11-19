@@ -15,7 +15,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
@@ -37,24 +39,31 @@ public final class NullApostleManager {
                     && a.playerId.equals(player.getUUID()))) return;
 
         ServerLevel level = player.serverLevel();
-        BlockPos position = findPosition(player, 28.0D, 42.0D);
-        if (position == null) return;
-
-        NullApostleEntity apostle = OutlandsEntities.NULL_APOSTLE.get().create(level);
-        if (apostle == null) return;
-        apostle.moveTo(position.getX() + 0.5D, position.getY(), position.getZ() + 0.5D,
-                player.getYRot() + 180.0F, 0.0F);
-        apostle.setBlessedPlayer(player.getUUID());
-        apostle.setNoAi(true);
-        // Apostles are mortal and intentionally fragile compared with Null.
-        apostle.setInvulnerable(false);
-        if (!level.noCollision(apostle, apostle.getBoundingBox()) || !level.addFreshEntity(apostle)) return;
-
+        int observations = HorrorMemory.nullObservationCount(player);
+        int groupSize = observations >= 6 ? (player.getRandom().nextBoolean() ? 2 : 3)
+                : observations >= 3 ? 2 : 1;
+        List<BlockPos> positions = new ArrayList<>();
         long now = level.getGameTime();
-        ACTIVE.put(apostle.getUUID(), new ActiveApostle(level, apostle.getUUID(), player.getUUID(),
-                now + 180L, now, -1L));
+        for (int i = 0; i < groupSize; i++) {
+            BlockPos position = findPosition(player, 28.0D, 42.0D, positions);
+            if (position == null) continue;
+            NullApostleEntity apostle = OutlandsEntities.NULL_APOSTLE.get().create(level);
+            if (apostle == null) continue;
+            apostle.moveTo(position.getX() + 0.5D, position.getY(), position.getZ() + 0.5D,
+                    player.getYRot() + 180.0F, 0.0F);
+            apostle.setBlessedPlayer(player.getUUID());
+            apostle.setNoAi(true);
+            // Apostles are mortal and intentionally fragile compared with Null.
+            apostle.setInvulnerable(false);
+            if (!level.noCollision(apostle, apostle.getBoundingBox()) || !level.addFreshEntity(apostle)) continue;
+            positions.add(position);
+            ACTIVE.put(apostle.getUUID(), new ActiveApostle(level, apostle.getUUID(), player.getUUID(),
+                    now + 180L, now, -1L));
+        }
+        if (positions.isEmpty()) return;
         HorrorMemory.setLastNullApostleSpawn(player, now);
         HorrorMemory.recordDiscovery(player, "null_apostle_seen");
+        if (positions.size() > 1) HorrorMemory.recordDiscovery(player, "null_apostle_group_seen");
     }
 
     public static void tick(ServerLevel level) {
@@ -96,7 +105,14 @@ public final class NullApostleManager {
 
             active.lookedAtSince = -1L;
             if (level.getGameTime() - active.lastRelocatedAt >= 65L) {
-                BlockPos next = findPosition(player, 24.0D, 40.0D);
+                List<BlockPos> occupied = new ArrayList<>();
+                for (ActiveApostle other : ACTIVE.values()) {
+                    if (other.level == level && other.playerId.equals(player.getUUID()) && !other.entityId.equals(apostle.getUUID())) {
+                        Entity otherEntity = level.getEntity(other.entityId);
+                        if (otherEntity != null) occupied.add(otherEntity.blockPosition());
+                    }
+                }
+                BlockPos next = findPosition(player, 24.0D, 40.0D, occupied);
                 if (next != null && !isLookingAtPosition(player, next)) {
                     apostle.moveTo(next.getX() + 0.5D, next.getY(), next.getZ() + 0.5D,
                             player.getYRot() + 180.0F, 0.0F);
@@ -106,9 +122,9 @@ public final class NullApostleManager {
         }
     }
 
-    private static BlockPos findPosition(ServerPlayer player, double min, double max) {
+    private static BlockPos findPosition(ServerPlayer player, double min, double max, List<BlockPos> occupied) {
         ServerLevel level = player.serverLevel();
-        for (int i = 0; i < 12; i++) {
+        for (int i = 0; i < 18; i++) {
             double angle = Math.toRadians(player.getYRot())
                     + (player.getRandom().nextDouble() - 0.5D) * Math.PI * 1.4D;
             double distance = min + player.getRandom().nextDouble() * (max - min);
@@ -118,7 +134,8 @@ public final class NullApostleManager {
             if (!level.hasChunkAt(column)) continue;
             int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
             BlockPos feet = new BlockPos(x, y, z);
-            if (level.getBlockState(feet.below()).isFaceSturdy(level, feet.below(), net.minecraft.core.Direction.UP)
+            boolean separated = occupied.stream().allMatch(other -> other.distSqr(feet) >= 25.0D);
+            if (separated && level.getBlockState(feet.below()).isFaceSturdy(level, feet.below(), net.minecraft.core.Direction.UP)
                     && level.getBlockState(feet).isAir() && level.getBlockState(feet.above()).isAir()
                     && level.getFluidState(feet).isEmpty()) return feet;
         }

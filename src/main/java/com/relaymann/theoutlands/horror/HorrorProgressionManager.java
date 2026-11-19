@@ -59,8 +59,10 @@ public final class HorrorProgressionManager {
                 && now - HorrorMemory.lastFamiliarDistortion(player) >= 6_000L
                 && player.getRandom().nextInt(4) == 0) {
             boolean alreadyHaunted = HorrorMemory.markHauntedLocation(player, player.blockPosition());
-            if (alreadyHaunted) ClientAfterimageManager.showFalseStructure(player);
-            else HorrorEventExecutor.executeFamiliarPlaceDistortion(player);
+            if (alreadyHaunted) {
+                if (player.getRandom().nextInt(3) == 0) ClientAfterimageManager.showDoorAfterimage(player);
+                else ClientAfterimageManager.showFalseStructure(player);
+            } else HorrorEventExecutor.executeFamiliarPlaceDistortion(player);
             HorrorMemory.setLastFamiliarDistortion(player, now);
         }
 

@@ -226,6 +226,24 @@ public final class HorrorMemory {
         return getMemory(player.getPersistentData()).getInt("null_observations");
     }
 
+    /** Records a completed watcher appearance without storing exact player coordinates. */
+    public static void recordNullStalking(ServerPlayer player, long gameTime) {
+        CompoundTag data = player.getPersistentData();
+        CompoundTag memory = getMemory(data);
+        memory.putInt("null_stalking_count", Math.min(10_000, memory.getInt("null_stalking_count") + 1));
+        memory.putLong("last_null_stalk", gameTime);
+        data.put(ROOT, memory);
+    }
+
+    public static int nullStalkingCount(ServerPlayer player) {
+        return getMemory(player.getPersistentData()).getInt("null_stalking_count");
+    }
+
+    public static long lastNullStalking(ServerPlayer player) {
+        CompoundTag memory = getMemory(player.getPersistentData());
+        return memory.contains("last_null_stalk") ? memory.getLong("last_null_stalk") : -24_000L;
+    }
+
     public static int deathEncounterCount(ServerPlayer player) {
         return getMemory(player.getPersistentData()).getInt("death_encounters");
     }

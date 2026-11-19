@@ -5,10 +5,13 @@ import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -77,6 +80,42 @@ public final class ClientAfterimageManager {
             BlockPos pos = new BlockPos(x + part[0], ground + part[1], z);
             if (level.hasChunkAt(pos) && level.getBlockState(pos).isAir()) sendFake(player, pos, shadow, 34);
         }
+    }
+
+    /**
+     * Makes a nearby closed door look open to this player only. Both halves are
+     * restored from the authoritative server state; no world block is changed.
+     */
+    public static void showDoorAfterimage(ServerPlayer player) {
+        ServerLevel level = player.serverLevel();
+        List<BlockPos> candidates = new java.util.ArrayList<>();
+        BlockPos origin = player.blockPosition();
+        for (int dx = -8; dx <= 8; dx++) {
+            for (int dy = -3; dy <= 3; dy++) {
+                for (int dz = -8; dz <= 8; dz++) {
+                    BlockPos pos = origin.offset(dx, dy, dz);
+                    if (!level.hasChunkAt(pos)) continue;
+                    BlockState state = level.getBlockState(pos);
+                    if (state.getBlock() instanceof DoorBlock
+                            && state.hasProperty(DoorBlock.OPEN)
+                            && state.hasProperty(DoorBlock.HALF)
+                            && state.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER
+                            && !state.getValue(DoorBlock.OPEN)) {
+                        BlockPos upper = pos.above();
+                        if (level.hasChunkAt(upper) && level.getBlockState(upper).getBlock() == state.getBlock()) {
+                            candidates.add(pos.immutable());
+                        }
+                    }
+                }
+            }
+        }
+        if (candidates.isEmpty()) return;
+        BlockPos lower = candidates.get(player.getRandom().nextInt(candidates.size()));
+        BlockPos upper = lower.above();
+        BlockState lowerState = level.getBlockState(lower);
+        BlockState upperState = level.getBlockState(upper);
+        sendFake(player, lower, lowerState.setValue(DoorBlock.OPEN, true), 48);
+        sendFake(player, upper, upperState.setValue(DoorBlock.OPEN, true), 48);
     }
 
     private static void sendFake(ServerPlayer player, BlockPos pos, BlockState fake, int duration) {
