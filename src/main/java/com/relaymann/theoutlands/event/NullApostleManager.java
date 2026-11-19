@@ -1,5 +1,6 @@
 package com.relaymann.theoutlands.event;
 
+import com.relaymann.theoutlands.OutlandsConfig;
 import com.relaymann.theoutlands.entity.NullApostleEntity;
 import com.relaymann.theoutlands.entity.OutlandsEntities;
 import com.relaymann.theoutlands.horror.AlmightyTerritory;
@@ -96,8 +97,9 @@ public final class NullApostleManager {
             if (player.hasLineOfSight(apostle) && isLookingAt(player, apostle)) {
                 if (active.lookedAtSince < 0L) active.lookedAtSince = level.getGameTime();
                 if (level.getGameTime() - active.lookedAtSince >= 18L) {
-                    level.playSound(player, apostle.blockPosition(), OutlandsSounds.NULL_APOSTLE_DEPARTURE.get(),
-                            SoundSource.HOSTILE, 0.22F, 0.72F + player.getRandom().nextFloat() * 0.12F);
+                    if (OutlandsConfig.HORROR_AUDIO_ENABLED.get())
+                        level.playSound(player, apostle.blockPosition(), OutlandsSounds.NULL_APOSTLE_DEPARTURE.get(),
+                                SoundSource.HOSTILE, 0.22F, 0.72F + player.getRandom().nextFloat() * 0.12F);
                     apostle.discard();
                     it.remove();
                 }

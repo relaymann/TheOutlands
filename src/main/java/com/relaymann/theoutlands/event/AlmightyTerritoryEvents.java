@@ -2,9 +2,11 @@ package com.relaymann.theoutlands.event;
 
 import com.relaymann.theoutlands.TheOutlands;
 import com.relaymann.theoutlands.horror.AlmightyTerritory;
+import com.relaymann.theoutlands.item.OutlandsItems;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -49,6 +51,13 @@ public final class AlmightyTerritoryEvents {
     }
 
     private static boolean isExempt(Entity entity) {
-        return entity instanceof Player || entity.getTags().contains(ALMIGHTY_ENTITY_TAG);
+        if (entity instanceof Player || entity.getTags().contains(ALMIGHTY_ENTITY_TAG)) return true;
+        if (entity instanceof ItemEntity item) {
+            return item.getItem().is(OutlandsItems.DEATH_JAR.get())
+                    || item.getItem().is(OutlandsItems.DEATH_MANIFEST.get())
+                    || item.getItem().is(OutlandsItems.ALMIGHTY_FRAGMENT.get())
+                    || item.getItem().is(OutlandsItems.THE_LAST_PAGE.get());
+        }
+        return false;
     }
 }

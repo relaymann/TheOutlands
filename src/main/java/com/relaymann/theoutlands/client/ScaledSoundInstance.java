@@ -2,7 +2,6 @@ package com.relaymann.theoutlands.client;
 
 import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.client.resources.sounds.SoundInstance;
-import net.minecraft.client.resources.sounds.TickableSoundInstance;
 import net.minecraft.client.sounds.AudioStream;
 import net.minecraft.client.sounds.SoundBufferLibrary;
 import net.minecraft.client.sounds.SoundManager;
@@ -12,14 +11,12 @@ import net.minecraft.sounds.SoundSource;
 import java.util.concurrent.CompletableFuture;
 
 /** Delegates sound playback and ticking while scaling only the effective volume. */
-final class ScaledSoundInstance implements TickableSoundInstance {
+class ScaledSoundInstance implements SoundInstance {
     private final SoundInstance original;
-    private final TickableSoundInstance tickable;
     private final float scale;
 
     ScaledSoundInstance(SoundInstance original, float scale) {
         this.original = original;
-        this.tickable = original instanceof TickableSoundInstance ticking ? ticking : null;
         this.scale = Math.max(0.0F, Math.min(1.0F, scale));
     }
     @Override public ResourceLocation getLocation() { return original.getLocation(); }
@@ -40,6 +37,4 @@ final class ScaledSoundInstance implements TickableSoundInstance {
     @Override public CompletableFuture<AudioStream> getStream(SoundBufferLibrary buffers, Sound sound, boolean looping) {
         return original.getStream(buffers, sound, looping);
     }
-    @Override public void tick() { if (tickable != null) tickable.tick(); }
-    @Override public boolean isStopped() { return tickable != null && tickable.isStopped(); }
 }

@@ -5,6 +5,7 @@ import com.relaymann.theoutlands.TheOutlands;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.client.resources.sounds.TickableSoundInstance;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.biome.Biome;
 import net.neoforged.api.distmarker.Dist;
@@ -42,7 +43,9 @@ public final class FearClientAtmosphere {
         if (source != SoundSource.AMBIENT && source != SoundSource.WEATHER) return;
         // Keep important player/entity sounds intact; only soften the world's ambient bed.
         float scale = (float) (1.0D - strength * 0.72D);
-        event.setSound(new ScaledSoundInstance(sound, scale));
+        event.setSound(sound instanceof TickableSoundInstance ticking
+                ? new ScaledTickableSoundInstance(ticking, scale)
+                : new ScaledSoundInstance(sound, scale));
     }
 
     @SubscribeEvent

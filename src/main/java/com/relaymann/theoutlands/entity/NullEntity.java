@@ -1,5 +1,6 @@
 package com.relaymann.theoutlands.entity;
 
+import com.relaymann.theoutlands.OutlandsConfig;
 import com.relaymann.theoutlands.sound.OutlandsSounds;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
@@ -41,7 +42,7 @@ public final class NullEntity extends Monster {
         super.readAdditionalSaveData(tag);
         temporaryExpiresAt = tag.contains("outlands_temporary_expires_at") ? tag.getLong("outlands_temporary_expires_at") : level().getGameTime() + 260L;
     }
-    @Override protected net.minecraft.sounds.SoundEvent getAmbientSound() { return OutlandsSounds.NULL_PRESENCE.get(); }
+    @Override protected net.minecraft.sounds.SoundEvent getAmbientSound() { return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.NULL_PRESENCE.get() : null; }
     @Override protected net.minecraft.sounds.SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return OutlandsSounds.NULL_PRESENCE.get(); }
     @Override protected net.minecraft.sounds.SoundEvent getDeathSound() { return OutlandsSounds.NULL_PRESENCE.get(); }
 }

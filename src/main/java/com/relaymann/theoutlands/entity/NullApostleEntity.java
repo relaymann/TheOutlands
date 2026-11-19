@@ -1,5 +1,6 @@
 package com.relaymann.theoutlands.entity;
 
+import com.relaymann.theoutlands.OutlandsConfig;
 import com.relaymann.theoutlands.sound.OutlandsSounds;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
@@ -44,7 +45,7 @@ public final class NullApostleEntity extends Monster {
         setNoGravity(true);
         setDeltaMovement(0.0D, 0.0D, 0.0D);
     }
-    @Override protected net.minecraft.sounds.SoundEvent getAmbientSound() { return OutlandsSounds.NULL_APOSTLE_WHISPER.get(); }
+    @Override protected net.minecraft.sounds.SoundEvent getAmbientSound() { return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.NULL_APOSTLE_WHISPER.get() : null; }
     @Override protected net.minecraft.sounds.SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return OutlandsSounds.NULL_APOSTLE_WHISPER.get(); }
-    @Override protected net.minecraft.sounds.SoundEvent getDeathSound() { return OutlandsSounds.NULL_APOSTLE_DEPARTURE.get(); }
+    @Override protected net.minecraft.sounds.SoundEvent getDeathSound() { return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.NULL_APOSTLE_DEPARTURE.get() : null; }
 }

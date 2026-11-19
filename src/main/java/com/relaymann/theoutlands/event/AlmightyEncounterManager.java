@@ -1,6 +1,7 @@
 package com.relaymann.theoutlands.event;
 
 import com.relaymann.theoutlands.OutlandsConfig;
+import com.relaymann.theoutlands.item.OutlandsItems;
 import com.relaymann.theoutlands.entity.AlmightyEntity;
 import com.relaymann.theoutlands.entity.OutlandsEntities;
 import com.relaymann.theoutlands.horror.AlmightyTerritory;
@@ -17,6 +18,11 @@ public final class AlmightyEncounterManager {
     private AlmightyEncounterManager() {}
 
     public static void evaluate(ServerPlayer player) {
+        boolean carriesLastPage = java.util.stream.Stream.of(player.getInventory().items,
+                        player.getInventory().armor, player.getInventory().offhand)
+                .flatMap(java.util.Collection::stream)
+                .anyMatch(stack -> stack.is(OutlandsItems.THE_LAST_PAGE.get()));
+        if (carriesLastPage) HorrorMemory.recordDiscovery(player, "the_last_page_recovered");
         var level = player.serverLevel();
         double depth = AlmightyTerritory.distanceInsideBorder(level, player.getX(), player.getZ());
         if (!Double.isFinite(depth) || depth < 0.0D
@@ -51,6 +57,7 @@ public final class AlmightyEncounterManager {
         if (!level.noCollision(boss, boss.getBoundingBox()) || !level.addFreshEntity(boss)) return;
 
         HorrorMemory.recordDiscovery(player, "almighty_encounter_started");
-        level.playSound(null, spawn, SoundEvents.WARDEN_ROAR, SoundSource.HOSTILE, 1.0F, 0.35F);
+        if (OutlandsConfig.HORROR_AUDIO_ENABLED.get())
+            level.playSound(null, spawn, SoundEvents.WARDEN_ROAR, SoundSource.HOSTILE, 1.0F, 0.35F);
     }
 }

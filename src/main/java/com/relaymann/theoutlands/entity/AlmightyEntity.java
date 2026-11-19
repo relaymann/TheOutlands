@@ -1,5 +1,6 @@
 package com.relaymann.theoutlands.entity;
 
+import com.relaymann.theoutlands.OutlandsConfig;
 import com.relaymann.theoutlands.horror.HorrorMemory;
 import com.relaymann.theoutlands.item.OutlandsItems;
 import net.minecraft.core.particles.ParticleTypes;
@@ -70,7 +71,7 @@ public final class AlmightyEntity extends Monster {
             if (level() instanceof ServerLevel server) {
                 server.sendParticles(phase == 3 ? ParticleTypes.SOUL : ParticleTypes.REVERSE_PORTAL,
                         getX(), getY() + 1.0D, getZ(), 70, 8.0D, 3.0D, 8.0D, 0.04D);
-                server.playSound(null, blockPosition(), SoundEvents.WARDEN_ROAR,
+                if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) server.playSound(null, blockPosition(), SoundEvents.WARDEN_ROAR,
                         SoundSource.HOSTILE, 1.0F, phase == 3 ? 0.32F : 0.48F);
             }
         }
@@ -94,7 +95,7 @@ public final class AlmightyEntity extends Monster {
             }
             player.hurt(damageSources().mobAttack(this), damage);
         }
-        level().playSound(null, blockPosition(), SoundEvents.WARDEN_ROAR,
+        if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) level().playSound(null, blockPosition(), SoundEvents.WARDEN_ROAR,
                 SoundSource.HOSTILE, phase == 3 ? 0.85F : 0.62F, phase == 3 ? 0.38F : 0.56F);
     }
 
@@ -110,18 +111,18 @@ public final class AlmightyEntity extends Monster {
 
     @Override public void die(DamageSource source) {
         if (!level().isClientSide && !getPersistentData().getBoolean("outlands_ending_dropped")) {
-            getPersistentData().putBoolean("outlands_ending_dropped", true);
             ItemEntity page = new ItemEntity(level(), getX(), getY() + 0.8D, getZ(),
                     new ItemStack(OutlandsItems.THE_LAST_PAGE.get()));
             page.setDefaultPickUpDelay();
             page.setUnlimitedLifetime();
-            level().addFreshEntity(page);
+            boolean dropped = level().addFreshEntity(page);
+            if (dropped) getPersistentData().putBoolean("outlands_ending_dropped", true);
             if (level() instanceof ServerLevel server) {
                 for (ServerPlayer player : server.getEntitiesOfClass(ServerPlayer.class,
                         new AABB(blockPosition()).inflate(128.0D))) {
                     HorrorMemory.recordDiscovery(player, "almighty_defeated");
-                    HorrorMemory.recordDiscovery(player, "the_last_page_recovered");
-                    player.sendSystemMessage(Component.literal("§8[The Almighty] §7You found the seam."));
+                    if (dropped) HorrorMemory.recordDiscovery(player, "the_last_page_dropped");
+                    player.sendSystemMessage(Component.literal("§8[The Almighty] §7The seam has opened."));
                 }
             }
         }
@@ -130,5 +131,5 @@ public final class AlmightyEntity extends Monster {
 
     @Override protected net.minecraft.sounds.SoundEvent getAmbientSound() { return null; }
     @Override protected net.minecraft.sounds.SoundEvent getHurtSound(DamageSource source) { return null; }
-    @Override protected net.minecraft.sounds.SoundEvent getDeathSound() { return SoundEvents.WARDEN_DEATH; }
+    @Override protected net.minecraft.sounds.SoundEvent getDeathSound() { return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? SoundEvents.WARDEN_DEATH : null; }
 }
