@@ -8,6 +8,8 @@ import com.relaymann.theoutlands.horror.DistanceProgression;
 import com.relaymann.theoutlands.horror.HorrorMemory;
 import com.relaymann.theoutlands.sound.OutlandsSounds;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -98,8 +100,11 @@ public final class NullApostleManager {
                 if (active.lookedAtSince < 0L) active.lookedAtSince = level.getGameTime();
                 if (level.getGameTime() - active.lookedAtSince >= 18L) {
                     if (OutlandsConfig.HORROR_AUDIO_ENABLED.get())
-                        level.playSound(player, apostle.blockPosition(), OutlandsSounds.NULL_APOSTLE_DEPARTURE.get(),
-                                SoundSource.HOSTILE, 0.22F, 0.72F + player.getRandom().nextFloat() * 0.12F);
+                        player.connection.send(new ClientboundSoundPacket(
+                                BuiltInRegistries.SOUND_EVENT.wrapAsHolder(OutlandsSounds.NULL_APOSTLE_DEPARTURE.get()),
+                                SoundSource.HOSTILE, apostle.getX(), apostle.getY(), apostle.getZ(),
+                                0.22F, 0.72F + player.getRandom().nextFloat() * 0.12F,
+                                player.getRandom().nextLong()));
                     apostle.discard();
                     it.remove();
                 }
