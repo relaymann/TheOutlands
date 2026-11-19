@@ -25,7 +25,7 @@ public final class ObserverEntity extends Monster {
         goalSelector.addGoal(7, new RandomLookAroundGoal(this));
         targetSelector.addGoal(1, new HurtByTargetGoal(this));
         targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 12, true, false,
-                player -> player.isAlive() && !player.isCreative() && !player.isSpectator()));
+                player -> player instanceof Player p && p.isAlive() && !p.isCreative() && !p.isSpectator()));
     }
     private final class AdvanceUnseenGoal extends Goal {
         private int repathDelay;
