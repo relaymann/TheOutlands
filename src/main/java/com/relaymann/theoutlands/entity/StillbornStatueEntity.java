@@ -1,0 +1,68 @@
+package com.relaymann.theoutlands.entity;
+
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.sounds.SoundEvent;
+import com.relaymann.theoutlands.sound.OutlandsSounds;
+import java.util.EnumSet;
+
+/** A stone sentinel that advances only while its chosen prey cannot see it. */
+public final class StillbornStatueEntity extends Monster {
+    private int stillnessTicks;
+    private int strikeCooldown;
+    private boolean stalking;
+    public StillbornStatueEntity(EntityType<? extends Monster> type, Level level) { super(type, level); xpReward = 10; }
+    public static AttributeSupplier.Builder createAttributes() {
+        return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 58.0D)
+                .add(Attributes.MOVEMENT_SPEED, 0.30D).add(Attributes.FOLLOW_RANGE, 42.0D)
+                .add(Attributes.ATTACK_DAMAGE, 9.0D).add(Attributes.ARMOR, 8.0D)
+                .add(Attributes.KNOCKBACK_RESISTANCE, 0.85D);
+    }
+    @Override protected void registerGoals() {
+        goalSelector.addGoal(1, new WatcherAdvanceGoal());
+        targetSelector.addGoal(1, new HurtByTargetGoal(this));
+        targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false,
+                p -> p instanceof Player player && player.isAlive() && !player.isCreative() && !player.isSpectator()));
+    }
+    private final class WatcherAdvanceGoal extends Goal {
+        private int repath;
+        WatcherAdvanceGoal() { setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK)); }
+        @Override public boolean canUse() {
+            return getTarget() instanceof Player p && p.isAlive() && distanceToSqr(p) < 900.0D;
+        }
+        @Override public boolean canContinueToUse() { return canUse(); }
+        @Override public void tick() {
+            Player p = (Player)getTarget();
+            getLookControl().setLookAt(p, 45.0F, 45.0F);
+            if (p.hasLineOfSight(StillbornStatueEntity.this)) {
+                stalking = false; stillnessTicks++; getNavigation().stop(); setDeltaMovement(0, getDeltaMovement().y, 0);
+                if (stillnessTicks > 100 && distanceToSqr(p) < 16.0D) setTarget(null);
+                return;
+            }
+            stillnessTicks = 0; stalking = true;
+            if (--repath <= 0) { repath = 6 + getRandom().nextInt(7); getNavigation().moveTo(p, 1.22D); }
+            if (strikeCooldown > 0) strikeCooldown--;
+            if (distanceToSqr(p) < 3.4D && strikeCooldown == 0) {
+                doHurtTarget(p); strikeCooldown = 28;
+                playSound(OutlandsSounds.STILLBORN_STRIKE.get(), 0.9F, 0.8F + getRandom().nextFloat() * 0.15F);
+            }
+        }
+        @Override public void stop() { stalking = false; getNavigation().stop(); }
+    }
+    public boolean isStalking() { return stalking; }
+    public float getStiffness(float partialTick) { return stalking ? 0.0F : 1.0F; }
+    @Override public void tick() { super.tick(); if (!level().isClientSide && getTarget() instanceof Player p && distanceToSqr(p) > 1600.0D) setTarget(null); }
+    @Override public void addAdditionalSaveData(CompoundTag tag) { super.addAdditionalSaveData(tag); tag.putInt("stillness", stillnessTicks); tag.putInt("strike_cd", strikeCooldown); tag.putBoolean("stalking", stalking); }
+    @Override public void readAdditionalSaveData(CompoundTag tag) { super.readAdditionalSaveData(tag); stillnessTicks=tag.getInt("stillness"); strikeCooldown=tag.getInt("strike_cd"); stalking=tag.getBoolean("stalking"); }
+    @Override protected SoundEvent getAmbientSound() { return null; }
+    @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return OutlandsSounds.STILLBORN_STONE.get(); }
+    @Override protected SoundEvent getDeathSound() { return OutlandsSounds.STILLBORN_STONE.get(); }
+}
