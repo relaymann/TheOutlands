@@ -108,6 +108,18 @@ public final class AlmightyEntity extends Monster {
                 SoundSource.HOSTILE, phase == 3 ? 0.85F : 0.62F, phase == 3 ? 0.38F : 0.56F);
     }
 
+    @Override public void addAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        tag.putInt("almighty_phase", lastPhase);
+    }
+
+    @Override public void readAdditionalSaveData(net.minecraft.nbt.CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        int savedPhase = tag.contains("almighty_phase") ? tag.getInt("almighty_phase")
+                : (getHealth() / getMaxHealth() > 0.66F ? 1 : getHealth() / getMaxHealth() > 0.33F ? 2 : 3);
+        lastPhase = Math.max(1, Math.min(3, savedPhase));
+    }
+
     @Override public void startSeenByPlayer(ServerPlayer player) {
         super.startSeenByPlayer(player);
         bossEvent.addPlayer(player);
