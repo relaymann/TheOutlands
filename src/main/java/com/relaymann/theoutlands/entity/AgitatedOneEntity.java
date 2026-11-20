@@ -63,10 +63,15 @@ public final class AgitatedOneEntity extends Monster {
             }
             if (attackWindup > 0) { getNavigation().stop(); setDeltaMovement(0, getDeltaMovement().y, 0); }
             if (attackWindup > 0 && --attackWindup == 0) {
-                net.minecraft.world.phys.Vec3 dir = p.position().add(p.getDeltaMovement().scale(5.0D)).subtract(position()).normalize();
-                setDeltaMovement(getDeltaMovement().add(dir.x * 0.92D, 0.32D, dir.z * 0.92D));
-                hasImpulse = true; charging = true; chargeTicks = 14; chargeCooldown = 100; agitation = Math.max(20, agitation - 25);
-                if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) playSound(OutlandsSounds.AGITATED_CHARGE.get(), 1.0F, 0.9F + getRandom().nextFloat() * 0.1F);
+                if (p.isAlive() && hasLineOfSight(p) && d > 16.0D && d < 196.0D) {
+                    net.minecraft.world.phys.Vec3 dir = p.position().add(p.getDeltaMovement().scale(5.0D)).subtract(position()).normalize();
+                    setDeltaMovement(getDeltaMovement().add(dir.x * 0.92D, 0.32D, dir.z * 0.92D));
+                    hasImpulse = true; charging = true; chargeTicks = 14; chargeCooldown = 100; agitation = Math.max(20, agitation - 25);
+                    if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) playSound(OutlandsSounds.AGITATED_CHARGE.get(), 1.0F, 0.9F + getRandom().nextFloat() * 0.1F);
+                } else {
+                    charging = false;
+                    chargeTicks = 0;
+                }
             }
             if (charging) {
                 // Keep the melee goal from replacing the charge's launch velocity.
