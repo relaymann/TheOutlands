@@ -85,6 +85,19 @@ public final class OutlandsEcosystemManager {
         if (a instanceof CaveJarEntity && b instanceof BurrowerEntity) yieldTerritory(a, b);
         if (b instanceof CaveJarEntity && a instanceof BurrowerEntity) yieldTerritory(b, a);
 
+        // Cave.jar dominates narrow cave routes. Hunters and unrevealed Mimics
+        // avoid contesting its immediate hunting ground rather than starting
+        // artificial mob-vs-mob combat.
+        if (a instanceof CaveJarEntity && b instanceof HunterEntity) yieldTerritory(a, b);
+        if (b instanceof CaveJarEntity && a instanceof HunterEntity) yieldTerritory(b, a);
+        if (a instanceof CaveJarEntity && b instanceof MimicEntity mimic && !mimic.isRevealed()) yieldTerritory(a, b);
+        if (b instanceof CaveJarEntity && a instanceof MimicEntity mimic && !mimic.isRevealed()) yieldTerritory(b, a);
+
+        // Stillborn territory is avoided by subterranean travelers; the statue
+        // remains a stationary threat instead of chasing unrelated creatures.
+        if (a instanceof StillbornStatueEntity && b instanceof BurrowerEntity) yieldTerritory(a, b);
+        if (b instanceof StillbornStatueEntity && a instanceof BurrowerEntity) yieldTerritory(b, a);
+
         // Two sentinels avoid crowding the same narrow approach.
         if (a instanceof StillbornStatueEntity && b instanceof ObserverEntity) giveSpace(a, b);
         if (b instanceof StillbornStatueEntity && a instanceof ObserverEntity) giveSpace(b, a);
