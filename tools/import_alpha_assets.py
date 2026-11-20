@@ -65,6 +65,29 @@ ENVIRONMENT = ("environment/clouds.png", "environment/rain.png",
                "misc/foliagecolor.png", "misc/vignette.png",
                "misc/pumpkinblur.png", "font/default.png")
 
+
+SOUND_GROUPS = {
+    "alpha_step_stone": "step/stone", "alpha_step_grass": "step/grass",
+    "alpha_step_gravel": "step/gravel", "alpha_step_sand": "step/sand",
+    "alpha_step_snow": "step/snow", "alpha_step_wood": "step/wood",
+    "alpha_step_cloth": "step/cloth", "alpha_step_ladder": "step/ladder",
+    "alpha_dig_stone": "dig/stone", "alpha_dig_grass": "dig/grass",
+    "alpha_dig_gravel": "dig/gravel", "alpha_dig_sand": "dig/sand",
+    "alpha_dig_snow": "dig/snow", "alpha_dig_wood": "dig/wood",
+    "alpha_dig_cloth": "dig/cloth", "alpha_door_open": "random/door_open",
+    "alpha_door_close": "random/door_close", "alpha_player_hurt": "random/classic_hurt",
+    "alpha_fall_small": "damage/fallsmall", "alpha_fall_big": "damage/fallbig",
+    "alpha_water": "liquid/water", "alpha_swim": "liquid/swim",
+    "alpha_lava": "liquid/lava", "alpha_cave_ambience": "ambient/cave/cave",
+    "alpha_rain": "ambient/weather/rain", "alpha_thunder": "ambient/weather/thunder",
+    "alpha_chicken": "mob/chicken/say", "alpha_cow": "mob/cow/say",
+    "alpha_pig": "mob/pig/say", "alpha_sheep": "mob/sheep/say",
+    "alpha_wolf": "mob/wolf/bark", "alpha_zombie": "mob/zombie/say",
+    "alpha_skeleton": "mob/skeleton/say", "alpha_spider": "mob/spider/say",
+    "alpha_creeper": "mob/creeper/say", "alpha_ghast": "mob/ghast/moan",
+    "alpha_enderman": "mob/endermen/idle", "alpha_villager": "mob/villager/idle",
+}
+
 def save_image(source: zipfile.ZipFile, member: str, destination: Path) -> bool:
     try:
         with source.open(member) as stream, Image.open(stream) as image:
@@ -78,6 +101,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("client_archive", type=Path,
                         help="User-owned legacy Minecraft client JAR or ZIP")
+    parser.add_argument("--sounds-archive", type=Path,
+                        help="Optional legacy sounds ZIP supplied by the user")
     args = parser.parse_args()
     if not args.client_archive.is_file():
         parser.error(f"File not found: {args.client_archive}")
@@ -176,8 +201,44 @@ def main() -> None:
             print("Warning: could not verify the Alpha 1.2.6 version marker.")
         print(f"Imported {len(BLOCK_TILES)} exact legacy block crops and {len(copied)} "
               f"reference assets into {OUT}.")
-        print("No audio files exist in this archive; original Alpha sounds must be supplied separately.")
-        print("Generated source textures are local build inputs and must not be committed.")
+        if args.sounds_archive:
+            if not args.sounds_archive.is_file() or not zipfile.is_zipfile(args.sounds_archive):
+                parser.error(f"Invalid sounds archive: {args.sounds_archive}")
+            sound_root = OUT / "theoutlands/sounds/legacy"
+            sound_count = 0
+            sound_names = set()
+            with zipfile.ZipFile(args.sounds_archive) as sound_zip:
+                for member in sound_zip.namelist():
+                    if member.lower().endswith(".ogg"):
+                        destination = sound_root / member
+                        destination.parent.mkdir(parents=True, exist_ok=True)
+                        destination.write_bytes(sound_zip.read(member))
+                        sound_names.add(member[:-4])
+                        sound_count += 1
+
+            import json
+            sound_json_path = ROOT / "src/main/resources/assets/theoutlands/sounds.json"
+            definitions = json.loads(sound_json_path.read_text(encoding="utf-8"))
+            for event_name, prefix in SOUND_GROUPS.items():
+                if event_name in ("alpha_door_open", "alpha_door_close",
+                                  "alpha_player_hurt", "alpha_fall_small",
+                                  "alpha_fall_big", "alpha_water", "alpha_lava"):
+                    variants = [prefix] if prefix in sound_names else []
+                else:
+                    variants = sorted(name for name in sound_names
+                                      if name.startswith(prefix) and
+                                      name[len(prefix):].lstrip("0123456789") == "")
+                if variants:
+                    definitions[event_name] = {
+                        "sounds": [{"name": "theoutlands:legacy/" + name,
+                                    "volume": 0.65 if event_name.startswith("alpha_step_") else 1.0}
+                                   for name in variants]
+                    }
+            sound_json_path.write_text(json.dumps(definitions, indent=2) + "\n", encoding="utf-8")
+            print(f"Imported {sound_count} legacy OGG files and updated classic sound definitions.")
+        else:
+            print("No sounds archive supplied; texture import completed without changing sound definitions.")
+        print("Generated source textures and audio are local build inputs and must not be committed.")
 
 if __name__ == "__main__":
     main()
