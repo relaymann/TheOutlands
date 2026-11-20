@@ -101,7 +101,7 @@ public final class CaveJarEntity extends Monster {
     }
 
     @Override protected SoundEvent getAmbientSound() { return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.CAVEJAR_STALK.get() : null; }
-    @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return OutlandsSounds.CAVEJAR_STALK.get(); }
+    @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.CAVEJAR_STALK.get() : null; }
     @Override protected SoundEvent getDeathSound() { return null; }
 
     @Override public void addAdditionalSaveData(CompoundTag tag) {
