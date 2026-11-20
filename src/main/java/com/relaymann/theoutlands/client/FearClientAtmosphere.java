@@ -22,7 +22,8 @@ public final class FearClientAtmosphere {
     private FearClientAtmosphere() {}
 
     private static double territoryStrength(LocalPlayer player) {
-        if (player == null || player.level() == null || !player.level().dimension().equals(Level.OVERWORLD)
+        if (player == null || player.level() == null || !player.isAlive() || player.isCreative() || player.isSpectator()
+                || !player.level().dimension().equals(Level.OVERWORLD)
                 || !OutlandsConfig.FEAR_AMBIENT_ATTENUATION.get()) return 0.0D;
         var key = player.level().registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.BIOME)
                 .getKey(player.level().getBiome(player.blockPosition()).value());
