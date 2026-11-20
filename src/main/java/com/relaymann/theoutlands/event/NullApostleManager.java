@@ -80,7 +80,8 @@ public final class NullApostleManager {
             var trackedPlayer = level.getPlayerByUUID(active.playerId);
             if (!(entity instanceof NullApostleEntity apostle)
                     || !(trackedPlayer instanceof ServerPlayer player)
-                    || !player.isAlive() || !apostle.isBlessedTo(player.getUUID())
+                    || !player.isAlive() || player.isCreative() || player.isSpectator()
+                    || !apostle.isBlessedTo(player.getUUID())
                     || level.getGameTime() >= active.expiresAt) {
                 if (entity != null) entity.discard();
                 it.remove();
