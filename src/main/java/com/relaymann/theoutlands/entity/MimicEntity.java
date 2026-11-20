@@ -4,6 +4,9 @@ import com.relaymann.theoutlands.sound.OutlandsSounds;
 import com.relaymann.theoutlands.OutlandsConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.Tag;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -185,7 +188,7 @@ public final class MimicEntity extends Monster {
         super.addAdditionalSaveData(tag);
         tag.putBoolean("revealed", revealed);
         tag.putBoolean("disguise_chosen", disguiseChosen);
-        tag.putInt("disguise_state", entityData.get(DATA_DISGUISE_STATE));
+        tag.put("disguise_state", NbtUtils.writeBlockState(getDisguiseBlockState()));
         tag.putInt("reveal_cd", revealCooldown);
         tag.putInt("unseen_ticks", unseenTicks);
         tag.putInt("retreat_ticks", retreatTicks);
@@ -208,9 +211,23 @@ public final class MimicEntity extends Monster {
         memoryZ = tag.getDouble("mimic_memory_z");
         hasMemory = tag.getBoolean("mimic_has_memory");
         entityData.set(DATA_REVEALED, revealed);
-        if (tag.contains("disguise_state")) {
-            entityData.set(DATA_DISGUISE_STATE, tag.getInt("disguise_state"));
+        BlockState loadedDisguise = Blocks.BARREL.defaultBlockState();
+        if (tag.contains("disguise_state", Tag.TAG_COMPOUND)) {
+            try {
+                loadedDisguise = NbtUtils.readBlockState(
+                        level().registryAccess().lookupOrThrow(Registries.BLOCK),
+                        tag.getCompound("disguise_state"));
+            } catch (RuntimeException ignored) {
+                // A block removed by another mod/version falls back to a safe visible disguise.
+            }
+        } else if (tag.contains("disguise_state", Tag.TAG_INT)) {
+            // Backward compatibility with worlds saved before blockstate compounds were used.
+            loadedDisguise = Block.stateById(tag.getInt("disguise_state"));
         }
+        if (loadedDisguise.isAir() || loadedDisguise.getRenderShape() != RenderShape.MODEL) {
+            loadedDisguise = Blocks.BARREL.defaultBlockState();
+        }
+        entityData.set(DATA_DISGUISE_STATE, Block.getId(loadedDisguise));
     }
 
     @Override
