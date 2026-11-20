@@ -25,6 +25,7 @@ public final class HorrorProgressionManager {
     private HorrorProgressionManager() {}
 
     public static void update(ServerPlayer player) {
+        if (player == null || !player.isAlive() || player.isSpectator()) return;
         UUID id = player.getUUID();
         HorrorSnapshot snapshot = DistanceProgression.createSnapshot(player);
         FearEncounterManager.evaluate(player);
@@ -41,7 +42,7 @@ public final class HorrorProgressionManager {
         long time = level.getDayTime() % 24000L;
         int nearby = level.getEntitiesOfClass(ServerPlayer.class,
                 new AABB(player.blockPosition()).inflate(48.0D),
-                other -> !other.getUUID().equals(id)).size();
+                other -> !other.getUUID().equals(id) && other.isAlive() && !other.isSpectator() && !other.isCreative()).size();
         float health = player.getMaxHealth() <= 0.0F ? 1.0F : player.getHealth() / player.getMaxHealth();
         int encounterCount = HorrorMemory.totalEncounters(player);
         boolean hasSeenNull = HorrorMemory.hasDiscovered(player, "null_first_sighting");
