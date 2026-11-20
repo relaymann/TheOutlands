@@ -331,11 +331,14 @@ public final class HorrorMemory {
         // Refresh recency when a known bed/base cell is used again. Repeated samples
         // in the same most-recent cell are a no-op, keeping NBT writes bounded.
         if (!old.isEmpty() && ((LongTag) old.get(old.size() - 1)).getAsLong() == packed) return;
-        ListTag updated = new ListTag();
-        for (int i = 0; i < old.size(); i++) {
+        List<Long> retainedRecent = new ArrayList<>(MAX_CONTEXT_CELLS - 1);
+        for (int i = old.size() - 1; i >= 0 && retainedRecent.size() < MAX_CONTEXT_CELLS - 1; i--) {
             long existing = ((LongTag) old.get(i)).getAsLong();
-            if (existing != packed && updated.size() < MAX_CONTEXT_CELLS - 1)
-                updated.add(LongTag.valueOf(existing));
+            if (existing != packed) retainedRecent.add(existing);
+        }
+        ListTag updated = new ListTag();
+        for (int i = retainedRecent.size() - 1; i >= 0; i--) {
+            updated.add(LongTag.valueOf(retainedRecent.get(i)));
         }
         updated.add(LongTag.valueOf(packed));
         memory.put(key, updated);
