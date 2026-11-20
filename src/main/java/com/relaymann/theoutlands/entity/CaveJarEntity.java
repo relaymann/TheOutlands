@@ -1,6 +1,9 @@
 package com.relaymann.theoutlands.entity;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -23,8 +26,10 @@ import com.relaymann.theoutlands.OutlandsConfig;
  * searches the last known area, and uses a telegraphed close-range lunge.
  */
 public final class CaveJarEntity extends Monster {
+    private static final EntityDataAccessor<Integer> DATA_LUNGE_WINDUP =
+            SynchedEntityData.defineId(CaveJarEntity.class, EntityDataSerializers.INT);
     private double memoryX, memoryY, memoryZ;
-    private int lostSightTicks, searchTicks, lungeCooldown;
+    private int lostSightTicks, searchTicks, lungeCooldown, lungeWindup;
     private boolean hasMemory;
 
     public CaveJarEntity(EntityType<? extends Monster> type, Level level) { super(type, level); xpReward = 12; }
@@ -35,6 +40,13 @@ public final class CaveJarEntity extends Monster {
                 .add(Attributes.ATTACK_DAMAGE, 9.0D).add(Attributes.ATTACK_KNOCKBACK, 1.4D)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 0.45D);
     }
+
+    @Override protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_LUNGE_WINDUP, 0);
+    }
+
+    public int getLungeWindup() { return entityData.get(DATA_LUNGE_WINDUP); }
 
     @Override protected void registerGoals() {
         goalSelector.addGoal(0, new MeleeAttackGoal(this, 1.38D, true));
@@ -77,17 +89,31 @@ public final class CaveJarEntity extends Monster {
             if (distance < 16.0D && hasLineOfSight(player)) setSprinting(true);
             else if (distance > 36.0D) setSprinting(false);
 
-            // A short wind-up is communicated by a pause before the lunge.
-            // It is dangerous in a tunnel but still avoidable by moving laterally.
-            if (lungeCooldown == 0 && distance > 9.0D && distance < 42.0D
-                    && hasLineOfSight(player) && onGround() && tickCount % 24 == 0) {
+            // A visible pause gives the player time to dodge the committed lunge.
+            if (lungeWindup > 0) {
                 getNavigation().stop();
-                Vec3 direction = player.position().subtract(position()).normalize();
-                setDeltaMovement(getDeltaMovement().add(direction.x * 0.88D, 0.34D, direction.z * 0.88D));
-                hasImpulse = true;
-                lungeCooldown = 100 + getRandom().nextInt(45);
+                setDeltaMovement(0.0D, getDeltaMovement().y, 0.0D);
+                if (--lungeWindup == 0) {
+                    entityData.set(DATA_LUNGE_WINDUP, 0);
+                    if (player.isAlive() && hasLineOfSight(player) && onGround()) {
+                        Vec3 direction = player.position().subtract(position()).normalize();
+                        setDeltaMovement(getDeltaMovement().add(direction.x * 0.88D, 0.34D, direction.z * 0.88D));
+                        hasImpulse = true;
+                        lungeCooldown = 100 + getRandom().nextInt(45);
+                    }
+                } else {
+                    entityData.set(DATA_LUNGE_WINDUP, lungeWindup);
+                }
+            } else if (lungeCooldown == 0 && distance > 9.0D && distance < 42.0D
+                    && hasLineOfSight(player) && onGround() && tickCount % 24 == 0) {
+                lungeWindup = 8;
+                entityData.set(DATA_LUNGE_WINDUP, lungeWindup);
+                getNavigation().stop();
             }
-        } else if (hasMemory) {
+        } else {
+            lungeWindup = 0;
+            entityData.set(DATA_LUNGE_WINDUP, 0);
+            if (hasMemory) {
             searchTicks++;
             if (searchTicks < 80 && tickCount % 18 == 0) {
                 double angle = searchTicks * 0.8D;
@@ -96,6 +122,7 @@ public final class CaveJarEntity extends Monster {
                         memoryZ + Math.sin(angle) * radius, 0.88D);
             } else if (searchTicks >= 80) {
                 hasMemory = false; searchTicks = 0; getNavigation().stop();
+            }
             }
         }
     }
@@ -109,7 +136,7 @@ public final class CaveJarEntity extends Monster {
         tag.putDouble("cavejar_memory_x", memoryX); tag.putDouble("cavejar_memory_y", memoryY);
         tag.putDouble("cavejar_memory_z", memoryZ); tag.putBoolean("cavejar_has_memory", hasMemory);
         tag.putInt("cavejar_lost_sight", lostSightTicks); tag.putInt("cavejar_search", searchTicks);
-        tag.putInt("cavejar_lunge_cd", lungeCooldown);
+        tag.putInt("cavejar_lunge_cd", lungeCooldown); tag.putInt("cavejar_lunge_windup", lungeWindup);
     }
 
     @Override public void readAdditionalSaveData(CompoundTag tag) {
@@ -117,6 +144,6 @@ public final class CaveJarEntity extends Monster {
         memoryX = tag.getDouble("cavejar_memory_x"); memoryY = tag.getDouble("cavejar_memory_y");
         memoryZ = tag.getDouble("cavejar_memory_z"); hasMemory = tag.getBoolean("cavejar_has_memory");
         lostSightTicks = tag.getInt("cavejar_lost_sight"); searchTicks = tag.getInt("cavejar_search");
-        lungeCooldown = tag.getInt("cavejar_lunge_cd");
+        lungeCooldown = tag.getInt("cavejar_lunge_cd"); lungeWindup = Math.max(0, Math.min(8, tag.getInt("cavejar_lunge_windup"))); entityData.set(DATA_LUNGE_WINDUP, lungeWindup);
     }
 }
