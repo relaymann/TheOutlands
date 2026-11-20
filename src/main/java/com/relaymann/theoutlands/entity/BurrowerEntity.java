@@ -1,6 +1,7 @@
 package com.relaymann.theoutlands.entity;
 
 import com.relaymann.theoutlands.sound.OutlandsSounds;
+import com.relaymann.theoutlands.OutlandsConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -178,7 +179,7 @@ public final class BurrowerEntity extends Monster {
         setInvisible(false);
         setSilent(false);
         revealCooldown = 90;
-        playSound(OutlandsSounds.BURROWER_RISE.get(), 1.1F,
+        if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) playSound(OutlandsSounds.BURROWER_RISE.get(), 1.1F,
                 0.82F + getRandom().nextFloat() * 0.18F);
         if (target != null && target.isAlive()) {
             Vec3 direction = target.position().subtract(position()).normalize();
@@ -221,7 +222,7 @@ public final class BurrowerEntity extends Monster {
 
     @Override protected SoundEvent getAmbientSound() { return null; }
     @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) {
-        return OutlandsSounds.BURROWER_RISE.get();
+        return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.BURROWER_RISE.get() : null;
     }
     @Override protected SoundEvent getDeathSound() { return null; }
 }
