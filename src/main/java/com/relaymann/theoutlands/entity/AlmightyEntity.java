@@ -2,6 +2,7 @@ package com.relaymann.theoutlands.entity;
 
 import com.relaymann.theoutlands.OutlandsConfig;
 import com.relaymann.theoutlands.horror.HorrorMemory;
+import com.relaymann.theoutlands.horror.AlmightyTerritory;
 import com.relaymann.theoutlands.item.OutlandsItems;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -55,12 +56,18 @@ public final class AlmightyEntity extends Monster {
         goalSelector.addGoal(1, new FloatGoal(this));
         goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.12D, true));
         goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 96.0F));
-        targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, true));
+        targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false,
+                player -> player instanceof Player p && p.isAlive() && !p.isCreative() && !p.isSpectator()
+                        && AlmightyTerritory.contains(level(), p.getX(), p.getZ())));
     }
 
     @Override public void tick() {
         super.tick();
         if (level().isClientSide) return;
+        if (getTarget() instanceof Player target && !AlmightyTerritory.contains(level(), target.getX(), target.getZ())) {
+            setTarget(null);
+            getNavigation().stop();
+        }
         float healthRatio = getHealth() / getMaxHealth();
         bossEvent.setProgress(Math.max(0.0F, healthRatio));
         int phase = healthRatio > 0.66F ? 1 : healthRatio > 0.33F ? 2 : 3;
@@ -81,7 +88,8 @@ public final class AlmightyEntity extends Monster {
         double radius = phase == 1 ? 7.0D : phase == 2 ? 10.0D : 14.0D;
         float damage = phase == 1 ? 5.0F : phase == 2 ? 7.0F : 9.0F;
         for (Player player : level().getEntitiesOfClass(Player.class, getBoundingBox().inflate(radius),
-                Player::isAlive)) {
+                player -> player.isAlive() && !player.isCreative() && !player.isSpectator()
+                        && AlmightyTerritory.contains(level(), player.getX(), player.getZ()))) {
             if (player.isCreative() || player.isSpectator()) continue;
             double dx = player.getX() - getX();
             double dz = player.getZ() - getZ();
