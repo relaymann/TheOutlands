@@ -32,14 +32,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ffmpeg
 
-      - name: Validate local asset import tools
-        run: python3 -m py_compile tools/import_alpha_assets.py tools/import_prepared_alpha_resources.py tools/import_classic_sounds.py tools/extract_alpha_atlas_cells.py
+      - name: Validate entity audio generator
+        run: python3 -m py_compile tools/generate_entity_audio.py
 
       - name: Generate original entity audio
         run: python3 tools/generate_entity_audio.py
-
-      - name: Generate original Alpha-inspired textures
-        run: python3 tools/generate_alpha_textures.py
 
       - name: Set up Gradle 9.2.1
         uses: gradle/actions/setup-gradle@v4
