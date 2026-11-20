@@ -67,8 +67,8 @@ public final class ObserverEntity extends Monster {
         @Override public void stop() { entityData.set(DATA_ADVANCING, false); getNavigation().stop(); }
     }
     private boolean isWatchedByAnyPlayer() {
-        return !level().getEntitiesOfClass(Player.class, getBoundingBox().inflate(48.0D),
-                p -> p.isAlive() && !p.isSpectator() && p.hasLineOfSight(this)).isEmpty();
+        return level().players().stream()
+                .anyMatch(p -> p.isAlive() && !p.isSpectator() && p.hasLineOfSight(this));
     }
     @Override public void tick() {
         super.tick();
