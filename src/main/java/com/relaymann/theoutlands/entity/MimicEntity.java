@@ -1,6 +1,9 @@
 package com.relaymann.theoutlands.entity;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -19,6 +22,7 @@ import com.relaymann.theoutlands.sound.OutlandsSounds;
  * stalks through cover when unseen, and commits to a sudden but physical reveal.
  */
 public final class MimicEntity extends Monster {
+    private static final EntityDataAccessor<Boolean> DATA_REVEALED = SynchedEntityData.defineId(MimicEntity.class, EntityDataSerializers.BOOLEAN);
     private boolean revealed;
     private int revealCooldown;
     private int unseenTicks;
@@ -33,6 +37,11 @@ public final class MimicEntity extends Monster {
                 .add(Attributes.MOVEMENT_SPEED, 0.31D).add(Attributes.FOLLOW_RANGE, 32.0D)
                 .add(Attributes.ATTACK_DAMAGE, 7.0D).add(Attributes.ARMOR, 3.0D)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 0.2D);
+    }
+
+    @Override protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_REVEALED, false);
     }
 
     @Override protected void registerGoals() {
@@ -69,6 +78,7 @@ public final class MimicEntity extends Monster {
 
             if (!revealed && distance < 64.0D) {
                 revealed = true;
+                entityData.set(DATA_REVEALED, true);
                 revealCooldown = 120;
                 unseenTicks = 0;
                 playSound(OutlandsSounds.MIMIC_REVEAL.get(), 1.0F,
@@ -95,6 +105,7 @@ public final class MimicEntity extends Monster {
             setSprinting(false);
             if (revealed && revealCooldown == 0) {
                 revealed = false;
+                entityData.set(DATA_REVEALED, false);
                 unseenTicks = 0;
                 getNavigation().stop();
             }
@@ -105,7 +116,7 @@ public final class MimicEntity extends Monster {
         }
     }
 
-    public boolean isRevealed() { return revealed; }
+    public boolean isRevealed() { return entityData.get(DATA_REVEALED); }
 
     @Override public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
@@ -129,6 +140,7 @@ public final class MimicEntity extends Monster {
         memoryY = tag.getDouble("mimic_memory_y");
         memoryZ = tag.getDouble("mimic_memory_z");
         hasMemory = tag.getBoolean("mimic_has_memory");
+        entityData.set(DATA_REVEALED, revealed);
     }
 
     @Override protected SoundEvent getAmbientSound() { return null; }
