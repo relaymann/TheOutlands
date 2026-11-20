@@ -55,7 +55,8 @@ public final class AgitatedOneEntity extends Monster {
             double d = distanceToSqr(p);
             if (d < 256.0D) agitation = Math.min(100, agitation + (d < 64.0D ? 2 : 1));
             else agitation = Math.max(0, agitation - 2);
-            if (agitation >= 35 && attackWindup == 0 && chargeCooldown == 0 && d > 16.0D && d < 196.0D) {
+            if (agitation >= 35 && attackWindup == 0 && chargeCooldown == 0 && d > 16.0D && d < 196.0D
+                    && hasLineOfSight(p)) {
                 attackWindup = 16;
                 charging = false;
                 chargeHit = false;
@@ -71,6 +72,7 @@ public final class AgitatedOneEntity extends Monster {
                 } else {
                     charging = false;
                     chargeTicks = 0;
+                    chargeCooldown = 20;
                 }
             }
             if (charging) {
