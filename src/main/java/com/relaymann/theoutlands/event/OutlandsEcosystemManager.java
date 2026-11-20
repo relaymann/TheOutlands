@@ -25,7 +25,7 @@ public final class OutlandsEcosystemManager {
         for (ServerLevel level : event.getServer().getAllLevels()) {
             Set<Long> processedPairs = new HashSet<>();
             for (ServerPlayer player : level.players()) {
-                if (!player.isAlive() || player.isSpectator()) continue;
+                if (!player.isAlive() || player.isSpectator() || player.isCreative()) continue;
                 var nearby = level.getEntitiesOfClass(Mob.class, new AABB(player.blockPosition()).inflate(64.0D),
                         mob -> mob.isAlive() && isOutlandsCreature(mob));
                 for (int i = 0; i < nearby.size(); i++) {
