@@ -100,6 +100,9 @@ public final class BurrowerEntity extends Monster {
     }
 
     private void tickBurrowTravel() {
+        // The normal melee goal runs in super.tick(); cancel its pathing while phased.
+        getNavigation().stop();
+        setDeltaMovement(Vec3.ZERO);
         Player player = getTarget() instanceof Player p && p.isAlive() ? p : null;
         if (player == null || ++burrowTicks > 260) {
             emergeAtStart();
