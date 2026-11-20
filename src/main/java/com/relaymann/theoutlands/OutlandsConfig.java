@@ -18,6 +18,7 @@ public final class OutlandsConfig {
     public static final ModConfigSpec.BooleanValue HORROR_AUDIO_ENABLED;
     public static final ModConfigSpec.BooleanValue FEAR_AMBIENT_ATTENUATION;
     public static final ModConfigSpec.BooleanValue ALPHA_VISUALS_ENABLED;
+    public static final ModConfigSpec.BooleanValue ALPHA_SOUNDS_ENABLED;
     public static final ModConfigSpec SPEC;
 
     static {
@@ -62,8 +63,11 @@ public final class OutlandsConfig {
                 .comment("Locally attenuates ambient and weather audio in Fear's distant forest territory.")
                 .define("fearAmbientAttenuation", true);
         ALPHA_VISUALS_ENABLED = BUILDER
-                .comment("Enables the Alpha-era visual presentation: shorter, flatter Overworld fog and restrained atmospheric lighting. Does not alter gameplay light levels.")
+                .comment("Enables Alpha-inspired Overworld visual presentation. Does not alter world generation or gameplay light levels.")
                 .define("alphaVisualsEnabled", true);
+        ALPHA_SOUNDS_ENABLED = BUILDER
+                .comment("Replaces selected vanilla footsteps, mining, animal, door, damage, water and ambience sounds with locally imported classic-era recordings.")
+                .define("alphaSoundsEnabled", true);
         BUILDER.pop();
 
         SPEC = BUILDER.build();
