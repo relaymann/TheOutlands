@@ -76,7 +76,7 @@ public final class NullWatcherManager {
                 continue;
             }
             var trackedPlayer = level.getPlayerByUUID(watcher.playerId);
-            if (!(trackedPlayer instanceof ServerPlayer target) || !target.isAlive() || target.isRemoved()) {
+            if (!(trackedPlayer instanceof ServerPlayer target) || !target.isAlive() || target.isRemoved() || target.isCreative() || target.isSpectator()) {
                 entity.discard(); it.remove(); continue;
             }
             if (target.distanceToSqr(entity) <= APPROACH_DISTANCE_SQR) {
