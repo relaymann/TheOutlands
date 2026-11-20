@@ -43,7 +43,6 @@ public final class FearClientAtmosphere {
         SoundInstance sound = event.getOriginalSound();
         SoundSource source = sound.getSource();
         if (source != SoundSource.AMBIENT && source != SoundSource.WEATHER) return;
-        // Keep important player/entity sounds intact; only soften the world's ambient bed.
         float scale = (float) (1.0D - strength * 0.72D);
         event.setSound(sound instanceof TickableSoundInstance ticking
                 ? new ScaledTickableSoundInstance(ticking, scale)
@@ -52,53 +51,23 @@ public final class FearClientAtmosphere {
 
     @SubscribeEvent
     public static void onFogColor(ViewportEvent.ComputeFogColor event) {
-        Minecraft minecraft = Minecraft.getInstance();
-        LocalPlayer player = minecraft.player;
-        var clientLevel = minecraft.level;
-        if (player == null || clientLevel == null || event.getCamera().getFluidInCamera() != FogType.NONE
-                || !OutlandsConfig.ALPHA_VISUALS_ENABLED.get()
-                || !player.level().dimension().equals(Level.OVERWORLD)) return;
-
-        // Alpha's distant horizon was visually tied to the sky rather than the
-        // modern biome-specific fog palette. Sampling the live sky colour keeps
-        // sunrise, sunset, weather and night transitions coherent without
-        // hard-coding one daytime blue into every scene.
-        var sky = clientLevel.getSkyColor(player.position(), (float) event.getPartialTick());
-        float retroBlend = 0.78F;
-        event.setRed(event.getRed() * (1.0F - retroBlend) + (float) sky.x * retroBlend);
-        event.setGreen(event.getGreen() * (1.0F - retroBlend) + (float) sky.y * retroBlend);
-        event.setBlue(event.getBlue() * (1.0F - retroBlend) + (float) sky.z * retroBlend);
-
-        // Preserve the existing Fear territory tint as a distinct overlay.
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (player == null || event.getCamera().getFluidInCamera() != FogType.NONE) return;
         double strength = territoryStrength(player);
-        if (strength > 0.0D) {
-            float blend = (float) (0.24D + strength * 0.18D);
-            event.setRed(event.getRed() * (1.0F - blend) + 0.035F * blend);
-            event.setGreen(event.getGreen() * (1.0F - blend) + 0.045F * blend);
-            event.setBlue(event.getBlue() * (1.0F - blend) + 0.055F * blend);
-        }
+        if (strength <= 0.0D) return;
+        float blend = (float) (0.24D + strength * 0.18D);
+        event.setRed(event.getRed() * (1.0F - blend) + 0.035F * blend);
+        event.setGreen(event.getGreen() * (1.0F - blend) + 0.045F * blend);
+        event.setBlue(event.getBlue() * (1.0F - blend) + 0.055F * blend);
     }
 
     @SubscribeEvent
     public static void onFog(ViewportEvent.RenderFog event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null || event.getType() != FogType.NONE) return;
-
-        // Alpha's Overworld horizon used a simple, early fade instead of the
-        // much denser modern volumetric horizon. Keep the effect local to the
-        // Overworld and leave water, lava, powder snow, and Nether/End fog alone.
-        if (OutlandsConfig.ALPHA_VISUALS_ENABLED.get()
-                && player.level().dimension().equals(Level.OVERWORLD)) {
-            event.scaleFarPlaneDistance(0.78F);
-            event.scaleNearPlaneDistance(0.58F);
-        }
-
-        // Fear's territory is a separate, stronger layer over the global retro
-        // horizon. The vanilla fog event is deliberately not cancelled.
         double strength = territoryStrength(player);
-        if (strength > 0.0D) {
-            event.scaleFarPlaneDistance((float) (1.0D - strength * 0.32D));
-            event.scaleNearPlaneDistance((float) (1.0D - strength * 0.12D));
-        }
+        if (strength <= 0.0D) return;
+        event.scaleFarPlaneDistance((float) (1.0D - strength * 0.32D));
+        event.scaleNearPlaneDistance((float) (1.0D - strength * 0.12D));
     }
 }
