@@ -14,6 +14,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.sounds.SoundEvent;
 import com.relaymann.theoutlands.sound.OutlandsSounds;
+import com.relaymann.theoutlands.OutlandsConfig;
 
 /**
  * The Stalker is a patient pursuit specialist. It remembers confirmed sightings,
@@ -111,7 +112,7 @@ public final class StalkerEntity extends Monster {
         }
     }
 
-    @Override protected SoundEvent getAmbientSound() { return OutlandsSounds.STALKER_BREATH.get(); }
+    @Override protected SoundEvent getAmbientSound() { return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.STALKER_BREATH.get() : null; }
     @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return OutlandsSounds.STALKER_BREATH.get(); }
     @Override protected SoundEvent getDeathSound() { return null; }
 
