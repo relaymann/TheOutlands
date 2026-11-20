@@ -18,6 +18,7 @@ public final class FootstepEchoManager {
 
     public static void tick(ServerPlayer player) {
         if (player.level().isClientSide) return;
+        if (!player.isAlive() || player.isCreative() || player.isSpectator()) { clear(player); return; }
         ServerLevel level = player.serverLevel();
         UUID id = player.getUUID();
         State state = STATES.computeIfAbsent(id, ignored -> new State());
