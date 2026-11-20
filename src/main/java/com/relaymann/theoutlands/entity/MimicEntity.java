@@ -1,5 +1,7 @@
 package com.relaymann.theoutlands.entity;
 
+import com.relaymann.theoutlands.sound.OutlandsSounds;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -13,24 +15,35 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.phys.Vec3;
-import com.relaymann.theoutlands.sound.OutlandsSounds;
 
 /**
- * The Mimic is an ambush predator. It remains statue-still while observed,
- * stalks through cover when unseen, and commits to a sudden but physical reveal.
+ * A block-mimicking ambush predator. Before revealing, the client renders the
+ * Mimic as a nearby real block state. It never replaces or destroys world blocks.
  */
 public final class MimicEntity extends Monster {
-    private static final EntityDataAccessor<Boolean> DATA_REVEALED = SynchedEntityData.defineId(MimicEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> DATA_REVEALED =
+            SynchedEntityData.defineId(MimicEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> DATA_DISGUISE_STATE =
+            SynchedEntityData.defineId(MimicEntity.class, EntityDataSerializers.INT);
+
     private boolean revealed;
+    private boolean disguiseChosen;
     private int revealCooldown;
     private int unseenTicks;
     private int retreatTicks;
     private double memoryX, memoryY, memoryZ;
     private boolean hasMemory;
 
-    public MimicEntity(EntityType<? extends Monster> type, Level level) { super(type, level); xpReward = 8; }
+    public MimicEntity(EntityType<? extends Monster> type, Level level) {
+        super(type, level);
+        xpReward = 8;
+    }
 
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 42.0D)
@@ -39,21 +52,27 @@ public final class MimicEntity extends Monster {
                 .add(Attributes.KNOCKBACK_RESISTANCE, 0.2D);
     }
 
-    @Override protected void defineSynchedData(SynchedEntityData.Builder builder) {
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(DATA_REVEALED, false);
+        builder.define(DATA_DISGUISE_STATE, Block.getId(Blocks.BARREL.defaultBlockState()));
     }
 
-    @Override protected void registerGoals() {
+    @Override
+    protected void registerGoals() {
         goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.28D, true));
         targetSelector.addGoal(1, new HurtByTargetGoal(this));
         targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 12, true, false,
                 p -> p instanceof Player player && player.isAlive() && !player.isCreative() && !player.isSpectator()));
     }
 
-    @Override public void tick() {
+    @Override
+    public void tick() {
         super.tick();
         if (level().isClientSide) return;
+
+        if (!disguiseChosen) chooseDisguiseBlock();
         if (revealCooldown > 0) revealCooldown--;
         if (retreatTicks > 0) retreatTicks--;
 
@@ -61,21 +80,23 @@ public final class MimicEntity extends Monster {
             double distance = distanceToSqr(player);
             boolean watched = player.hasLineOfSight(this);
             if (watched) {
-                memoryX = player.getX(); memoryY = player.getY(); memoryZ = player.getZ();
-                hasMemory = true; unseenTicks = 0;
+                memoryX = player.getX();
+                memoryY = player.getY();
+                memoryZ = player.getZ();
+                hasMemory = true;
+                unseenTicks = 0;
             } else {
                 unseenTicks++;
             }
 
-            // Mimic does not advance while directly observed. It only creeps
-            // closer through cover, using ordinary pathfinding and no teleport.
-            if (!revealed && !watched && unseenTicks > 12 && distance > 30.0D && distance < 625.0D
-                    && tickCount % 18 == 0) {
+            if (!revealed && !watched && unseenTicks > 12 && distance > 30.0D
+                    && distance < 625.0D && tickCount % 18 == 0) {
                 getNavigation().moveTo(player, 0.78D);
             } else if (!revealed && watched) {
                 getNavigation().stop();
             }
 
+            // The block disguise breaks only when the player gets genuinely close.
             if (!revealed && distance < 64.0D) {
                 revealed = true;
                 entityData.set(DATA_REVEALED, true);
@@ -110,17 +131,46 @@ public final class MimicEntity extends Monster {
                 getNavigation().stop();
             }
             if (hasMemory && tickCount % 40 == 0 && retreatTicks == 0) {
-                // Return to the last ambush area instead of wandering far away.
                 getNavigation().moveTo(memoryX, memoryY, memoryZ, 0.72D);
             }
         }
     }
 
-    public boolean isRevealed() { return entityData.get(DATA_REVEALED); }
+    private void chooseDisguiseBlock() {
+        disguiseChosen = true;
+        BlockPos origin = blockPosition().below();
+        BlockState selected = Blocks.BARREL.defaultBlockState();
 
-    @Override public void addAdditionalSaveData(CompoundTag tag) {
+        // Prefer an ordinary nearby world block so the disguise fits its surroundings.
+        for (int attempt = 0; attempt < 18; attempt++) {
+            BlockPos candidate = origin.offset(
+                    getRandom().nextInt(7) - 3,
+                    getRandom().nextInt(3),
+                    getRandom().nextInt(7) - 3);
+            BlockState state = level().getBlockState(candidate);
+            if (!state.isAir() && state.getFluidState().isEmpty()
+                    && state.getRenderShape() == RenderShape.MODEL) {
+                selected = state;
+                break;
+            }
+        }
+        entityData.set(DATA_DISGUISE_STATE, Block.getId(selected));
+    }
+
+    public boolean isRevealed() {
+        return entityData.get(DATA_REVEALED);
+    }
+
+    public BlockState getDisguiseBlockState() {
+        return Block.stateById(entityData.get(DATA_DISGUISE_STATE));
+    }
+
+    @Override
+    public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.putBoolean("revealed", revealed);
+        tag.putBoolean("disguise_chosen", disguiseChosen);
+        tag.putInt("disguise_state", entityData.get(DATA_DISGUISE_STATE));
         tag.putInt("reveal_cd", revealCooldown);
         tag.putInt("unseen_ticks", unseenTicks);
         tag.putInt("retreat_ticks", retreatTicks);
@@ -130,9 +180,11 @@ public final class MimicEntity extends Monster {
         tag.putBoolean("mimic_has_memory", hasMemory);
     }
 
-    @Override public void readAdditionalSaveData(CompoundTag tag) {
+    @Override
+    public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         revealed = tag.getBoolean("revealed");
+        disguiseChosen = tag.getBoolean("disguise_chosen");
         revealCooldown = tag.getInt("reveal_cd");
         unseenTicks = tag.getInt("unseen_ticks");
         retreatTicks = tag.getInt("retreat_ticks");
@@ -141,11 +193,19 @@ public final class MimicEntity extends Monster {
         memoryZ = tag.getDouble("mimic_memory_z");
         hasMemory = tag.getBoolean("mimic_has_memory");
         entityData.set(DATA_REVEALED, revealed);
+        if (tag.contains("disguise_state")) {
+            entityData.set(DATA_DISGUISE_STATE, tag.getInt("disguise_state"));
+        }
     }
 
-    @Override protected SoundEvent getAmbientSound() { return null; }
-    @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) {
+    @Override
+    protected SoundEvent getAmbientSound() { return null; }
+
+    @Override
+    protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) {
         return OutlandsSounds.MIMIC_REVEAL.get();
     }
-    @Override protected SoundEvent getDeathSound() { return null; }
+
+    @Override
+    protected SoundEvent getDeathSound() { return null; }
 }
