@@ -69,6 +69,6 @@ public final class FearClientAtmosphere {
         if (strength <= 0.0D || event.getType() != FogType.NONE) return;
         event.scaleFarPlaneDistance((float) (1.0D - strength * 0.32D));
         event.scaleNearPlaneDistance((float) (1.0D - strength * 0.12D));
-        event.setCanceled(true);
+        // Keep vanilla fog active; the scaled near/far planes provide the attenuation.
     }
 }
