@@ -43,5 +43,5 @@ public final class NullEntity extends Monster {
     }
     @Override protected net.minecraft.sounds.SoundEvent getAmbientSound() { return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.NULL_PRESENCE.get() : null; }
     @Override protected net.minecraft.sounds.SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.NULL_PRESENCE.get() : null; }
-    @Override protected net.minecraft.sounds.SoundEvent getDeathSound() { return OutlandsSounds.NULL_PRESENCE.get(); }
+    @Override protected net.minecraft.sounds.SoundEvent getDeathSound() { return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.NULL_PRESENCE.get() : null; }
 }
