@@ -7,6 +7,8 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
@@ -100,6 +102,7 @@ public final class MimicEntity extends Monster {
             if (!revealed && distance < 64.0D) {
                 revealed = true;
                 entityData.set(DATA_REVEALED, true);
+                refreshDimensions();
                 revealCooldown = 120;
                 unseenTicks = 0;
                 playSound(OutlandsSounds.MIMIC_REVEAL.get(), 1.0F,
@@ -127,6 +130,7 @@ public final class MimicEntity extends Monster {
             if (revealed && revealCooldown == 0) {
                 revealed = false;
                 entityData.set(DATA_REVEALED, false);
+                refreshDimensions();
                 unseenTicks = 0;
                 getNavigation().stop();
             }
@@ -155,6 +159,11 @@ public final class MimicEntity extends Monster {
             }
         }
         entityData.set(DATA_DISGUISE_STATE, Block.getId(selected));
+    }
+
+    @Override
+    public EntityDimensions getDimensions(Pose pose) {
+        return isRevealed() ? super.getDimensions(pose) : EntityDimensions.scalable(0.98F, 0.98F);
     }
 
     public boolean isRevealed() {
