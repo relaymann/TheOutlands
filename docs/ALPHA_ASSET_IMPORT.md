@@ -8,10 +8,10 @@ The uploaded client archive contains the classic texture atlases and environment
 
 1. Keep your own client archive outside the Git repository (for example, `client.jar.zip` in the project root).
 2. Install Pillow: `python -m pip install Pillow`.
-3. From the repository root, run:
+3. From the repository root, run the importer with both your client archive and the supplied sounds archive:
 
    ```bash
-   python tools/import_alpha_assets.py client.jar.zip
+   python tools/import_alpha_assets.py client.jar.zip --sounds-archive "InventivetalentDev minecraft-assets 1.2.5 assets-sound.zip"
    ```
 
 4. Build normally:
@@ -36,7 +36,7 @@ This archive has **zero audio files**. To reproduce Alpha footsteps, mining, ani
 
 ## Lighting and fog limitation
 
-The archive contains clouds, sun, moon, water and biome-colour images, but no standalone Alpha lightmap or executable renderer configuration. Exact Alpha lighting requires recreating the old light calculation/rendering behaviour in the modern client, not merely copying a PNG. The current fog update is a compatibility-oriented approximation; it is not claimed to be a pixel-perfect port of Alpha's renderer.
+The archive contains clouds, sun, moon, water and biome-colour images, but no standalone Alpha lightmap or executable renderer configuration. Exact Alpha lighting requires recreating the old light calculation/rendering behaviour in the modern client, not merely copying a PNG. The current fog update is a compatibility-oriented approximation; it is not claimed to be a pixel-perfect port of Alpha's renderer. No world-generation, biome placement, cave generation, structure generation, or terrain formation code is changed by this visual/audio importer.
 
 ## Modern compatibility
 
