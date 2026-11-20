@@ -130,11 +130,23 @@ def main() -> None:
         for member, modern_name in (("misc/grasscolor.png", "grass.png"),
                                     ("misc/foliagecolor.png", "foliage.png")):
             save_image(jar, member, OUT / "minecraft/textures/colormap" / modern_name)
+        for member in ("environment/rain.png", "environment/snow.png"):
+            save_image(jar, member, OUT / "minecraft/textures" / member)
+        save_image(jar, "terrain/sun.png", OUT / "minecraft/textures/environment/sun.png")
 
         for member in ITEM_ATLASES:
             dest = REF / "atlases" / Path(member).name
             if save_image(jar, member, dest):
                 copied.append(member)
+                if member == "gui/items.png":
+                    with jar.open(member) as stream, Image.open(stream) as atlas:
+                        atlas = atlas.convert("RGBA")
+                        cell_dir = REF / "item_cells"
+                        cell_dir.mkdir(parents=True, exist_ok=True)
+                        for y in range(atlas.height // 16):
+                            for x in range(atlas.width // 16):
+                                atlas.crop((x * 16, y * 16, (x + 1) * 16, (y + 1) * 16)).save(
+                                    cell_dir / f"{x:02d}_{y:02d}.png")
 
         for member in ENVIRONMENT:
             dest = REF / "environment" / Path(member).name
@@ -146,6 +158,15 @@ def main() -> None:
             dest = REF / "atlases" / dest_name
             if save_image(jar, member, dest):
                 copied.append(member)
+                if member == "particles.png":
+                    with jar.open(member) as stream, Image.open(stream) as atlas:
+                        atlas = atlas.convert("RGBA")
+                        cell_dir = REF / "particle_cells"
+                        cell_dir.mkdir(parents=True, exist_ok=True)
+                        for y in range(atlas.height // 16):
+                            for x in range(atlas.width // 16):
+                                atlas.crop((x * 16, y * 16, (x + 1) * 16, (y + 1) * 16)).save(
+                                    cell_dir / f"{x:02d}_{y:02d}.png")
 
         # Retain the original Alpha player skin separately: its 64x32 layout
         # predates modern 64x64 player skin overlays and is not silently remapped.
