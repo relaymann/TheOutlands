@@ -65,10 +65,23 @@ public final class FearClientAtmosphere {
     @SubscribeEvent
     public static void onFog(ViewportEvent.RenderFog event) {
         LocalPlayer player = Minecraft.getInstance().player;
+        if (player == null || event.getType() != FogType.NONE) return;
+
+        // Alpha's Overworld horizon used a simple, early fade instead of the
+        // much denser modern volumetric horizon. Keep the effect local to the
+        // Overworld and leave water, lava, powder snow, and Nether/End fog alone.
+        if (OutlandsConfig.ALPHA_VISUALS_ENABLED.get()
+                && player.level().dimension().equals(Level.OVERWORLD)) {
+            event.scaleFarPlaneDistance(0.86F);
+            event.scaleNearPlaneDistance(0.72F);
+        }
+
+        // Fear's territory is a separate, stronger layer over the global retro
+        // horizon. The vanilla fog event is deliberately not cancelled.
         double strength = territoryStrength(player);
-        if (strength <= 0.0D || event.getType() != FogType.NONE) return;
-        event.scaleFarPlaneDistance((float) (1.0D - strength * 0.32D));
-        event.scaleNearPlaneDistance((float) (1.0D - strength * 0.12D));
-        // Keep vanilla fog active; the scaled near/far planes provide the attenuation.
+        if (strength > 0.0D) {
+            event.scaleFarPlaneDistance((float) (1.0D - strength * 0.32D));
+            event.scaleNearPlaneDistance((float) (1.0D - strength * 0.12D));
+        }
     }
 }
