@@ -11,6 +11,8 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import java.util.HashSet;
+import java.util.Set;
 
 /** Server-authoritative ecology: factions, territory and rare emergent encounters. */
 @EventBusSubscriber(modid = TheOutlands.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
@@ -21,6 +23,7 @@ public final class OutlandsEcosystemManager {
     public static void onServerTick(ServerTickEvent.Post event) {
         if (event.getServer().getTickCount() % 20 != 0) return;
         for (ServerLevel level : event.getServer().getAllLevels()) {
+            Set<Long> processedPairs = new HashSet<>();
             for (ServerPlayer player : level.players()) {
                 if (!player.isAlive() || player.isSpectator()) continue;
                 var nearby = level.getEntitiesOfClass(Mob.class, new AABB(player.blockPosition()).inflate(64.0D),
@@ -29,7 +32,24 @@ public final class OutlandsEcosystemManager {
                     Mob first = nearby.get(i);
                     for (int j = i + 1; j < nearby.size(); j++) {
                         Mob second = nearby.get(j);
-                        if (first.distanceToSqr(second) <= 24.0D * 24.0D) interact(first, second, player);
+                        if (first.distanceToSqr(second) <= 24.0D * 24.0D) {
+                            int low = Math.min(first.getId(), second.getId());
+                            int high = Math.max(first.getId(), second.getId());
+                            long pairKey = ((long) low << 32) | (high & 0xffffffffL);
+                            if (processedPairs.add(pairKey)) {
+                                ServerPlayer witness = player;
+                                Mob defended = first instanceof AgitatedOneEntity ? first
+                                        : second instanceof AgitatedOneEntity ? second : null;
+                                if (defended != null) {
+                                    double nearest = Double.MAX_VALUE;
+                                    for (ServerPlayer candidate : level.players()) {
+                                        double distance = candidate.distanceToSqr(defended);
+                                        if (distance < nearest) { nearest = distance; witness = candidate; }
+                                    }
+                                }
+                                interact(first, second, witness);
+                            }
+                        }
                     }
                 }
             }
