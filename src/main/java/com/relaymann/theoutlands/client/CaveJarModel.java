@@ -2,6 +2,7 @@ package com.relaymann.theoutlands.client;
 import com.relaymann.theoutlands.entity.CaveJarEntity;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.util.Mth;
 /** Elongated, forward-hunched cave predator silhouette. */
 public final class CaveJarModel extends HumanoidModel<CaveJarEntity> {
  public CaveJarModel(ModelPart root){super(root);}
@@ -9,7 +10,9 @@ public final class CaveJarModel extends HumanoidModel<CaveJarEntity> {
   super.setupAnim(e,swing,amount,age,yaw,pitch);
   body.yScale=1.12F; body.xScale=0.94F; head.xScale=0.86F; head.yScale=0.92F;
   head.xRot+=0.12F; body.xRot=0.16F+(float)Math.sin(age*0.12F)*0.025F;
-  rightArm.xRot-=0.42F; leftArm.xRot-=0.42F;
+  rightArm.xRot-=0.42F+amount*0.12F; leftArm.xRot-=0.42F-amount*0.12F;
+  rightLeg.xRot+=Mth.cos(swing*.7F)*amount*.32F;
+  leftLeg.xRot-=Mth.cos(swing*.7F)*amount*.32F;
   rightArm.zRot=-0.16F; leftArm.zRot=0.16F;
   rightLeg.xRot*=0.85F; leftLeg.xRot*=0.85F;
   rightArm.yScale=1.22F; leftArm.yScale=1.22F;
