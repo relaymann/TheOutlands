@@ -14,6 +14,8 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.sounds.SoundEvent;
+import com.relaymann.theoutlands.sound.OutlandsSounds;
 
 /**
  * Cave.jar is a committed cave predator. It tracks confirmed sightings,
@@ -96,6 +98,10 @@ public final class CaveJarEntity extends Monster {
             }
         }
     }
+
+    @Override protected SoundEvent getAmbientSound() { return OutlandsSounds.CAVEJAR_STALK.get(); }
+    @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return OutlandsSounds.CAVEJAR_STALK.get(); }
+    @Override protected SoundEvent getDeathSound() { return null; }
 
     @Override public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
