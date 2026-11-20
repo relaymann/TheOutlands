@@ -31,6 +31,7 @@ public final class BurrowerEntity extends Monster {
     private boolean submerged;
     private int revealCooldown;
     private int burrowTicks;
+    private int blockedEmergenceTicks;
     private double burrowStartX, burrowStartY, burrowStartZ;
 
     public BurrowerEntity(EntityType<? extends Monster> type, Level level) {
@@ -86,6 +87,7 @@ public final class BurrowerEntity extends Monster {
         submerged = true;
         entityData.set(DATA_BURROWING, true);
         burrowTicks = 0;
+        blockedEmergenceTicks = 0;
         burrowStartX = getX();
         burrowStartY = getY();
         burrowStartZ = getZ();
@@ -134,7 +136,7 @@ public final class BurrowerEntity extends Monster {
     private BlockPos findEmergencePosition(Player player) {
         BlockPos base = player != null ? player.blockPosition()
                 : BlockPos.containing(burrowStartX, burrowStartY, burrowStartZ);
-        for (int radius = 0; radius <= 3; radius++) {
+        for (int radius = 0; radius <= 5; radius++) {
             for (int dx = -radius; dx <= radius; dx++) {
                 for (int dz = -radius; dz <= radius; dz++) {
                     if (Math.max(Math.abs(dx), Math.abs(dz)) != radius) continue;
@@ -162,9 +164,9 @@ public final class BurrowerEntity extends Monster {
             BlockPos safe = findEmergencePosition(getTarget() instanceof Player p ? p : null);
             if (safe != null) emergeAt(new Vec3(safe.getX() + 0.5D, safe.getY(), safe.getZ() + 0.5D),
                     getTarget() instanceof Player p ? p : null);
-            else {
-                // Keep phasing for a short extra interval rather than materialize inside stone.
-                burrowTicks = Math.min(burrowTicks, 240);
+            else if (++blockedEmergenceTicks >= 100) {
+                // Never materialize inside solid blocks; discard rather than remain invisible forever.
+                discard();
             }
         }
     }
@@ -179,6 +181,7 @@ public final class BurrowerEntity extends Monster {
         setInvisible(false);
         setSilent(false);
         revealCooldown = 90;
+        blockedEmergenceTicks = 0;
         if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) playSound(OutlandsSounds.BURROWER_RISE.get(), 1.1F,
                 0.82F + getRandom().nextFloat() * 0.18F);
         if (target != null && target.isAlive()) {
@@ -199,6 +202,7 @@ public final class BurrowerEntity extends Monster {
         tag.putBoolean("submerged", submerged);
         tag.putInt("reveal_cd", revealCooldown);
         tag.putInt("burrow_ticks", burrowTicks);
+        tag.putInt("blocked_emergence_ticks", blockedEmergenceTicks);
         tag.putDouble("burrow_start_x", burrowStartX);
         tag.putDouble("burrow_start_y", burrowStartY);
         tag.putDouble("burrow_start_z", burrowStartZ);
@@ -210,6 +214,7 @@ public final class BurrowerEntity extends Monster {
         submerged = tag.getBoolean("submerged");
         revealCooldown = tag.getInt("reveal_cd");
         burrowTicks = tag.getInt("burrow_ticks");
+        blockedEmergenceTicks = Math.max(0, Math.min(100, tag.getInt("blocked_emergence_ticks")));
         burrowStartX = tag.getDouble("burrow_start_x");
         burrowStartY = tag.getDouble("burrow_start_y");
         burrowStartZ = tag.getDouble("burrow_start_z");
