@@ -26,7 +26,7 @@ The importer writes to `src/generated/resources`, which is a local generated-res
 
 - Exact 16x16 crops from the legacy `terrain.png` atlas for the mapped classic blocks, installed as modern block texture overrides.
 - Every cell of the terrain atlas as a reference tile, including cells that are not yet mapped to a modern block name.
-- Compatible 64x32 classic skins for chicken, cow, creeper, ghast, pig, sheep, skeleton, slime and spider are installed at the matching modern entity texture paths. The original skin files are also retained as references.\n- Original item/UI atlases, particles, clouds, weather, sun/moon, water and biome colour maps are retained as local reference assets; the grass and foliage colour maps are applied to modern biome tint paths.
+- Compatible 64x32 classic skins for chicken, cow, creeper, ghast, pig, sheep, skeleton, slime and spider are installed at the matching modern entity texture paths. The original skin files are also retained as references.\n- Original item/UI atlases, particles, clouds, weather, sun/moon and water are retained as local reference assets. The item and particle atlases are also split into 16x16 reference cells for later sprite mapping.\n- Alpha rain/snow textures, the sun texture, and grass/foliage colour maps are applied to their compatible modern resource paths.
 
 The item and GUI images are retained as original atlases, not falsely presented as modern one-file-per-item sprites. Legacy player, zombie and pigman skins are retained as references because their modern UV/model layouts are not a safe direct replacement. More mapping work is needed for full automatic conversion of every item, particle and screen.
 
