@@ -34,7 +34,7 @@ public final class AlmightyEncounterManager {
             HorrorMemory.recordDiscovery(player, "almighty_encounter_started");
             var existingBoss = nearby.get(0);
             if (!(existingBoss.getTarget() instanceof net.minecraft.world.entity.player.Player currentTarget)
-                    || !currentTarget.isAlive()
+                    || !currentTarget.isAlive() || currentTarget.isCreative() || currentTarget.isSpectator()
                     || !AlmightyTerritory.contains(level, currentTarget.getX(), currentTarget.getZ())) {
                 existingBoss.setTarget(player);
             }
