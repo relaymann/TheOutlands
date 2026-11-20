@@ -25,8 +25,10 @@ public final class HorrorProgressionManager {
     private HorrorProgressionManager() {}
 
     public static void update(ServerPlayer player) {
-        if (player == null || !player.isAlive() || player.isSpectator() || player.isCreative()) return;
+        if (player == null) return;
         UUID id = player.getUUID();
+        if (!player.isAlive()) return;
+        if (player.isSpectator() || player.isCreative()) { remove(id); return; }
         HorrorSnapshot snapshot = DistanceProgression.createSnapshot(player);
         FearEncounterManager.evaluate(player);
         FearTerritoryManager.tick(player);
