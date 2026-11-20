@@ -1,115 +1,41 @@
 {
   "null_presence": {
-    "sounds": [
-      {
-        "name": "theoutlands:null_presence",
-        "volume": 0.18
-      }
-    ]
+    "sounds": [{"name": "theoutlands:null_presence", "volume": 0.18}]
   },
   "null_apostle_whisper": {
-    "sounds": [
-      {
-        "name": "theoutlands:null_presence",
-        "volume": 0.16,
-        "pitch": 0.62
-      }
-    ]
+    "sounds": [{"name": "theoutlands:null_presence", "volume": 0.16, "pitch": 0.62}]
   },
   "null_apostle_departure": {
-    "sounds": [
-      {
-        "name": "theoutlands:null_presence",
-        "volume": 0.2,
-        "pitch": 1.32
-      }
-    ]
+    "sounds": [{"name": "theoutlands:null_presence", "volume": 0.2, "pitch": 1.32}]
   },
   "hunter_stalk": {
-    "sounds": [
-      {
-        "name": "theoutlands:hunter_stalk",
-        "volume": 0.8
-      }
-    ]
+    "sounds": [{"name": "theoutlands:hunter_stalk", "volume": 0.8}]
   },
   "burrower_rise": {
-    "sounds": [
-      {
-        "name": "theoutlands:burrower_rise",
-        "volume": 0.9
-      }
-    ]
+    "sounds": [{"name": "theoutlands:burrower_rise", "volume": 0.9}]
   },
   "mimic_reveal": {
-    "sounds": [
-      {
-        "name": "theoutlands:mimic_reveal",
-        "volume": 0.85
-      }
-    ]
+    "sounds": [{"name": "theoutlands:mimic_reveal", "volume": 0.85}]
   },
   "stillborn_stone": {
-    "sounds": [
-      {
-        "name": "theoutlands:burrower_rise",
-        "volume": 0.75,
-        "pitch": 0.55
-      }
-    ]
+    "sounds": [{"name": "theoutlands:stillborn_stone", "volume": 0.8}]
   },
   "stillborn_strike": {
-    "sounds": [
-      {
-        "name": "theoutlands:hunter_stalk",
-        "volume": 0.9,
-        "pitch": 0.72
-      }
-    ]
+    "sounds": [{"name": "theoutlands:stillborn_strike", "volume": 0.9}]
   },
   "agitated_warning": {
-    "sounds": [
-      {
-        "name": "theoutlands:mimic_reveal",
-        "volume": 0.85,
-        "pitch": 1.3
-      }
-    ]
+    "sounds": [{"name": "theoutlands:agitated_warning", "volume": 0.85}]
   },
   "agitated_charge": {
-    "sounds": [
-      {
-        "name": "theoutlands:hunter_stalk",
-        "volume": 0.95,
-        "pitch": 0.85
-      }
-    ]
+    "sounds": [{"name": "theoutlands:agitated_charge", "volume": 0.95}]
   },
   "cavejar_stalk": {
-    "sounds": [
-      {
-        "name": "theoutlands:burrower_rise",
-        "volume": 0.62,
-        "pitch": 0.68
-      }
-    ]
+    "sounds": [{"name": "theoutlands:cavejar_stalk", "volume": 0.7}]
   },
   "stalker_breath": {
-    "sounds": [
-      {
-        "name": "theoutlands:hunter_stalk",
-        "volume": 0.22,
-        "pitch": 0.78
-      }
-    ]
+    "sounds": [{"name": "theoutlands:stalker_breath", "volume": 0.32}]
   },
   "observer_click": {
-    "sounds": [
-      {
-        "name": "theoutlands:null_presence",
-        "volume": 0.12,
-        "pitch": 1.7
-      }
-    ]
+    "sounds": [{"name": "theoutlands:observer_click", "volume": 0.2}]
   }
 }
