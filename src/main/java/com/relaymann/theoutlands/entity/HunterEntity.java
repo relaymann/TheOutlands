@@ -14,6 +14,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.sounds.SoundEvent;
 import com.relaymann.theoutlands.sound.OutlandsSounds;
+import com.relaymann.theoutlands.OutlandsConfig;
 
 /** A pursuit specialist that searches the last place it saw its prey and commits to short ambush lunges. */
 public final class HunterEntity extends Monster {
@@ -71,7 +72,7 @@ public final class HunterEntity extends Monster {
             }
         }
     }
-    @Override protected SoundEvent getAmbientSound(){return OutlandsSounds.HUNTER_STALK.get();}
+    @Override protected SoundEvent getAmbientSound(){return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.HUNTER_STALK.get() : null;}
     @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source){return OutlandsSounds.HUNTER_STALK.get();}
     @Override protected SoundEvent getDeathSound(){return OutlandsSounds.HUNTER_STALK.get();}
     @Override public void addAdditionalSaveData(CompoundTag tag){super.addAdditionalSaveData(tag);tag.putDouble("hunt_x",memoryX);tag.putDouble("hunt_y",memoryY);tag.putDouble("hunt_z",memoryZ);tag.putBoolean("has_memory",hasMemory);tag.putInt("lost_sight",lostSightTicks);tag.putInt("pounce_cd",pounceCooldown);}
