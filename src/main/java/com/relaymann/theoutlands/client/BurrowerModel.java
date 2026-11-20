@@ -25,10 +25,13 @@ public final class BurrowerModel extends EntityModel<BurrowerEntity> {
  @Override public void setupAnim(BurrowerEntity e,float swing,float amount,float age,float yaw,float pitch){
   head.yRot=yaw*Mth.DEG_TO_RAD;head.xRot=pitch*Mth.DEG_TO_RAD;
   float gait=Mth.cos(swing*.8F)*amount;
-  body.xRot=.12F+(float)Math.sin(age*.06F)*.025F;
-  leftClaw.xRot=-.25F+gait*.45F;rightClaw.xRot=-.25F-gait*.45F;
+  float concealed=e.isSubmerged()?1.0F:0.0F;
+  body.xRot=.12F+(float)Math.sin(age*.06F)*.025F+concealed*.32F;
+  body.y=-4.0F+concealed*2.0F;
+  plates.xRot=(float)Math.sin(age*.09F)*.018F+concealed*.16F;
+  leftClaw.xRot=-.25F+gait*.45F+concealed*.45F;rightClaw.xRot=-.25F-gait*.45F+concealed*.45F;
   leftRear.xRot=-gait*.4F;rightRear.xRot=gait*.4F;
-  plates.xRot=(float)Math.sin(age*.09F)*.018F;
+
  }
  @Override public void renderToBuffer(PoseStack p,com.mojang.blaze3d.vertex.VertexConsumer v,int light,int overlay,int color){root.render(p,v,light,overlay,color);}
 }
