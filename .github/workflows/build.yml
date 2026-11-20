@@ -35,6 +35,9 @@ jobs:
       - name: Generate original entity audio
         run: python3 tools/generate_entity_audio.py
 
+      - name: Generate original Alpha-inspired textures
+        run: python3 tools/generate_alpha_textures.py
+
       - name: Set up Gradle 9.2.1
         uses: gradle/actions/setup-gradle@v4
         with:
