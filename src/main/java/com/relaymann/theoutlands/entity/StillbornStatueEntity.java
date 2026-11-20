@@ -51,7 +51,7 @@ public final class StillbornStatueEntity extends Monster {
         @Override public void tick() {
             Player p = (Player)getTarget();
             getLookControl().setLookAt(p, 45.0F, 45.0F);
-            if (p.hasLineOfSight(StillbornStatueEntity.this)) {
+            if (isWatchedByAnyPlayer()) {
                 stalking = false; entityData.set(DATA_STALKING, false); stillnessTicks++; getNavigation().stop(); setDeltaMovement(0, getDeltaMovement().y, 0);
                 // It does not abandon a nearby watched target; it waits for a genuine loss of sight.
                 return;
@@ -65,6 +65,10 @@ public final class StillbornStatueEntity extends Monster {
             }
         }
         @Override public void stop() { stalking = false; entityData.set(DATA_STALKING, false); getNavigation().stop(); }
+    }
+    private boolean isWatchedByAnyPlayer() {
+        return !level().getEntitiesOfClass(Player.class, getBoundingBox().inflate(48.0D),
+                player -> player.isAlive() && !player.isSpectator() && player.hasLineOfSight(this)).isEmpty();
     }
     public boolean isStalking() { return entityData.get(DATA_STALKING); }
     public float getStiffness(float partialTick) { return stalking ? 0.0F : 1.0F; }
