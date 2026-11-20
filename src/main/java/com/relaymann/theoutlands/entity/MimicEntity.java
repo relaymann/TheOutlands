@@ -106,8 +106,8 @@ public final class MimicEntity extends Monster {
                 unseenTicks = 0;
                 if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) playSound(OutlandsSounds.MIMIC_REVEAL.get(), 1.0F,
                         0.90F + getRandom().nextFloat() * 0.16F);
-                Vec3 direction = player.position().subtract(position()).normalize();
-                if (distance > 9.0D) {
+                Vec3 direction = visibleApproach.position().subtract(position()).normalize();
+                if (distanceToSqr(visibleApproach) > 9.0D) {
                     setDeltaMovement(getDeltaMovement().add(direction.x * 0.48D, 0.16D, direction.z * 0.48D));
                     hasImpulse = true;
                 }
@@ -126,7 +126,7 @@ public final class MimicEntity extends Monster {
             }
         } else {
             setSprinting(false);
-            if (revealed && revealCooldown == 0) {
+            if (revealed && revealCooldown == 0 && !isWatchedByAnyPlayer()) {
                 revealed = false;
                 entityData.set(DATA_REVEALED, false);
                 unseenTicks = 0;
