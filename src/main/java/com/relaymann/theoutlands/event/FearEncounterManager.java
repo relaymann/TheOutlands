@@ -30,7 +30,8 @@ public final class FearEncounterManager {
     private FearEncounterManager() {}
 
     public static void evaluate(ServerPlayer player) {
-        if (!player.serverLevel().dimension().equals(Level.OVERWORLD)) return;
+        if (!player.isAlive() || player.isSpectator() || player.isCreative()
+                || !player.serverLevel().dimension().equals(Level.OVERWORLD)) return;
         double distance = DistanceProgression.horizontalDistanceFromWorldSpawn(player);
         boolean almighty = AlmightyTerritory.contains(player.serverLevel(), player.getX(), player.getZ());
         if (FearEncounterPolicy.shouldIntroduce(distance, OutlandsConfig.FEAR_FIRST_APPEARANCE_DISTANCE.get(),
@@ -46,7 +47,8 @@ public final class FearEncounterManager {
         // The first manifestation is a shared story beat for everyone who can witness it.
         List<ServerPlayer> audience = new ArrayList<>();
         for (ServerPlayer candidate : player.serverLevel().players()) {
-            if (candidate.distanceToSqr(player) <= AUDIENCE_RADIUS_SQR) audience.add(candidate);
+            if (candidate.isAlive() && !candidate.isSpectator() && !candidate.isCreative()
+                    && candidate.distanceToSqr(player) <= AUDIENCE_RADIUS_SQR) audience.add(candidate);
         }
         if (audience.stream().noneMatch(candidate -> candidate.getUUID().equals(player.getUUID()))) {
             audience.add(player);
