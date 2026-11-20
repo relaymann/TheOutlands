@@ -13,3 +13,6 @@ build/
 ### Minecraft ###
 run/
 run-*/
+
+# Locally imported legacy Minecraft assets (keep copyrighted source art out of Git)
+src/generated/resources/
