@@ -158,7 +158,11 @@ public final class BurrowerEntity extends Monster {
 
     private void emergeAtStart() {
         Vec3 position = new Vec3(burrowStartX, burrowStartY, burrowStartZ);
-        if (level().noCollision(this, getBoundingBox().move(position.subtract(position())))) {
+        BlockPos startFeet = BlockPos.containing(burrowStartX, burrowStartY, burrowStartZ);
+        BlockPos startFloor = startFeet.below();
+        boolean hasSafeFloor = level().getBlockState(startFloor).isFaceSturdy(level(), startFloor,
+                net.minecraft.core.Direction.UP);
+        if (hasSafeFloor && level().noCollision(this, getBoundingBox().move(position.subtract(position())))) {
             emergeAt(position, getTarget() instanceof Player p ? p : null);
         } else {
             BlockPos safe = findEmergencePosition(getTarget() instanceof Player p ? p : null);
