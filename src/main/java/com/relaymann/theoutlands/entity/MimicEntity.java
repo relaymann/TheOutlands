@@ -149,7 +149,8 @@ public final class MimicEntity extends Monster {
                     getRandom().nextInt(7) - 3);
             BlockState state = level().getBlockState(candidate);
             if (!state.isAir() && state.getFluidState().isEmpty()
-                    && state.getRenderShape() == RenderShape.MODEL) {
+                    && state.getRenderShape() == RenderShape.MODEL
+                    && state.isSolidRender(level(), candidate)) {
                 selected = state;
                 break;
             }
