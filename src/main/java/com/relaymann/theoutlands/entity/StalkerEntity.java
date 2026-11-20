@@ -113,7 +113,7 @@ public final class StalkerEntity extends Monster {
     }
 
     @Override protected SoundEvent getAmbientSound() { return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.STALKER_BREATH.get() : null; }
-    @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return OutlandsSounds.STALKER_BREATH.get(); }
+    @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.STALKER_BREATH.get() : null; }
     @Override protected SoundEvent getDeathSound() { return null; }
 
     @Override public void addAdditionalSaveData(CompoundTag tag) {
