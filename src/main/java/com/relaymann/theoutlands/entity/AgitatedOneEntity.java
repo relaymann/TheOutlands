@@ -85,7 +85,7 @@ public final class AgitatedOneEntity extends Monster {
     public int getAgitation() { return entityData.get(DATA_AGITATION); }
     public boolean isCharging() { return entityData.get(DATA_CHARGING); }
     @Override public void addAdditionalSaveData(CompoundTag tag) { super.addAdditionalSaveData(tag); tag.putInt("agitation", agitation); tag.putInt("charge_cd", chargeCooldown); tag.putInt("windup", attackWindup); tag.putInt("charge_ticks", chargeTicks); tag.putBoolean("charging", charging); tag.putBoolean("charge_hit", chargeHit); }
-    @Override public void readAdditionalSaveData(CompoundTag tag) { super.readAdditionalSaveData(tag); agitation=tag.getInt("agitation"); chargeCooldown=tag.getInt("charge_cd"); attackWindup=tag.getInt("windup"); chargeTicks=tag.getInt("charge_ticks"); charging=tag.getBoolean("charging"); chargeHit=tag.getBoolean("charge_hit"); }
+    @Override public void readAdditionalSaveData(CompoundTag tag) { super.readAdditionalSaveData(tag); agitation=tag.getInt("agitation"); chargeCooldown=tag.getInt("charge_cd"); attackWindup=tag.getInt("windup"); chargeTicks=tag.getInt("charge_ticks"); charging=tag.getBoolean("charging"); chargeHit=tag.getBoolean("charge_hit"); entityData.set(DATA_AGITATION, agitation); entityData.set(DATA_CHARGING, charging); }
     @Override protected SoundEvent getAmbientSound() { return null; }
     @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return OutlandsSounds.AGITATED_WARNING.get(); }
     @Override protected SoundEvent getDeathSound() { return OutlandsSounds.AGITATED_CHARGE.get(); }
