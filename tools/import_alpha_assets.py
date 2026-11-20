@@ -8,7 +8,7 @@ Requires Pillow: python -m pip install Pillow
 from __future__ import annotations
 import argparse
 import zipfile
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -168,9 +168,9 @@ def main() -> None:
                         atlas = atlas.convert("RGBA")
                         cell_dir = REF / "item_cells"
                         cell_dir.mkdir(parents=True, exist_ok=True)
-                        for y in range(atlas.height // 16):
-                            for x in range(atlas.width // 16):
-                                atlas.crop((x * 16, y * 16, (x + 1) * 16, (y + 1) * 16)).save(
+                        for y in range(atlas.height // 8):
+                            for x in range(atlas.width // 8):
+                                atlas.crop((x * 8, y * 8, (x + 1) * 8, (y + 1) * 8)).save(
                                     cell_dir / f"{x:02d}_{y:02d}.png")
 
         for member in ENVIRONMENT:
@@ -210,7 +210,11 @@ def main() -> None:
             with zipfile.ZipFile(args.sounds_archive) as sound_zip:
                 for member in sound_zip.namelist():
                     if member.lower().endswith(".ogg"):
-                        destination = sound_root / member
+                        archive_path = PurePosixPath(member)
+                        if (archive_path.is_absolute() or ".." in archive_path.parts
+                                or "\\" in member or not archive_path.parts):
+                            raise SystemExit(f"Unsafe OGG path in archive: {member!r}")
+                        destination = sound_root.joinpath(*archive_path.parts)
                         destination.parent.mkdir(parents=True, exist_ok=True)
                         destination.write_bytes(sound_zip.read(member))
                         sound_names.add(member[:-4])
