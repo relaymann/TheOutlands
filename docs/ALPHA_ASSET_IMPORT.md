@@ -6,11 +6,12 @@ The uploaded client archive contains the classic texture atlases and environment
 
 ## Local import (keep the archive private)
 
-1. Keep your own client archive outside the Git repository (for example, `client.jar.zip` in the project root).
+1. Keep the source archives outside the Git repository. The supplied `alpha_1_2_6_imported_resources.zip` is the prepared Alpha texture/resource archive; `client.jar.zip` is the original client archive; the separate `InventivetalentDev minecraft-assets 1.2.5 assets-sound.zip` is the classic sound archive.
 2. Install Pillow: `python -m pip install Pillow`.
-3. From the repository root, run the importer with both your client archive and the supplied sounds archive:
+3. From the repository root, import the prepared Alpha resource archive and then the classic sounds:
 
    ```bash
+   python tools/import_prepared_alpha_resources.py alpha_1_2_6_imported_resources.zip
    python tools/import_alpha_assets.py client.jar.zip --sounds-archive "InventivetalentDev minecraft-assets 1.2.5 assets-sound.zip"
    ```
 
@@ -20,7 +21,7 @@ The uploaded client archive contains the classic texture atlases and environment
    gradle --no-daemon clean test build
    ```
 
-The importer writes to `src/generated/resources`, which is a local generated-resource directory. Do not commit the extracted Mojang art or upload it to the public repository. The normal procedural texture generator now leaves imported block textures untouched and only fills missing fallback textures.
+Both importers write to `src/generated/resources`, which is a local generated-resource directory. Do not commit the extracted Mojang art or upload it to the public repository. The normal procedural texture generator now leaves imported block textures untouched and only fills missing fallback textures.
 
 ## What is imported
 
@@ -28,7 +29,7 @@ The importer writes to `src/generated/resources`, which is a local generated-res
 - Every cell of the terrain atlas as a reference tile, including cells that are not yet mapped to a modern block name.
 - Compatible 64x32 classic skins for chicken, cow, creeper, ghast, pig, sheep, skeleton, slime and spider are installed at the matching modern entity texture paths. The original skin files are also retained as references.\n- Original item/UI atlases, particles, clouds, weather, sun/moon and water are retained as local reference assets. The item and particle atlases are also split into 16x16 reference cells for later sprite mapping.\n- Alpha rain/snow textures, the sun texture, and grass/foliage colour maps are applied to their compatible modern resource paths.
 
-The item and GUI images are retained as original atlases, not falsely presented as modern one-file-per-item sprites. Legacy player, zombie and pigman skins are retained as references because their modern UV/model layouts are not a safe direct replacement. More mapping work is needed for full automatic conversion of every item, particle and screen.
+The prepared archive includes extracted terrain, item and particle atlas cells, plus GUI/environment reference images. Item and GUI images are retained as original atlas cells/reference assets, not falsely presented as modern one-file-per-item sprites. Legacy player, zombie and pigman skins are retained as references because their modern UV/model layouts are not a safe direct replacement. More mapping work is needed for full automatic conversion of every item, particle and screen.
 
 ## Sound limitation
 
