@@ -54,6 +54,8 @@ public final class BurrowerEntity extends Monster {
         } else if(submerged){submerged=false;setInvisible(false);setSilent(false);}
         if(submerged){setSprinting(false);setSilent(true);}
     }
+    public boolean isSubmerged() { return submerged; }
+
     @Override public void addAdditionalSaveData(CompoundTag tag){super.addAdditionalSaveData(tag);tag.putBoolean("submerged",submerged);tag.putInt("reveal_cd",revealCooldown);}
     @Override public void readAdditionalSaveData(CompoundTag tag){super.readAdditionalSaveData(tag);submerged=tag.getBoolean("submerged");revealCooldown=tag.getInt("reveal_cd");setInvisible(submerged);setSilent(submerged);}
     @Override protected SoundEvent getAmbientSound(){return null;}
