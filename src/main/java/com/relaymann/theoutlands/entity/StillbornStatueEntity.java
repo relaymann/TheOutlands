@@ -69,7 +69,7 @@ public final class StillbornStatueEntity extends Monster {
     public float getStiffness(float partialTick) { return stalking ? 0.0F : 1.0F; }
     @Override public void tick() { super.tick(); if (!level().isClientSide && getTarget() instanceof Player p && distanceToSqr(p) > 1600.0D) setTarget(null); }
     @Override public void addAdditionalSaveData(CompoundTag tag) { super.addAdditionalSaveData(tag); tag.putInt("stillness", stillnessTicks); tag.putInt("strike_cd", strikeCooldown); tag.putBoolean("stalking", stalking); }
-    @Override public void readAdditionalSaveData(CompoundTag tag) { super.readAdditionalSaveData(tag); stillnessTicks=tag.getInt("stillness"); strikeCooldown=tag.getInt("strike_cd"); stalking=tag.getBoolean("stalking"); }
+    @Override public void readAdditionalSaveData(CompoundTag tag) { super.readAdditionalSaveData(tag); stillnessTicks=tag.getInt("stillness"); strikeCooldown=tag.getInt("strike_cd"); stalking=tag.getBoolean("stalking"); entityData.set(DATA_STALKING, stalking); }
     @Override protected SoundEvent getAmbientSound() { return null; }
     @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return OutlandsSounds.STILLBORN_STONE.get(); }
     @Override protected SoundEvent getDeathSound() { return OutlandsSounds.STILLBORN_STONE.get(); }
