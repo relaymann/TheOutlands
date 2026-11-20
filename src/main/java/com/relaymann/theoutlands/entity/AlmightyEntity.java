@@ -52,20 +52,27 @@ public final class AlmightyEntity extends Monster {
                 .add(Attributes.KNOCKBACK_RESISTANCE, 1.0D);
     }
 
+    private boolean isWithinHuntTerritory(Player player) {
+        // The story boss is confined to the configured Overworld borderland.
+        // Its exceptionally rare natural End spawns still need to hunt normally.
+        return !level().dimension().equals(Level.OVERWORLD)
+                || AlmightyTerritory.contains(level(), player.getX(), player.getZ());
+    }
+
     @Override protected void registerGoals() {
         goalSelector.addGoal(1, new FloatGoal(this));
         goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.12D, true));
         goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 96.0F));
         targetSelector.addGoal(1, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false,
                 player -> player instanceof Player p && p.isAlive() && !p.isCreative() && !p.isSpectator()
-                        && AlmightyTerritory.contains(level(), p.getX(), p.getZ())));
+                        && isWithinHuntTerritory(p)));
     }
 
     @Override public void tick() {
         super.tick();
         if (level().isClientSide) return;
         if (getTarget() instanceof Player target && (!target.isAlive() || target.isCreative() || target.isSpectator()
-                || !AlmightyTerritory.contains(level(), target.getX(), target.getZ()))) {
+                || !isWithinHuntTerritory(target))) {
             setTarget(null);
             getNavigation().stop();
         }
@@ -90,7 +97,7 @@ public final class AlmightyEntity extends Monster {
         float damage = phase == 1 ? 5.0F : phase == 2 ? 7.0F : 9.0F;
         for (Player player : level().getEntitiesOfClass(Player.class, getBoundingBox().inflate(radius),
                 player -> player.isAlive() && !player.isCreative() && !player.isSpectator()
-                        && AlmightyTerritory.contains(level(), player.getX(), player.getZ())
+                        && isWithinHuntTerritory(player)
                         && distanceToSqr(player) <= radius * radius && hasLineOfSight(player))) {
             if (player.isCreative() || player.isSpectator()) continue;
             double dx = player.getX() - getX();
