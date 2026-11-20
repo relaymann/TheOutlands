@@ -29,14 +29,13 @@ BLOCK_TILES = {
     "lapis_ore": (0, 3), "diamond_ore": (2, 3), "redstone_ore": (3, 3),
     "cobweb": (4, 3), "glass": (6, 1), "ice": (2, 4), "oak_leaves": (5, 4),
     "cactus_side": (6, 4), "cactus_top": (7, 4),
-    "torch": (0, 5), "oak_door": (1, 5), "iron_door": (2, 5),
+    "torch": (0, 5),
     "oak_sapling": (15, 0), "redstone_torch": (3, 6),
     "pumpkin_side": (6, 7), "netherrack": (7, 7),
     "soul_sand": (8, 7), "glowstone": (9, 7),
     "furnace_front": (13, 2), "furnace_front_on": (13, 3),
     "furnace_side": (13, 1), "crafting_table_side": (12, 3),
-    "crafting_table_top": (12, 2), "chest": (10, 1),
-    "chest_front": (11, 1), "chest_side": (9, 1),
+    "crafting_table_top": (12, 2),
 }
 
 MOB_TARGETS = {
