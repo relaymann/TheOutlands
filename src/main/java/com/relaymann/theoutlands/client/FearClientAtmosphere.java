@@ -53,7 +53,8 @@ public final class FearClientAtmosphere {
     @SubscribeEvent
     public static void onFogColor(ViewportEvent.ComputeFogColor event) {
         LocalPlayer player = Minecraft.getInstance().player;
-        if (player == null || !OutlandsConfig.ALPHA_VISUALS_ENABLED.get()
+        if (player == null || event.getCamera().getFluidInCamera() != FogType.NONE
+                || !OutlandsConfig.ALPHA_VISUALS_ENABLED.get()
                 || !player.level().dimension().equals(Level.OVERWORLD)) return;
 
         // Alpha's distant horizon was visually tied to the sky rather than the
