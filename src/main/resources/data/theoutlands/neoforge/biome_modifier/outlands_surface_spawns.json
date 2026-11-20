@@ -2,10 +2,10 @@
   "type": "neoforge:add_spawns",
   "biomes": "#minecraft:is_overworld",
   "spawners": [
-    { "type": "theoutlands:agitated_one", "weight": 2, "minCount": 1, "maxCount": 1 },
-    { "type": "theoutlands:hunter", "weight": 3, "minCount": 1, "maxCount": 1 },
-    { "type": "theoutlands:stalker", "weight": 2, "minCount": 1, "maxCount": 1 },
-    { "type": "theoutlands:mimic", "weight": 3, "minCount": 1, "maxCount": 1 },
-    { "type": "theoutlands:observer", "weight": 2, "minCount": 1, "maxCount": 1 }
+    { "type": "theoutlands:agitated_one", "weight": 1, "minCount": 1, "maxCount": 1 },
+    { "type": "theoutlands:hunter", "weight": 2, "minCount": 1, "maxCount": 1 },
+    { "type": "theoutlands:stalker", "weight": 1, "minCount": 1, "maxCount": 1 },
+    { "type": "theoutlands:mimic", "weight": 1, "minCount": 1, "maxCount": 1 },
+    { "type": "theoutlands:observer", "weight": 1, "minCount": 1, "maxCount": 1 }
   ]
 }
