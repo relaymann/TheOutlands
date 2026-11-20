@@ -1,6 +1,7 @@
 package com.relaymann.theoutlands.event;
 
 import com.relaymann.theoutlands.TheOutlands;
+import com.relaymann.theoutlands.sound.AlphaEraSounds;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -38,6 +39,8 @@ public final class NostalgiaGameplayEvents {
         var woolItem = BuiltInRegistries.ITEM.get(woolId);
         if (woolItem == null || woolItem == net.minecraft.world.item.Items.AIR) return;
 
+        sheep.playSound(AlphaEraSounds.SHEEP_SHEAR.get(), 0.9F,
+                0.94F + level.getRandom().nextFloat() * 0.12F);
         sheep.setSheared(true);
         int count = 1 + level.getRandom().nextInt(3);
         ItemEntity drop = new ItemEntity(level, sheep.getX(), sheep.getY() + 0.55D,
