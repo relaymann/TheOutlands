@@ -11,49 +11,129 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.phys.Vec3;
 import com.relaymann.theoutlands.sound.OutlandsSounds;
 
-/** A still, human-shaped lure that only commits once a player enters its reveal radius. */
+/**
+ * The Mimic is an ambush predator. It remains statue-still while observed,
+ * stalks through cover when unseen, and commits to a sudden but physical reveal.
+ */
 public final class MimicEntity extends Monster {
     private boolean revealed;
     private int revealCooldown;
-    public MimicEntity(EntityType<? extends Monster> type,Level level){super(type,level);xpReward=8;}
-    public static AttributeSupplier.Builder createAttributes(){
-        return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH,38.0D)
-                .add(Attributes.MOVEMENT_SPEED,0.34D).add(Attributes.FOLLOW_RANGE,24.0D)
-                .add(Attributes.ATTACK_DAMAGE,6.0D).add(Attributes.ARMOR,2.0D)
-                .add(Attributes.KNOCKBACK_RESISTANCE,0.15D);
+    private int unseenTicks;
+    private int retreatTicks;
+    private double memoryX, memoryY, memoryZ;
+    private boolean hasMemory;
+
+    public MimicEntity(EntityType<? extends Monster> type, Level level) { super(type, level); xpReward = 8; }
+
+    public static AttributeSupplier.Builder createAttributes() {
+        return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 42.0D)
+                .add(Attributes.MOVEMENT_SPEED, 0.31D).add(Attributes.FOLLOW_RANGE, 32.0D)
+                .add(Attributes.ATTACK_DAMAGE, 7.0D).add(Attributes.ARMOR, 3.0D)
+                .add(Attributes.KNOCKBACK_RESISTANCE, 0.2D);
     }
-    @Override protected void registerGoals(){
-        goalSelector.addGoal(1,new MeleeAttackGoal(this,1.32D,true));
-        targetSelector.addGoal(1,new HurtByTargetGoal(this));
-        targetSelector.addGoal(2,new NearestAttackableTargetGoal<>(this,Player.class,10,true,false,
+
+    @Override protected void registerGoals() {
+        goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.28D, true));
+        targetSelector.addGoal(1, new HurtByTargetGoal(this));
+        targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 12, true, false,
                 p -> p instanceof Player player && player.isAlive() && !player.isCreative() && !player.isSpectator()));
     }
-    @Override public void tick(){
+
+    @Override public void tick() {
         super.tick();
-        if(level().isClientSide)return;
-        if(revealCooldown>0)revealCooldown--;
-        if(getTarget() instanceof Player player){
-            double d=distanceToSqr(player);
-            if(!revealed && d<64.0D){
-                revealed=true;revealCooldown=100;
-                playSound(OutlandsSounds.MIMIC_REVEAL.get(),1.0F,0.92F+getRandom().nextFloat()*0.12F);
-                // A sudden closing movement makes the reveal an actual ambush, without teleporting.
-                if (d > 9.0D) {
-                    net.minecraft.world.phys.Vec3 direction = player.position().subtract(position()).normalize();
-                    setDeltaMovement(getDeltaMovement().add(direction.x * 0.42D, 0.18D, direction.z * 0.42D));
+        if (level().isClientSide) return;
+        if (revealCooldown > 0) revealCooldown--;
+        if (retreatTicks > 0) retreatTicks--;
+
+        if (getTarget() instanceof Player player && player.isAlive()) {
+            double distance = distanceToSqr(player);
+            boolean watched = player.hasLineOfSight(this);
+            if (watched) {
+                memoryX = player.getX(); memoryY = player.getY(); memoryZ = player.getZ();
+                hasMemory = true; unseenTicks = 0;
+            } else {
+                unseenTicks++;
+            }
+
+            // Mimic does not advance while directly observed. It only creeps
+            // closer through cover, using ordinary pathfinding and no teleport.
+            if (!revealed && !watched && unseenTicks > 12 && distance > 30.0D && distance < 625.0D
+                    && tickCount % 18 == 0) {
+                getNavigation().moveTo(player, 0.78D);
+            } else if (!revealed && watched) {
+                getNavigation().stop();
+            }
+
+            if (!revealed && distance < 64.0D) {
+                revealed = true;
+                revealCooldown = 120;
+                unseenTicks = 0;
+                playSound(OutlandsSounds.MIMIC_REVEAL.get(), 1.0F,
+                        0.90F + getRandom().nextFloat() * 0.16F);
+                Vec3 direction = player.position().subtract(position()).normalize();
+                if (distance > 9.0D) {
+                    setDeltaMovement(getDeltaMovement().add(direction.x * 0.48D, 0.16D, direction.z * 0.48D));
                     hasImpulse = true;
                 }
             }
-            if(!revealed){getNavigation().stop();setSprinting(false);}
-            else setSprinting(d>12.0D);
-        }else if(revealed && revealCooldown==0){revealed=false;setSprinting(false);}
+
+            if (revealed) {
+                setSprinting(distance > 16.0D);
+                if (distance < 9.0D && retreatTicks == 0 && getHealth() < getMaxHealth() * 0.35F
+                        && getRandom().nextInt(100) == 0) {
+                    Vec3 away = position().subtract(player.position()).normalize();
+                    getNavigation().moveTo(getX() + away.x * 5.0D, getY(), getZ() + away.z * 5.0D, 1.1D);
+                    retreatTicks = 70;
+                }
+            } else {
+                setSprinting(false);
+            }
+        } else {
+            setSprinting(false);
+            if (revealed && revealCooldown == 0) {
+                revealed = false;
+                unseenTicks = 0;
+                getNavigation().stop();
+            }
+            if (hasMemory && tickCount % 40 == 0 && retreatTicks == 0) {
+                // Return to the last ambush area instead of wandering far away.
+                getNavigation().moveTo(memoryX, memoryY, memoryZ, 0.72D);
+            }
+        }
     }
-    public boolean isRevealed(){return revealed;}
-    @Override public void addAdditionalSaveData(CompoundTag tag){super.addAdditionalSaveData(tag);tag.putBoolean("revealed",revealed);tag.putInt("reveal_cd",revealCooldown);}
-    @Override public void readAdditionalSaveData(CompoundTag tag){super.readAdditionalSaveData(tag);revealed=tag.getBoolean("revealed");revealCooldown=tag.getInt("reveal_cd");}
-    @Override protected SoundEvent getAmbientSound(){return null;}
-    @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source){return OutlandsSounds.MIMIC_REVEAL.get();}
-    @Override protected SoundEvent getDeathSound(){return null;}
+
+    public boolean isRevealed() { return revealed; }
+
+    @Override public void addAdditionalSaveData(CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        tag.putBoolean("revealed", revealed);
+        tag.putInt("reveal_cd", revealCooldown);
+        tag.putInt("unseen_ticks", unseenTicks);
+        tag.putInt("retreat_ticks", retreatTicks);
+        tag.putDouble("mimic_memory_x", memoryX);
+        tag.putDouble("mimic_memory_y", memoryY);
+        tag.putDouble("mimic_memory_z", memoryZ);
+        tag.putBoolean("mimic_has_memory", hasMemory);
+    }
+
+    @Override public void readAdditionalSaveData(CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        revealed = tag.getBoolean("revealed");
+        revealCooldown = tag.getInt("reveal_cd");
+        unseenTicks = tag.getInt("unseen_ticks");
+        retreatTicks = tag.getInt("retreat_ticks");
+        memoryX = tag.getDouble("mimic_memory_x");
+        memoryY = tag.getDouble("mimic_memory_y");
+        memoryZ = tag.getDouble("mimic_memory_z");
+        hasMemory = tag.getBoolean("mimic_has_memory");
+    }
+
+    @Override protected SoundEvent getAmbientSound() { return null; }
+    @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) {
+        return OutlandsSounds.MIMIC_REVEAL.get();
+    }
+    @Override protected SoundEvent getDeathSound() { return null; }
 }
