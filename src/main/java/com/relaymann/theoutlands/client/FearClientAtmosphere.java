@@ -60,7 +60,7 @@ public final class FearClientAtmosphere {
         // modern biome-specific fog palette. Sampling the live sky colour keeps
         // sunrise, sunset, weather and night transitions coherent without
         // hard-coding one daytime blue into every scene.
-        var sky = player.level().getSkyColor(player.blockPosition(), event.getPartialTick());
+        var sky = player.level().getSkyColor(player.position(), (float) event.getPartialTick());
         float retroBlend = 0.78F;
         event.setRed(event.getRed() * (1.0F - retroBlend) + (float) sky.x * retroBlend);
         event.setGreen(event.getGreen() * (1.0F - retroBlend) + (float) sky.y * retroBlend);
