@@ -79,7 +79,7 @@ public final class MimicEntity extends Monster {
 
         if (getTarget() instanceof Player player && player.isAlive()) {
             double distance = distanceToSqr(player);
-            boolean watched = player.hasLineOfSight(this);
+            boolean watched = isWatchedByAnyPlayer();
             if (watched) {
                 memoryX = player.getX();
                 memoryY = player.getY();
@@ -98,7 +98,8 @@ public final class MimicEntity extends Monster {
             }
 
             // The block disguise breaks only when the player gets genuinely close.
-            if (!revealed && distance < 64.0D && player.hasLineOfSight(this)) {
+            Player visibleApproach = getNearestVisiblePlayer(8.0D);
+            if (!revealed && visibleApproach != null) {
                 revealed = true;
                 entityData.set(DATA_REVEALED, true);
                 revealCooldown = 120;
@@ -135,6 +136,18 @@ public final class MimicEntity extends Monster {
                 getNavigation().moveTo(memoryX, memoryY, memoryZ, 0.72D);
             }
         }
+    }
+
+    private boolean isWatchedByAnyPlayer() {
+        return !level().getEntitiesOfClass(Player.class, getBoundingBox().inflate(48.0D),
+                p -> p.isAlive() && !p.isSpectator() && p.hasLineOfSight(this)).isEmpty();
+    }
+
+    private Player getNearestVisiblePlayer(double range) {
+        double rangeSqr = range * range;
+        return level().getEntitiesOfClass(Player.class, getBoundingBox().inflate(range),
+                p -> p.isAlive() && !p.isSpectator() && distanceToSqr(p) <= rangeSqr && p.hasLineOfSight(this))
+                .stream().min(java.util.Comparator.comparingDouble(this::distanceToSqr)).orElse(null);
     }
 
     private void chooseDisguiseBlock() {
