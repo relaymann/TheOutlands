@@ -32,7 +32,12 @@ public final class AlmightyEncounterManager {
                 new AABB(player.blockPosition()).inflate(256.0D), AlmightyEntity::isAlive);
         if (!nearby.isEmpty()) {
             HorrorMemory.recordDiscovery(player, "almighty_encounter_started");
-            nearby.get(0).setTarget(player);
+            var existingBoss = nearby.get(0);
+            if (!(existingBoss.getTarget() instanceof net.minecraft.world.entity.player.Player currentTarget)
+                    || !currentTarget.isAlive()
+                    || !AlmightyTerritory.contains(level, currentTarget.getX(), currentTarget.getZ())) {
+                existingBoss.setTarget(player);
+            }
             return;
         }
         if (HorrorMemory.hasDiscovered(player, "almighty_encounter_started")) return;
