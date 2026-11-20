@@ -64,7 +64,8 @@ public final class AlmightyEntity extends Monster {
     @Override public void tick() {
         super.tick();
         if (level().isClientSide) return;
-        if (getTarget() instanceof Player target && !AlmightyTerritory.contains(level(), target.getX(), target.getZ())) {
+        if (getTarget() instanceof Player target && (!target.isAlive() || target.isCreative() || target.isSpectator()
+                || !AlmightyTerritory.contains(level(), target.getX(), target.getZ()))) {
             setTarget(null);
             getNavigation().stop();
         }
