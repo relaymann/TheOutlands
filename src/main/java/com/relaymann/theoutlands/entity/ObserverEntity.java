@@ -45,14 +45,18 @@ public final class ObserverEntity extends Monster {
         private AdvanceUnseenGoal() { setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK)); }
         @Override public boolean canUse() {
             return getTarget() instanceof Player player && player.isAlive()
-                    && distanceToSqr(player) < 900.0D && !player.hasLineOfSight(ObserverEntity.this);
+                    && distanceToSqr(player) < 900.0D && !isWatchedByAnyPlayer();
         }
         @Override public boolean canContinueToUse() { return canUse(); }
         @Override public void start() { repathDelay = 0; }
-        @Override public void tick() {
+        private boolean isWatchedByAnyPlayer() {
+        return !level().getEntitiesOfClass(Player.class, getBoundingBox().inflate(48.0D),
+                p -> p.isAlive() && !p.isSpectator() && p.hasLineOfSight(this)).isEmpty();
+    }
+    @Override public void tick() {
             Player player = (Player) getTarget();
             getLookControl().setLookAt(player, 30.0F, 30.0F);
-            if (player.hasLineOfSight(ObserverEntity.this)) { entityData.set(DATA_ADVANCING, false); getNavigation().stop(); return; }
+            if (isWatchedByAnyPlayer()) { entityData.set(DATA_ADVANCING, false); getNavigation().stop(); return; }
             entityData.set(DATA_ADVANCING, true);
             if (--repathDelay <= 0) {
                 repathDelay = 8 + getRandom().nextInt(8);
