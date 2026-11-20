@@ -40,6 +40,19 @@ BLOCK_TILES = {
     "chest_front": (11, 1), "chest_side": (9, 1),
 }
 
+MOB_TARGETS = {
+    "chicken": "entity/chicken.png",
+    "cow": "entity/cow/cow.png",
+    "creeper": "entity/creeper/creeper.png",
+    "ghast": "entity/ghast/ghast.png",
+    "pig": "entity/pig/pig.png",
+    "sheep": "entity/sheep/sheep.png",
+    "sheep_fur": "entity/sheep/sheep_fur.png",
+    "skeleton": "entity/skeleton/skeleton.png",
+    "slime": "entity/slime/slime.png",
+    "spider": "entity/spider/spider.png",
+    "spider_eyes": "entity/spider_eyes.png",
+}
 MOBS = (
     "chicken", "cow", "creeper", "ghast", "ghast_fire", "pig", "pigman",
     "pigzombie", "sheep", "sheep_fur", "skeleton", "slime", "spider",
@@ -104,6 +117,16 @@ def main() -> None:
             dest = REF / "mobs" / f"{mob}.png"
             if save_image(jar, member, dest):
                 copied.append(member)
+                if mob in MOB_TARGETS:
+                    # These classic mob skins retain the 64x32 UV layout used by
+                    # the corresponding modern entity models.
+                    modern_dest = OUT / "minecraft/textures" / MOB_TARGETS[mob]
+                    save_image(jar, member, modern_dest)
+
+        # Alpha biome tint maps share the modern 256x256 colormap dimensions.
+        for member, modern_name in (("misc/grasscolor.png", "grass.png"),
+                                    ("misc/foliagecolor.png", "foliage.png")):
+            save_image(jar, member, OUT / "minecraft/textures/colormap" / modern_name)
 
         for member in ITEM_ATLASES:
             dest = REF / "atlases" / Path(member).name
