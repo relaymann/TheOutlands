@@ -77,5 +77,5 @@ public final class StillbornStatueEntity extends Monster {
     @Override public void readAdditionalSaveData(CompoundTag tag) { super.readAdditionalSaveData(tag); stillnessTicks=tag.getInt("stillness"); strikeCooldown=tag.getInt("strike_cd"); stalking=tag.getBoolean("stalking"); entityData.set(DATA_STALKING, stalking); }
     @Override protected SoundEvent getAmbientSound() { return null; }
     @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.STILLBORN_STONE.get() : null; }
-    @Override protected SoundEvent getDeathSound() { return OutlandsSounds.STILLBORN_STONE.get(); }
+    @Override protected SoundEvent getDeathSound() { return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.STILLBORN_STONE.get() : null; }
 }
