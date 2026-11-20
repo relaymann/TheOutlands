@@ -18,13 +18,13 @@ Keep all three supplied archives outside Git. From the repository root:
 
 3. Import the original client atlas references and the 1.2.5-era sound recordings:
 
-   `python tools/import_alpha_assets.py client.jar.zip --sounds-archive "InventivetalentDev minecraft-assets 1.2.5 assets-sound.zip"`
+   `python tools/import_classic_sounds.py "InventivetalentDev minecraft-assets 1.2.5 assets-sound.zip"`
 
 4. Build:
 
    `gradle --no-daemon clean test build`
 
-Both importers write only to `src/generated/resources`, which is ignored by Git. Do not commit or publish the extracted Mojang art or sound files. The procedural block-texture generator skips files already imported, so it cannot overwrite those original crops.
+The texture importer writes only to `src/generated/resources`, which is ignored by Git. The sound importer writes OGGs there and updates the mod's tracked `sounds.json` aliases. Do not commit or publish the extracted Mojang art or sound files. The procedural block-texture generator skips files already imported, so it cannot overwrite those original crops.
 
 ## What gets applied
 
