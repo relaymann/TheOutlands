@@ -95,7 +95,8 @@ public final class CaveJarEntity extends Monster {
                 setDeltaMovement(0.0D, getDeltaMovement().y, 0.0D);
                 if (--lungeWindup == 0) {
                     entityData.set(DATA_LUNGE_WINDUP, 0);
-                    if (player.isAlive() && hasLineOfSight(player) && onGround()) {
+                    if (player.isAlive() && hasLineOfSight(player) && onGround()
+                            && distanceToSqr(player) > 9.0D && distanceToSqr(player) < 42.0D) {
                         Vec3 direction = player.position().subtract(position()).normalize();
                         setDeltaMovement(getDeltaMovement().add(direction.x * 0.88D, 0.34D, direction.z * 0.88D));
                         hasImpulse = true;
