@@ -34,6 +34,7 @@ public final class OutlandsIntelligenceManager {
     private static final Map<ResourceKey<Level>, ArrayDeque<Disturbance>> DISTURBANCES = new HashMap<>();
     private static final Map<UUID, PlayerPattern> PLAYER_PATTERNS = new HashMap<>();
     private static final Map<UUID, Long> INVESTIGATION_COOLDOWNS = new HashMap<>();
+    private static final Map<UUID, Territory> TERRITORIES = new HashMap<>();
     private static long lastCleanup;
 
     private OutlandsIntelligenceManager() {}
@@ -68,6 +69,7 @@ public final class OutlandsIntelligenceManager {
                         mob -> mob.isAlive() && isOutlandsCreature(mob));
                 for (Mob mob : nearby) {
                     if (processed.add(mob.getUUID())) {
+                        maintainTerritory(level, mob);
                         investigateDisturbances(level, mob);
                         adaptPursuit(mob);
                     }
@@ -151,6 +153,34 @@ public final class OutlandsIntelligenceManager {
         INVESTIGATION_COOLDOWNS.put(mob.getUUID(), now + 100L + (long)(temperament.patience() * 180.0D));
     }
 
+    private static void maintainTerritory(ServerLevel level, Mob mob) {
+        int radius = territoryRadius(mob);
+        if (radius == 0) return;
+        Territory territory = TERRITORIES.computeIfAbsent(mob.getUUID(),
+                ignored -> new Territory(mob.blockPosition().immutable(), radius));
+        if (mob.getTarget() != null) return;
+
+        // Home ranges are virtual ecological territories: they guide patrol and
+        // return behavior but never place, remove, or disguise world blocks.
+        double distance = mob.distanceToSqr(Vec3.atCenterOf(territory.center()));
+        long now = level.getGameTime();
+        if (distance > (double) territory.radius() * territory.radius() * 2.25D
+                && now >= territory.nextReturn() && mob.getNavigation().isDone()) {
+            BlockPos home = territory.center();
+            mob.getNavigation().moveTo(home.getX() + 0.5D, home.getY(), home.getZ() + 0.5D,
+                    0.72D + temperament(mob).patience() * 0.22D);
+            TERRITORIES.put(mob.getUUID(), new Territory(home, territory.radius(), now + 100L));
+        }
+    }
+
+    private static int territoryRadius(Mob mob) {
+        if (mob instanceof StillbornStatueEntity) return 14;
+        if (mob instanceof AgitatedOneEntity) return 24;
+        if (mob instanceof CaveJarEntity) return 34;
+        if (mob instanceof BurrowerEntity) return 28;
+        return 0;
+    }
+
     private static boolean canInvestigate(Mob mob) {
         // The major supernatural presences retain their own encounter logic.
         // This shared system is for independent creatures and ordinary apostles.
@@ -217,9 +247,22 @@ public final class OutlandsIntelligenceManager {
         for (ServerLevel level : levels) for (ServerPlayer player : level.players()) online.add(player.getUUID());
         PLAYER_PATTERNS.keySet().removeIf(id -> !online.contains(id));
         INVESTIGATION_COOLDOWNS.entrySet().removeIf(entry -> entry.getValue() < 0L);
+        if (TERRITORIES.size() > 4096) {
+            Set<UUID> activeMobs = new HashSet<>();
+            for (ServerLevel level : levels) {
+                for (ServerPlayer player : level.players()) {
+                    level.getEntitiesOfClass(Mob.class, new AABB(player.blockPosition()).inflate(96.0D),
+                            OutlandsIntelligenceManager::isOutlandsCreature).forEach(mob -> activeMobs.add(mob.getUUID()));
+                }
+            }
+            TERRITORIES.keySet().removeIf(id -> !activeMobs.contains(id));
+        }
     }
 
     private record Disturbance(BlockPos pos, UUID source, long gameTime, String kind) {}
+    private record Territory(BlockPos center, int radius, long nextReturn) {
+        private Territory(BlockPos center, int radius) { this(center, radius, 0L); }
+    }
     private record Temperament(float curiosity, float patience, float boldness) {}
 
     private static final class PlayerPattern {
