@@ -69,7 +69,6 @@ PALETTES = {
     "pumpkin_top": ((194, 112, 35), 18, "noise"),
     "melon_side": ((111, 150, 57), 18, "leaves"),
     "melon_top": ((111, 150, 57), 18, "noise"),
-    "netherrack": ((117, 55, 50), 24, "noise"),
     "soul_sand": ((84, 63, 48), 17, "noise"),
     "glowstone": ((190, 151, 75), 20, "noise"),
     "end_stone": ((215, 211, 151), 16, "noise"),
@@ -91,7 +90,7 @@ def png(path, pixels):
     def chunk(kind, data):
         return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data) & 0xffffffff)
     data = (b"\x89PNG\r\n\x1a\n" +
-            chunk(b"IHDR", struct.pack(">2I5B", 16, 16, 8, 2, 0, 0, 0)) +
+            chunk(b"IHDR", struct.pack(">2I5B", 16, 16, 8, 6, 0, 0, 0)) +
             chunk(b"IDAT", zlib.compress(raw, 9)) + chunk(b"IEND", b""))
     path.write_bytes(data)
 
@@ -136,10 +135,17 @@ def make(name, base, spread, pattern):
                     color = ore
                 elif rng.random() < .08:
                     color = tuple(clamp(c - 35) for c in base)
-            row.append(color)
+            alpha = 255
+            if pattern == "glass":
+                # Classic glass is mostly transparent, with pale blue edges and glints.
+                alpha = 0 if 2 <= x <= 13 and 2 <= y <= 13 and x != y and x != y + 1 else 190
+            elif pattern == "leaves" and rng.random() < 0.12:
+                # Preserve the cutout silhouette expected by modern leaf render types.
+                alpha = 0
+            row.append((*color, alpha))
         pixels.append(row)
     return pixels
 
 for name, (base, spread, pattern) in PALETTES.items():
     png(OUT / f"{name}.png", make(name, base, spread, pattern))
-print(f"Generated {len(PALETTES)} original 16x16 Alpha-inspired block textures.")
+print(f"Generated {len(PALETTES)} original 16x16 Alpha-inspired block textures with cutout transparency.")
