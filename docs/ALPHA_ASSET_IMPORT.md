@@ -1,4 +1,6 @@
-# Importing the legacy Alpha client assets
+# Importing the Minecraft Alpha 1.2.6 client assets
+
+The supplied archive was verified as **Minecraft Alpha v1.2.6** from its embedded client version string.
 
 The uploaded client archive contains the classic texture atlases and environment images, but **does not contain any original sound recordings**. Inspection found no OGG, WAV, MP3, AU, or MIDI assets in the archive. The sound-engine Java classes are not sound recordings.
 
