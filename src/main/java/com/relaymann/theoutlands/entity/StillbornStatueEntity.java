@@ -15,6 +15,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.sounds.SoundEvent;
 import com.relaymann.theoutlands.sound.OutlandsSounds;
+import com.relaymann.theoutlands.OutlandsConfig;
 import java.util.EnumSet;
 
 /** A stone sentinel that advances only while its chosen prey cannot see it. */
@@ -58,9 +59,9 @@ public final class StillbornStatueEntity extends Monster {
             stillnessTicks = 0; stalking = true; entityData.set(DATA_STALKING, true);
             if (--repath <= 0) { repath = 6 + getRandom().nextInt(7); getNavigation().moveTo(p, 1.22D); }
             if (strikeCooldown > 0) strikeCooldown--;
-            if (distanceToSqr(p) < 3.4D && strikeCooldown == 0) {
+            if (distanceToSqr(p) < 3.4D && hasLineOfSight(p) && strikeCooldown == 0) {
                 doHurtTarget(p); strikeCooldown = 28;
-                playSound(OutlandsSounds.STILLBORN_STRIKE.get(), 0.9F, 0.8F + getRandom().nextFloat() * 0.15F);
+                if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) playSound(OutlandsSounds.STILLBORN_STRIKE.get(), 0.9F, 0.8F + getRandom().nextFloat() * 0.15F);
             }
         }
         @Override public void stop() { stalking = false; entityData.set(DATA_STALKING, false); getNavigation().stop(); }
@@ -71,6 +72,6 @@ public final class StillbornStatueEntity extends Monster {
     @Override public void addAdditionalSaveData(CompoundTag tag) { super.addAdditionalSaveData(tag); tag.putInt("stillness", stillnessTicks); tag.putInt("strike_cd", strikeCooldown); tag.putBoolean("stalking", stalking); }
     @Override public void readAdditionalSaveData(CompoundTag tag) { super.readAdditionalSaveData(tag); stillnessTicks=tag.getInt("stillness"); strikeCooldown=tag.getInt("strike_cd"); stalking=tag.getBoolean("stalking"); entityData.set(DATA_STALKING, stalking); }
     @Override protected SoundEvent getAmbientSound() { return null; }
-    @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return OutlandsSounds.STILLBORN_STONE.get(); }
+    @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.STILLBORN_STONE.get() : null; }
     @Override protected SoundEvent getDeathSound() { return OutlandsSounds.STILLBORN_STONE.get(); }
 }
