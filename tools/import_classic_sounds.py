@@ -31,6 +31,7 @@ GROUPS = {
     "alpha_rain": "ambient/weather/rain", "alpha_thunder": "ambient/weather/thunder",
     "alpha_chicken": "mob/chicken/say", "alpha_cow": "mob/cow/say",
     "alpha_pig": "mob/pig/say", "alpha_sheep": "mob/sheep/say",
+    "alpha_sheep_shear": "mob/sheep/shear",
     "alpha_wolf": "mob/wolf/bark", "alpha_zombie": "mob/zombie/say",
     "alpha_skeleton": "mob/skeleton/say", "alpha_spider": "mob/spider/say",
     "alpha_creeper": "mob/creeper/say", "alpha_ghast": "mob/ghast/moan",
@@ -39,6 +40,7 @@ GROUPS = {
 SINGLE = {
     "alpha_door_open", "alpha_door_close", "alpha_player_hurt",
     "alpha_fall_small", "alpha_fall_big", "alpha_water", "alpha_lava",
+    "alpha_sheep_shear",
 }
 
 def main() -> None:
