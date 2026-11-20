@@ -1,44 +1,47 @@
-# Importing the Minecraft Alpha 1.2.6 client assets
+# Importing the Minecraft Alpha 1.2.6 assets
 
-The supplied archive was verified as **Minecraft Alpha v1.2.6** from its embedded client version string.
+The supplied `client.jar.zip` was verified as Minecraft Alpha v1.2.6. The prepared `alpha_1_2_6_imported_resources.zip` contains 672 PNG resources derived from that client, including mapped modern block/entity texture paths and reference cells for the legacy atlases.
 
-The uploaded client archive contains the classic texture atlases and environment images, but **does not contain any original sound recordings**. Inspection found no OGG, WAV, MP3, AU, or MIDI assets in the archive. The sound-engine Java classes are not sound recordings.
+The separate `InventivetalentDev minecraft-assets 1.2.5 assets-sound.zip` contains 491 OGG files. Its own label identifies it as a Minecraft 1.2.5-era sound archive, **not** Alpha 1.2.6 audio. It is used as a classic-era sound fallback, not misrepresented as verified Alpha audio. The Alpha client archive itself contains no sound recordings.
 
-## Local import (keep the archive private)
+## Import locally
 
-1. Keep the source archives outside the Git repository. The supplied `alpha_1_2_6_imported_resources.zip` is the prepared Alpha texture/resource archive; `client.jar.zip` is the original client archive; the separate `InventivetalentDev minecraft-assets 1.2.5 assets-sound.zip` is the classic sound archive.
-2. Install Pillow: `python -m pip install Pillow`.
-3. From the repository root, import the prepared Alpha resource archive and then the classic sounds:
+Keep all three supplied archives outside Git. From the repository root:
 
-   ```bash
-   python tools/import_prepared_alpha_resources.py alpha_1_2_6_imported_resources.zip
-   python tools/import_alpha_assets.py client.jar.zip --sounds-archive "InventivetalentDev minecraft-assets 1.2.5 assets-sound.zip"
-   ```
+1. Install Pillow:
 
-4. Build normally:
+   `python -m pip install Pillow`
 
-   ```bash
-   gradle --no-daemon clean test build
-   ```
+2. Import the prepared Alpha textures and atlas references:
 
-Both importers write to `src/generated/resources`, which is a local generated-resource directory. Do not commit the extracted Mojang art or upload it to the public repository. The normal procedural texture generator now leaves imported block textures untouched and only fills missing fallback textures.
+   `python tools/import_prepared_alpha_resources.py alpha_1_2_6_imported_resources.zip`
 
-## What is imported
+3. Import the original client atlas references and the 1.2.5-era sound recordings:
 
-- Exact 16x16 crops from the legacy `terrain.png` atlas for the mapped classic blocks, installed as modern block texture overrides.
-- Every cell of the terrain atlas as a reference tile, including cells that are not yet mapped to a modern block name.
-- Compatible 64x32 classic skins for chicken, cow, creeper, ghast, pig, sheep, skeleton, slime and spider are installed at the matching modern entity texture paths. The original skin files are also retained as references.\n- Original item/UI atlases, particles, clouds, weather, sun/moon and water are retained as local reference assets. The item and particle atlases are also split into 16x16 reference cells for later sprite mapping.\n- Alpha rain/snow textures, the sun texture, and grass/foliage colour maps are applied to their compatible modern resource paths.
+   `python tools/import_alpha_assets.py client.jar.zip --sounds-archive "InventivetalentDev minecraft-assets 1.2.5 assets-sound.zip"`
 
-The prepared archive includes extracted terrain, item and particle atlas cells, plus GUI/environment reference images. Item and GUI images are retained as original atlas cells/reference assets, not falsely presented as modern one-file-per-item sprites. Legacy player, zombie and pigman skins are retained as references because their modern UV/model layouts are not a safe direct replacement. More mapping work is needed for full automatic conversion of every item, particle and screen.
+4. Build:
 
-## Sound limitation
+   `gradle --no-daemon clean test build`
 
-This archive has **zero audio files**. To reproduce Alpha footsteps, mining, animal calls, doors, damage, water and ambient sounds, provide the corresponding original sound files separately (or another client archive that actually contains them). The current modern vanilla sounds and The Outlands' generated creature sounds are not Alpha recordings.
+Both importers write only to `src/generated/resources`, which is ignored by Git. Do not commit or publish the extracted Mojang art or sound files. The procedural block-texture generator skips files already imported, so it cannot overwrite those original crops.
 
-## Lighting and fog limitation
+## What gets applied
 
-The archive contains clouds, sun, moon, water and biome-colour images, but no standalone Alpha lightmap or executable renderer configuration. Exact Alpha lighting requires recreating the old light calculation/rendering behaviour in the modern client, not merely copying a PNG. The current fog update is a compatibility-oriented approximation; it is not claimed to be a pixel-perfect port of Alpha's renderer. No world-generation, biome placement, cave generation, structure generation, or terrain formation code is changed by this visual/audio importer.
+- 40 mapped classic block textures from the 16×16 cells of Alpha's `terrain.png` atlas.
+- Classic 64×32 skins for chicken, cow, creeper, ghast, pig, sheep, skeleton, slime and spider at their corresponding modern entity texture paths.
+- Alpha rain/snow and sun images, plus grass and foliage colour maps, at compatible modern resource paths.
+- 491 local OGG recordings copied under The Outlands' generated sound resources. The importer updates The Outlands' existing `sounds.json` definitions; it does not replace Minecraft's entire `minecraft:sounds.json`.
+- Runtime sound-event redirection for selected footsteps, block hit/break, wooden/iron doors, player hurt/fall, water, swimming, lava, cave ambience, rain/thunder, and classic mob/animal calls. This can be switched with `alphaSoundsEnabled` in the common config.
 
-## Modern compatibility
+## What is retained for conversion, not blindly substituted
 
-The importer targets Minecraft 1.21.1 resource paths while retaining original source images. Some historical models, atlases, UV layouts and gameplay systems changed substantially after Alpha. Those need explicit conversion or client-side compatibility code; they are not safely interchangeable by renaming files.
+The archive preserves every terrain atlas tile and item/particle atlas cell as reference images, along with GUI, environmental and other legacy textures. These are not automatically installed as modern one-file-per-item sprites or modern GUI screens: their atlas coordinates, layouts and rendering contracts differ. Player, zombie and pigman skins are likewise retained as references where modern UV/model layouts do not safely match.
+
+## Terrain generation and renderer compatibility
+
+**World generation is not changed.** No biome placement, terrain formation, cave generation, structure placement, height distribution or world-generation algorithm is replaced. Imported block textures change only how existing blocks are drawn.
+
+The Alpha client archive has no standalone lightmap or renderer configuration. Alpha-like lighting therefore still requires a carefully implemented modern rendering adaptation; copying textures cannot recreate the old lighting algorithm. The current fog behaviour is an approximation, not a claim of pixel-perfect renderer parity.
+
+Newer 1.21.1 content that did not exist in Alpha retains its modern models and gameplay. The procedural texture palette gives selected newer blocks a restrained Alpha-inspired appearance; a full earliest-release texture audit still needs version-specific source assets and explicit sprite mappings.
