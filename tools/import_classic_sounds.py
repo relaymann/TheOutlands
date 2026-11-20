@@ -9,7 +9,7 @@ from __future__ import annotations
 import argparse
 import json
 import zipfile
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "src/generated/resources/assets/theoutlands/sounds/legacy"
@@ -43,6 +43,13 @@ SINGLE = {
     "alpha_sheep_shear",
 }
 
+def safe_ogg_member(member: str) -> bool:
+    path = PurePosixPath(member)
+    return (not path.is_absolute() and ".." not in path.parts
+            and "\\" not in member and member.lower().endswith(".ogg")
+            and bool(path.parts))
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("sounds_archive", type=Path, help="The supplied classic-era sounds ZIP")
@@ -56,7 +63,9 @@ def main() -> None:
         for member in archive.namelist():
             if not member.lower().endswith(".ogg"):
                 continue
-            destination = OUT / member
+            if not safe_ogg_member(member):
+                raise SystemExit(f"Unsafe OGG path in archive: {member!r}")
+            destination = OUT.joinpath(*PurePosixPath(member).parts)
             destination.parent.mkdir(parents=True, exist_ok=True)
             destination.write_bytes(archive.read(member))
             sound_names.add(member[:-4])
