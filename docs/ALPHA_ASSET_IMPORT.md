@@ -16,7 +16,13 @@ Keep all three supplied archives outside Git. From the repository root:
 
    `python tools/import_prepared_alpha_resources.py alpha_1_2_6_imported_resources.zip`
 
-3. Split all four original Alpha atlases into individually addressable RGBA cell textures and write a coordinate/hash manifest:\n\n   `python tools/extract_alpha_atlas_cells.py client.jar.zip`\n\n   This extracts 256 terrain cells (16×16), 256 item cells (16×16), 256 particle cells (8×8), and 256 GUI cells (16×16). Cells keep their original pixel values. Their names are coordinate-based until a verified semantic mapping is assigned; no block/item is guessed from appearance.\n\n4. Import the 1.2.5-era sound recordings:
+3. Split all four original Alpha atlases into individually addressable RGBA cell textures and write a coordinate/hash manifest:
+
+   `python tools/extract_alpha_atlas_cells.py client.jar.zip`
+
+   This extracts 256 terrain cells (16×16), 256 item cells (16×16), 256 particle cells (8×8), and 256 GUI cells (16×16). Cells keep their original pixel values. Their names are coordinate-based until a verified semantic mapping is assigned; no block/item is guessed from appearance.
+
+4. Import the 1.2.5-era sound recordings:
 
    `python tools/import_classic_sounds.py "InventivetalentDev minecraft-assets 1.2.5 assets-sound.zip"`
 
