@@ -24,6 +24,7 @@ public final class AgitatedOneEntity extends Monster {
     private int agitation;
     private int chargeCooldown;
     private int attackWindup;
+    private int chargeTicks;
     private boolean charging;
     private boolean chargeHit;
     public AgitatedOneEntity(EntityType<? extends Monster> type, Level level) { super(type, level); xpReward = 9; }
@@ -63,24 +64,28 @@ public final class AgitatedOneEntity extends Monster {
             if (attackWindup > 0 && --attackWindup == 0) {
                 net.minecraft.world.phys.Vec3 dir = p.position().add(p.getDeltaMovement().scale(5.0D)).subtract(position()).normalize();
                 setDeltaMovement(getDeltaMovement().add(dir.x * 0.92D, 0.32D, dir.z * 0.92D));
-                hasImpulse = true; charging = true; chargeCooldown = 100; agitation = Math.max(20, agitation - 25);
+                hasImpulse = true; charging = true; chargeTicks = 14; chargeCooldown = 100; agitation = Math.max(20, agitation - 25);
                 playSound(OutlandsSounds.AGITATED_CHARGE.get(), 1.0F, 0.9F + getRandom().nextFloat() * 0.1F);
             }
-            if (charging && !chargeHit && d < 4.0D) { doHurtTarget(p); chargeHit = true; charging = false; }
-            if (charging && onGround() && chargeCooldown < 78) charging = false;
+            if (charging) {
+                // Keep the melee goal from replacing the charge's launch velocity.
+                getNavigation().stop();
+                if (!chargeHit && d < 4.0D) { doHurtTarget(p); chargeHit = true; }
+                if (--chargeTicks <= 0) charging = false;
+            }
             entityData.set(DATA_AGITATION, agitation);
             entityData.set(DATA_CHARGING, charging);
             setSprinting(agitation > 45 || charging);
         } else {
-            agitation = Math.max(0, agitation - 1); charging = false; attackWindup = 0;
+            agitation = Math.max(0, agitation - 1); charging = false; chargeTicks = 0; attackWindup = 0;
             entityData.set(DATA_AGITATION, agitation);
             entityData.set(DATA_CHARGING, false);
         }
     }
     public int getAgitation() { return entityData.get(DATA_AGITATION); }
     public boolean isCharging() { return entityData.get(DATA_CHARGING); }
-    @Override public void addAdditionalSaveData(CompoundTag tag) { super.addAdditionalSaveData(tag); tag.putInt("agitation", agitation); tag.putInt("charge_cd", chargeCooldown); tag.putInt("windup", attackWindup); tag.putBoolean("charging", charging); tag.putBoolean("charge_hit", chargeHit); }
-    @Override public void readAdditionalSaveData(CompoundTag tag) { super.readAdditionalSaveData(tag); agitation=tag.getInt("agitation"); chargeCooldown=tag.getInt("charge_cd"); attackWindup=tag.getInt("windup"); charging=tag.getBoolean("charging"); chargeHit=tag.getBoolean("charge_hit"); }
+    @Override public void addAdditionalSaveData(CompoundTag tag) { super.addAdditionalSaveData(tag); tag.putInt("agitation", agitation); tag.putInt("charge_cd", chargeCooldown); tag.putInt("windup", attackWindup); tag.putInt("charge_ticks", chargeTicks); tag.putBoolean("charging", charging); tag.putBoolean("charge_hit", chargeHit); }
+    @Override public void readAdditionalSaveData(CompoundTag tag) { super.readAdditionalSaveData(tag); agitation=tag.getInt("agitation"); chargeCooldown=tag.getInt("charge_cd"); attackWindup=tag.getInt("windup"); chargeTicks=tag.getInt("charge_ticks"); charging=tag.getBoolean("charging"); chargeHit=tag.getBoolean("charge_hit"); }
     @Override protected SoundEvent getAmbientSound() { return null; }
     @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return OutlandsSounds.AGITATED_WARNING.get(); }
     @Override protected SoundEvent getDeathSound() { return OutlandsSounds.AGITATED_CHARGE.get(); }
