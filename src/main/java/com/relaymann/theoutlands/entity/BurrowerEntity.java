@@ -92,6 +92,7 @@ public final class BurrowerEntity extends Monster {
         burrowStartZ = getZ();
         getNavigation().stop();
         setSprinting(false);
+        refreshDimensions();
         setInvisible(true);
         setSilent(true);
         noPhysics = true;
@@ -129,7 +130,8 @@ public final class BurrowerEntity extends Monster {
     }
 
     private BlockPos findEmergencePosition(Player player) {
-        BlockPos base = player.blockPosition();
+        BlockPos base = player != null ? player.blockPosition()
+                : BlockPos.containing(burrowStartX, burrowStartY, burrowStartZ);
         for (int radius = 0; radius <= 3; radius++) {
             for (int dx = -radius; dx <= radius; dx++) {
                 for (int dz = -radius; dz <= radius; dz++) {
@@ -151,7 +153,6 @@ public final class BurrowerEntity extends Monster {
     }
 
     private void emergeAtStart() {
-        BlockPos start = BlockPos.containing(burrowStartX, burrowStartY, burrowStartZ);
         Vec3 position = new Vec3(burrowStartX, burrowStartY, burrowStartZ);
         if (level().noCollision(this, getBoundingBox().move(position.subtract(position())))) {
             emergeAt(position, getTarget() instanceof Player p ? p : null);
@@ -172,6 +173,7 @@ public final class BurrowerEntity extends Monster {
         setNoGravity(false);
         submerged = false;
         entityData.set(DATA_BURROWING, false);
+        refreshDimensions();
         setInvisible(false);
         setSilent(false);
         revealCooldown = 90;
