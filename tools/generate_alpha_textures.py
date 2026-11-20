@@ -35,6 +35,45 @@ PALETTES = {
     "lapis_ore": ((112, 112, 112), 17, "lapis"),
     "netherrack": ((117, 55, 50), 24, "noise"),
     "obsidian": ((31, 25, 54), 18, "noise"),
+    "stone_bricks": ((116, 116, 116), 17, "cracks"),
+    "mossy_cobblestone": ((91, 105, 73), 27, "cracks"),
+    "mossy_stone_bricks": ((100, 111, 83), 22, "cracks"),
+    "bricks": ((150, 75, 57), 18, "brick"),
+    "sandstone_top": ((218, 202, 145), 12, "noise"),
+    "sandstone": ((203, 185, 126), 15, "brick"),
+    "sandstone_bottom": ((190, 172, 119), 12, "noise"),
+    "glass": ((188, 218, 222), 8, "glass"),
+    "glass_pane_top": ((188, 218, 222), 8, "glass"),
+    "oak_door": ((142, 101, 57), 18, "wood"),
+    "oak_trapdoor": ((142, 101, 57), 18, "wood"),
+    "bookshelf": ((151, 111, 66), 18, "wood"),
+    "crafting_table_top": ((151, 111, 66), 18, "wood"),
+    "furnace_front": ((105, 105, 105), 16, "cracks"),
+    "furnace_side": ((105, 105, 105), 16, "noise"),
+    "coal_block": ((37, 37, 37), 15, "noise"),
+    "iron_block": ((190, 190, 190), 12, "noise"),
+    "gold_block": ((229, 190, 48), 13, "noise"),
+    "diamond_block": ((78, 205, 190), 13, "noise"),
+    "emerald_block": ((49, 174, 91), 13, "noise"),
+    "lapis_block": ((39, 67, 148), 13, "noise"),
+    "redstone_block": ((157, 35, 29), 13, "noise"),
+    "snow": ((235, 241, 245), 8, "noise"),
+    "snow_block": ((231, 238, 242), 7, "noise"),
+    "ice": ((154, 190, 210), 13, "glass"),
+    "packed_ice": ((128, 166, 193), 12, "glass"),
+    "clay": ((151, 158, 165), 13, "noise"),
+    "terracotta": ((152, 91, 66), 14, "noise"),
+    "cactus_side": ((57, 117, 49), 17, "leaves"),
+    "cactus_top": ((57, 117, 49), 17, "noise"),
+    "pumpkin_side": ((194, 112, 35), 18, "wood"),
+    "pumpkin_top": ((194, 112, 35), 18, "noise"),
+    "melon_side": ((111, 150, 57), 18, "leaves"),
+    "melon_top": ((111, 150, 57), 18, "noise"),
+    "netherrack": ((117, 55, 50), 24, "noise"),
+    "soul_sand": ((84, 63, 48), 17, "noise"),
+    "glowstone": ((190, 151, 75), 20, "noise"),
+    "end_stone": ((215, 211, 151), 16, "noise"),
+    "prismarine": ((70, 133, 122), 17, "cracks"),
 }
 
 ORE = {
@@ -84,6 +123,14 @@ def make(name, base, spread, pattern):
             elif pattern == "cracks":
                 if (x + y * 3) % 11 == 0:
                     color = (65, 65, 65)
+            elif pattern == "brick":
+                if y in (3, 8, 13) or (y // 5) % 2 == 0 and x in (0, 8) or (y // 5) % 2 == 1 and x in (4, 12):
+                    color = tuple(clamp(c - 38) for c in base)
+            elif pattern == "glass":
+                if x == y or x == y + 1 or (x + y) % 13 == 0:
+                    color = (220, 235, 238)
+                else:
+                    color = tuple(clamp(c - 12) for c in base)
             elif pattern in ORE:
                 if rng.random() < .19:
                     color = ore
