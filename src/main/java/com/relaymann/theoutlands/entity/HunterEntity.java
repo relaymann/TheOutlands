@@ -73,8 +73,8 @@ public final class HunterEntity extends Monster {
         }
     }
     @Override protected SoundEvent getAmbientSound(){return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.HUNTER_STALK.get() : null;}
-    @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source){return OutlandsSounds.HUNTER_STALK.get();}
-    @Override protected SoundEvent getDeathSound(){return OutlandsSounds.HUNTER_STALK.get();}
+    @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source){return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.HUNTER_STALK.get() : null;}
+    @Override protected SoundEvent getDeathSound(){return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.HUNTER_STALK.get() : null;}
     @Override public void addAdditionalSaveData(CompoundTag tag){super.addAdditionalSaveData(tag);tag.putDouble("hunt_x",memoryX);tag.putDouble("hunt_y",memoryY);tag.putDouble("hunt_z",memoryZ);tag.putBoolean("has_memory",hasMemory);tag.putInt("lost_sight",lostSightTicks);tag.putInt("pounce_cd",pounceCooldown);}
     @Override public void readAdditionalSaveData(CompoundTag tag){super.readAdditionalSaveData(tag);memoryX=tag.getDouble("hunt_x");memoryY=tag.getDouble("hunt_y");memoryZ=tag.getDouble("hunt_z");hasMemory=tag.getBoolean("has_memory");lostSightTicks=tag.getInt("lost_sight");pounceCooldown=tag.getInt("pounce_cd");}
 }
