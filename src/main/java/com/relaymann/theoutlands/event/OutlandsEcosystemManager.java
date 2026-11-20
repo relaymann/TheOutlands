@@ -43,6 +43,7 @@ public final class OutlandsEcosystemManager {
                                 if (defended != null) {
                                     double nearest = Double.MAX_VALUE;
                                     for (ServerPlayer candidate : level.players()) {
+                                        if (!candidate.isAlive() || candidate.isSpectator() || candidate.isCreative()) continue;
                                         double distance = candidate.distanceToSqr(defended);
                                         if (distance < nearest) { nearest = distance; witness = candidate; }
                                     }
