@@ -49,11 +49,7 @@ public final class ObserverEntity extends Monster {
         }
         @Override public boolean canContinueToUse() { return canUse(); }
         @Override public void start() { repathDelay = 0; }
-        private boolean isWatchedByAnyPlayer() {
-        return !level().getEntitiesOfClass(Player.class, getBoundingBox().inflate(48.0D),
-                p -> p.isAlive() && !p.isSpectator() && p.hasLineOfSight(this)).isEmpty();
-    }
-    @Override public void tick() {
+        @Override public void tick() {
             Player player = (Player) getTarget();
             getLookControl().setLookAt(player, 30.0F, 30.0F);
             if (isWatchedByAnyPlayer()) { entityData.set(DATA_ADVANCING, false); getNavigation().stop(); return; }
@@ -70,11 +66,15 @@ public final class ObserverEntity extends Monster {
         }
         @Override public void stop() { entityData.set(DATA_ADVANCING, false); getNavigation().stop(); }
     }
+    private boolean isWatchedByAnyPlayer() {
+        return !level().getEntitiesOfClass(Player.class, getBoundingBox().inflate(48.0D),
+                p -> p.isAlive() && !p.isSpectator() && p.hasLineOfSight(this)).isEmpty();
+    }
     @Override public void tick() {
         super.tick();
         if (!level().isClientSide && getTarget() instanceof Player player) {
             if (distanceToSqr(player) > 900.0D) { setTarget(null); entityData.set(DATA_ADVANCING, false); }
-            else if (!player.hasLineOfSight(this) && distanceToSqr(player) < 256.0D && tickCount % 240 == 0 && getRandom().nextInt(3) == 0)
+            else if (!isWatchedByAnyPlayer() && distanceToSqr(player) < 256.0D && tickCount % 240 == 0 && getRandom().nextInt(3) == 0)
                 if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) playSound(OutlandsSounds.OBSERVER_CLICK.get(), 0.22F, 0.85F + getRandom().nextFloat() * 0.25F);
         }
     }
