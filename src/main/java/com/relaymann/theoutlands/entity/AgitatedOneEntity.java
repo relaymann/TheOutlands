@@ -16,6 +16,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.sounds.SoundEvent;
 import com.relaymann.theoutlands.sound.OutlandsSounds;
+import com.relaymann.theoutlands.OutlandsConfig;
 
 /** A volatile predator that escalates from twitching vigilance to sustained, telegraphed charges. */
 public final class AgitatedOneEntity extends Monster {
@@ -58,14 +59,14 @@ public final class AgitatedOneEntity extends Monster {
                 attackWindup = 16;
                 charging = false;
                 chargeHit = false;
-                playSound(OutlandsSounds.AGITATED_WARNING.get(), 1.0F, 0.75F + getRandom().nextFloat() * 0.12F);
+                if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) playSound(OutlandsSounds.AGITATED_WARNING.get(), 1.0F, 0.75F + getRandom().nextFloat() * 0.12F);
             }
             if (attackWindup > 0) { getNavigation().stop(); setDeltaMovement(0, getDeltaMovement().y, 0); }
             if (attackWindup > 0 && --attackWindup == 0) {
                 net.minecraft.world.phys.Vec3 dir = p.position().add(p.getDeltaMovement().scale(5.0D)).subtract(position()).normalize();
                 setDeltaMovement(getDeltaMovement().add(dir.x * 0.92D, 0.32D, dir.z * 0.92D));
                 hasImpulse = true; charging = true; chargeTicks = 14; chargeCooldown = 100; agitation = Math.max(20, agitation - 25);
-                playSound(OutlandsSounds.AGITATED_CHARGE.get(), 1.0F, 0.9F + getRandom().nextFloat() * 0.1F);
+                if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) playSound(OutlandsSounds.AGITATED_CHARGE.get(), 1.0F, 0.9F + getRandom().nextFloat() * 0.1F);
             }
             if (charging) {
                 // Keep the melee goal from replacing the charge's launch velocity.
@@ -87,6 +88,6 @@ public final class AgitatedOneEntity extends Monster {
     @Override public void addAdditionalSaveData(CompoundTag tag) { super.addAdditionalSaveData(tag); tag.putInt("agitation", agitation); tag.putInt("charge_cd", chargeCooldown); tag.putInt("windup", attackWindup); tag.putInt("charge_ticks", chargeTicks); tag.putBoolean("charging", charging); tag.putBoolean("charge_hit", chargeHit); }
     @Override public void readAdditionalSaveData(CompoundTag tag) { super.readAdditionalSaveData(tag); agitation=tag.getInt("agitation"); chargeCooldown=tag.getInt("charge_cd"); attackWindup=tag.getInt("windup"); chargeTicks=tag.getInt("charge_ticks"); charging=tag.getBoolean("charging"); chargeHit=tag.getBoolean("charge_hit"); entityData.set(DATA_AGITATION, agitation); entityData.set(DATA_CHARGING, charging); }
     @Override protected SoundEvent getAmbientSound() { return null; }
-    @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return OutlandsSounds.AGITATED_WARNING.get(); }
-    @Override protected SoundEvent getDeathSound() { return OutlandsSounds.AGITATED_CHARGE.get(); }
+    @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.AGITATED_WARNING.get() : null; }
+    @Override protected SoundEvent getDeathSound() { return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.AGITATED_CHARGE.get() : null; }
 }
