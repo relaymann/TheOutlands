@@ -69,7 +69,7 @@ public final class DeathEntity extends Monster {
             huntTarget = serverPlayer.getUUID();
         }
         ServerPlayer target = level().getServer().getPlayerList().getPlayer(huntTarget);
-        if (target == null || !target.isAlive() || target.serverLevel() != level()
+        if (target == null || !target.isAlive() || target.isCreative() || target.isSpectator() || target.serverLevel() != level()
                 || AlmightyTerritory.contains(target.serverLevel(), target.getX(), target.getZ())) {
             setTarget(null);
             getNavigation().stop();
