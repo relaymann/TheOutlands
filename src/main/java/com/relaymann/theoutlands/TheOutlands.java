@@ -4,7 +4,6 @@ import com.mojang.logging.LogUtils;
 import com.relaymann.theoutlands.entity.OutlandsEntities;
 import com.relaymann.theoutlands.item.OutlandsItems;
 import com.relaymann.theoutlands.sound.OutlandsSounds;
-import com.relaymann.theoutlands.sound.AlphaEraSounds;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.config.ModConfig;
@@ -22,7 +21,6 @@ public final class TheOutlands {
         OutlandsEntities.ENTITY_TYPES.register(modEventBus);
         OutlandsItems.ITEMS.register(modEventBus);
         OutlandsSounds.SOUNDS.register(modEventBus);
-        AlphaEraSounds.SOUNDS.register(modEventBus);
         LOGGER.info("The Outlands is loading. The world is still ordinary.");
     }
 }
