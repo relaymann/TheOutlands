@@ -46,6 +46,6 @@ public final class NullApostleEntity extends Monster {
         setDeltaMovement(0.0D, 0.0D, 0.0D);
     }
     @Override protected net.minecraft.sounds.SoundEvent getAmbientSound() { return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.NULL_APOSTLE_WHISPER.get() : null; }
-    @Override protected net.minecraft.sounds.SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return OutlandsSounds.NULL_APOSTLE_WHISPER.get(); }
+    @Override protected net.minecraft.sounds.SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.NULL_APOSTLE_WHISPER.get() : null; }
     @Override protected net.minecraft.sounds.SoundEvent getDeathSound() { return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.NULL_APOSTLE_DEPARTURE.get() : null; }
 }
