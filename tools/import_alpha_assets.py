@@ -21,7 +21,7 @@ REF = OUT / "theoutlands/textures/alpha_reference"
 # preserved as individually addressable reference tiles below.
 BLOCK_TILES = {
     "stone": (0, 0), "cobblestone": (0, 1), "dirt": (2, 0),
-    "grass_block_top": (3, 0), "grass_block_side": (3, 1),
+    "grass_block_top": (3, 0),
     "oak_planks": (4, 0), "bedrock": (1, 1), "sand": (2, 1),
     "gravel": (3, 1), "oak_log": (4, 1), "oak_log_top": (5, 1),
     "bricks": (7, 0), "gold_block": (7, 1), "diamond_block": (8, 1),
@@ -82,6 +82,7 @@ def main() -> None:
             parser.error(f"Expected a 256x256 legacy terrain atlas, got {terrain.size}")
 
         # Preserve every cell—including unused cells—for exact visual reference.
+        (REF / "terrain_tiles").mkdir(parents=True, exist_ok=True)
         for y in range(16):
             for x in range(16):
                 tile = terrain.crop((x * 16, y * 16, (x + 1) * 16, (y + 1) * 16))
