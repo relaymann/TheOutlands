@@ -86,6 +86,11 @@ def main() -> None:
 
     with zipfile.ZipFile(args.client_archive) as jar:
         names = set(jar.namelist())
+        version_marker = b"Minecraft Alpha v1.2.6"
+        detected_alpha_126 = any(
+            version_marker in jar.read(name)
+            for name in names if name.endswith(".class")
+        )
         if "terrain.png" not in names:
             parser.error("Archive has no terrain.png; this does not look like the expected legacy client")
         terrain = Image.open(jar.open("terrain.png")).convert("RGBA")
@@ -144,6 +149,10 @@ def main() -> None:
 
         # Retain the original Alpha player skin separately: its 64x32 layout
         # predates modern 64x64 player skin overlays and is not silently remapped.
+        if detected_alpha_126:
+            print("Verified source client: Minecraft Alpha v1.2.6.")
+        else:
+            print("Warning: could not verify the Alpha 1.2.6 version marker.")
         print(f"Imported {len(BLOCK_TILES)} exact legacy block crops and {len(copied)} "
               f"reference assets into {OUT}.")
         print("No audio files exist in this archive; original Alpha sounds must be supplied separately.")
