@@ -67,8 +67,8 @@ public final class StillbornStatueEntity extends Monster {
         @Override public void stop() { stalking = false; entityData.set(DATA_STALKING, false); getNavigation().stop(); }
     }
     private boolean isWatchedByAnyPlayer() {
-        return !level().getEntitiesOfClass(Player.class, getBoundingBox().inflate(48.0D),
-                player -> player.isAlive() && !player.isSpectator() && player.hasLineOfSight(this)).isEmpty();
+        return level().players().stream()
+                .anyMatch(player -> player.isAlive() && !player.isSpectator() && player.hasLineOfSight(this));
     }
     public boolean isStalking() { return entityData.get(DATA_STALKING); }
     public float getStiffness(float partialTick) { return stalking ? 0.0F : 1.0F; }
