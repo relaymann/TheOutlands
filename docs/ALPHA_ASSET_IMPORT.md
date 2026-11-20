@@ -8,7 +8,7 @@ The separate `InventivetalentDev minecraft-assets 1.2.5 assets-sound.zip` contai
 
 Keep all three supplied archives outside Git. From the repository root:
 
-1. Install Pillow if you also use the optional image inspection tools:
+1. Install Pillow for the atlas splitter and legacy client importer:
 
    `python -m pip install Pillow`
 
