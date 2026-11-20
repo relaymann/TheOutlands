@@ -16,7 +16,7 @@ Keep all three supplied archives outside Git. From the repository root:
 
    `python tools/import_prepared_alpha_resources.py alpha_1_2_6_imported_resources.zip`
 
-3. Import the original client atlas references and the 1.2.5-era sound recordings:
+3. Import the 1.2.5-era sound recordings:
 
    `python tools/import_classic_sounds.py "InventivetalentDev minecraft-assets 1.2.5 assets-sound.zip"`
 
