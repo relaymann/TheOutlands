@@ -6,6 +6,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
 import com.relaymann.theoutlands.sound.OutlandsSounds;
+import com.relaymann.theoutlands.OutlandsConfig;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -58,7 +59,7 @@ public final class ObserverEntity extends Monster {
                 getNavigation().moveTo(player, 1.12D);
             }
             if (attackCooldown > 0) attackCooldown--;
-            if (distanceToSqr(player) < 3.2D && attackCooldown == 0) {
+            if (distanceToSqr(player) < 3.2D && hasLineOfSight(player) && attackCooldown == 0) {
                 doHurtTarget(player);
                 attackCooldown = 24;
             }
@@ -70,11 +71,11 @@ public final class ObserverEntity extends Monster {
         if (!level().isClientSide && getTarget() instanceof Player player) {
             if (distanceToSqr(player) > 900.0D) { setTarget(null); entityData.set(DATA_ADVANCING, false); }
             else if (!player.hasLineOfSight(this) && distanceToSqr(player) < 256.0D && tickCount % 240 == 0 && getRandom().nextInt(3) == 0)
-                playSound(OutlandsSounds.OBSERVER_CLICK.get(), 0.22F, 0.85F + getRandom().nextFloat() * 0.25F);
+                if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) playSound(OutlandsSounds.OBSERVER_CLICK.get(), 0.22F, 0.85F + getRandom().nextFloat() * 0.25F);
         }
     }
     @Override protected SoundEvent getAmbientSound() { return null; }
-    @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return OutlandsSounds.OBSERVER_CLICK.get(); }
+    @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.OBSERVER_CLICK.get() : null; }
     @Override protected SoundEvent getDeathSound() { return null;
     }
 }
