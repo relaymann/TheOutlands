@@ -91,7 +91,7 @@ public final class AlmightyEntity extends Monster {
         for (Player player : level().getEntitiesOfClass(Player.class, getBoundingBox().inflate(radius),
                 player -> player.isAlive() && !player.isCreative() && !player.isSpectator()
                         && AlmightyTerritory.contains(level(), player.getX(), player.getZ())
-                        && hasLineOfSight(player))) {
+                        && distanceToSqr(player) <= radius * radius && hasLineOfSight(player))) {
             if (player.isCreative() || player.isSpectator()) continue;
             double dx = player.getX() - getX();
             double dz = player.getZ() - getZ();
