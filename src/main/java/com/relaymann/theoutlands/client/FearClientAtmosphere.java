@@ -14,6 +14,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.client.event.sound.PlaySoundEvent;
 import net.minecraft.world.level.material.FogType;
+import net.minecraft.world.level.Level;
 
 /** Client-only Fear territory atmosphere. It never changes server state or other players' audio. */
 @EventBusSubscriber(modid = TheOutlands.MOD_ID, value = Dist.CLIENT)
@@ -21,7 +22,8 @@ public final class FearClientAtmosphere {
     private FearClientAtmosphere() {}
 
     private static double territoryStrength(LocalPlayer player) {
-        if (player == null || player.level() == null || !OutlandsConfig.FEAR_AMBIENT_ATTENUATION.get()) return 0.0D;
+        if (player == null || player.level() == null || !player.level().dimension().equals(Level.OVERWORLD)
+                || !OutlandsConfig.FEAR_AMBIENT_ATTENUATION.get()) return 0.0D;
         var key = player.level().registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.BIOME)
                 .getKey(player.level().getBiome(player.blockPosition()).value());
         if (key == null || !(key.getPath().contains("forest") || key.getPath().equals("fear_forest"))) return 0.0D;
