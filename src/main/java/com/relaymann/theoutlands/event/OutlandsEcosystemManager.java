@@ -68,6 +68,10 @@ public final class OutlandsEcosystemManager {
         if (a instanceof StillbornStatueEntity && b instanceof ObserverEntity) giveSpace(a, b);
         if (b instanceof StillbornStatueEntity && a instanceof ObserverEntity) giveSpace(b, a);
 
+        // Very rarely, an Observer shadows an active predator from a distance.
+        if (a instanceof ObserverEntity && isPredator(b)) studyHunt((ObserverEntity) a, b);
+        if (b instanceof ObserverEntity && isPredator(a)) studyHunt((ObserverEntity) b, a);
+
         // Agitated One defends its immediate territory against intruders when a
         // legitimate player is present, but never attacks other Outlands entities.
         if (a instanceof AgitatedOneEntity && isPredator(b)) defendPlayerSpace((AgitatedOneEntity)a, witness);
@@ -119,6 +123,15 @@ public final class OutlandsEcosystemManager {
     private static void defendPlayerSpace(AgitatedOneEntity entity, ServerPlayer witness) {
         if (witness.isAlive() && !witness.isCreative() && !witness.isSpectator()
                 && entity.distanceToSqr(witness) <= 18.0D * 18.0D && entity.getTarget() == null) entity.setTarget(witness);
+    }
+
+    private static void studyHunt(ObserverEntity observer, Mob predator) {
+        if (observer.getTarget() != null || predator.getTarget() == null || observer.tickCount % 200 != 0
+                || observer.getRandom().nextInt(6) != 0 || observer.distanceToSqr(predator) > 18.0D * 18.0D) return;
+        Vec3 direction = predator.position().subtract(observer.position());
+        if (direction.lengthSqr() < 0.001D) direction = new Vec3(0, 0, 1);
+        Vec3 shadowPoint = predator.position().subtract(direction.normalize().scale(6.0D));
+        observer.getNavigation().moveTo(shadowPoint.x, shadowPoint.y, shadowPoint.z, 0.72D);
     }
 
     private static void investigateMimic(Mob hunter, Mob mimic) {
