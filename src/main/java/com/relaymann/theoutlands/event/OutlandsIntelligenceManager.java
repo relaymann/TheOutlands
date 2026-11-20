@@ -17,6 +17,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 import java.util.*;
@@ -44,6 +45,22 @@ public final class OutlandsIntelligenceManager {
         if (!(event.getLevel() instanceof ServerLevel level) || !(event.getPlayer() instanceof ServerPlayer player)
                 || !eligible(player)) return;
         record(level, event.getPos(), player.getUUID(), "break");
+    }
+
+    @SubscribeEvent
+    public static void onBlockPlaced(BlockEvent.EntityPlaceEvent event) {
+        if (!(event.getLevel() instanceof ServerLevel level)
+                || !(event.getEntity() instanceof ServerPlayer player) || !eligible(player)) return;
+        record(level, event.getPos(), player.getUUID(), "place");
+    }
+
+    @SubscribeEvent
+    public static void onOutlandsCreatureDeath(LivingDeathEvent event) {
+        if (!(event.getEntity().level() instanceof ServerLevel level)
+                || !(event.getEntity() instanceof Mob mob) || !isOutlandsCreature(mob)) return;
+        // Nearby creatures can investigate a real death site. No death message,
+        // fake remains, block edits, or forced encounter is produced.
+        record(level, mob.blockPosition(), mob.getUUID(), "death");
     }
 
     @SubscribeEvent
