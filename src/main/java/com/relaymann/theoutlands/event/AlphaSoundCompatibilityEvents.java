@@ -1,100 +1,87 @@
 package com.relaymann.theoutlands.event;
 
+import com.relaymann.theoutlands.OutlandsConfig;
 import com.relaymann.theoutlands.sound.AlphaEraSounds;
-import net.minecraft.core.Holder;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.RandomSource;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.PlayLevelSoundEvent;
+import net.neoforged.neoforge.client.event.sound.PlaySoundEvent;
 
 import java.util.Map;
 
-/** Replaces selected vanilla sound events with classic-era recordings without replacing terrain or resource systems. */
-@EventBusSubscriber(modid = "theoutlands", bus = EventBusSubscriber.Bus.GAME)
+/**
+ * Client sound-engine replacement catches both world-played and local-only
+ * sounds (notably block hit/break sounds) without replacing vanilla sounds.json.
+ */
+@EventBusSubscriber(modid = "theoutlands", bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public final class AlphaSoundCompatibilityEvents {
-    private static final Map<String, Holder<SoundEvent>> REPLACEMENTS = Map.ofEntries(
-        Map.entry("minecraft:block.stone.step", AlphaEraSounds.STEP_STONE),
-        Map.entry("minecraft:block.grass.step", AlphaEraSounds.STEP_GRASS),
-        Map.entry("minecraft:block.gravel.step", AlphaEraSounds.STEP_GRAVEL),
-        Map.entry("minecraft:block.sand.step", AlphaEraSounds.STEP_SAND),
-        Map.entry("minecraft:block.snow.step", AlphaEraSounds.STEP_SNOW),
-        Map.entry("minecraft:block.wood.step", AlphaEraSounds.STEP_WOOD),
-        Map.entry("minecraft:block.wool.step", AlphaEraSounds.STEP_CLOTH),
-        Map.entry("minecraft:block.ladder.step", AlphaEraSounds.STEP_LADDER),
-        Map.entry("minecraft:block.stone.hit", AlphaEraSounds.DIG_STONE),
-        Map.entry("minecraft:block.stone.break", AlphaEraSounds.DIG_STONE),
-        Map.entry("minecraft:block.grass.hit", AlphaEraSounds.DIG_GRASS),
-        Map.entry("minecraft:block.grass.break", AlphaEraSounds.DIG_GRASS),
-        Map.entry("minecraft:block.gravel.hit", AlphaEraSounds.DIG_GRAVEL),
-        Map.entry("minecraft:block.gravel.break", AlphaEraSounds.DIG_GRAVEL),
-        Map.entry("minecraft:block.sand.hit", AlphaEraSounds.DIG_SAND),
-        Map.entry("minecraft:block.sand.break", AlphaEraSounds.DIG_SAND),
-        Map.entry("minecraft:block.snow.hit", AlphaEraSounds.DIG_SNOW),
-        Map.entry("minecraft:block.snow.break", AlphaEraSounds.DIG_SNOW),
-        Map.entry("minecraft:block.wood.hit", AlphaEraSounds.DIG_WOOD),
-        Map.entry("minecraft:block.wood.break", AlphaEraSounds.DIG_WOOD),
-        Map.entry("minecraft:block.wool.hit", AlphaEraSounds.DIG_CLOTH),
-        Map.entry("minecraft:block.wool.break", AlphaEraSounds.DIG_CLOTH),
-        Map.entry("minecraft:block.wooden_door.open", AlphaEraSounds.DOOR_OPEN),
-        Map.entry("minecraft:block.wooden_door.close", AlphaEraSounds.DOOR_CLOSE),
-        Map.entry("minecraft:block.iron_door.open", AlphaEraSounds.DOOR_OPEN),
-        Map.entry("minecraft:block.iron_door.close", AlphaEraSounds.DOOR_CLOSE),
-        Map.entry("minecraft:entity.player.hurt", AlphaEraSounds.PLAYER_HURT),
-        Map.entry("minecraft:entity.player.small_fall", AlphaEraSounds.FALL_SMALL),
-        Map.entry("minecraft:entity.player.big_fall", AlphaEraSounds.FALL_BIG),
-        Map.entry("minecraft:block.water.ambient", AlphaEraSounds.WATER),
-        Map.entry("minecraft:entity.generic.splash", AlphaEraSounds.WATER),
-        Map.entry("minecraft:entity.player.splash", AlphaEraSounds.WATER),
-        Map.entry("minecraft:entity.player.swim", AlphaEraSounds.SWIM),
-        Map.entry("minecraft:block.lava.ambient", AlphaEraSounds.LAVA),
-        Map.entry("minecraft:ambient.cave", AlphaEraSounds.CAVE),
-        Map.entry("minecraft:weather.rain", AlphaEraSounds.RAIN),
-        Map.entry("minecraft:entity.lightning_bolt.thunder", AlphaEraSounds.THUNDER),
-        Map.entry("minecraft:entity.chicken.ambient", AlphaEraSounds.CHICKEN),
-        Map.entry("minecraft:entity.chicken.hurt", AlphaEraSounds.CHICKEN),
-        Map.entry("minecraft:entity.chicken.death", AlphaEraSounds.CHICKEN),
-        Map.entry("minecraft:entity.cow.ambient", AlphaEraSounds.COW),
-        Map.entry("minecraft:entity.cow.hurt", AlphaEraSounds.COW),
-        Map.entry("minecraft:entity.cow.death", AlphaEraSounds.COW),
-        Map.entry("minecraft:entity.pig.ambient", AlphaEraSounds.PIG),
-        Map.entry("minecraft:entity.pig.hurt", AlphaEraSounds.PIG),
-        Map.entry("minecraft:entity.pig.death", AlphaEraSounds.PIG),
-        Map.entry("minecraft:entity.sheep.ambient", AlphaEraSounds.SHEEP),
-        Map.entry("minecraft:entity.sheep.hurt", AlphaEraSounds.SHEEP),
-        Map.entry("minecraft:entity.sheep.death", AlphaEraSounds.SHEEP),
-        Map.entry("minecraft:entity.wolf.ambient", AlphaEraSounds.WOLF),
-        Map.entry("minecraft:entity.wolf.hurt", AlphaEraSounds.WOLF),
-        Map.entry("minecraft:entity.wolf.death", AlphaEraSounds.WOLF),
-        Map.entry("minecraft:entity.zombie.ambient", AlphaEraSounds.ZOMBIE),
-        Map.entry("minecraft:entity.zombie.hurt", AlphaEraSounds.ZOMBIE),
-        Map.entry("minecraft:entity.zombie.death", AlphaEraSounds.ZOMBIE),
-        Map.entry("minecraft:entity.skeleton.ambient", AlphaEraSounds.SKELETON),
-        Map.entry("minecraft:entity.skeleton.hurt", AlphaEraSounds.SKELETON),
-        Map.entry("minecraft:entity.skeleton.death", AlphaEraSounds.SKELETON),
-        Map.entry("minecraft:entity.spider.ambient", AlphaEraSounds.SPIDER),
-        Map.entry("minecraft:entity.spider.hurt", AlphaEraSounds.SPIDER),
-        Map.entry("minecraft:entity.spider.death", AlphaEraSounds.SPIDER),
-        Map.entry("minecraft:entity.creeper.primed", AlphaEraSounds.CREEPER),
-        Map.entry("minecraft:entity.creeper.hurt", AlphaEraSounds.CREEPER),
-        Map.entry("minecraft:entity.creeper.death", AlphaEraSounds.CREEPER),
-        Map.entry("minecraft:entity.ghast.ambient", AlphaEraSounds.GHAST),
-        Map.entry("minecraft:entity.ghast.scream", AlphaEraSounds.GHAST),
-        Map.entry("minecraft:entity.ghast.hurt", AlphaEraSounds.GHAST),
-        Map.entry("minecraft:entity.enderman.ambient", AlphaEraSounds.ENDERMAN),
-        Map.entry("minecraft:entity.enderman.scream", AlphaEraSounds.ENDERMAN),
-        Map.entry("minecraft:entity.villager.ambient", AlphaEraSounds.VILLAGER),
-        Map.entry("minecraft:entity.villager.hurt", AlphaEraSounds.VILLAGER)
+    private static final Map<String, AlphaEraSoundRef> REPLACEMENTS = Map.ofEntries(
+        Map.entry("minecraft:block.stone.step", new AlphaEraSoundRef(() -> AlphaEraSounds.STEP_STONE.get())),
+        Map.entry("minecraft:block.grass.step", new AlphaEraSoundRef(() -> AlphaEraSounds.STEP_GRASS.get())),
+        Map.entry("minecraft:block.gravel.step", new AlphaEraSoundRef(() -> AlphaEraSounds.STEP_GRAVEL.get())),
+        Map.entry("minecraft:block.sand.step", new AlphaEraSoundRef(() -> AlphaEraSounds.STEP_SAND.get())),
+        Map.entry("minecraft:block.snow.step", new AlphaEraSoundRef(() -> AlphaEraSounds.STEP_SNOW.get())),
+        Map.entry("minecraft:block.wood.step", new AlphaEraSoundRef(() -> AlphaEraSounds.STEP_WOOD.get())),
+        Map.entry("minecraft:block.wool.step", new AlphaEraSoundRef(() -> AlphaEraSounds.STEP_CLOTH.get())),
+        Map.entry("minecraft:block.ladder.step", new AlphaEraSoundRef(() -> AlphaEraSounds.STEP_LADDER.get())),
+        Map.entry("minecraft:block.stone.hit", new AlphaEraSoundRef(() -> AlphaEraSounds.DIG_STONE.get())),
+        Map.entry("minecraft:block.stone.break", new AlphaEraSoundRef(() -> AlphaEraSounds.DIG_STONE.get())),
+        Map.entry("minecraft:block.grass.hit", new AlphaEraSoundRef(() -> AlphaEraSounds.DIG_GRASS.get())),
+        Map.entry("minecraft:block.grass.break", new AlphaEraSoundRef(() -> AlphaEraSounds.DIG_GRASS.get())),
+        Map.entry("minecraft:block.gravel.hit", new AlphaEraSoundRef(() -> AlphaEraSounds.DIG_GRAVEL.get())),
+        Map.entry("minecraft:block.gravel.break", new AlphaEraSoundRef(() -> AlphaEraSounds.DIG_GRAVEL.get())),
+        Map.entry("minecraft:block.sand.hit", new AlphaEraSoundRef(() -> AlphaEraSounds.DIG_SAND.get())),
+        Map.entry("minecraft:block.sand.break", new AlphaEraSoundRef(() -> AlphaEraSounds.DIG_SAND.get())),
+        Map.entry("minecraft:block.snow.hit", new AlphaEraSoundRef(() -> AlphaEraSounds.DIG_SNOW.get())),
+        Map.entry("minecraft:block.snow.break", new AlphaEraSoundRef(() -> AlphaEraSounds.DIG_SNOW.get())),
+        Map.entry("minecraft:block.wood.hit", new AlphaEraSoundRef(() -> AlphaEraSounds.DIG_WOOD.get())),
+        Map.entry("minecraft:block.wood.break", new AlphaEraSoundRef(() -> AlphaEraSounds.DIG_WOOD.get())),
+        Map.entry("minecraft:block.wool.hit", new AlphaEraSoundRef(() -> AlphaEraSounds.DIG_CLOTH.get())),
+        Map.entry("minecraft:block.wool.break", new AlphaEraSoundRef(() -> AlphaEraSounds.DIG_CLOTH.get())),
+        Map.entry("minecraft:block.wooden_door.open", new AlphaEraSoundRef(() -> AlphaEraSounds.DOOR_OPEN.get())),
+        Map.entry("minecraft:block.wooden_door.close", new AlphaEraSoundRef(() -> AlphaEraSounds.DOOR_CLOSE.get())),
+        Map.entry("minecraft:block.iron_door.open", new AlphaEraSoundRef(() -> AlphaEraSounds.DOOR_OPEN.get())),
+        Map.entry("minecraft:block.iron_door.close", new AlphaEraSoundRef(() -> AlphaEraSounds.DOOR_CLOSE.get())),
+        Map.entry("minecraft:entity.player.hurt", new AlphaEraSoundRef(() -> AlphaEraSounds.PLAYER_HURT.get())),
+        Map.entry("minecraft:entity.player.small_fall", new AlphaEraSoundRef(() -> AlphaEraSounds.FALL_SMALL.get())),
+        Map.entry("minecraft:entity.player.big_fall", new AlphaEraSoundRef(() -> AlphaEraSounds.FALL_BIG.get())),
+        Map.entry("minecraft:block.water.ambient", new AlphaEraSoundRef(() -> AlphaEraSounds.WATER.get())),
+        Map.entry("minecraft:entity.generic.splash", new AlphaEraSoundRef(() -> AlphaEraSounds.WATER.get())),
+        Map.entry("minecraft:entity.player.splash", new AlphaEraSoundRef(() -> AlphaEraSounds.WATER.get())),
+        Map.entry("minecraft:entity.player.swim", new AlphaEraSoundRef(() -> AlphaEraSounds.SWIM.get())),
+        Map.entry("minecraft:block.lava.ambient", new AlphaEraSoundRef(() -> AlphaEraSounds.LAVA.get())),
+        Map.entry("minecraft:ambient.cave", new AlphaEraSoundRef(() -> AlphaEraSounds.CAVE.get())),
+        Map.entry("minecraft:weather.rain", new AlphaEraSoundRef(() -> AlphaEraSounds.RAIN.get())),
+        Map.entry("minecraft:entity.lightning_bolt.thunder", new AlphaEraSoundRef(() -> AlphaEraSounds.THUNDER.get())),
+        Map.entry("minecraft:entity.chicken.ambient", new AlphaEraSoundRef(() -> AlphaEraSounds.CHICKEN.get())),
+        Map.entry("minecraft:entity.cow.ambient", new AlphaEraSoundRef(() -> AlphaEraSounds.COW.get())),
+        Map.entry("minecraft:entity.pig.ambient", new AlphaEraSoundRef(() -> AlphaEraSounds.PIG.get())),
+        Map.entry("minecraft:entity.sheep.ambient", new AlphaEraSoundRef(() -> AlphaEraSounds.SHEEP.get())),
+        Map.entry("minecraft:entity.wolf.ambient", new AlphaEraSoundRef(() -> AlphaEraSounds.WOLF.get())),
+        Map.entry("minecraft:entity.zombie.ambient", new AlphaEraSoundRef(() -> AlphaEraSounds.ZOMBIE.get())),
+        Map.entry("minecraft:entity.skeleton.ambient", new AlphaEraSoundRef(() -> AlphaEraSounds.SKELETON.get())),
+        Map.entry("minecraft:entity.spider.ambient", new AlphaEraSoundRef(() -> AlphaEraSounds.SPIDER.get())),
+        Map.entry("minecraft:entity.creeper.primed", new AlphaEraSoundRef(() -> AlphaEraSounds.CREEPER.get())),
+        Map.entry("minecraft:entity.ghast.ambient", new AlphaEraSoundRef(() -> AlphaEraSounds.GHAST.get())),
+        Map.entry("minecraft:entity.enderman.ambient", new AlphaEraSoundRef(() -> AlphaEraSounds.ENDERMAN.get())),
+        Map.entry("minecraft:entity.villager.ambient", new AlphaEraSoundRef(() -> AlphaEraSounds.VILLAGER.get()))
     );
 
     @SubscribeEvent
-    public static void replaceClassicSounds(PlayLevelSoundEvent event) {
-        if (!com.relaymann.theoutlands.OutlandsConfig.ALPHA_SOUNDS_ENABLED.get()) return;
-        var sound = event.getSound();
-        if (sound == null) return;
-        String id = sound.unwrapKey().map(key -> key.location().toString()).orElse("");
-        Holder<SoundEvent> replacement = REPLACEMENTS.get(id);
-        if (replacement != null) event.setSound(replacement);
+    public static void replaceClassicSounds(PlaySoundEvent event) {
+        if (!OutlandsConfig.ALPHA_SOUNDS_ENABLED.get()) return;
+        SoundInstance original = event.getOriginalSound();
+        AlphaEraSoundRef replacement = REPLACEMENTS.get(original.getLocation().toString());
+        if (replacement == null) return;
+        event.setSound(new SimpleSoundInstance(replacement.sound().get(),
+                original.getSource(), original.getVolume(), original.getPitch(),
+                RandomSource.create(), original.getX(), original.getY(), original.getZ()));
     }
 
+    private record AlphaEraSoundRef(java.util.function.Supplier<SoundEvent> sound) {}
     private AlphaSoundCompatibilityEvents() {}
 }
