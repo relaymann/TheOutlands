@@ -1,6 +1,7 @@
 package com.relaymann.theoutlands.entity;
 
 import com.relaymann.theoutlands.sound.OutlandsSounds;
+import com.relaymann.theoutlands.OutlandsConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -97,12 +98,12 @@ public final class MimicEntity extends Monster {
             }
 
             // The block disguise breaks only when the player gets genuinely close.
-            if (!revealed && distance < 64.0D) {
+            if (!revealed && distance < 64.0D && player.hasLineOfSight(this)) {
                 revealed = true;
                 entityData.set(DATA_REVEALED, true);
                 revealCooldown = 120;
                 unseenTicks = 0;
-                playSound(OutlandsSounds.MIMIC_REVEAL.get(), 1.0F,
+                if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) playSound(OutlandsSounds.MIMIC_REVEAL.get(), 1.0F,
                         0.90F + getRandom().nextFloat() * 0.16F);
                 Vec3 direction = player.position().subtract(position()).normalize();
                 if (distance > 9.0D) {
@@ -204,7 +205,7 @@ public final class MimicEntity extends Monster {
 
     @Override
     protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) {
-        return OutlandsSounds.MIMIC_REVEAL.get();
+        return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.MIMIC_REVEAL.get() : null;
     }
 
     @Override
