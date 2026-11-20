@@ -42,6 +42,7 @@ public final class AlphaEraSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> COW = register("alpha_cow");
     public static final DeferredHolder<SoundEvent, SoundEvent> PIG = register("alpha_pig");
     public static final DeferredHolder<SoundEvent, SoundEvent> SHEEP = register("alpha_sheep");
+    public static final DeferredHolder<SoundEvent, SoundEvent> SHEEP_SHEAR = register("alpha_sheep_shear");
     public static final DeferredHolder<SoundEvent, SoundEvent> WOLF = register("alpha_wolf");
     public static final DeferredHolder<SoundEvent, SoundEvent> ZOMBIE = register("alpha_zombie");
     public static final DeferredHolder<SoundEvent, SoundEvent> SKELETON = register("alpha_skeleton");
