@@ -146,6 +146,13 @@ def make(name, base, spread, pattern):
         pixels.append(row)
     return pixels
 
+generated = 0
 for name, (base, spread, pattern) in PALETTES.items():
-    png(OUT / f"{name}.png", make(name, base, spread, pattern))
-print(f"Generated {len(PALETTES)} original 16x16 Alpha-inspired block textures with cutout transparency.")
+    destination = OUT / f"{name}.png"
+    # A locally imported original Alpha atlas crop takes precedence over the
+    # procedural fallback. This lets users build with their own licensed copy.
+    if destination.exists():
+        continue
+    png(destination, make(name, base, spread, pattern))
+    generated += 1
+print(f"Generated {generated} fallback 16x16 Alpha-inspired block textures; preserved imported originals.")
