@@ -110,7 +110,6 @@ public final class OutlandsIntelligenceManager {
             pattern.samples++;
             if (player.isSprinting()) pattern.sprintSamples++;
             if (player.isCrouching()) pattern.sneakSamples++;
-            pattern.lastPosition = player.position();
             if (pattern.samples > 200) {
                 pattern.samples = Math.max(1, pattern.samples / 2);
                 pattern.sprintSamples /= 2;
@@ -207,14 +206,12 @@ public final class OutlandsIntelligenceManager {
         Set<ResourceKey<Level>> activeDimensions = new HashSet<>();
         for (ServerLevel level : levels) activeDimensions.add(level.dimension());
         DISTURBANCES.keySet().removeIf(key -> !activeDimensions.contains(key));
-        for (ArrayDeque<Disturbance> records : DISTURBANCES.values()) {
-            long now = 0L;
-            for (ServerLevel level : levels) if (level.dimension().equals(records.isEmpty() ? null : level.dimension())) {
-                now = level.getGameTime();
-                break;
+        for (ServerLevel level : levels) {
+            ArrayDeque<Disturbance> records = DISTURBANCES.get(level.dimension());
+            if (records != null) {
+                long gameTime = level.getGameTime();
+                records.removeIf(record -> gameTime - record.gameTime() > DISTURBANCE_LIFETIME);
             }
-            final long gameTime = now;
-            records.removeIf(record -> gameTime - record.gameTime() > DISTURBANCE_LIFETIME);
         }
         Set<UUID> online = new HashSet<>();
         for (ServerLevel level : levels) for (ServerPlayer player : level.players()) online.add(player.getUUID());
@@ -229,6 +226,5 @@ public final class OutlandsIntelligenceManager {
         private int samples;
         private int sprintSamples;
         private int sneakSamples;
-        private Vec3 lastPosition = Vec3.ZERO;
     }
 }
