@@ -9,7 +9,6 @@ group = mod_group_id
 base { archivesName = mod_id }
 java { toolchain.languageVersion = JavaLanguageVersion.of(21) }
 sourceSets.main.resources {
-    srcDir('src/generated/resources')
     exclude('**/*.bbmodel')
     exclude('src/generated/**/.cache')
 }
@@ -41,7 +40,6 @@ def generateModMetadata = tasks.register('generateModMetadata', ProcessResources
             neo_version: neo_version, loader_version_range: loader_version_range, mod_id: mod_id,
             mod_name: mod_name, mod_license: mod_license, mod_version: mod_version]
     inputs.properties replaceProperties
-    expand replaceProperties
     from 'src/main/templates'
     into 'build/generated/sources/modMetadata'
 }
