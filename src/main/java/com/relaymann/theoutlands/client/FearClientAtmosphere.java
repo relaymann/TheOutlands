@@ -7,7 +7,6 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.resources.sounds.TickableSoundInstance;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.level.biome.Biome;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -54,12 +53,27 @@ public final class FearClientAtmosphere {
     @SubscribeEvent
     public static void onFogColor(ViewportEvent.ComputeFogColor event) {
         LocalPlayer player = Minecraft.getInstance().player;
+        if (player == null || !OutlandsConfig.ALPHA_VISUALS_ENABLED.get()
+                || !player.level().dimension().equals(Level.OVERWORLD)) return;
+
+        // Alpha's distant horizon was visually tied to the sky rather than the
+        // modern biome-specific fog palette. Sampling the live sky colour keeps
+        // sunrise, sunset, weather and night transitions coherent without
+        // hard-coding one daytime blue into every scene.
+        var sky = player.level().getSkyColor(player.blockPosition(), event.getPartialTick());
+        float retroBlend = 0.78F;
+        event.setRed(event.getRed() * (1.0F - retroBlend) + (float) sky.x * retroBlend);
+        event.setGreen(event.getGreen() * (1.0F - retroBlend) + (float) sky.y * retroBlend);
+        event.setBlue(event.getBlue() * (1.0F - retroBlend) + (float) sky.z * retroBlend);
+
+        // Preserve the existing Fear territory tint as a distinct overlay.
         double strength = territoryStrength(player);
-        if (strength <= 0.0D) return;
-        float blend = (float) (0.24D + strength * 0.18D);
-        event.setRed(event.getRed() * (1.0F - blend) + 0.035F * blend);
-        event.setGreen(event.getGreen() * (1.0F - blend) + 0.045F * blend);
-        event.setBlue(event.getBlue() * (1.0F - blend) + 0.055F * blend);
+        if (strength > 0.0D) {
+            float blend = (float) (0.24D + strength * 0.18D);
+            event.setRed(event.getRed() * (1.0F - blend) + 0.035F * blend);
+            event.setGreen(event.getGreen() * (1.0F - blend) + 0.045F * blend);
+            event.setBlue(event.getBlue() * (1.0F - blend) + 0.055F * blend);
+        }
     }
 
     @SubscribeEvent
@@ -72,8 +86,8 @@ public final class FearClientAtmosphere {
         // Overworld and leave water, lava, powder snow, and Nether/End fog alone.
         if (OutlandsConfig.ALPHA_VISUALS_ENABLED.get()
                 && player.level().dimension().equals(Level.OVERWORLD)) {
-            event.scaleFarPlaneDistance(0.86F);
-            event.scaleNearPlaneDistance(0.72F);
+            event.scaleFarPlaneDistance(0.78F);
+            event.scaleNearPlaneDistance(0.58F);
         }
 
         // Fear's territory is a separate, stronger layer over the global retro
