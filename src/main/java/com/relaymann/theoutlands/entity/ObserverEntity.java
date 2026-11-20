@@ -1,6 +1,11 @@
 package com.relaymann.theoutlands.entity;
 
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvent;
+import com.relaymann.theoutlands.sound.OutlandsSounds;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -14,12 +19,18 @@ import java.util.EnumSet;
 
 /** The Observer advances by pathfinding only while its target cannot see it. No turning-trigger teleportation. */
 public final class ObserverEntity extends Monster {
+    private static final EntityDataAccessor<Boolean> DATA_ADVANCING = SynchedEntityData.defineId(ObserverEntity.class, EntityDataSerializers.BOOLEAN);
     public ObserverEntity(EntityType<? extends Monster> type, Level level) { super(type, level); xpReward = 8; }
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 34.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.29D).add(Attributes.FOLLOW_RANGE, 40.0D)
                 .add(Attributes.ATTACK_DAMAGE, 5.0D).add(Attributes.KNOCKBACK_RESISTANCE, 0.8D);
     }
+    @Override protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_ADVANCING, false);
+    }
+    public boolean isAdvancing() { return entityData.get(DATA_ADVANCING); }
     @Override protected void registerGoals() {
         goalSelector.addGoal(1, new AdvanceUnseenGoal());
         goalSelector.addGoal(7, new RandomLookAroundGoal(this));
@@ -40,7 +51,8 @@ public final class ObserverEntity extends Monster {
         @Override public void tick() {
             Player player = (Player) getTarget();
             getLookControl().setLookAt(player, 30.0F, 30.0F);
-            if (player.hasLineOfSight(ObserverEntity.this)) { getNavigation().stop(); return; }
+            if (player.hasLineOfSight(ObserverEntity.this)) { entityData.set(DATA_ADVANCING, false); getNavigation().stop(); return; }
+            entityData.set(DATA_ADVANCING, true);
             if (--repathDelay <= 0) {
                 repathDelay = 8 + getRandom().nextInt(8);
                 getNavigation().moveTo(player, 1.12D);
@@ -51,11 +63,18 @@ public final class ObserverEntity extends Monster {
                 attackCooldown = 24;
             }
         }
-        @Override public void stop() { getNavigation().stop(); }
+        @Override public void stop() { entityData.set(DATA_ADVANCING, false); getNavigation().stop(); }
     }
     @Override public void tick() {
         super.tick();
-        if (!level().isClientSide && getTarget() instanceof Player player && distanceToSqr(player) > 900.0D)
-            setTarget(null);
+        if (!level().isClientSide && getTarget() instanceof Player player) {
+            if (distanceToSqr(player) > 900.0D) { setTarget(null); entityData.set(DATA_ADVANCING, false); }
+            else if (!player.hasLineOfSight(this) && distanceToSqr(player) < 256.0D && tickCount % 240 == 0 && getRandom().nextInt(3) == 0)
+                playSound(OutlandsSounds.OBSERVER_CLICK.get(), 0.22F, 0.85F + getRandom().nextFloat() * 0.25F);
+        }
+    }
+    @Override protected SoundEvent getAmbientSound() { return null; }
+    @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return OutlandsSounds.OBSERVER_CLICK.get(); }
+    @Override protected SoundEvent getDeathSound() { return null;
     }
 }
