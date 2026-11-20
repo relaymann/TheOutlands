@@ -1,5 +1,9 @@
 name: Build and publish mod
 
+concurrency:
+  group: theoutlands-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: [main]
