@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 public final class CaveJarRenderer extends MobRenderer<CaveJarEntity,CaveJarModel> {
  public static final ModelLayerLocation LAYER=new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(TheOutlands.MOD_ID,"cave_jar"),"main");
- private static final ResourceLocation TEXTURE=ResourceLocation.fromNamespaceAndPath(TheOutlands.MOD_ID,"textures/entity/death.png");
+ private static final ResourceLocation TEXTURE=ResourceLocation.fromNamespaceAndPath(TheOutlands.MOD_ID,"textures/entity/cave_jar.png");
  public CaveJarRenderer(EntityRendererProvider.Context c){super(c,new CaveJarModel(c.bakeLayer(LAYER)),0.55F);}
  return CaveJarModel.createBodyLayer();
  @Override public ResourceLocation getTextureLocation(CaveJarEntity e){return TEXTURE;}
