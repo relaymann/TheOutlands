@@ -1,0 +1,54 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": {
+        "min": 2,
+        "max": 4
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:gold_nugget",
+          "weight": 8
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:prismarine_crystals",
+          "weight": 4
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:written_book",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "minecraft:written_book_content": {
+                  "title": "The Seven Vows",
+                  "author": "A Prior",
+                  "pages": [
+                    "{\"text\":\"Seven alcoves. Seven vows. None of the names were written down.\"}",
+                    "{\"text\":\"The central altar was built last. The builders refused to enter the nave after sunset.\"}"
+                  ]
+                },
+                "minecraft:custom_name": "{\"text\":\"Recovered field record\",\"italic\":false}"
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:paper",
+          "weight": 4
+        }
+      ]
+    }
+  ]
+}

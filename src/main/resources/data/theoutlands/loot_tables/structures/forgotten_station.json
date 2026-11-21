@@ -1,0 +1,54 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": {
+        "min": 2,
+        "max": 4
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:rail",
+          "weight": 8
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:iron_nugget",
+          "weight": 4
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:written_book",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "minecraft:written_book_content": {
+                  "title": "Platform Notice",
+                  "author": "Station Clerk",
+                  "pages": [
+                    "{\"text\":\"Service suspended until further notice. No trains are scheduled, and no line is shown beyond the western tunnel.\"}",
+                    "{\"text\":\"The timetable has one departure written in fresh ink.\"}"
+                  ]
+                },
+                "minecraft:custom_name": "{\"text\":\"Recovered field record\",\"italic\":false}"
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:paper",
+          "weight": 4
+        }
+      ]
+    }
+  ]
+}

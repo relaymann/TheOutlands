@@ -22,7 +22,7 @@ public final class OutlandsStructurePiece extends StructurePiece {
 
     public OutlandsStructurePiece(int x,int y,int z,int size,long seed) {
         super(OutlandsWorldgen.OUTLANDS_PIECE.get(),0,
-                new BoundingBox(x,y-32,z,x+size-1,y+12,z+size-1));
+                new BoundingBox(x,y-40,z,x+size-1,y+12,z+size-1));
         this.anchorX=x;this.surfaceY=y;this.anchorZ=z;this.size=size;this.seed=seed;
     }
 

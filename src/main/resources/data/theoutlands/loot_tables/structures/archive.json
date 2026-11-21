@@ -1,0 +1,54 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": {
+        "min": 2,
+        "max": 4
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:paper",
+          "weight": 8
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:ink_sac",
+          "weight": 4
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:written_book",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "minecraft:written_book_content": {
+                  "title": "Archive Fragment",
+                  "author": "Archivist",
+                  "pages": [
+                    "{\"text\":\"The final pages were removed. The index still lists a witness who was never admitted.\"}",
+                    "{\"text\":\"The shelves are not arranged by date. They are arranged by the order in which people disappeared.\"}"
+                  ]
+                },
+                "minecraft:custom_name": "{\"text\":\"Recovered field record\",\"italic\":false}"
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:paper",
+          "weight": 4
+        }
+      ]
+    }
+  ]
+}

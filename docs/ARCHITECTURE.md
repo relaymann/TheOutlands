@@ -140,3 +140,12 @@ The native piece spans a 48x48-block footprint (normally three chunks across). M
 Candidate sites use a 3x3 sample of generator height averages and reject footprints with more than five blocks of height variation or unsafe build-height margins. The structure biome tag includes land-oriented Overworld biomes and excludes oceans, rivers, and beaches. Structure terrain adaptation is none; the mod does not alter vanilla noise settings, cave carvers, biome sources, or vanilla structure sets. Existing chunks are not retroactively populated.
 
 The native structure JSON is data-driven, while the custom codec only carries the footprint size. Structure pieces persist their anchor, surface height, size, and seed in NBT. All block writes are clipped to the current structure-piece chunk box, including chest placement, so generation does not force-load or write into adjacent chunks.
+
+
+## Structure depth and exploration (Phase 2A–2C)
+
+All 14 structure identities now use dedicated Outlands chest loot tables under `theoutlands:structures/`. Loot is themed to each location and remains bounded: common supplies are useful but modest, while unusual curiosities and rare materials are uncommon. The existing Death progression artifacts are deliberately excluded, preserving the player-specific clue chain and Almighty ending reward.
+
+Each site chest can contain a written field record with location-specific observations. These records provide fragments rather than a narrator or a complete explanation; several references point toward other sites and leave the entities' origins unresolved.
+
+Every structure also receives a concealed lower service chamber, reached through a moss-covered surface hatch and ladder shaft. Each chamber has structure-specific physical clues, a small cache, and a recovered record. Its placement is clipped to the native structure piece bounds. The piece's vertical bounds and candidate height margin include the chamber. These additions affect only newly generated Outlands structure chunks; vanilla terrain noise, caves, biome sources, and vanilla structure sets remain untouched.

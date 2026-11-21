@@ -1,0 +1,54 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": {
+        "min": 2,
+        "max": 4
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:redstone",
+          "weight": 8
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:iron_ingot",
+          "weight": 4
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:written_book",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "minecraft:written_book_content": {
+                  "title": "Bunker Inventory",
+                  "author": "Quartermaster",
+                  "pages": [
+                    "{\"text\":\"The inner door was sealed from this side. The stores were untouched. Someone took every map and left the food.\"}",
+                    "{\"text\":\"If the ventilation starts, do not open the hatch.\"}"
+                  ]
+                },
+                "minecraft:custom_name": "{\"text\":\"Recovered field record\",\"italic\":false}"
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:paper",
+          "weight": 4
+        }
+      ]
+    }
+  ]
+}
