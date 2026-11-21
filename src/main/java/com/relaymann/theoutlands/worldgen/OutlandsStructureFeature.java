@@ -253,7 +253,7 @@ public final class OutlandsStructureFeature {
         room(l,rx,y,rz,9,7,4,Blocks.CRACKED_DEEPSLATE_BRICKS.defaultBlockState(),Blocks.POLISHED_DEEPSLATE.defaultBlockState(),Blocks.DEEPSLATE_BRICKS.defaultBlockState());
         for(int h=y+1;h<surface-1;h++){air(l,x+38,h,z+5);p(l,x+37,h,z+5,Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING,Direction.SOUTH));}
         p(l,x+38,surface-1,z+5,Blocks.IRON_TRAPDOOR.defaultBlockState());
-        p(l,x+38,surface,z+5,Blocks.OAK_LEAVES.defaultBlockState());
+        p(l,x+38,surface,z+5,Blocks.MOSS_CARPET.defaultBlockState());
         p(l,rx+2,y+1,rz+2,Blocks.COBWEB.defaultBlockState());p(l,rx+6,y+1,rz+2,Blocks.LECTERN.defaultBlockState());
         p(l,rx+6,y+1,rz+5,Blocks.SOUL_LANTERN.defaultBlockState());
         chest(l,rx+6,y+1,rz+4,"theoutlands:structures/hidden_cache",r);
