@@ -69,11 +69,11 @@ for field, entity_id in fields.items():
         renderer_path = "java/com/relaymann/theoutlands/client/NewEntityRenderers.java"
     src = read(renderer_path)
     renderer_block_match = re.search(
-        r'class\\s+' + re.escape(renderer_name) + r'\\b.*?(?=\\nfinal class|\\Z)',
+        r'class\s+' + re.escape(renderer_name) + r'\b.*?(?=\nfinal class|\Z)',
         src, re.S)
     renderer_block = renderer_block_match.group(0) if renderer_block_match else src
-    model_match = re.search(r'new\\s+([A-Za-z0-9_]+Model)\\s*\\(', renderer_block)
-    texture_match = re.search(r'textures/entity/([^"]+\\.png)', renderer_block)
+    model_match = re.search(r'new\s+([A-Za-z0-9_]+Model)\s*\(', renderer_block)
+    texture_match = re.search(r'textures/entity/([^"]+\.png)', renderer_block)
     if model_match:
         renderer_models[entity_id] = model_match.group(1)
     if texture_match:
