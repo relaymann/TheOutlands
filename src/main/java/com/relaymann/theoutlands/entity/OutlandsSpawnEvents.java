@@ -134,7 +134,7 @@ public final class OutlandsSpawnEvents {
         if (type == OutlandsEntities.HOWLER.get()) return new SpawnProfile(1_200.0D, 2, 1);
         if (type == OutlandsEntities.PILGRIM.get()) return new SpawnProfile(1_000.0D, 1, 2);
         if (type == OutlandsEntities.CEILING_DWELLER.get()) return new SpawnProfile(1_800.0D, 2, 2);
-        if (type == OutlandsEntities.COLOSSUS.get()) return new SpawnProfile(9_000.0D, 8, 10);
+        if (type == OutlandsEntities.COLOSSUS.get()) return new SpawnProfile(6_000.0D, 6, 5);
         if (type == OutlandsEntities.HUNTER.get() || type == OutlandsEntities.OBSERVER.get()
                 || type == OutlandsEntities.BURROWER.get() || type == OutlandsEntities.MIMIC.get()) {
             return new SpawnProfile(1_500.0D, 2, 2);
@@ -192,7 +192,12 @@ public final class OutlandsSpawnEvents {
     }
 
 
-    private static boolean pilgrimSpawn(EntityType<? extends Monster> type, ServerLevelAccessor level, MobSpawnType reason, BlockPos pos, RandomSource random) { return Monster.checkMonsterSpawnRules(type,level,reason,pos,random) && level.getBrightness(LightLayer.BLOCK,pos)<=10; }
+    private static boolean pilgrimSpawn(EntityType<? extends Monster> type, ServerLevelAccessor level, MobSpawnType reason, BlockPos pos, RandomSource random) {
+        return Monster.checkMonsterSpawnRules(type, level, reason, pos, random)
+                && level.getBrightness(LightLayer.BLOCK, pos) <= 10
+                && (level.getBiome(pos).is(net.minecraft.tags.BiomeTags.IS_FOREST)
+                    || level.getBiome(pos).is(net.minecraft.tags.BiomeTags.IS_PLAINS));
+    }
     private static boolean ceilingSpawn(EntityType<? extends Monster> type, ServerLevelAccessor level, MobSpawnType reason, BlockPos pos, RandomSource random) {
         if(!caveSpawn(type,level,reason,pos,random))return false;
         for(int dy=3;dy<=8;dy++){BlockPos ceiling=pos.above(dy);if(level.getBlockState(ceiling).isSolidRender(level,ceiling))return true;}return false;
