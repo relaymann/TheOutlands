@@ -31,9 +31,10 @@ def chunk(kind, data):
     return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data) & 0xffffffff)
 
 def write_png(path, pixels):
+    height, width = len(pixels), len(pixels[0])
     raw = b"".join(b"\x00" + bytes(channel for rgb in row for channel in rgb) for row in pixels)
     data = (b"\x89PNG\r\n\x1a\n"
-            + chunk(b"IHDR", struct.pack(">IIBBBBB",64,64,8,2,0,0,0))
+            + chunk(b"IHDR", struct.pack(">IIBBBBB",width,height,8,2,0,0,0))
             + chunk(b"IDAT", zlib.compress(raw, 9)) + chunk(b"IEND", b""))
     with open(path, "wb") as f: f.write(data)
 
@@ -54,10 +55,11 @@ def rect(pixels, x0, y0, x1, y1, color):
 
 def generate(name, palette, index):
     rng = random.Random(20261120 + index*173)
+    size = 128 if name == "colossus" else 64
     pixels = []
-    for y in range(64):
+    for y in range(size):
         row=[]
-        for x in range(64):
+        for x in range(size):
             grain = rng.random()*0.65 + 0.18*math.sin((x+index*3)*0.39) + 0.12*math.cos(y*.31+x*.13)
             band = (x//4 + y//8 + index) % 5
             shade = max(0,min(4,int(grain*3.0)+(1 if band==3 and rng.random()<.25 else 0)))
@@ -109,12 +111,27 @@ def generate(name, palette, index):
         for x in (25,31,37): line(pixels,x,18,x+2,13,palette[4])
     if name == "dredge":
         for x in (23,29,35): line(pixels,x,25,x+2,18,palette[4])
+    if name == "pilgrim":
+        line(pixels, 27, 18, 27, 43, palette[1])
+        line(pixels, 36, 18, 36, 43, palette[1])
+        rect(pixels, 29, 31, 34, 34, palette[3])
+        line(pixels, 31, 29, 31, 37, palette[4])
+        line(pixels, 28, 33, 35, 33, palette[4])
+    if name == "ceiling_dweller":
+        for x in (8, 13, 18): rect(pixels, x, 9, x+1, 11, palette[4])
+        for x in (21, 27, 37, 43): line(pixels, x, 31, x-3, 39, palette[4])
+    if name == "colossus":
+        for y in range(8, 120, 12): line(pixels, 18, y, 108, y-3, palette[1])
+        for x in (20, 42, 66, 90, 112): line(pixels, x, 8, x-5, 120, palette[2])
+        for x, y in ((32, 28), (78, 46), (54, 83), (96, 101)):
+            line(pixels, x, y, x+7, y+11, palette[4])
+            line(pixels, x+7, y+11, x+13, y+15, palette[3])
     os.makedirs(OUT, exist_ok=True)
     write_png(os.path.join(OUT,name+".png"), pixels)
 
 def main():
     for index,(name,palette) in enumerate(PALETTES.items()):
         generate(name,palette,index)
-    print("Generated",len(PALETTES),"unique 64x64 Outlands entity textures.")
+    print("Generated",len(PALETTES)-1,"64x64 and one 128x128 Outlands entity texture.")
 
 if __name__ == "__main__": main()
