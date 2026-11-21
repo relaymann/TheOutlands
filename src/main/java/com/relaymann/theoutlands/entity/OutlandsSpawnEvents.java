@@ -195,8 +195,7 @@ public final class OutlandsSpawnEvents {
     private static boolean pilgrimSpawn(EntityType<? extends Monster> type, ServerLevelAccessor level, MobSpawnType reason, BlockPos pos, RandomSource random) {
         return Monster.checkMonsterSpawnRules(type, level, reason, pos, random)
                 && level.getBrightness(LightLayer.BLOCK, pos) <= 10
-                && (level.getBiome(pos).is(net.minecraft.tags.BiomeTags.IS_FOREST)
-                    || level.getBiome(pos).is(net.minecraft.tags.BiomeTags.IS_PLAINS));
+                && level.getBiome(pos).is(net.minecraft.tags.BiomeTags.IS_FOREST);
     }
     private static boolean ceilingSpawn(EntityType<? extends Monster> type, ServerLevelAccessor level, MobSpawnType reason, BlockPos pos, RandomSource random) {
         if(!caveSpawn(type,level,reason,pos,random))return false;
