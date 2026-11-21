@@ -303,5 +303,53 @@
         "volume": 1
       }
     ]
+  },
+  "pilgrim_breath": {
+    "sounds": [
+      {
+        "name": "theoutlands:pilgrim_breath",
+        "volume": 0.38
+      }
+    ]
+  },
+  "pilgrim_hurt": {
+    "sounds": [
+      {
+        "name": "theoutlands:pilgrim_hurt",
+        "volume": 0.6
+      }
+    ]
+  },
+  "ceiling_crawl": {
+    "sounds": [
+      {
+        "name": "theoutlands:ceiling_crawl",
+        "volume": 0.65
+      }
+    ]
+  },
+  "ceiling_hit": {
+    "sounds": [
+      {
+        "name": "theoutlands:ceiling_hit",
+        "volume": 0.8
+      }
+    ]
+  },
+  "colossus_step": {
+    "sounds": [
+      {
+        "name": "theoutlands:colossus_step",
+        "volume": 0.75
+      }
+    ]
+  },
+  "colossus_hurt": {
+    "sounds": [
+      {
+        "name": "theoutlands:colossus_hurt",
+        "volume": 0.95
+      }
+    ]
   }
 }
