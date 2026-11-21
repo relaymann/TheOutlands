@@ -77,8 +77,8 @@ public final class PilgrimEntity extends Monster {
         }
         setSprinting(false);
 
-        Player player = level().getNearestPlayer(this, 24.0D);
-        if (player == null || !isValidObserver(player)) {
+        Player player = level().getNearestPlayer(this, 24.0D, this::isValidObserver);
+        if (player == null) {
             if (watchTicks == 0 && getNavigation().isDone() && getRandom().nextInt(120) == 0) {
                 getNavigation().moveTo(getX() + (getRandom().nextDouble() - 0.5D) * 12.0D,
                         getY(), getZ() + (getRandom().nextDouble() - 0.5D) * 12.0D, 0.78D);
