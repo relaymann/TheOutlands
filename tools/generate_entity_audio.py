@@ -282,3 +282,21 @@ structure_tone("structure_hollow_crypt", 2.7, 39, 0.26, 0.4)
 structure_tone("structure_boundary_monument", 3, 64, 0.17, 0.26)
 
 print("Generated original Outlands entity and structure sound effects in", OUT)
+
+# Three new original entity sound palettes.
+def pilgrim_breath(t,d,i,n):
+ a=noise(t,90,520,pilgrim_breath.a);b=noise(t,620,2100,pilgrim_breath.b);p=max(0,math.sin(2*math.pi*.38*t+.4))**2
+ return fade(t,d,.2,.45)*(.28*a*p+.09*b*p+.035*math.sin(2*math.pi*58*t))
+pilgrim_breath.a,pilgrim_breath.b={"lp1":0.,"lp2":0.},{"lp1":0.,"lp2":0.};make("pilgrim_breath",2.7,pilgrim_breath)
+def pilgrim_hurt(t,d,i,n): return .38*noise(t,80,850,pilgrim_hurt.a)*math.exp(-t*10)+.16*noise(t,700,3200,pilgrim_hurt.b)*math.exp(-t*24)
+pilgrim_hurt.a,pilgrim_hurt.b={"lp1":0.,"lp2":0.},{"lp1":0.,"lp2":0.};make("pilgrim_hurt",.9,pilgrim_hurt)
+def ceiling_crawl(t,d,i,n):
+ a=noise(t,150,1100,ceiling_crawl.a);b=noise(t,900,4700,ceiling_crawl.b);return fade(t,d,.03,.18)*(.25*a+.14*b+.12*math.sin(2*math.pi*520*t)*math.exp(-t*2))
+ceiling_crawl.a,ceiling_crawl.b={"lp1":0.,"lp2":0.},{"lp1":0.,"lp2":0.};make("ceiling_crawl",1.5,ceiling_crawl)
+def ceiling_hit(t,d,i,n): return .48*noise(t,65,900,ceiling_hit.a)*math.exp(-t*14)+.2*noise(t,1100,5500,ceiling_hit.b)*math.exp(-t*30)
+ceiling_hit.a,ceiling_hit.b={"lp1":0.,"lp2":0.},{"lp1":0.,"lp2":0.};make("ceiling_hit",.72,ceiling_hit)
+def colossus_step(t,d,i,n):
+ a=noise(t,28,180,colossus_step.a);b=noise(t,180,650,colossus_step.b);return fade(t,d,.02,.65)*(.38*a*math.exp(-t*1.7)+.18*b*math.exp(-t*4)+.26*math.sin(2*math.pi*(38-9*t)*t)*math.exp(-t*2.7))
+colossus_step.a,colossus_step.b={"lp1":0.,"lp2":0.},{"lp1":0.,"lp2":0.};make("colossus_step",2.2,colossus_step)
+def colossus_hurt(t,d,i,n): return .42*noise(t,25,260,colossus_hurt.a)*math.exp(-t*4)+.2*noise(t,240,1200,colossus_hurt.b)*math.exp(-t*11)
+colossus_hurt.a,colossus_hurt.b={"lp1":0.,"lp2":0.},{"lp1":0.,"lp2":0.};make("colossus_hurt",1.7,colossus_hurt)
