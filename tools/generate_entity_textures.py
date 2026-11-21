@@ -55,11 +55,11 @@ def rect(pixels, x0, y0, x1, y1, color):
 
 def generate(name, palette, index):
     rng = random.Random(20261120 + index*173)
-    size = 128 if name == "colossus" else 64
+    width, height = (128, 128) if name == "colossus" else (64, 128) if name == "pilgrim" else (64, 64)
     pixels = []
-    for y in range(size):
+    for y in range(height):
         row=[]
-        for x in range(size):
+        for x in range(width):
             grain = rng.random()*0.65 + 0.18*math.sin((x+index*3)*0.39) + 0.12*math.cos(y*.31+x*.13)
             band = (x//4 + y//8 + index) % 5
             shade = max(0,min(4,int(grain*3.0)+(1 if band==3 and rng.random()<.25 else 0)))
@@ -132,6 +132,6 @@ def generate(name, palette, index):
 def main():
     for index,(name,palette) in enumerate(PALETTES.items()):
         generate(name,palette,index)
-    print("Generated",len(PALETTES)-1,"64x64 and one 128x128 Outlands entity texture.")
+    print("Generated Outlands textures: standard 64x64, Pilgrim 64x128, Colossus 128x128.")
 
 if __name__ == "__main__": main()
