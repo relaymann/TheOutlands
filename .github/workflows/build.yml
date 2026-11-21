@@ -33,7 +33,7 @@ jobs:
           sudo apt-get install -y ffmpeg
 
       - name: Validate entity generators and registry audit
-        run: python3 -m py_compile tools/generate_entity_audio.py tools/generate_entity_textures.py tools/validate_entity_registry.py tools/validate_structure_phase2.py tools/audit_ten_passes.py
+        run: python3 -m py_compile tools/generate_entity_audio.py tools/generate_entity_textures.py tools/validate_entity_registry.py tools/validate_structure_phase2.py tools/validate_phase3.py tools/audit_ten_passes.py
 
       - name: Generate unique entity textures
         run: python3 tools/generate_entity_textures.py
