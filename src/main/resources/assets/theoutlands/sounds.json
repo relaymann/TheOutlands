@@ -383,5 +383,13 @@
         "volume": 1.5
       }
     ]
+  },
+  "colossus_rumble": {
+    "sounds": [
+      {
+        "name": "theoutlands:colossus_rumble",
+        "volume": 0.72
+      }
+    ]
   }
 }
