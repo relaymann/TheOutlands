@@ -82,11 +82,9 @@ public final class OutlandsSpawnEvents {
 
         if (distance < profile.minimumDistance()) return false;
 
-        int distanceDenominator = distance < 1_000.0D ? 8
-                : distance < 2_000.0D ? 5
-                : distance < 4_000.0D ? 3
-                : distance < 7_000.0D ? 2 : 1;
-        int denominator = distanceDenominator * profile.rarityMultiplier();
+        // Distance is a progression gate, not a second rarity penalty. Once an
+        // entity reaches its intended territory, only its own rarity applies.
+        int denominator = profile.rarityMultiplier();
         if (denominator > 1 && random.nextInt(denominator) != 0) return false;
 
         // Budget around the candidate spawn location rather than the nearest
@@ -129,22 +127,22 @@ public final class OutlandsSpawnEvents {
     private static SpawnProfile profile(EntityType<?> type) {
         if (type == OutlandsEntities.LURKER.get() || type == OutlandsEntities.DREDGE.get()
                 || type == OutlandsEntities.STALKER.get()) return new SpawnProfile(500.0D, 1, 1);
-        if (type == OutlandsEntities.HOWLER.get()) return new SpawnProfile(1_500.0D, 2, 2);
+        if (type == OutlandsEntities.HOWLER.get()) return new SpawnProfile(1_200.0D, 2, 1);
         if (type == OutlandsEntities.HUNTER.get() || type == OutlandsEntities.OBSERVER.get()
                 || type == OutlandsEntities.BURROWER.get() || type == OutlandsEntities.MIMIC.get()) {
-            return new SpawnProfile(1_800.0D, 2, 2);
+            return new SpawnProfile(1_500.0D, 2, 2);
         }
-        if (type == OutlandsEntities.CAVE_JAR.get()) return new SpawnProfile(2_500.0D, 4, 3);
+        if (type == OutlandsEntities.CAVE_JAR.get()) return new SpawnProfile(2_000.0D, 3, 2);
         if (type == OutlandsEntities.STILLBORN_STATUE.get()
-                || type == OutlandsEntities.AGITATED_ONE.get()) return new SpawnProfile(3_500.0D, 4, 4);
+                || type == OutlandsEntities.AGITATED_ONE.get()) return new SpawnProfile(2_500.0D, 3, 3);
         if (type == OutlandsEntities.NULL.get() || type == OutlandsEntities.NULL_APOSTLE.get()) {
-            return new SpawnProfile(7_000.0D, 7, 8);
+            return new SpawnProfile(5_000.0D, 5, 4);
         }
         if (type == OutlandsEntities.FEAR.get()) {
-            return new SpawnProfile(OutlandsConfig.FEAR_FIRST_APPEARANCE_DISTANCE.get(), 10, 16);
+            return new SpawnProfile(OutlandsConfig.FEAR_FIRST_APPEARANCE_DISTANCE.get(), 8, 6);
         }
         if (type == OutlandsEntities.DEATH.get()) {
-            return new SpawnProfile(OutlandsConfig.DEATH_FIRST_APPEARANCE_DISTANCE.get(), 10, 32);
+            return new SpawnProfile(OutlandsConfig.DEATH_FIRST_APPEARANCE_DISTANCE.get(), 8, 10);
         }
         return null;
     }
@@ -189,6 +187,6 @@ public final class OutlandsSpawnEvents {
     private static boolean almightySpawn(EntityType<? extends Monster> type,
             ServerLevelAccessor level, MobSpawnType reason, BlockPos pos, RandomSource random) {
         return Monster.checkMonsterSpawnRules(type, level, reason, pos, random)
-                && random.nextInt(160) == 0;
+                && random.nextInt(80) == 0;
     }
 }
