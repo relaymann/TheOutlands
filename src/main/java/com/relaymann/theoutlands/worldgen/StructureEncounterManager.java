@@ -26,7 +26,7 @@ public final class StructureEncounterManager {
             case "shrine" -> { if(distance>=15_000) { selected=OutlandsEntities.NULL_APOSTLE.get(); denominator=90; } }
             case "observatory" -> { if(distance>=22_000) { selected=OutlandsEntities.NULL_APOSTLE.get(); denominator=70; } }
             case "archive" -> {
-                if(distance>=50_000 && random.nextInt(240)==0) selected=OutlandsEntities.DEATH.get();
+                if(distance>=OutlandsConfig.DEATH_FIRST_APPEARANCE_DISTANCE.get() && random.nextInt(240)==0) selected=OutlandsEntities.DEATH.get();
                 else { selected=OutlandsEntities.DREDGE.get(); denominator=32; }
             }
             case "research_facility" -> { selected=OutlandsEntities.STILLBORN_STATUE.get(); denominator=52; }
@@ -35,11 +35,11 @@ public final class StructureEncounterManager {
             case "last_outpost" -> { selected=OutlandsEntities.HUNTER.get(); denominator=24; }
             case "forgotten_station" -> { selected=OutlandsEntities.DREDGE.get(); denominator=24; }
             case "null_chamber" -> {
-                if(distance>=25_000 && random.nextInt(320)==0) selected=OutlandsEntities.NULL.get();
+                if(distance>=25_000 && OutlandsConfig.NULL_SIGHTINGS_ENABLED.get() && random.nextInt(320)==0) selected=OutlandsEntities.NULL.get();
                 else { selected=OutlandsEntities.NULL_APOSTLE.get(); denominator=90; }
             }
             case "hollow_crypt" -> {
-                if(distance>=50_000 && random.nextInt(280)==0) selected=OutlandsEntities.DEATH.get();
+                if(distance>=OutlandsConfig.DEATH_FIRST_APPEARANCE_DISTANCE.get() && random.nextInt(280)==0) selected=OutlandsEntities.DEATH.get();
                 else { selected=OutlandsEntities.DREDGE.get(); denominator=38; }
             }
             case "boundary_monument" -> {

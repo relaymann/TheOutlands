@@ -50,7 +50,8 @@ def main() -> None:
     encounters = ROOT / "src/main/java/com/relaymann/theoutlands/worldgen/StructureEncounterManager.java"
     ambience_text = ambience.read_text(encoding="utf-8")
     encounter_text = encounters.read_text(encoding="utf-8")
-    assert "getStructureWithPieceAt" in ambience_text and "Horror_AUDIO_ENABLED" .lower() not in ambience_text.lower() or "HORROR_AUDIO_ENABLED" in ambience_text
+    assert "getStructureWithPieceAt" in ambience_text
+    assert "HORROR_AUDIO_ENABLED" in ambience_text
     assert "NEXT_CUE" in ambience_text and "ClientboundSoundPacket" in ambience_text
     assert "ENTITY_SPAWN_BALANCE_ENABLED" in encounter_text and "ENTITY_ECOSYSTEM_ENABLED" in encounter_text
     assert "addFreshEntity" in encounter_text and "NULL" in encounter_text and "DEATH" in encounter_text
