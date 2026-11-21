@@ -52,6 +52,11 @@ public final class OutlandsStructureFeature extends Feature<NoneFeatureConfigura
         if(dist>=Math.max(min,12_000)&&roll(r,16_000,mult)){apostleCathedral(l,x,y,z,r);return true;}
         if(dist>=Math.max(min,2_000)&&roll(r,8_000,mult)){forsakenSettlement(l,x,y,z,r);return true;}
         if(dist>=Math.max(min,4_000)&&roll(r,12_000,mult)){lastOutpost(l,x,y,z,r);return true;}
+        // Priority batch 2: rarer, deeper sites with stronger ties to Null and Death.
+        if(dist>=Math.max(min,5_000)&&roll(r,15_000,mult)){forgottenStation(l,x,y,z,r);return true;}
+        if(dist>=Math.max(min,25_000)&&roll(r,28_000,mult)){nullChamber(l,x,y,z,r);return true;}
+        if(dist>=Math.max(min,35_000)&&roll(r,30_000,mult)){hollowCrypt(l,x,y,z,r);return true;}
+        if(dist>=Math.max(min,18_000)&&roll(r,22_000,mult)){boundaryMonument(l,x,y,z,r);return true;}
         return false;
     }
 
@@ -260,7 +265,7 @@ public final class OutlandsStructureFeature extends Feature<NoneFeatureConfigura
         }
         p(l,x+1,y+1,z+1,Blocks.BARREL.defaultBlockState());
         p(l,x+7,y+1,z+7,Blocks.COBWEB.defaultBlockState());
-        chest(l,x+2,y+1,z+1,"village_taiga_house",r);
+        chest(l,x+2,y+1,z+1,"village/village_taiga_house",r);
     }
 
     // Last Outpost: a barricaded perimeter, lookout corners and an abandoned command post.
@@ -279,6 +284,95 @@ public final class OutlandsStructureFeature extends Feature<NoneFeatureConfigura
         p(l,x+4,y+2,z+4,Blocks.LANTERN.defaultBlockState());
         for(int a=2;a<=6;a++)p(l,x+a,y+1,z+2,Blocks.SPRUCE_FENCE.defaultBlockState());
         chest(l,x+6,y+1,z+6,"bastion_treasure",r);
+    }
+
+    // Forgotten Station: a buried platform with a short track section that ends at a sealed wall.
+    private static void forgottenStation(WorldGenLevel l,int x,int surface,int z,RandomSource r){
+        int y=surface-10;
+        for(int a=0;a<9;a++)for(int b=0;b<7;b++){
+            p(l,x+a,y,z+b,Blocks.POLISHED_ANDESITE.defaultBlockState());
+            p(l,x+a,y+4,z+b,Blocks.STONE_BRICKS.defaultBlockState());
+            for(int h=1;h<4;h++){
+                boolean edge=a==0||a==8||b==0||b==6;
+                if(!edge)air(l,x+a,y+h,z+b);
+                else p(l,x+a,y+h,z+b,Blocks.CRACKED_STONE_BRICKS.defaultBlockState());
+            }
+        }
+        for(int a=0;a<9;a++){
+            p(l,x+a,y+1,z+2,Blocks.RAIL.defaultBlockState());
+            p(l,x+a,y+1,z+4,Blocks.RAIL.defaultBlockState());
+        }
+        for(int a=2;a<=6;a++)p(l,x+a,y+1,z+1,Blocks.OAK_PLANKS.defaultBlockState());
+        p(l,x+4,y+2,z+1,Blocks.LANTERN.defaultBlockState());
+        for(int h=1;h<=3;h++)p(l,x+8,y+h,z+3,Blocks.DEEPSLATE_BRICKS.defaultBlockState());
+        for(int h=y+4;h<surface;h++){air(l,x+4,h,z+1);p(l,x+3,h,z+1,Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING,Direction.SOUTH));}
+        air(l,x+4,surface,z+1);p(l,x+3,surface,z+1,Blocks.IRON_TRAPDOOR.defaultBlockState());
+        chest(l,x+2,y+1,z+5,"mineshaft",r);
+    }
+
+    // Null Chamber: a very rare, nearly featureless room with a central blackstone void-marker.
+    private static void nullChamber(WorldGenLevel l,int x,int surface,int z,RandomSource r){
+        int y=surface-20;
+        for(int a=0;a<7;a++)for(int b=0;b<7;b++){
+            p(l,x+a,y,z+b,Blocks.POLISHED_DEEPSLATE.defaultBlockState());
+            p(l,x+a,y+4,z+b,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState());
+            for(int h=1;h<4;h++){
+                boolean edge=a==0||a==6||b==0||b==6;
+                if(!edge)air(l,x+a,y+h,z+b);
+                else p(l,x+a,y+h,z+b,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState());
+            }
+        }
+        int[][] pillars={{1,1},{5,1},{1,5},{5,5}};
+        for(int[] q:pillars)for(int h=1;h<=3;h++)p(l,x+q[0],y+h,z+q[1],Blocks.BLACKSTONE.defaultBlockState());
+        p(l,x+3,y+1,z+3,Blocks.CRYING_OBSIDIAN.defaultBlockState());
+        p(l,x+3,y+2,z+3,Blocks.BLACK_CONCRETE.defaultBlockState());
+        p(l,x+3,y+3,z+3,Blocks.BLACK_CONCRETE.defaultBlockState());
+        for(int h=y+4;h<surface;h++){air(l,x+3,h,z+1);p(l,x+2,h,z+1,Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING,Direction.SOUTH));}
+        air(l,x+3,surface,z+1);p(l,x+2,surface,z+1,Blocks.IRON_TRAPDOOR.defaultBlockState());
+        chest(l,x+5,y+1,z+3,"ancient_city",r);
+    }
+
+    // Hollow Crypt: a buried burial hall with empty marked alcoves and a sealed central tomb.
+    private static void hollowCrypt(WorldGenLevel l,int x,int surface,int z,RandomSource r){
+        int y=surface-24;
+        for(int a=0;a<9;a++)for(int b=0;b<7;b++){
+            p(l,x+a,y,z+b,Blocks.DEEPSLATE_BRICKS.defaultBlockState());
+            p(l,x+a,y+4,z+b,Blocks.POLISHED_DEEPSLATE.defaultBlockState());
+            for(int h=1;h<4;h++){
+                boolean edge=a==0||a==8||b==0||b==6;
+                if(!edge)air(l,x+a,y+h,z+b);
+                else p(l,x+a,y+h,z+b,Blocks.DEEPSLATE_BRICKS.defaultBlockState());
+            }
+        }
+        for(int a=1;a<=7;a+=2){
+            p(l,x+a,y+1,z+1,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState());
+            p(l,x+a,y+1,z+5,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState());
+            p(l,x+a,y+2,z+1,Blocks.SOUL_LANTERN.defaultBlockState());
+            p(l,x+a,y+2,z+5,Blocks.SOUL_LANTERN.defaultBlockState());
+        }
+        for(int a=3;a<=5;a++)for(int b=2;b<=4;b++)p(l,x+a,y+1,z+b,Blocks.CRYING_OBSIDIAN.defaultBlockState());
+        p(l,x+4,y+2,z+3,Blocks.IRON_BARS.defaultBlockState());
+        for(int h=y+4;h<surface;h++){air(l,x+4,h,z+1);p(l,x+3,h,z+1,Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING,Direction.SOUTH));}
+        air(l,x+4,surface,z+1);p(l,x+3,surface,z+1,Blocks.DEEPSLATE_BRICKS.defaultBlockState());
+        p(l,x+5,surface,z+1,Blocks.DEEPSLATE_BRICKS.defaultBlockState());
+        p(l,x+4,surface,z+2,Blocks.IRON_TRAPDOOR.defaultBlockState());
+        chest(l,x+7,y+1,z+3,"ancient_city",r);
+    }
+
+    // Boundary Monument: broken concentric rings around a deliberately empty central frame.
+    private static void boundaryMonument(WorldGenLevel l,int x,int y,int z,RandomSource r){
+        for(int a=0;a<9;a++)for(int b=0;b<9;b++){
+            int ax=a-4,bz=b-4,dist2=ax*ax+bz*bz;
+            if(dist2>=9&&dist2<=20)p(l,x+a,y,z+b,Blocks.CRACKED_STONE_BRICKS.defaultBlockState());
+        }
+        for(int[] q:new int[][]{{1,1},{7,1},{1,7},{7,7}}){
+            for(int h=1;h<=5;h++)p(l,x+q[0],y+h,z+q[1],Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState());
+        }
+        // A broken lintel and empty frame; no portal or dimension transfer is created.
+        for(int a=3;a<=5;a++)p(l,x+a,y+5,z+4,Blocks.CHISELED_STONE_BRICKS.defaultBlockState());
+        p(l,x+4,y+1,z+4,Blocks.CRYING_OBSIDIAN.defaultBlockState());
+        p(l,x+4,y+2,z+4,Blocks.AIR.defaultBlockState());
+        chest(l,x+2,y+1,z+4,"ruined_portal",r);
     }
 
 }

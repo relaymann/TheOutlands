@@ -99,3 +99,14 @@ Four additional lore sites extend the additive feature pool:
 - **Last Outpost** — a barricaded field position with lookout posts and a command cache, showing a failed attempt to hold the wilderness.
 
 These use compact footprints that fit the existing single-chunk placement model. They are generated only in newly generated chunks and do not modify vanilla terrain generation rules or existing structures.
+
+
+## Lore structure batch 2
+
+The second batch adds four more specialized locations:
+- **Forgotten Station** — a buried platform and short rail segment ending at a sealed wall, implying a route that was deliberately abandoned.
+- **Null Chamber** — a rare deep room with a stark central marker and four blackstone pillars, connected to failed attempts to contact Null.
+- **Hollow Crypt** — a deep burial hall with empty marked alcoves and a sealed central tomb, tied to Death's presence without placing any Death progression artifacts.
+- **Boundary Monument** — broken stone rings and an empty central frame, suggesting a boundary without creating a portal or changing dimensions.
+
+As with the first batch, these are compact single-chunk features, appear only in newly generated chunks, and leave vanilla terrain and structure generation systems intact.
