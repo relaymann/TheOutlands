@@ -38,10 +38,9 @@ public final class OutlandsStructure extends Structure {
         int x=context.chunkPos().getMinBlockX()-(size-16)/2;
         int z=context.chunkPos().getMinBlockZ()-(size-16)/2;
         int min=Integer.MAX_VALUE,max=Integer.MIN_VALUE;
-        for(int sx=0;sx<3;sx++)for(int sz=0;sz<3;sz++){
-            int sampleX=x+sx*(size-1)/2;
-            int sampleZ=z+sz*(size-1)/2;
-            int height=context.chunkGenerator().getFirstOccupiedHeight(sampleX,sampleZ,
+        int[] samples=StructurePlacementPolicy.surfaceSampleOffsets(size,4);
+        for(int sx:samples)for(int sz:samples){
+            int height=context.chunkGenerator().getFirstOccupiedHeight(x+sx,z+sz,
                     Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,context.heightAccessor(),context.randomState());
             min=Math.min(min,height);max=Math.max(max,height);
         }

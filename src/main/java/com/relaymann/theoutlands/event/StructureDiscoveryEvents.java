@@ -21,7 +21,9 @@ public final class StructureDiscoveryEvents {
 
     @SubscribeEvent
     public static void onStructureCacheOpened(PlayerInteractEvent.RightClickBlock event) {
-        if (!(event.getEntity() instanceof ServerPlayer player)
+        if (event.isCanceled()
+                || !(event.getEntity() instanceof ServerPlayer player)
+                || player.isCreative() || player.isSpectator()
                 || !(player.level() instanceof ServerLevel level)
                 || !OutlandsConfig.OUTLANDS_STRUCTURES_ENABLED.get()) return;
         var state = level.getBlockState(event.getPos());

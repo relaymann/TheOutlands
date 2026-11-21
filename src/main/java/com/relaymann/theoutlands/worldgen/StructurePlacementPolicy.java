@@ -39,6 +39,18 @@ public final class StructurePlacementPolicy {
         return new int[] {(int) (cellX * CELL_CHUNKS + offsetX), (int) (cellZ * CELL_CHUNKS + offsetZ)};
     }
 
+    /** Evenly samples a footprint and always includes its final block coordinate. */
+    public static int[] surfaceSampleOffsets(int size, int step) {
+        if (size < 1 || step < 1) throw new IllegalArgumentException("size and step must be positive");
+        int last = size - 1;
+        int count = last / step + 1 + (last % step == 0 ? 0 : 1);
+        int[] offsets = new int[count];
+        int index = 0;
+        for (int offset = 0; offset <= last; offset += step) offsets[index++] = offset;
+        if (last % step != 0) offsets[index] = last;
+        return offsets;
+    }
+
     /** Inclusive block clipping shared by every piece write and its tests. */
     public static boolean containsBlock(int minX, int minY, int minZ,
                                         int maxX, int maxY, int maxZ,

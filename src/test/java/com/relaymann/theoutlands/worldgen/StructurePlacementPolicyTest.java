@@ -32,6 +32,17 @@ class StructurePlacementPolicyTest {
         }
     }
 
+    @Test void surfaceSamplesCoverTheEntireFootprintIncludingTheLastBlock() {
+        assertArrayEquals(new int[] {0,4,8,12,16,20,24,28,32,36,40,44,47},
+                StructurePlacementPolicy.surfaceSampleOffsets(48,4));
+        assertArrayEquals(new int[] {0}, StructurePlacementPolicy.surfaceSampleOffsets(1,4));
+        assertArrayEquals(new int[] {0,3,6,8}, StructurePlacementPolicy.surfaceSampleOffsets(9,3));
+        assertThrows(IllegalArgumentException.class,
+                () -> StructurePlacementPolicy.surfaceSampleOffsets(0,4));
+        assertThrows(IllegalArgumentException.class,
+                () -> StructurePlacementPolicy.surfaceSampleOffsets(48,0));
+    }
+
     @Test void chunkClippingIncludesEdgesAndRejectsEveryOutsideAxis() {
         assertTrue(StructurePlacementPolicy.containsBlock(0, 10, 20, 15, 30, 35, 0, 10, 20));
         assertTrue(StructurePlacementPolicy.containsBlock(0, 10, 20, 15, 30, 35, 15, 30, 35));

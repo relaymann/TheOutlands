@@ -52,13 +52,14 @@ public final class StructureEncounterManager {
             String layout = OutlandsStructureFeature.chooseLayout(seed, distance, forest,
                     Math.max(1_000.0D, OutlandsConfig.STRUCTURE_MIN_DISTANCE.get()),
                     OutlandsConfig.STRUCTURE_CHANCE_MULTIPLIER.get());
-            RESOLVED_SITES.add(key);
-            if (layout != null) resolve(level, layout, center, distance, seed);
+            if (layout == null || resolve(level, layout, center, distance, seed)) {
+                RESOLVED_SITES.add(key);
+            }
         }
     }
 
-    private static void resolve(ServerLevel level, String structure, BlockPos center,
-                                double distance, long seed) {
+    private static boolean resolve(ServerLevel level, String structure, BlockPos center,
+                                   double distance, long seed) {
         RandomSource random = RandomSource.create(seed ^ ENCOUNTER_SALT);
         EntityType<?> selected = null;
         int denominator = 0;
@@ -90,7 +91,7 @@ public final class StructureEncounterManager {
             }
             case "boundary_monument" -> { if (distance >= 18_000) { selected = OutlandsEntities.NULL_APOSTLE.get(); denominator = 100; } }
         }
-        if (selected == null || (denominator > 0 && random.nextInt(denominator) != 0)) return;
+        if (selected == null || (denominator > 0 && random.nextInt(denominator) != 0)) return true;
         int spawnY = switch (structure) {
             case "bunker" -> center.getY() - 12;
             case "archive" -> center.getY() - 25;
@@ -101,17 +102,18 @@ public final class StructureEncounterManager {
             default -> center.getY() + 1;
         };
         BlockPos spawn = new BlockPos(center.getX(), spawnY, center.getZ());
-        if (!level.hasChunkAt(spawn)) return;
-        Entity entity = selected.create(level);
-        if (entity == null) return;
+        if (!level.hasChunkAt(spawn)) return false;
         float yaw = random.nextFloat() * 360.0F;
         int[][] offsets = {{0,0},{2,0},{-2,0},{0,2},{0,-2},{2,2},{2,-2},{-2,2},{-2,-2}};
         for (int[] offset : offsets) {
+            Entity entity = selected.create(level);
+            if (entity == null) continue;
             entity.moveTo(spawn.getX() + offset[0] + 0.5D, spawn.getY(),
                     spawn.getZ() + offset[1] + 0.5D, yaw, 0.0F);
-            if (level.noCollision(entity) && level.addFreshEntity(entity)) return;
+            if (level.noCollision(entity) && level.addFreshEntity(entity)) return true;
+            entity.discard();
         }
-        entity.discard();
+        return false;
     }
 
     public static void clear() { RESOLVED_SITES.clear(); }

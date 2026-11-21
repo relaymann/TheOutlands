@@ -93,6 +93,10 @@ def main():
     assert "hasSuitableSurface(level,box,surfaceY)" in piece
     assert "Heightmap.Types.MOTION_BLOCKING_NO_LEAVES" in piece and "BlockTags.LOGS" in piece
     assert "Heightmap.Types.MOTION_BLOCKING_NO_LEAVES" in structure
+    assert "surfaceSampleOffsets(size,4)" in structure and "surfaceSampleOffsets(int size, int step)" in policy
+    assert "Math.abs((top-1)-expectedY)>5" not in piece
+    assert "return false;" in encounters and "return true;" in encounters
+    assert "event.isCanceled()" in (ROOT/"src/main/java/com/relaymann/theoutlands/event/StructureDiscoveryEvents.java").read_text(encoding="utf-8")
     assert not any("ocean" in b or b.endswith(":river") or b.endswith(":beach") for b in bt["values"])
     excluded=(":stony_shore",":dripstone_caves",":lush_caves",":deep_dark",":swamp",":mangrove_swamp")
     assert not any(b.endswith(s) for b in bt["values"] for s in excluded)

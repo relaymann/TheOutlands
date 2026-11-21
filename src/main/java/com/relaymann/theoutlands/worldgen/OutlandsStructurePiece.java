@@ -70,7 +70,7 @@ public final class OutlandsStructurePiece extends StructurePiece {
         for(int x=box.minX();x<=box.maxX();x+=4) {
             for(int z=box.minZ();z<=box.maxZ();z+=4) {
                 int top=level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,x,z);
-                if(top<=level.getMinBuildHeight()||Math.abs((top-1)-expectedY)>5) return false;
+                if(top<=level.getMinBuildHeight()) return false;
                 var surface=level.getBlockState(new BlockPos(x,top-1,z));
                 if(!surface.getFluidState().isEmpty()||surface.is(BlockTags.LOGS)) return false;
             }
