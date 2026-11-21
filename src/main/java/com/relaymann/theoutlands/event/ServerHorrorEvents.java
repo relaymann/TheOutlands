@@ -2,6 +2,7 @@ package com.relaymann.theoutlands.event;
 
 import com.relaymann.theoutlands.TheOutlands;
 import com.relaymann.theoutlands.horror.HorrorMemory;
+import com.relaymann.theoutlands.worldgen.StructureEncounterManager;
 import com.relaymann.theoutlands.horror.HorrorProgressionManager;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -39,6 +40,7 @@ public final class ServerHorrorEvents {
             if (event.getServer().getTickCount() % 20 == 0) {
                 EnvironmentalAnomalyManager.tick(level);
                 StructureAmbienceManager.tick(level);
+                StructureEncounterManager.tick(level);
             }
         }
     }
@@ -88,6 +90,7 @@ public final class ServerHorrorEvents {
         FootstepEchoManager.clear();
         EnvironmentalAnomalyManager.clear();
         StructureAmbienceManager.clear();
+        StructureEncounterManager.clear();
         OutlandsIntelligenceManager.clear();
     }
 }

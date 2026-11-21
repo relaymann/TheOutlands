@@ -3,54 +3,111 @@ package com.relaymann.theoutlands.worldgen;
 import com.relaymann.theoutlands.OutlandsConfig;
 import com.relaymann.theoutlands.entity.OutlandsEntities;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.Level;
 
-/** Very rare, one-time structure encounters; no encounter is guaranteed by finding a site. */
+import java.util.HashSet;
+import java.util.Set;
+
+/** Resolves rare encounters on the main server tick when a player explores a site. */
 public final class StructureEncounterManager {
+    private static final Set<String> RESOLVED_SITES = new HashSet<>();
+    private static final long ENCOUNTER_SALT = 0x3C6EF372FE94F82BL;
+
     private StructureEncounterManager() {}
 
-    public static void trySpawn(String structure,WorldGenLevel level,BlockPos center,
-                                double distance,long seed) {
-        if(!OutlandsConfig.ENTITY_SPAWN_BALANCE_ENABLED.get()
+    public static void tick(ServerLevel level) {
+        if (!level.dimension().equals(Level.OVERWORLD)
+                || !OutlandsConfig.OUTLANDS_STRUCTURES_ENABLED.get()
+                || !OutlandsConfig.ENTITY_SPAWN_BALANCE_ENABLED.get()
                 || !OutlandsConfig.ENTITY_ECOSYSTEM_ENABLED.get()) return;
-        RandomSource random=RandomSource.create(seed ^ 0x3C6EF372FE94F82BL);
-        EntityType<?> selected=null;
-        int denominator=0;
-        switch(structure) {
-            case "cabin" -> { selected=OutlandsEntities.LURKER.get(); denominator=22; }
-            case "tower" -> { selected=OutlandsEntities.OBSERVER.get(); denominator=36; }
-            case "bunker" -> { selected=OutlandsEntities.CAVE_JAR.get(); denominator=32; }
-            case "shrine" -> { if(distance>=15_000) { selected=OutlandsEntities.NULL_APOSTLE.get(); denominator=90; } }
-            case "observatory" -> { if(distance>=22_000) { selected=OutlandsEntities.NULL_APOSTLE.get(); denominator=70; } }
+        for (ServerPlayer player : level.players()) {
+            if (!player.isAlive() || player.isCreative() || player.isSpectator()
+                    || player.isSleeping() || player.isPassenger()) continue;
+            var start = level.structureManager().getStructureWithPieceAt(player.blockPosition(),
+                    holder -> holder.value() instanceof OutlandsStructure);
+            if (start == null || !start.isValid()) continue;
+            var bounds = start.getBoundingBox();
+            if (!bounds.isInside(player.blockPosition())) continue;
+            int centerX = (bounds.minX() + bounds.maxX()) / 2;
+            int centerZ = (bounds.minZ() + bounds.maxZ()) / 2;
+            int centerChunkX = Math.floorDiv(centerX, 16);
+            int centerChunkZ = Math.floorDiv(centerZ, 16);
+            long seed = StructurePlacementPolicy.chunkSeed(level.getSeed(), centerChunkX, centerChunkZ);
+            String key = level.dimension().location() + ":" + level.getSeed()
+                    + ":" + bounds.minX() + ":" + bounds.minZ();
+            if (RESOLVED_SITES.contains(key)) continue;
+            BlockPos center = new BlockPos(centerX, bounds.maxY() - 12, centerZ);
+            if (!level.hasChunkAt(center)) continue;
+            double dx = centerX - level.getSharedSpawnPos().getX();
+            double dz = centerZ - level.getSharedSpawnPos().getZ();
+            double distance = Math.sqrt(dx * dx + dz * dz);
+            String biome = level.getBiome(center).unwrapKey().map(k -> k.location().getPath()).orElse("");
+            boolean forest = biome.contains("forest") || biome.contains("taiga")
+                    || biome.contains("grove") || biome.contains("wooded");
+            String layout = OutlandsStructureFeature.chooseLayout(seed, distance, forest,
+                    Math.max(1_000.0D, OutlandsConfig.STRUCTURE_MIN_DISTANCE.get()),
+                    OutlandsConfig.STRUCTURE_CHANCE_MULTIPLIER.get());
+            RESOLVED_SITES.add(key);
+            if (layout != null) resolve(level, layout, center, distance, seed);
+        }
+    }
+
+    private static void resolve(ServerLevel level, String structure, BlockPos center,
+                                double distance, long seed) {
+        RandomSource random = RandomSource.create(seed ^ ENCOUNTER_SALT);
+        EntityType<?> selected = null;
+        int denominator = 0;
+        switch (structure) {
+            case "cabin" -> { selected = OutlandsEntities.LURKER.get(); denominator = 22; }
+            case "tower" -> { selected = OutlandsEntities.OBSERVER.get(); denominator = 36; }
+            case "bunker" -> { selected = OutlandsEntities.CAVE_JAR.get(); denominator = 32; }
+            case "shrine" -> { if (distance >= 15_000) { selected = OutlandsEntities.NULL_APOSTLE.get(); denominator = 90; } }
+            case "observatory" -> { if (distance >= 22_000) { selected = OutlandsEntities.NULL_APOSTLE.get(); denominator = 70; } }
             case "archive" -> {
-                if(distance>=OutlandsConfig.DEATH_FIRST_APPEARANCE_DISTANCE.get() && random.nextInt(240)==0) selected=OutlandsEntities.DEATH.get();
-                else { selected=OutlandsEntities.DREDGE.get(); denominator=32; }
+                if (distance >= OutlandsConfig.DEATH_FIRST_APPEARANCE_DISTANCE.get() && random.nextInt(240) == 0)
+                    selected = OutlandsEntities.DEATH.get();
+                else { selected = OutlandsEntities.DREDGE.get(); denominator = 32; }
             }
-            case "research_facility" -> { selected=OutlandsEntities.STILLBORN_STATUE.get(); denominator=52; }
-            case "apostle_cathedral" -> { if(distance>=12_000) { selected=OutlandsEntities.NULL_APOSTLE.get(); denominator=34; } }
-            case "forsaken_settlement" -> { selected=OutlandsEntities.MIMIC.get(); denominator=26; }
-            case "last_outpost" -> { selected=OutlandsEntities.HUNTER.get(); denominator=24; }
-            case "forgotten_station" -> { selected=OutlandsEntities.DREDGE.get(); denominator=24; }
+            case "research_facility" -> { selected = OutlandsEntities.STILLBORN_STATUE.get(); denominator = 52; }
+            case "apostle_cathedral" -> { if (distance >= 12_000) { selected = OutlandsEntities.NULL_APOSTLE.get(); denominator = 34; } }
+            case "forsaken_settlement" -> { selected = OutlandsEntities.MIMIC.get(); denominator = 26; }
+            case "last_outpost" -> { selected = OutlandsEntities.HUNTER.get(); denominator = 24; }
+            case "forgotten_station" -> { selected = OutlandsEntities.DREDGE.get(); denominator = 24; }
             case "null_chamber" -> {
-                if(distance>=25_000 && OutlandsConfig.NULL_SIGHTINGS_ENABLED.get() && random.nextInt(320)==0) selected=OutlandsEntities.NULL.get();
-                else { selected=OutlandsEntities.NULL_APOSTLE.get(); denominator=90; }
+                if (distance >= 25_000 && OutlandsConfig.NULL_SIGHTINGS_ENABLED.get() && random.nextInt(320) == 0)
+                    selected = OutlandsEntities.NULL.get();
+                else { selected = OutlandsEntities.NULL_APOSTLE.get(); denominator = 90; }
             }
             case "hollow_crypt" -> {
-                if(distance>=OutlandsConfig.DEATH_FIRST_APPEARANCE_DISTANCE.get() && random.nextInt(280)==0) selected=OutlandsEntities.DEATH.get();
-                else { selected=OutlandsEntities.DREDGE.get(); denominator=38; }
+                if (distance >= OutlandsConfig.DEATH_FIRST_APPEARANCE_DISTANCE.get() && random.nextInt(280) == 0)
+                    selected = OutlandsEntities.DEATH.get();
+                else { selected = OutlandsEntities.DREDGE.get(); denominator = 38; }
             }
-            case "boundary_monument" -> {
-                if(distance>=18_000) { selected=OutlandsEntities.NULL_APOSTLE.get(); denominator=100; }
-            }
+            case "boundary_monument" -> { if (distance >= 18_000) { selected = OutlandsEntities.NULL_APOSTLE.get(); denominator = 100; } }
         }
-        if(selected==null || (denominator>0 && random.nextInt(denominator)!=0)) return;
-        Entity entity=selected.create(level.getLevel());
-        if(entity==null) return;
-        entity.moveTo(center.getX()+0.5D,center.getY(),center.getZ()+0.5D,
-                random.nextFloat()*360.0F,0.0F);
-        level.getLevel().addFreshEntity(entity);
+        if (selected == null || (denominator > 0 && random.nextInt(denominator) != 0)) return;
+        int spawnY = switch (structure) {
+            case "bunker" -> center.getY() - 2;
+            case "archive" -> center.getY() - 15;
+            case "research_facility" -> center.getY() - 10;
+            case "forgotten_station" -> center.getY() - 8;
+            case "null_chamber" -> center.getY() - 18;
+            case "hollow_crypt" -> center.getY() - 22;
+            default -> center.getY() + 1;
+        };
+        BlockPos spawn = new BlockPos(center.getX(), spawnY, center.getZ());
+        if (!level.hasChunkAt(spawn)) return;
+        Entity entity = selected.create(level);
+        if (entity == null) return;
+        entity.moveTo(spawn.getX() + 0.5D, spawn.getY(), spawn.getZ() + 0.5D,
+                random.nextFloat() * 360.0F, 0.0F);
+        if (!level.noCollision(entity) || !level.addFreshEntity(entity)) entity.discard();
     }
+
+    public static void clear() { RESOLVED_SITES.clear(); }
 }

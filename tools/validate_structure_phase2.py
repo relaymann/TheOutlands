@@ -50,7 +50,10 @@ def main():
     assert not any(item in serialized for item in forbidden), "progression artifact leaked into structure loot"
     assert "hiddenCache(id,level,x,surfaceY,z,random)" in feature and "private static void hiddenCache(String id" in feature
     assert "three-stroke mark" in feature
-    assert "new BoundingBox(x,y-40,z" in piece and "chunkPos.x==centerChunkX&&chunkPos.z==centerChunkZ" in piece
+    assert "new BoundingBox(x,y-40,z" in piece
+    assert "StructureEncounterManager.tick(level)" in (ROOT/"src/main/java/com/relaymann/theoutlands/event/ServerHorrorEvents.java").read_text(encoding="utf-8")
+    assert "void tick(ServerLevel level)" in encounters and "RESOLVED_SITES" in encounters
+    assert "addFreshEntity(entity)" in encounters and "addFreshEntity" not in piece
     assert "getStructureWithPieceAt" in ambience and "holder.value() instanceof" in ambience
     assert "HORROR_AUDIO_ENABLED" in ambience and "ClientboundSoundPacket" in ambience and "NEXT_CUE" in ambience
     sound_registry=(ROOT/"src/main/java/com/relaymann/theoutlands/sound/OutlandsSounds.java").read_text(encoding="utf-8")
