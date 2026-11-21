@@ -33,8 +33,8 @@ public final class StructureEncounterManager {
             if (start == null || !start.isValid()) continue;
             var bounds = start.getBoundingBox();
             if (!bounds.isInside(player.blockPosition())) continue;
-            int centerX = (bounds.minX() + bounds.maxX()) / 2;
-            int centerZ = (bounds.minZ() + bounds.maxZ()) / 2;
+            int centerX = bounds.minX() + 24;
+            int centerZ = bounds.minZ() + 24;
             int centerChunkX = Math.floorDiv(centerX, 16);
             int centerChunkZ = Math.floorDiv(centerZ, 16);
             long seed = StructurePlacementPolicy.chunkSeed(level.getSeed(), centerChunkX, centerChunkZ);
@@ -92,8 +92,8 @@ public final class StructureEncounterManager {
         }
         if (selected == null || (denominator > 0 && random.nextInt(denominator) != 0)) return;
         int spawnY = switch (structure) {
-            case "bunker" -> center.getY() - 2;
-            case "archive" -> center.getY() - 15;
+            case "bunker" -> center.getY() - 12;
+            case "archive" -> center.getY() - 25;
             case "research_facility" -> center.getY() - 10;
             case "forgotten_station" -> center.getY() - 8;
             case "null_chamber" -> center.getY() - 18;

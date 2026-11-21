@@ -38,8 +38,8 @@ public final class StructureAmbienceManager {
             if(start==null||!start.isValid()) continue;
             var bounds=start.getBoundingBox();
             if(!bounds.isInside(player.blockPosition())) continue;
-            BlockPos center=new BlockPos((bounds.minX()+bounds.maxX())/2,
-                    (bounds.minY()+bounds.maxY())/2,(bounds.minZ()+bounds.maxZ())/2);
+            BlockPos center=new BlockPos(bounds.minX()+24,
+                    bounds.maxY()-12,bounds.minZ()+24);
             double dx=center.getX()-level.getSharedSpawnPos().getX();
             double dz=center.getZ()-level.getSharedSpawnPos().getZ();
             double distance=Math.sqrt(dx*dx+dz*dz);

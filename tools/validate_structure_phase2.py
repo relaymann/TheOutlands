@@ -53,6 +53,8 @@ def main():
     assert "new BoundingBox(x,y-40,z" in piece
     assert "StructureEncounterManager.tick(level)" in (ROOT/"src/main/java/com/relaymann/theoutlands/event/ServerHorrorEvents.java").read_text(encoding="utf-8")
     assert "void tick(ServerLevel level)" in encounters and "RESOLVED_SITES" in encounters
+    assert "bounds.minX() + 24" in encounters and "center.getY() - 12" in encounters and "center.getY() - 25" in encounters
+    assert "bounds.minX()+24" in ambience and "bounds.minX()+24" in discovery
     assert "addFreshEntity(entity)" in encounters and "addFreshEntity" not in piece
     assert "getStructureWithPieceAt" in ambience and "holder.value() instanceof" in ambience
     assert "HORROR_AUDIO_ENABLED" in ambience and "ClientboundSoundPacket" in ambience and "NEXT_CUE" in ambience

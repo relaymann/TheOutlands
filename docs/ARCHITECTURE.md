@@ -79,7 +79,7 @@ Surface and cave biome weights were modestly raised for common and mid-tier thre
 
 Historical first-pass implementation: the original six structures were initially placed as a chunk-contained configured feature through a NeoForge biome modifier. That implementation was superseded in Phase 1 by the native 48x48 multi-chunk Structure/StructurePiece pipeline documented below. The biome source, terrain noise, cave carvers, and vanilla structure sets remain unchanged.
 
-The structures are:
+The current structure catalog contains 14 identities: Abandoned Cabin, Watchtower, Sealed Bunker, Silent Shrine, Null Observatory, Death Archive, Research Facility, Apostle Cathedral, Forsaken Settlement, Last Outpost, Forgotten Station, Null Chamber, Hollow Crypt, and Boundary Monument.
 - **Abandoned cabin** — forest/taiga wilderness, beyond 1,000 blocks.
 - **Watchtower** — isolated observation post, beyond 1,800 blocks.
 - **Sealed bunker** — buried stone room with a surface access shaft, beyond 2,500 blocks.
@@ -126,7 +126,7 @@ Outlands structure placement now uses deterministic 8x8-chunk candidate cells. A
 
 Eligible structures are selected with one weighted roll rather than a sequence of independent early-return rolls, so structures later in the registry are no longer suppressed by earlier checks. Per-cell probabilities are scaled to preserve approximately the previous per-area encounter rate. Placement is deterministic from the world seed and chunk coordinates.
 
-Sites reject ocean, river, and beach biomes, water/fluid surfaces, leaf/log canopy tops, steep footprints, and unsafe build-height margins. The 9x9 placement footprint remains inside the generating chunk. Vanilla terrain, caves, biome sources, and vanilla structure sets are unchanged.
+Sites reject ocean, river, and beach biomes, water/fluid surfaces, leaf/log canopy tops, steep footprints, and unsafe build-height margins. The later native structure pipeline uses a 48x48 multi-chunk footprint clipped to each generating chunk. Vanilla terrain, caves, biome sources, and vanilla structure sets are unchanged.
 
 This describes the intermediate placement-policy stage. It was superseded by the native multi-chunk piece/template-system migration in the following Phase 1 section; the current 14 builders are procedural modules invoked through persisted native pieces.
 

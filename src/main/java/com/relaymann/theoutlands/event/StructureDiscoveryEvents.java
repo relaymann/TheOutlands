@@ -30,7 +30,7 @@ public final class StructureDiscoveryEvents {
                 holder -> holder.value() instanceof OutlandsStructure);
         if (start == null || !start.isValid()) return;
         var bounds = start.getBoundingBox();
-        BlockPos center = new BlockPos((bounds.minX()+bounds.maxX())/2,bounds.maxY()-8,(bounds.minZ()+bounds.maxZ())/2);
+        BlockPos center = new BlockPos(bounds.minX()+24,bounds.maxY()-8,bounds.minZ()+24);
         double dx=center.getX()-level.getSharedSpawnPos().getX(), dz=center.getZ()-level.getSharedSpawnPos().getZ();
         double distance=Math.sqrt(dx*dx+dz*dz);
         int chunkX=Math.floorDiv(center.getX(),16), chunkZ=Math.floorDiv(center.getZ(),16);
