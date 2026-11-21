@@ -21,6 +21,7 @@ import net.minecraft.world.phys.Vec3;
 public final class LurkerEntity extends Monster {
     private int retreatTicks;
     private int ambushCooldown;
+    private int stalkTicks;
     public LurkerEntity(EntityType<? extends Monster> type, Level level) { super(type, level); xpReward=5; }
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 26.0D)
@@ -39,6 +40,7 @@ public final class LurkerEntity extends Monster {
         super.tick();
         if(level().isClientSide) return;
         if(ambushCooldown>0) ambushCooldown--;
+        if(stalkTicks>0) stalkTicks--;
         if(retreatTicks>0) {
             retreatTicks--;
             if(retreatTicks==0) { setTarget(null); setSprinting(false); }
@@ -48,23 +50,24 @@ public final class LurkerEntity extends Monster {
             if(d>100 && d<625 && hasLineOfSight(player)) {
                 // Hold position and lower its silhouette while it observes the player.
                 getNavigation().stop(); setPose(net.minecraft.world.entity.Pose.CROUCHING);
-                if(ambushCooldown==0 && getRandom().nextInt(100)==0) ambushCooldown=50;
+                setYRot(getYRot() + net.minecraft.util.Mth.wrapDegrees(player.getYRot() - getYRot()) * 0.035F);
+                if(stalkTicks==0 && getRandom().nextInt(180)==0) { stalkTicks=80; if(OutlandsConfig.HORROR_AUDIO_ENABLED.get()) playSound(OutlandsSounds.LURKER_BREATH.get(),0.45F,0.7F); }
             } else setPose(net.minecraft.world.entity.Pose.STANDING);
             if(getHealth()<getMaxHealth()*0.34F && retreatTicks==0 && ambushCooldown==0) {
                 Vec3 away=position().subtract(player.position()).normalize();
                 getNavigation().moveTo(getX()+away.x*13,getY(),getZ()+away.z*13,1.22D);
                 setSprinting(true); retreatTicks=70; ambushCooldown=240;
             }
-            if(d<12 && onGround() && ambushCooldown==0) {
+            if(d<20 && onGround() && ambushCooldown==0 && hasLineOfSight(player)) {
                 Vec3 toward=player.position().subtract(position()).normalize();
-                setDeltaMovement(getDeltaMovement().add(toward.x*.38D,.16D,toward.z*.38D));
-                hasImpulse=true; ambushCooldown=85;
+                setDeltaMovement(getDeltaMovement().add(toward.x*.48D,.22D,toward.z*.48D));
+                hasImpulse=true; ambushCooldown=105;
             }
         } else if(getPose()==net.minecraft.world.entity.Pose.CROUCHING) setPose(net.minecraft.world.entity.Pose.STANDING);
     }
     @Override protected SoundEvent getAmbientSound(){return OutlandsConfig.HORROR_AUDIO_ENABLED.get()?OutlandsSounds.LURKER_BREATH.get():null;}
     @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource s){return OutlandsConfig.HORROR_AUDIO_ENABLED.get()?OutlandsSounds.LURKER_HIT.get():null;}
     @Override protected SoundEvent getDeathSound(){return OutlandsConfig.HORROR_AUDIO_ENABLED.get()?OutlandsSounds.LURKER_HIT.get():null;}
-    @Override public void addAdditionalSaveData(CompoundTag t){super.addAdditionalSaveData(t);t.putInt("retreat_ticks",retreatTicks);t.putInt("ambush_cd",ambushCooldown);}
-    @Override public void readAdditionalSaveData(CompoundTag t){super.readAdditionalSaveData(t);retreatTicks=t.getInt("retreat_ticks");ambushCooldown=t.getInt("ambush_cd");}
+    @Override public void addAdditionalSaveData(CompoundTag t){super.addAdditionalSaveData(t);t.putInt("retreat_ticks",retreatTicks);t.putInt("ambush_cd",ambushCooldown);t.putInt("stalk_ticks",stalkTicks);}
+    @Override public void readAdditionalSaveData(CompoundTag t){super.readAdditionalSaveData(t);retreatTicks=t.getInt("retreat_ticks");ambushCooldown=t.getInt("ambush_cd");stalkTicks=t.getInt("stalk_ticks");}
 }

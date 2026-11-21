@@ -34,13 +34,13 @@
     },
     {
       "type": "theoutlands:lurker",
-      "weight": 5,
+      "weight": 10,
       "minCount": 1,
       "maxCount": 1
     },
     {
       "type": "theoutlands:howler",
-      "weight": 3,
+      "weight": 7,
       "minCount": 1,
       "maxCount": 1
     }

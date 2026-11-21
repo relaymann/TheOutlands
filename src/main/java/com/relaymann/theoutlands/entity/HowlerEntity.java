@@ -20,6 +20,7 @@ public final class HowlerEntity extends Monster {
     private int callCooldown;
     private int windup;
     private boolean calling;
+    private int territoryPressure;
     public HowlerEntity(EntityType<? extends Monster> type, Level level){super(type,level);xpReward=6;}
     public static AttributeSupplier.Builder createAttributes(){
         return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH,34.0D)
@@ -38,9 +39,10 @@ public final class HowlerEntity extends Monster {
     @Override public void tick(){
         super.tick(); if(level().isClientSide)return;
         if(callCooldown>0)callCooldown--;
+        if(territoryPressure>0)territoryPressure--;
         if(getTarget() instanceof Player player && player.isAlive()){
             double d=distanceToSqr(player);
-            if(d>64 && d<625 && callCooldown==0 && !calling){calling=true;windup=28;getNavigation().stop();}
+            if(d>64 && d<900 && callCooldown==0 && !calling){calling=true;windup=36;getNavigation().stop();territoryPressure=36;}
             if(calling){
                 getNavigation().stop();
                 if(--windup<=0){callTerritory();calling=false;callCooldown=520+getRandom().nextInt(280);}
@@ -50,12 +52,15 @@ public final class HowlerEntity extends Monster {
     private void callTerritory(){
         if(OutlandsConfig.HORROR_AUDIO_ENABLED.get())playSound(OutlandsSounds.HOWLER_CALL.get(),1.45F,.82F+getRandom().nextFloat()*.12F);
         // Alert only nearby existing Outlands mobs. No global aggro or entity creation.
-        for(Monster mob:level().getEntitiesOfClass(Monster.class,getBoundingBox().inflate(24,12,24),
+        for(Monster mob:level().getEntitiesOfClass(Monster.class,getBoundingBox().inflate(32,14,32),
             m -> m!=this && (m instanceof HunterEntity || m instanceof StalkerEntity || m instanceof LurkerEntity || m instanceof DredgeEntity))){
-            if(getTarget()!=null && mob.getTarget()==null)mob.setTarget(getTarget());
+            if(getTarget()!=null && mob.getTarget()==null && mob.hasLineOfSight(this)) mob.setTarget(getTarget());
+            else if(mob instanceof LurkerEntity && mob.getTarget()==null && mob.distanceToSqr(this)>36.0D)
+                mob.getNavigation().moveTo(this,0.82D);
         }
     }
     public boolean isCalling(){return calling;}
+    public float getCallProgress(float partialTick){return calling?1.0F-(Math.max(0,windup-partialTick)/36.0F):0.0F;}
     @Override protected SoundEvent getAmbientSound(){return OutlandsConfig.HORROR_AUDIO_ENABLED.get()?OutlandsSounds.HOWLER_BREATH.get():null;}
     @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource s){return OutlandsConfig.HORROR_AUDIO_ENABLED.get()?OutlandsSounds.HOWLER_HIT.get():null;}
     @Override protected SoundEvent getDeathSound(){return OutlandsConfig.HORROR_AUDIO_ENABLED.get()?OutlandsSounds.HOWLER_HIT.get():null;}

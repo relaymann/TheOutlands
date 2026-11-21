@@ -64,7 +64,8 @@ public final class OutlandsEcosystemManager {
                 || mob instanceof HunterEntity || mob instanceof BurrowerEntity || mob instanceof MimicEntity
                 || mob instanceof StillbornStatueEntity || mob instanceof AgitatedOneEntity
                 || mob instanceof NullEntity || mob instanceof NullApostleEntity || mob instanceof FearEntity
-                || mob instanceof DeathEntity || mob instanceof AlmightyEntity;
+                || mob instanceof DeathEntity || mob instanceof AlmightyEntity
+                || mob instanceof LurkerEntity || mob instanceof HowlerEntity || mob instanceof DredgeEntity;
     }
 
     private static void interact(Mob a, Mob b, ServerPlayer witness) {
@@ -82,6 +83,24 @@ public final class OutlandsEcosystemManager {
         // Hunter and Stalker cooperate only after one has actually acquired a player.
         if (a instanceof HunterEntity && b instanceof StalkerEntity) shareTarget(a, b);
         if (b instanceof HunterEntity && a instanceof StalkerEntity) shareTarget(b, a);
+
+        // Howler calls create a temporary hunting alliance: nearby trackers converge
+        // only on a player already acquired by the Howler, never on arbitrary mobs.
+        if (a instanceof HowlerEntity && (b instanceof HunterEntity || b instanceof StalkerEntity)) shareTarget(a, b);
+        if (b instanceof HowlerEntity && (a instanceof HunterEntity || a instanceof StalkerEntity)) shareTarget(b, a);
+
+        // Lurkers are opportunists: they shadow a Howler's territory, but retreat
+        // from the Dredge's low, aggressive hunting route.
+        if (a instanceof HowlerEntity && b instanceof LurkerEntity) shadowHowler((LurkerEntity)b, a);
+        if (b instanceof HowlerEntity && a instanceof LurkerEntity) shadowHowler((LurkerEntity)a, b);
+        if (a instanceof DredgeEntity && b instanceof LurkerEntity) yieldTerritory(a, b);
+        if (b instanceof DredgeEntity && a instanceof LurkerEntity) yieldTerritory(b, a);
+
+        // Dredges and Lurkers recognize the old cave sentinels as dominant.
+        if (a instanceof CaveJarEntity && (b instanceof DredgeEntity || b instanceof LurkerEntity)) yieldTerritory(a, b);
+        if (b instanceof CaveJarEntity && (a instanceof DredgeEntity || a instanceof LurkerEntity)) yieldTerritory(b, a);
+        if (a instanceof StillbornStatueEntity && (b instanceof DredgeEntity || b instanceof LurkerEntity)) yieldTerritory(a, b);
+        if (b instanceof StillbornStatueEntity && (a instanceof DredgeEntity || a instanceof LurkerEntity)) yieldTerritory(b, a);
 
         // Cave.jar holds its ground; Burrowers yield instead of mob-vs-mob brawling.
         if (a instanceof CaveJarEntity && b instanceof BurrowerEntity) yieldTerritory(a, b);
@@ -153,7 +172,8 @@ public final class OutlandsEcosystemManager {
 
     private static boolean isPredator(Mob mob) {
         return mob instanceof CaveJarEntity || mob instanceof StalkerEntity || mob instanceof HunterEntity
-                || mob instanceof BurrowerEntity || mob instanceof MimicEntity || mob instanceof StillbornStatueEntity;
+                || mob instanceof BurrowerEntity || mob instanceof MimicEntity || mob instanceof StillbornStatueEntity
+                || mob instanceof LurkerEntity || mob instanceof DredgeEntity || mob instanceof HowlerEntity;
     }
 
     private static void defendPlayerSpace(AgitatedOneEntity entity, ServerPlayer witness) {
@@ -168,6 +188,16 @@ public final class OutlandsEcosystemManager {
         if (direction.lengthSqr() < 0.001D) direction = new Vec3(0, 0, 1);
         Vec3 shadowPoint = predator.position().subtract(direction.normalize().scale(6.0D));
         observer.getNavigation().moveTo(shadowPoint.x, shadowPoint.y, shadowPoint.z, 0.72D);
+    }
+
+
+    private static void shadowHowler(LurkerEntity lurker, Mob howler) {
+        if (lurker.getTarget() != null || lurker.tickCount % 80 != 0
+                || lurker.distanceToSqr(howler) < 25.0D || lurker.distanceToSqr(howler) > 24.0D * 24.0D) return;
+        Vec3 offset = lurker.position().subtract(howler.position());
+        if (offset.lengthSqr() < 0.001D) offset = new Vec3(1, 0, 0);
+        Vec3 point = howler.position().add(offset.normalize().scale(9.0D));
+        lurker.getNavigation().moveTo(point.x, point.y, point.z, 0.76D);
     }
 
     private static void investigateMimic(Mob hunter, Mob mimic) {
