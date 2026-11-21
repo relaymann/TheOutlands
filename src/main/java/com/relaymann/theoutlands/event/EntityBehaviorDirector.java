@@ -2,9 +2,7 @@ package com.relaymann.theoutlands.event;
 
 import com.relaymann.theoutlands.OutlandsConfig;
 import com.relaymann.theoutlands.TheOutlands;
-import com.relaymann.theoutlands.entity.HowlerEntity;
 import com.relaymann.theoutlands.entity.LurkerEntity;
-import com.relaymann.theoutlands.sound.OutlandsSounds;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Mob;
@@ -40,10 +38,9 @@ public final class EntityBehaviorDirector {
                 for (Mob mob : level.getEntitiesOfClass(Mob.class,
                         new AABB(observer.blockPosition()).inflate(40.0D),
                         candidate -> candidate.isAlive()
-                                && (candidate instanceof LurkerEntity || candidate instanceof HowlerEntity))) {
+                                && candidate instanceof LurkerEntity)) {
                     if (!PROCESSED.add(mob.getUUID())) continue;
                     if (mob instanceof LurkerEntity lurker) stalkFromCover(lurker);
-                    if (mob instanceof HowlerEntity howler) coordinateCall(howler);
                 }
             }
         }
@@ -65,17 +62,6 @@ public final class EntityBehaviorDirector {
         double x = target.getX() + forwardX * 4.0D - forwardZ * side * 7.0D;
         double z = target.getZ() + forwardZ * 4.0D + forwardX * side * 7.0D;
         lurker.getNavigation().moveTo(x, target.getY(), z, 0.88D);
-    }
-
-    private static void coordinateCall(HowlerEntity howler) {
-        if (!(howler.getTarget() instanceof Player target) || !eligible(target)
-                || howler.hasLineOfSight(target) || howler.tickCount % 200 != 0
-                || howler.distanceToSqr(target) > 1_296.0D
-                || !OutlandsConfig.HORROR_AUDIO_ENABLED.get()) return;
-        // This is an audible territorial call, not a forced spawn. The existing
-        // ecosystem rules decide whether nearby Hunters or Stalkers respond.
-        howler.playSound(OutlandsSounds.HOWLER_CALL.get(), 0.72F,
-                0.88F + howler.getRandom().nextFloat() * 0.18F);
     }
 
     private static boolean eligible(Player player) {
