@@ -13,17 +13,17 @@ class OutlandsStructureSelectionTest {
 
     @Test
     void minimumDistanceAndDisabledFrequencyRejectSites() {
-        assertNull(OutlandsStructureFeature.chooseLayout(7L, 999.0D, true, 1_000.0D, 1.0D));
-        assertNull(OutlandsStructureFeature.chooseLayout(7L, 10_000.0D, true, 1_000.0D, 0.0D));
-        assertNull(OutlandsStructureFeature.chooseLayout(7L, 1_000.0D, false, 1_001.0D, 1.0D));
+        assertNull(StructureLayoutPolicy.chooseLayout(7L, 999.0D, true, 1_000.0D, 1.0D));
+        assertNull(StructureLayoutPolicy.chooseLayout(7L, 10_000.0D, true, 1_000.0D, 0.0D));
+        assertNull(StructureLayoutPolicy.chooseLayout(7L, 1_000.0D, false, 1_001.0D, 1.0D));
     }
 
     @Test
     void forestOnlyCabinRequiresForest() {
         boolean foundCabin = false;
         for (long seed = 0; seed < 10_000 && !foundCabin; seed++) {
-            assertNull(OutlandsStructureFeature.chooseLayout(seed, 1_000.0D, false, 1_000.0D, 1.0D));
-            String selected = OutlandsStructureFeature.chooseLayout(seed, 1_000.0D, true, 1_000.0D, 1.0D);
+            assertNull(StructureLayoutPolicy.chooseLayout(seed, 1_000.0D, false, 1_000.0D, 1.0D));
+            String selected = StructureLayoutPolicy.chooseLayout(seed, 1_000.0D, true, 1_000.0D, 1.0D);
             if (selected != null) {
                 assertEquals("cabin", selected);
                 foundCabin = true;
@@ -36,8 +36,8 @@ class OutlandsStructureSelectionTest {
     void seededLayoutSelectionIsRepeatable() {
         boolean found = false;
         for (long seed = 0; seed < 10_000 && !found; seed++) {
-            String first = OutlandsStructureFeature.chooseLayout(seed, 60_000.0D, true, 1_000.0D, 1.0D);
-            String second = OutlandsStructureFeature.chooseLayout(seed, 60_000.0D, true, 1_000.0D, 1.0D);
+            String first = StructureLayoutPolicy.chooseLayout(seed, 60_000.0D, true, 1_000.0D, 1.0D);
+            String second = StructureLayoutPolicy.chooseLayout(seed, 60_000.0D, true, 1_000.0D, 1.0D);
             assertEquals(first, second);
             if (first != null) {
                 assertTrue(IDS.contains(first), "Unknown structure identity selected: " + first);
