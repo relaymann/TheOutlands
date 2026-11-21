@@ -71,5 +71,9 @@ public final class OutlandsEntities {
             ENTITY_TYPES.register("dredge", () -> EntityType.Builder.of(DredgeEntity::new, MobCategory.MONSTER)
                     .sized(0.95F, 1.15F).clientTrackingRange(20).updateInterval(2).build("theoutlands:dredge"));
 
+
+    public static final DeferredHolder<EntityType<?>, EntityType<PilgrimEntity>> PILGRIM = ENTITY_TYPES.register("pilgrim", () -> EntityType.Builder.of(PilgrimEntity::new, MobCategory.MONSTER).sized(.72F,2.55F).clientTrackingRange(24).updateInterval(2).build("theoutlands:pilgrim"));
+    public static final DeferredHolder<EntityType<?>, EntityType<CeilingDwellerEntity>> CEILING_DWELLER = ENTITY_TYPES.register("ceiling_dweller", () -> EntityType.Builder.of(CeilingDwellerEntity::new, MobCategory.MONSTER).sized(1.05F,.85F).clientTrackingRange(20).updateInterval(2).build("theoutlands:ceiling_dweller"));
+    public static final DeferredHolder<EntityType<?>, EntityType<ColossusEntity>> COLOSSUS = ENTITY_TYPES.register("colossus", () -> EntityType.Builder.of(ColossusEntity::new, MobCategory.MONSTER).sized(2.8F,7.2F).clientTrackingRange(48).updateInterval(3).build("theoutlands:colossus"));
     private OutlandsEntities() {}
 }
