@@ -8,7 +8,7 @@ import com.relaymann.theoutlands.horror.AlmightyTerritory;
 import com.relaymann.theoutlands.horror.HorrorMemory;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
+import com.relaymann.theoutlands.sound.OutlandsSounds;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
@@ -63,6 +63,6 @@ public final class AlmightyEncounterManager {
 
         HorrorMemory.recordDiscovery(player, "almighty_encounter_started");
         if (OutlandsConfig.HORROR_AUDIO_ENABLED.get())
-            level.playSound(null, spawn, SoundEvents.WARDEN_ROAR, SoundSource.HOSTILE, 1.0F, 0.35F);
+            level.playSound(null, spawn, OutlandsSounds.ALMIGHTY_PRESENCE.get(), SoundSource.HOSTILE, 1.0F, 0.35F);
     }
 }

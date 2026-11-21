@@ -43,21 +43,21 @@ public final class OutlandsIntelligenceManager {
 
     @SubscribeEvent
     public static void onBlockBroken(BlockEvent.BreakEvent event) {
-        if (!(event.getLevel() instanceof ServerLevel level) || !(event.getPlayer() instanceof ServerPlayer player)
-                || !eligible(player)) return;
+        if (event.isCanceled() || !(event.getLevel() instanceof ServerLevel level)
+                || !(event.getPlayer() instanceof ServerPlayer player) || !eligible(player)) return;
         record(level, event.getPos(), player.getUUID(), "break");
     }
 
     @SubscribeEvent
     public static void onBlockPlaced(BlockEvent.EntityPlaceEvent event) {
-        if (!(event.getLevel() instanceof ServerLevel level)
+        if (event.isCanceled() || !(event.getLevel() instanceof ServerLevel level)
                 || !(event.getEntity() instanceof ServerPlayer player) || !eligible(player)) return;
         record(level, event.getPos(), player.getUUID(), "place");
     }
 
     @SubscribeEvent
     public static void onOutlandsCreatureDeath(LivingDeathEvent event) {
-        if (!(event.getEntity().level() instanceof ServerLevel level)
+        if (event.isCanceled() || !(event.getEntity().level() instanceof ServerLevel level)
                 || !(event.getEntity() instanceof Mob mob) || !isOutlandsCreature(mob)) return;
         // Nearby creatures can investigate a real death site. No death message,
         // fake remains, block edits, or forced encounter is produced.
@@ -66,8 +66,8 @@ public final class OutlandsIntelligenceManager {
 
     @SubscribeEvent
     public static void onDoorUsed(PlayerInteractEvent.RightClickBlock event) {
-        if (!(event.getLevel() instanceof ServerLevel level) || !(event.getEntity() instanceof ServerPlayer player)
-                || !eligible(player)) return;
+        if (event.isCanceled() || !(event.getLevel() instanceof ServerLevel level)
+                || !(event.getEntity() instanceof ServerPlayer player) || !eligible(player)) return;
         var block = level.getBlockState(event.getPos()).getBlock();
         if (block instanceof DoorBlock || block instanceof TrapDoorBlock) {
             record(level, event.getPos(), player.getUUID(), "door");
