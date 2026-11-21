@@ -2,6 +2,7 @@ package com.relaymann.theoutlands.event;
 
 import com.relaymann.theoutlands.OutlandsConfig;
 import com.relaymann.theoutlands.worldgen.OutlandsStructureFeature;
+import com.relaymann.theoutlands.sound.OutlandsSounds;
 import com.relaymann.theoutlands.worldgen.OutlandsWorldgen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -9,7 +10,6 @@ import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 
@@ -63,20 +63,20 @@ public final class StructureAmbienceManager {
         double z=b.minZ()+4+player.getRandom().nextDouble()*Math.max(1,b.getZSpan()-8);
         double y=Math.max(player.getY()-8,Math.min(player.getY()+8,b.maxY()-2));
         switch(id) {
-            case "research_facility" -> send(player,SoundEvents.WOODEN_DOOR_OPEN,x,y,z,0.10F,0.52F);
-            case "apostle_cathedral" -> send(player,SoundEvents.AMBIENT_CAVE.value(),x,y,z,0.12F,0.45F);
-            case "forsaken_settlement" -> send(player,SoundEvents.GRASS_STEP,x,y,z,0.13F,0.62F);
-            case "last_outpost" -> send(player,SoundEvents.GRAVEL_STEP,x,y,z,0.12F,0.55F);
-            case "forgotten_station" -> send(player,SoundEvents.GRAVEL_STEP,x,y,z,0.10F,0.42F);
-            case "null_chamber" -> send(player,SoundEvents.AMBIENT_CAVE.value(),x,y,z,0.045F,0.34F);
-            case "hollow_crypt" -> send(player,SoundEvents.AMBIENT_CAVE.value(),x,y,z,0.08F,0.58F);
-            case "boundary_monument" -> send(player,SoundEvents.AMBIENT_CAVE.value(),x,y,z,0.07F,0.72F);
-            case "cabin" -> send(player,SoundEvents.WOODEN_DOOR_OPEN,x,y,z,0.09F,0.65F);
-            case "tower" -> send(player,SoundEvents.GRAVEL_STEP,x,y,z,0.08F,0.48F);
-            case "bunker" -> send(player,SoundEvents.WOODEN_DOOR_OPEN,x,y,z,0.07F,0.38F);
-            case "shrine" -> send(player,SoundEvents.AMBIENT_CAVE.value(),x,y,z,0.06F,0.62F);
-            case "observatory" -> send(player,SoundEvents.AMBIENT_CAVE.value(),x,y,z,0.05F,0.82F);
-            case "archive" -> send(player,SoundEvents.GRAVEL_STEP,x,y,z,0.07F,0.36F);
+            case "research_facility" -> send(player,OutlandsSounds.STRUCTURE_RESEARCH.get(),x,y,z,0.1F,0.62F);
+            case "apostle_cathedral" -> send(player,OutlandsSounds.STRUCTURE_CATHEDRAL.get(),x,y,z,0.12F,0.52F);
+            case "forsaken_settlement" -> send(player,OutlandsSounds.STRUCTURE_SETTLEMENT.get(),x,y,z,0.13F,0.78F);
+            case "last_outpost" -> send(player,OutlandsSounds.STRUCTURE_OUTPOST.get(),x,y,z,0.12F,0.7F);
+            case "forgotten_station" -> send(player,OutlandsSounds.STRUCTURE_STATION.get(),x,y,z,0.1F,0.58F);
+            case "null_chamber" -> send(player,OutlandsSounds.STRUCTURE_NULL_CHAMBER.get(),x,y,z,0.045F,0.36F);
+            case "hollow_crypt" -> send(player,OutlandsSounds.STRUCTURE_CRYPT.get(),x,y,z,0.08F,0.48F);
+            case "boundary_monument" -> send(player,OutlandsSounds.STRUCTURE_MONUMENT.get(),x,y,z,0.07F,0.64F);
+            case "cabin" -> send(player,OutlandsSounds.STRUCTURE_CABIN.get(),x,y,z,0.09F,0.75F);
+            case "tower" -> send(player,OutlandsSounds.STRUCTURE_TOWER.get(),x,y,z,0.08F,0.55F);
+            case "bunker" -> send(player,OutlandsSounds.STRUCTURE_BUNKER.get(),x,y,z,0.07F,0.44F);
+            case "shrine" -> send(player,OutlandsSounds.STRUCTURE_SHRINE.get(),x,y,z,0.06F,0.62F);
+            case "observatory" -> send(player,OutlandsSounds.STRUCTURE_OBSERVATORY.get(),x,y,z,0.05F,0.84F);
+            case "archive" -> send(player,OutlandsSounds.STRUCTURE_ARCHIVE.get(),x,y,z,0.07F,0.42F);
             default -> { return; }
         }
     }

@@ -34,5 +34,19 @@ public final class OutlandsSounds {
  public static final DeferredHolder<SoundEvent,SoundEvent> FEAR_PRESENCE=register("fear_presence");
  public static final DeferredHolder<SoundEvent,SoundEvent> DEATH_PRESENCE=register("death_presence");
  public static final DeferredHolder<SoundEvent,SoundEvent> ALMIGHTY_PRESENCE=register("almighty_presence");
+ public static final DeferredHolder<SoundEvent,SoundEvent> STRUCTURE_CABIN=register("structure_cabin");
+ public static final DeferredHolder<SoundEvent,SoundEvent> STRUCTURE_TOWER=register("structure_watchtower");
+ public static final DeferredHolder<SoundEvent,SoundEvent> STRUCTURE_BUNKER=register("structure_bunker");
+ public static final DeferredHolder<SoundEvent,SoundEvent> STRUCTURE_SHRINE=register("structure_shrine");
+ public static final DeferredHolder<SoundEvent,SoundEvent> STRUCTURE_OBSERVATORY=register("structure_observatory");
+ public static final DeferredHolder<SoundEvent,SoundEvent> STRUCTURE_ARCHIVE=register("structure_death_archive");
+ public static final DeferredHolder<SoundEvent,SoundEvent> STRUCTURE_RESEARCH=register("structure_research_facility");
+ public static final DeferredHolder<SoundEvent,SoundEvent> STRUCTURE_CATHEDRAL=register("structure_apostle_cathedral");
+ public static final DeferredHolder<SoundEvent,SoundEvent> STRUCTURE_SETTLEMENT=register("structure_forsaken_settlement");
+ public static final DeferredHolder<SoundEvent,SoundEvent> STRUCTURE_OUTPOST=register("structure_last_outpost");
+ public static final DeferredHolder<SoundEvent,SoundEvent> STRUCTURE_STATION=register("structure_forgotten_station");
+ public static final DeferredHolder<SoundEvent,SoundEvent> STRUCTURE_NULL_CHAMBER=register("structure_null_chamber");
+ public static final DeferredHolder<SoundEvent,SoundEvent> STRUCTURE_CRYPT=register("structure_hollow_crypt");
+ public static final DeferredHolder<SoundEvent,SoundEvent> STRUCTURE_MONUMENT=register("structure_boundary_monument");
  private OutlandsSounds(){}
 }

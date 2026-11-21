@@ -191,5 +191,117 @@
         "volume": 0.78
       }
     ]
+  },
+  "structure_cabin": {
+    "sounds": [
+      {
+        "name": "theoutlands:structure_cabin",
+        "volume": 0.42
+      }
+    ]
+  },
+  "structure_watchtower": {
+    "sounds": [
+      {
+        "name": "theoutlands:structure_watchtower",
+        "volume": 0.42
+      }
+    ]
+  },
+  "structure_bunker": {
+    "sounds": [
+      {
+        "name": "theoutlands:structure_bunker",
+        "volume": 0.42
+      }
+    ]
+  },
+  "structure_shrine": {
+    "sounds": [
+      {
+        "name": "theoutlands:structure_shrine",
+        "volume": 0.42
+      }
+    ]
+  },
+  "structure_observatory": {
+    "sounds": [
+      {
+        "name": "theoutlands:structure_observatory",
+        "volume": 0.42
+      }
+    ]
+  },
+  "structure_death_archive": {
+    "sounds": [
+      {
+        "name": "theoutlands:structure_death_archive",
+        "volume": 0.42
+      }
+    ]
+  },
+  "structure_research_facility": {
+    "sounds": [
+      {
+        "name": "theoutlands:structure_research_facility",
+        "volume": 0.42
+      }
+    ]
+  },
+  "structure_apostle_cathedral": {
+    "sounds": [
+      {
+        "name": "theoutlands:structure_apostle_cathedral",
+        "volume": 0.42
+      }
+    ]
+  },
+  "structure_forsaken_settlement": {
+    "sounds": [
+      {
+        "name": "theoutlands:structure_forsaken_settlement",
+        "volume": 0.42
+      }
+    ]
+  },
+  "structure_last_outpost": {
+    "sounds": [
+      {
+        "name": "theoutlands:structure_last_outpost",
+        "volume": 0.42
+      }
+    ]
+  },
+  "structure_forgotten_station": {
+    "sounds": [
+      {
+        "name": "theoutlands:structure_forgotten_station",
+        "volume": 0.42
+      }
+    ]
+  },
+  "structure_null_chamber": {
+    "sounds": [
+      {
+        "name": "theoutlands:structure_null_chamber",
+        "volume": 0.42
+      }
+    ]
+  },
+  "structure_hollow_crypt": {
+    "sounds": [
+      {
+        "name": "theoutlands:structure_hollow_crypt",
+        "volume": 0.42
+      }
+    ]
+  },
+  "structure_boundary_monument": {
+    "sounds": [
+      {
+        "name": "theoutlands:structure_boundary_monument",
+        "volume": 0.42
+      }
+    ]
   }
 }

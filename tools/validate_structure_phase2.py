@@ -53,6 +53,13 @@ def main():
     assert "new BoundingBox(x,y-40,z" in piece and "chunkPos.x==centerChunkX&&chunkPos.z==centerChunkZ" in piece
     assert "getStructureWithPieceAt" in ambience and "holder.value() instanceof" in ambience
     assert "HORROR_AUDIO_ENABLED" in ambience and "ClientboundSoundPacket" in ambience and "NEXT_CUE" in ambience
+    sound_registry=(ROOT/"src/main/java/com/relaymann/theoutlands/sound/OutlandsSounds.java").read_text(encoding="utf-8")
+    sound_json=json.loads((ROOT/"src/main/resources/assets/theoutlands/sounds.json").read_text(encoding="utf-8"))
+    audio_script=(ROOT/"tools/generate_entity_audio.py").read_text(encoding="utf-8")
+    for sound_id in ("cabin","watchtower","bunker","shrine","observatory","death_archive","research_facility","apostle_cathedral","forsaken_settlement","last_outpost","forgotten_station","null_chamber","hollow_crypt","boundary_monument"):
+        key="structure_"+sound_id
+        assert key in sound_registry and key in sound_json and f'structure_tone("{key}"' in audio_script, f"missing custom ambience asset: {key}"
+
     assert "getStructureWithPieceAt" in discovery and 'recordDiscovery(player, "structure_" + layout)' in discovery
     assert 'recordDiscovery(player, "shared_structure_mark")' in discovery
     assert "ENTITY_SPAWN_BALANCE_ENABLED" in encounters and "ENTITY_ECOSYSTEM_ENABLED" in encounters

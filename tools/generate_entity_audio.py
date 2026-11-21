@@ -247,3 +247,37 @@ almighty_presence.a, almighty_presence.b = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp
 make("almighty_presence", 3.6, almighty_presence)
 
 print("Generated all original Outlands entity sound effects in", OUT)
+
+
+# Structure-specific atmospheres: original procedural cues, not borrowed vanilla sounds.
+def structure_tone(name, duration, base, noise_amount, pulse_rate):
+    state_a = {"lp1": 0.0, "lp2": 0.0}
+    state_b = {"lp1": 0.0, "lp2": 0.0}
+    def sample(t, d, i, n):
+        slow = math.sin(2 * math.pi * (0.13 + pulse_rate * 0.12) * t)
+        sweep = base * (1.0 + 0.08 * math.sin(2 * math.pi * 0.19 * t))
+        fundamental = math.sin(2 * math.pi * sweep * t + 0.7 * slow)
+        harmonic = math.sin(2 * math.pi * (base * (1.47 + 0.025 * slow)) * t)
+        low = noise(t, max(25, base * 0.55), max(180, base * 4.2), state_a)
+        high = noise(t, max(220, base * 2.0), min(7000, base * 12.0), state_b)
+        pulse = 0.58 + 0.42 * math.sin(2 * math.pi * pulse_rate * t + 0.4)
+        envelope = fade(t, d, min(0.55, d * 0.18), min(0.75, d * 0.24))
+        return envelope * (0.22 * fundamental + 0.11 * harmonic
+                           + noise_amount * low * pulse + noise_amount * 0.28 * high
+                           + 0.035 * math.sin(2 * math.pi * (base * 0.5) * t))
+    make(name, duration, sample)
+
+structure_tone("structure_cabin", 1.7, 118, 0.24, 0.8)
+structure_tone("structure_watchtower", 2.5, 72, 0.32, 0.45)
+structure_tone("structure_bunker", 1.5, 58, 0.28, 2.8)
+structure_tone("structure_shrine", 2.4, 214, 0.13, 0.55)
+structure_tone("structure_observatory", 2.8, 440, 0.12, 0.32)
+structure_tone("structure_death_archive", 2, 84, 0.22, 1.1)
+structure_tone("structure_research_facility", 2.1, 46, 0.3, 3.4)
+structure_tone("structure_apostle_cathedral", 3, 55, 0.18, 0.22)
+structure_tone("structure_forsaken_settlement", 2.3, 92, 0.34, 0.7)
+structure_tone("structure_last_outpost", 1.8, 68, 0.3, 2.1)
+structure_tone("structure_forgotten_station", 2.6, 102, 0.25, 1.7)
+structure_tone("structure_null_chamber", 3.2, 31, 0.08, 0.18)
+structure_tone("structure_hollow_crypt", 2.7, 39, 0.26, 0.4)
+structure_tone("structure_boundary_monument", 3, 64, 0.17, 0.26)
