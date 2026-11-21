@@ -72,6 +72,7 @@ def main():
     assert "ENTITY_SPAWN_BALANCE_ENABLED" in encounters and "ENTITY_ECOSYSTEM_ENABLED" in encounters
     assert "void tick(ServerLevel level)" in encounters and "RESOLVED_SITES" in encounters
     assert "bounds.minX() + 24" in encounters and "level.noCollision(entity)" in encounters
+    assert "int[][] offsets" in encounters and "level.addFreshEntity(entity)" in encounters
     assert "level.addFreshEntity(entity)" in encounters and "NULL" in encounters and "DEATH" in encounters
     assert "StructureEncounterManager.tick(level)" in server_events
     assert "addFreshEntity" not in piece and "StructureEncounterManager" not in piece

@@ -104,9 +104,14 @@ public final class StructureEncounterManager {
         if (!level.hasChunkAt(spawn)) return;
         Entity entity = selected.create(level);
         if (entity == null) return;
-        entity.moveTo(spawn.getX() + 0.5D, spawn.getY(), spawn.getZ() + 0.5D,
-                random.nextFloat() * 360.0F, 0.0F);
-        if (!level.noCollision(entity) || !level.addFreshEntity(entity)) entity.discard();
+        float yaw = random.nextFloat() * 360.0F;
+        int[][] offsets = {{0,0},{2,0},{-2,0},{0,2},{0,-2},{2,2},{2,-2},{-2,2},{-2,-2}};
+        for (int[] offset : offsets) {
+            entity.moveTo(spawn.getX() + offset[0] + 0.5D, spawn.getY(),
+                    spawn.getZ() + offset[1] + 0.5D, yaw, 0.0F);
+            if (level.noCollision(entity) && level.addFreshEntity(entity)) return;
+        }
+        entity.discard();
     }
 
     public static void clear() { RESOLVED_SITES.clear(); }
