@@ -2,35 +2,10 @@
   "type": "neoforge:add_spawns",
   "biomes": "#minecraft:is_overworld",
   "spawners": [
-    {
-      "type": "theoutlands:stillborn_statue",
-      "weight": 1,
-      "minCount": 1,
-      "maxCount": 1
-    },
-    {
-      "type": "theoutlands:cave_jar",
-      "weight": 3,
-      "minCount": 1,
-      "maxCount": 1
-    },
-    {
-      "type": "theoutlands:burrower",
-      "weight": 3,
-      "minCount": 1,
-      "maxCount": 1
-    },
-    {
-      "type": "theoutlands:death",
-      "weight": 1,
-      "minCount": 1,
-      "maxCount": 1
-    },
-    {
-      "type": "theoutlands:dredge",
-      "weight": 8,
-      "minCount": 1,
-      "maxCount": 1
-    }
+    { "type": "theoutlands:stillborn_statue", "weight": 1, "minCount": 1, "maxCount": 1 },
+    { "type": "theoutlands:cave_jar", "weight": 3, "minCount": 1, "maxCount": 1 },
+    { "type": "theoutlands:burrower", "weight": 4, "minCount": 1, "maxCount": 1 },
+    { "type": "theoutlands:death", "weight": 1, "minCount": 1, "maxCount": 1 },
+    { "type": "theoutlands:dredge", "weight": 12, "minCount": 1, "maxCount": 1 }
   ]
 }

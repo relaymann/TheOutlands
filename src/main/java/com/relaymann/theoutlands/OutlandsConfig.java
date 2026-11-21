@@ -20,6 +20,7 @@ public final class OutlandsConfig {
     public static final ModConfigSpec.BooleanValue AMBIENT_ANOMALIES_ENABLED;
     public static final ModConfigSpec.BooleanValue ENTITY_INTELLIGENCE_ENABLED;
     public static final ModConfigSpec.BooleanValue ENTITY_ECOSYSTEM_ENABLED;
+    public static final ModConfigSpec.BooleanValue ENTITY_SPAWN_BALANCE_ENABLED;
     public static final ModConfigSpec.DoubleValue AMBIENT_ANOMALY_MIN_DISTANCE;
     public static final ModConfigSpec SPEC;
 
@@ -79,6 +80,9 @@ public final class OutlandsConfig {
         ENTITY_ECOSYSTEM_ENABLED = BUILDER
                 .comment("Enables existing creatures' territorial relationships and rare inter-entity encounters.")
                 .define("entityEcosystemEnabled", true);
+        ENTITY_SPAWN_BALANCE_ENABLED = BUILDER
+                .comment("Enables distance-based natural spawning and nearby Outlands threat limits. Disable only for unrestricted testing.")
+                .define("entitySpawnBalanceEnabled", true);
         BUILDER.pop();
 
         SPEC = BUILDER.build();
