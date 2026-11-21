@@ -27,5 +27,8 @@ public final class OutlandsEntityEvents {
         event.put(OutlandsEntities.LURKER.get(), LurkerEntity.createAttributes().build());
         event.put(OutlandsEntities.HOWLER.get(), HowlerEntity.createAttributes().build());
         event.put(OutlandsEntities.DREDGE.get(), DredgeEntity.createAttributes().build());
+        event.put(OutlandsEntities.PILGRIM.get(), PilgrimEntity.createAttributes().build());
+        event.put(OutlandsEntities.CEILING_DWELLER.get(), CeilingDwellerEntity.createAttributes().build());
+        event.put(OutlandsEntities.COLOSSUS.get(), ColossusEntity.createAttributes().build());
     }
 }
