@@ -62,14 +62,3 @@ The ambient anomaly layer adds rare, player-private positional audio cues after 
 The existing-creature intelligence and ecology managers can be independently disabled in the common config. Intelligence retains bounded disturbance history, per-creature temperament, investigation cooldowns, pursuit adaptation, and virtual home ranges. Ecology handles established creature relationships and rare inter-entity encounters. Both systems remain server-authoritative; their cleanup removes stale per-entity state when creatures despawn or unload.
 
 No terrain-generation hooks or world-generation settings are changed by these systems.
-
-
-## Distance-based natural spawning and encounter balance
-
-All 16 registered entities retain their biome-based natural spawn entries and habitat predicates. The spawn-placement layer now applies an additional Overworld distance profile measured horizontally from the original shared world spawn; it does not change biome generation, terrain, or the world seed.
-
-The opening 500 blocks are protected from ordinary Outlands natural spawns. Common trackers (Lurker, Dredge, and Stalker) can begin appearing beyond 500 blocks, with spawn rolls becoming progressively less restrictive across the 500–1,000, 1,000–2,000, 2,000–4,000, and 4,000–7,000 block bands. Other creatures have their own later minimum distances: Howler at 1,500; Hunter, Observer, Burrower, and Mimic at 1,800; Cave.jar at 2,500; Stillborn Statue and Agitated One at 3,500; Null and Null Apostle at 7,000. Fear and Death use their existing configurable 15,000- and 50,000-block story milestones. Almighty retains its separate End-only spawn rule.
-
-Natural encounters also use a nearby threat budget. Each entity has a threat cost, and the allowed local population grows gradually with distance: one entity/one threat point before 1,000 blocks, two/two from 1,000–2,000, three/four from 2,000–4,000, four/six from 4,000–7,000, and five/nine beyond 7,000. Existing Outlands creatures near the nearest survival player consume that budget, preventing repeated spawn attempts from stacking multiple powerful threats. Spawn eggs, commands, conversions, and other non-natural spawn reasons are not blocked by the progression gate. The entire balancing layer can be disabled with the common config option `entitySpawnBalanceEnabled` for controlled testing.
-
-Surface and cave biome weights were modestly raised for common and mid-tier threats; rare story entities retain low weights and their larger distance requirements. Existing biome, light, height, and cave predicates remain in force.

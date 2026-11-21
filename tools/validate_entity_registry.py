@@ -141,6 +141,10 @@ def audit_once():
         errors.append("distance progression does not cover both natural spawn reasons")
     if "type == OutlandsEntities.ALMIGHTY.get()" not in placements:
         errors.append("Almighty's separate End spawn rule is not exempted")
+    profile_section = placements.split("private static SpawnProfile profile", 1)[1].split("private record SpawnProfile", 1)[0]
+    for field in fields:
+        if field != "ALMIGHTY" and "OutlandsEntities." + field + ".get()" not in profile_section:
+            errors.append(field.lower() + ": missing distance/threat profile")
     return errors
 
 for pass_number in range(1, PASSES + 1):
