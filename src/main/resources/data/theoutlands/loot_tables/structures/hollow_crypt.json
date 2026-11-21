@@ -1,0 +1,54 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": {
+        "min": 2,
+        "max": 4
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:bone",
+          "weight": 8
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:glow_ink_sac",
+          "weight": 4
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:written_book",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "minecraft:written_book_content": {
+                  "title": "Burial Register",
+                  "author": "Keeper",
+                  "pages": [
+                    "{\"text\":\"Three alcoves were prepared and left empty. The central tomb was sealed before the burial rites.\"}",
+                    "{\"text\":\"The stone above it is warm. The corridor is not.\"}"
+                  ]
+                },
+                "minecraft:custom_name": "{\"text\":\"Recovered field record\",\"italic\":false}"
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:paper",
+          "weight": 4
+        }
+      ]
+    }
+  ]
+}
