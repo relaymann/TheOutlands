@@ -112,7 +112,7 @@ public final class AlmightyEntity extends Monster {
             }
             player.hurt(damageSources().mobAttack(this), damage);
         }
-        if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) level().playSound(null, blockPosition(), SoundEvents.WARDEN_ROAR,
+        if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) level().playSound(null, blockPosition(), OutlandsSounds.ALMIGHTY_PRESENCE.get(),
                 SoundSource.HOSTILE, phase == 3 ? 0.85F : 0.62F, phase == 3 ? 0.38F : 0.56F);
     }
 
