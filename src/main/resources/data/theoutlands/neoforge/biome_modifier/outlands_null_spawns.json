@@ -2,7 +2,7 @@
   "type": "neoforge:add_spawns",
   "biomes": "#minecraft:is_forest",
   "spawners": [
-    { "type": "theoutlands:null", "weight": 1, "minCount": 1, "maxCount": 1 },
-    { "type": "theoutlands:null_apostle", "weight": 1, "minCount": 1, "maxCount": 1 }
+    { "type": "theoutlands:null", "weight": 3, "minCount": 1, "maxCount": 1 },
+    { "type": "theoutlands:null_apostle", "weight": 3, "minCount": 1, "maxCount": 1 }
   ]
 }
