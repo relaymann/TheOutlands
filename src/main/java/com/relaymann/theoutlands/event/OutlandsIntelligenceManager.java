@@ -1,6 +1,7 @@
 package com.relaymann.theoutlands.event;
 
 import com.relaymann.theoutlands.TheOutlands;
+import com.relaymann.theoutlands.OutlandsConfig;
 import com.relaymann.theoutlands.entity.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
@@ -75,7 +76,8 @@ public final class OutlandsIntelligenceManager {
 
     @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
-        if (event.getServer().getTickCount() % 10 != 0) return;
+        if (!OutlandsConfig.ENTITY_INTELLIGENCE_ENABLED.get()
+                || event.getServer().getTickCount() % 10 != 0) return;
         for (ServerLevel level : event.getServer().getAllLevels()) {
             updatePlayerPatterns(level);
             Set<UUID> processed = new HashSet<>();
@@ -264,16 +266,24 @@ public final class OutlandsIntelligenceManager {
         for (ServerLevel level : levels) for (ServerPlayer player : level.players()) online.add(player.getUUID());
         PLAYER_PATTERNS.keySet().removeIf(id -> !online.contains(id));
         INVESTIGATION_COOLDOWNS.entrySet().removeIf(entry -> entry.getValue() < 0L);
-        if (TERRITORIES.size() > 4096) {
-            Set<UUID> activeMobs = new HashSet<>();
-            for (ServerLevel level : levels) {
-                for (ServerPlayer player : level.players()) {
-                    level.getEntitiesOfClass(Mob.class, new AABB(player.blockPosition()).inflate(96.0D),
-                            OutlandsIntelligenceManager::isOutlandsCreature).forEach(mob -> activeMobs.add(mob.getUUID()));
-                }
+        // Keep per-entity state bounded when creatures despawn or chunks unload.
+        Set<UUID> activeMobs = new HashSet<>();
+        for (ServerLevel level : levels) {
+            for (ServerPlayer player : level.players()) {
+                level.getEntitiesOfClass(Mob.class, new AABB(player.blockPosition()).inflate(96.0D),
+                        OutlandsIntelligenceManager::isOutlandsCreature).forEach(mob -> activeMobs.add(mob.getUUID()));
             }
-            TERRITORIES.keySet().removeIf(id -> !activeMobs.contains(id));
         }
+        TERRITORIES.keySet().removeIf(id -> !activeMobs.contains(id));
+        INVESTIGATION_COOLDOWNS.keySet().removeIf(id -> !activeMobs.contains(id));
+    }
+
+    public static void clear() {
+        DISTURBANCES.clear();
+        PLAYER_PATTERNS.clear();
+        INVESTIGATION_COOLDOWNS.clear();
+        TERRITORIES.clear();
+        lastCleanup = 0L;
     }
 
     private record Disturbance(BlockPos pos, UUID source, long gameTime, String kind) {}

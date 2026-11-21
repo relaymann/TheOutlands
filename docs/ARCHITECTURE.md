@@ -53,3 +53,12 @@ The server owns event selection and entity behavior. Targeted sounds, particles,
 
 ## Testing and remaining release gates
 Pure tests cover opening-range protection, pacing, cooldown boundaries, safe random rolls, contextual weighting, persistent memory policy, Almighty territory geometry, and apostle milestone boundaries. GitHub Actions runs `clean test build` and publishes the rolling JAR only after success. Dedicated-server startup, full client rendering/audio, multiplayer playtesting, and a full-worldgen compatibility pass remain release gates.
+
+
+## Environmental pressure and existing-creature systems
+
+The ambient anomaly layer adds rare, player-private positional audio cues after the configured distance from the shared Overworld spawn. It uses existing vanilla sound events and never edits blocks, creates fake terrain, teleports players, spawns a creature, or writes narration to chat. Ambient anomalies have their own enable switch and minimum-distance setting.
+
+The existing-creature intelligence and ecology managers can be independently disabled in the common config. Intelligence retains bounded disturbance history, per-creature temperament, investigation cooldowns, pursuit adaptation, and virtual home ranges. Ecology handles established creature relationships and rare inter-entity encounters. Both systems remain server-authoritative; their cleanup removes stale per-entity state when creatures despawn or unload.
+
+No terrain-generation hooks or world-generation settings are changed by these systems.

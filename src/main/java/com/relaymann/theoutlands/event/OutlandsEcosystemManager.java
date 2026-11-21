@@ -1,6 +1,7 @@
 package com.relaymann.theoutlands.event;
 
 import com.relaymann.theoutlands.TheOutlands;
+import com.relaymann.theoutlands.OutlandsConfig;
 import com.relaymann.theoutlands.entity.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,7 +22,8 @@ public final class OutlandsEcosystemManager {
 
     @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
-        if (event.getServer().getTickCount() % 20 != 0) return;
+        if (!OutlandsConfig.ENTITY_ECOSYSTEM_ENABLED.get()
+                || event.getServer().getTickCount() % 20 != 0) return;
         for (ServerLevel level : event.getServer().getAllLevels()) {
             Set<Long> processedPairs = new HashSet<>();
             for (ServerPlayer player : level.players()) {

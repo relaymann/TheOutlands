@@ -17,6 +17,10 @@ public final class OutlandsConfig {
     public static final ModConfigSpec.BooleanValue NULL_SIGHTINGS_ENABLED;
     public static final ModConfigSpec.BooleanValue HORROR_AUDIO_ENABLED;
     public static final ModConfigSpec.BooleanValue FEAR_AMBIENT_ATTENUATION;
+    public static final ModConfigSpec.BooleanValue AMBIENT_ANOMALIES_ENABLED;
+    public static final ModConfigSpec.BooleanValue ENTITY_INTELLIGENCE_ENABLED;
+    public static final ModConfigSpec.BooleanValue ENTITY_ECOSYSTEM_ENABLED;
+    public static final ModConfigSpec.DoubleValue AMBIENT_ANOMALY_MIN_DISTANCE;
     public static final ModConfigSpec SPEC;
 
     static {
@@ -48,6 +52,9 @@ public final class OutlandsConfig {
         ALMIGHTY_TERRITORY_DEPTH = BUILDER
                 .comment("Depth in blocks measured inward from the actual configured world border.")
                 .defineInRange("almightyTerritoryDepth", 5_000.0D, 1.0D, 30_000_000.0D);
+        AMBIENT_ANOMALY_MIN_DISTANCE = BUILDER
+                .comment("Minimum horizontal distance from world spawn before rare ambient anomalies can occur.")
+                .defineInRange("ambientAnomalyMinDistance", 1_000.0D, 0.0D, 30_000_000.0D);
         BUILDER.pop();
 
         BUILDER.push("presentation");
@@ -60,6 +67,18 @@ public final class OutlandsConfig {
         FEAR_AMBIENT_ATTENUATION = BUILDER
                 .comment("Locally attenuates ambient and weather audio in Fear's distant forest territory.")
                 .define("fearAmbientAttenuation", true);
+        AMBIENT_ANOMALIES_ENABLED = BUILDER
+                .comment("Enables rare, player-private environmental sound anomalies. No terrain is changed.")
+                .define("ambientAnomaliesEnabled", true);
+        BUILDER.pop();
+
+        BUILDER.push("entitySystems");
+        ENTITY_INTELLIGENCE_ENABLED = BUILDER
+                .comment("Enables existing creatures' investigation, memory, pursuit adaptation, and home-range behavior.")
+                .define("entityIntelligenceEnabled", true);
+        ENTITY_ECOSYSTEM_ENABLED = BUILDER
+                .comment("Enables existing creatures' territorial relationships and rare inter-entity encounters.")
+                .define("entityEcosystemEnabled", true);
         BUILDER.pop();
 
         SPEC = BUILDER.build();

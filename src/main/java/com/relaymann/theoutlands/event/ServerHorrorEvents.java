@@ -36,6 +36,9 @@ public final class ServerHorrorEvents {
             FearEncounterManager.tick(level);
             AggressiveJumpscareManager.tick(level);
             ClientAfterimageManager.tick(level);
+            if (event.getServer().getTickCount() % 20 == 0) {
+                EnvironmentalAnomalyManager.tick(level);
+            }
         }
     }
 
@@ -45,6 +48,7 @@ public final class ServerHorrorEvents {
             ClientAfterimageManager.clear(player);
             AggressiveJumpscareManager.clear(player);
             FootstepEchoManager.clear(player);
+            EnvironmentalAnomalyManager.clear(player);
         }
         HorrorProgressionManager.remove(event.getEntity().getUUID());
     }
@@ -80,5 +84,7 @@ public final class ServerHorrorEvents {
         DeathHuntManager.clear();
         ClientAfterimageManager.clear();
         FootstepEchoManager.clear();
+        EnvironmentalAnomalyManager.clear();
+        OutlandsIntelligenceManager.clear();
     }
 }
