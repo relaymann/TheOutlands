@@ -43,15 +43,15 @@ def line(pixels, x0, y0, x1, y1, color):
     dy, sy = -abs(y1-y0), 1 if y0<y1 else -1
     err = dx + dy
     while True:
-        if 0 <= x0 < 64 and 0 <= y0 < 64: pixels[y0][x0] = color
+        if 0 <= x0 < len(pixels[0]) and 0 <= y0 < len(pixels): pixels[y0][x0] = color
         if x0 == x1 and y0 == y1: break
         e2 = 2*err
         if e2 >= dy: err += dy; x0 += sx
         if e2 <= dx: err += dx; y0 += sy
 
 def rect(pixels, x0, y0, x1, y1, color):
-    for y in range(max(0,y0), min(64,y1+1)):
-        for x in range(max(0,x0), min(64,x1+1)): pixels[y][x] = color
+    for y in range(max(0,y0), min(len(pixels),y1+1)):
+        for x in range(max(0,x0), min(len(pixels[0]),x1+1)): pixels[y][x] = color
 
 def generate(name, palette, index):
     rng = random.Random(20261120 + index*173)
