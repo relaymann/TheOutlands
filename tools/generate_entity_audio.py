@@ -300,3 +300,36 @@ def colossus_step(t,d,i,n):
 colossus_step.a,colossus_step.b={"lp1":0.,"lp2":0.},{"lp1":0.,"lp2":0.};make("colossus_step",2.2,colossus_step)
 def colossus_hurt(t,d,i,n): return .42*noise(t,25,260,colossus_hurt.a)*math.exp(-t*4)+.2*noise(t,240,1200,colossus_hurt.b)*math.exp(-t*11)
 colossus_hurt.a,colossus_hurt.b={"lp1":0.,"lp2":0.},{"lp1":0.,"lp2":0.};make("colossus_hurt",1.7,colossus_hurt)
+
+# Additional close-range cues for the three new entities.
+def pilgrim_step(t,d,i,n):
+    low=noise(t,45,260,pilgrim_step.low); grit=noise(t,280,1800,pilgrim_step.grit)
+    return fade(t,d,.002,.11)*(.34*low*math.exp(-t*20)+.16*grit*math.exp(-t*30))
+pilgrim_step.low,pilgrim_step.grit={"lp1":0.,"lp2":0.},{"lp1":0.,"lp2":0.}
+make("pilgrim_step",.16,pilgrim_step)
+
+def ceiling_drop(t,d,i,n):
+    thud=noise(t,45,300,ceiling_drop.thud); scrape=noise(t,300,2100,ceiling_drop.scrape)
+    return fade(t,d,.001,.2)*(.52*thud*math.exp(-t*13)+.19*scrape*math.exp(-t*8))
+ceiling_drop.thud,ceiling_drop.scrape={"lp1":0.,"lp2":0.},{"lp1":0.,"lp2":0.}
+make("ceiling_drop",.55,ceiling_drop)
+
+def colossus_warning(t,d,i,n):
+    low=noise(t,22,150,colossus_warning.low); upper=noise(t,150,520,colossus_warning.upper)
+    swell=math.sin(math.pi*min(1.0,t/d))**1.5
+    return fade(t,d,.15,.2)*(.32*low+.12*upper+.22*math.sin(2*math.pi*(31-8*t)*t))*swell
+colossus_warning.low,colossus_warning.upper={"lp1":0.,"lp2":0.},{"lp1":0.,"lp2":0.}
+make("colossus_warning",1.35,colossus_warning)
+
+def colossus_stomp(t,d,i,n):
+    low=noise(t,18,130,colossus_stomp.low); crack=noise(t,130,900,colossus_stomp.crack)
+    return fade(t,d,.001,.48)*(.56*low*math.exp(-t*5)+.24*crack*math.exp(-t*11)+.13*math.sin(2*math.pi*42*t)*math.exp(-t*9))
+colossus_stomp.low,colossus_stomp.crack={"lp1":0.,"lp2":0.},{"lp1":0.,"lp2":0.}
+make("colossus_stomp",.9,colossus_stomp)
+
+def colossus_rumble(t,d,i,n):
+    low=noise(t,18,125,colossus_rumble.low); mid=noise(t,125,480,colossus_rumble.mid)
+    pulse=.5+.5*math.sin(2*math.pi*.72*t)
+    return fade(t,d,.3,.5)*(.34*low+.12*mid)*pulse
+colossus_rumble.low,colossus_rumble.mid={"lp1":0.,"lp2":0.},{"lp1":0.,"lp2":0.}
+make("colossus_rumble",2.8,colossus_rumble)
