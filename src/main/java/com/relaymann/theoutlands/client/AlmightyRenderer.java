@@ -23,7 +23,7 @@ public final class AlmightyRenderer extends MobRenderer<AlmightyEntity, Almighty
     }
 
     public static LayerDefinition createBodyLayer() {
-        return AlmightyModel.createBodyLayer();;
+        return AlmightyModel.createBodyLayer();
     }
 
     @Override
