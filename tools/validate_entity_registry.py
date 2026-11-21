@@ -125,6 +125,22 @@ def audit_once():
     if mimic_src.count("!p.isCreative()") < 2: errors.append("Mimic watcher checks do not ignore creative players")
     if intelligence.count("event.isCanceled()") < 4:
         errors.append("intelligence handlers do not consistently ignore canceled actions")
+
+    config = read("java/com/relaymann/theoutlands/OutlandsConfig.java")
+    required_spawn_rules = [
+        "ENTITY_SPAWN_BALANCE_ENABLED", "new SpawnProfile(500.0D, 1, 1)",
+        "new SpawnProfile(1_500.0D, 2, 2)", "new SpawnProfile(1_800.0D, 2, 2)",
+        "new SpawnProfile(2_500.0D, 4, 3)", "new SpawnProfile(3_500.0D, 4, 4)",
+        "new SpawnProfile(7_000.0D, 7, 8)", "FEAR_FIRST_APPEARANCE_DISTANCE.get()",
+        "DEATH_FIRST_APPEARANCE_DISTANCE.get()", "threatPoints + profile.threatCost() <= threatBudget"
+    ]
+    for rule in required_spawn_rules:
+        if rule not in placements + config:
+            errors.append("missing distance/threat spawn rule: " + rule)
+    if "MobSpawnType.NATURAL" not in placements or "MobSpawnType.CHUNK_GENERATION" not in placements:
+        errors.append("distance progression does not cover both natural spawn reasons")
+    if "type == OutlandsEntities.ALMIGHTY.get()" not in placements:
+        errors.append("Almighty's separate End spawn rule is not exempted")
     return errors
 
 for pass_number in range(1, PASSES + 1):
