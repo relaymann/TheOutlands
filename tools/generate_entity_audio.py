@@ -246,7 +246,6 @@ def almighty_presence(t, d, i, n):
 almighty_presence.a, almighty_presence.b = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
 make("almighty_presence", 3.6, almighty_presence)
 
-print("Generated original Outlands entity and structure sound effects in", OUT)
 
 
 # Structure-specific atmospheres: original procedural cues, not borrowed vanilla sounds.
@@ -281,3 +280,5 @@ structure_tone("structure_forgotten_station", 2.6, 102, 0.25, 1.7)
 structure_tone("structure_null_chamber", 3.2, 31, 0.08, 0.18)
 structure_tone("structure_hollow_crypt", 2.7, 39, 0.26, 0.4)
 structure_tone("structure_boundary_monument", 3, 64, 0.17, 0.26)
+
+print("Generated original Outlands entity and structure sound effects in", OUT)

@@ -63,20 +63,20 @@ public final class StructureAmbienceManager {
         double z=b.minZ()+4+player.getRandom().nextDouble()*Math.max(1,b.getZSpan()-8);
         double y=Math.max(player.getY()-8,Math.min(player.getY()+8,b.maxY()-2));
         switch(id) {
-            case "research_facility" -> send(player,OutlandsSounds.STRUCTURE_RESEARCH.get(),x,y,z,0.1F,0.62F);
-            case "apostle_cathedral" -> send(player,OutlandsSounds.STRUCTURE_CATHEDRAL.get(),x,y,z,0.12F,0.52F);
-            case "forsaken_settlement" -> send(player,OutlandsSounds.STRUCTURE_SETTLEMENT.get(),x,y,z,0.13F,0.78F);
-            case "last_outpost" -> send(player,OutlandsSounds.STRUCTURE_OUTPOST.get(),x,y,z,0.12F,0.7F);
-            case "forgotten_station" -> send(player,OutlandsSounds.STRUCTURE_STATION.get(),x,y,z,0.1F,0.58F);
-            case "null_chamber" -> send(player,OutlandsSounds.STRUCTURE_NULL_CHAMBER.get(),x,y,z,0.045F,0.36F);
-            case "hollow_crypt" -> send(player,OutlandsSounds.STRUCTURE_CRYPT.get(),x,y,z,0.08F,0.48F);
-            case "boundary_monument" -> send(player,OutlandsSounds.STRUCTURE_MONUMENT.get(),x,y,z,0.07F,0.64F);
-            case "cabin" -> send(player,OutlandsSounds.STRUCTURE_CABIN.get(),x,y,z,0.09F,0.75F);
-            case "tower" -> send(player,OutlandsSounds.STRUCTURE_TOWER.get(),x,y,z,0.08F,0.55F);
-            case "bunker" -> send(player,OutlandsSounds.STRUCTURE_BUNKER.get(),x,y,z,0.07F,0.44F);
-            case "shrine" -> send(player,OutlandsSounds.STRUCTURE_SHRINE.get(),x,y,z,0.06F,0.62F);
-            case "observatory" -> send(player,OutlandsSounds.STRUCTURE_OBSERVATORY.get(),x,y,z,0.05F,0.84F);
-            case "archive" -> send(player,OutlandsSounds.STRUCTURE_ARCHIVE.get(),x,y,z,0.07F,0.42F);
+            case "research_facility" -> send(player,OutlandsSounds.STRUCTURE_RESEARCH.get(),x,y,z,0.24F,0.62F);
+            case "apostle_cathedral" -> send(player,OutlandsSounds.STRUCTURE_CATHEDRAL.get(),x,y,z,0.24F,0.52F);
+            case "forsaken_settlement" -> send(player,OutlandsSounds.STRUCTURE_SETTLEMENT.get(),x,y,z,0.30F,0.78F);
+            case "last_outpost" -> send(player,OutlandsSounds.STRUCTURE_OUTPOST.get(),x,y,z,0.24F,0.7F);
+            case "forgotten_station" -> send(player,OutlandsSounds.STRUCTURE_STATION.get(),x,y,z,0.22F,0.58F);
+            case "null_chamber" -> send(player,OutlandsSounds.STRUCTURE_NULL_CHAMBER.get(),x,y,z,0.12F,0.36F);
+            case "hollow_crypt" -> send(player,OutlandsSounds.STRUCTURE_CRYPT.get(),x,y,z,0.22F,0.48F);
+            case "boundary_monument" -> send(player,OutlandsSounds.STRUCTURE_MONUMENT.get(),x,y,z,0.20F,0.64F);
+            case "cabin" -> send(player,OutlandsSounds.STRUCTURE_CABIN.get(),x,y,z,0.20F,0.75F);
+            case "tower" -> send(player,OutlandsSounds.STRUCTURE_TOWER.get(),x,y,z,0.18F,0.55F);
+            case "bunker" -> send(player,OutlandsSounds.STRUCTURE_BUNKER.get(),x,y,z,0.20F,0.44F);
+            case "shrine" -> send(player,OutlandsSounds.STRUCTURE_SHRINE.get(),x,y,z,0.18F,0.62F);
+            case "observatory" -> send(player,OutlandsSounds.STRUCTURE_OBSERVATORY.get(),x,y,z,0.16F,0.84F);
+            case "archive" -> send(player,OutlandsSounds.STRUCTURE_ARCHIVE.get(),x,y,z,0.18F,0.42F);
             default -> { return; }
         }
     }
