@@ -77,7 +77,7 @@ Surface and cave biome weights were modestly raised for common and mid-tier thre
 
 ## Additive Outlands structures
 
-The Overworld receives a rare, configurable structure-feature layer registered through a NeoForge biome modifier on the existing Overworld biome tag. Vanilla biome sources, terrain noise, caves, and vanilla structure sets are not replaced or rewritten. The feature keeps its maximum 9x9 footprint inside the chunk being decorated, rejects sites within the configured distance from the original shared spawn, and requires a relatively level non-fluid surface.
+Historical first-pass implementation: the original six structures were initially placed as a chunk-contained configured feature through a NeoForge biome modifier. That implementation was superseded in Phase 1 by the native 48x48 multi-chunk Structure/StructurePiece pipeline documented below. The biome source, terrain noise, cave carvers, and vanilla structure sets remain unchanged.
 
 The structures are:
 - **Abandoned cabin** — forest/taiga wilderness, beyond 1,000 blocks.
@@ -98,7 +98,7 @@ Four additional lore sites extend the additive feature pool:
 - **Forsaken Settlement** — a small cluster of damaged homes, a dry well and abandoned supplies, suggesting an abrupt disappearance.
 - **Last Outpost** — a barricaded field position with lookout posts and a command cache, showing a failed attempt to hold the wilderness.
 
-These use compact footprints that fit the existing single-chunk placement model. They are generated only in newly generated chunks and do not modify vanilla terrain generation rules or existing structures.
+These four identities were subsequently migrated into the native 48x48 multi-chunk structure piece system. Their placements are additive, clipped per chunk, and only affect newly generated chunks.
 
 
 ## Lore structure batch 2
@@ -109,7 +109,7 @@ The second batch adds four more specialized locations:
 - **Hollow Crypt** — a deep burial hall with empty marked alcoves and a sealed central tomb, tied to Death's presence without placing any Death progression artifacts.
 - **Boundary Monument** — broken stone rings and an empty central frame, suggesting a boundary without creating a portal or changing dimensions.
 
-As with the first batch, these are compact single-chunk features, appear only in newly generated chunks, and leave vanilla terrain and structure generation systems intact.
+These four identities also use the native multi-chunk piece pipeline, appear only in newly generated chunks, and leave vanilla terrain generation systems intact.
 
 
 ### Batch 2 fidelity pass
@@ -128,7 +128,7 @@ Eligible structures are selected with one weighted roll rather than a sequence o
 
 Sites reject ocean, river, and beach biomes, water/fluid surfaces, leaf/log canopy tops, steep footprints, and unsafe build-height margins. The 9x9 placement footprint remains inside the generating chunk. Vanilla terrain, caves, biome sources, and vanilla structure sets are unchanged.
 
-This is the generation-policy foundation; the current 14 structure builders are still single-chunk features. A native multi-chunk piece/template migration is a separate next step and is not claimed as complete by this phase.
+This describes the intermediate placement-policy stage. It was superseded by the native multi-chunk piece/template-system migration in the following Phase 1 section; the current 14 builders are procedural modules invoked through persisted native pieces.
 
 
 ## Native multi-chunk structure pipeline
