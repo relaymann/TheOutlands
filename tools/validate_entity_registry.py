@@ -93,10 +93,14 @@ def audit_once():
 
         model = model_map.get(entity_id)
         model_path = "java/com/relaymann/theoutlands/client/" + str(model) + ".java"
-        if not model or (not os.path.isfile(os.path.join(ROOT, model_path)) and ("class " + str(model)).encode() not in read("java/com/relaymann/theoutlands/client/NewEntityRenderers.java").encode()):
+        if not model:
             errors.append(entity_id + ": missing model")
-        elif "setupAnim" not in read(model_path):
-            errors.append(entity_id + ": missing animation method")
+        else:
+            model_source = read(model_path) if os.path.isfile(os.path.join(ROOT, model_path)) else read("java/com/relaymann/theoutlands/client/NewEntityRenderers.java")
+            if ("class " + str(model)) not in model_source:
+                errors.append(entity_id + ": missing model class")
+            elif "setupAnim" not in model_source:
+                errors.append(entity_id + ": missing animation method")
         if renderer_models.get(entity_id) != model:
             errors.append(entity_id + ": renderer/model mismatch")
 
