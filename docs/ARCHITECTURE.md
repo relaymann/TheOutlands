@@ -88,3 +88,14 @@ The structures are:
 - **Death archive** — buried deepslate chamber, beyond 50,000 blocks.
 
 Each structure uses a dedicated vanilla loot table appropriate to its setting. The structures do not place progression-gated ARG artifacts directly, preserving the existing Death clue chain. Player-specific false structures remain separate temporary illusions and never write permanent terrain changes. Common config options are `outlandsStructuresEnabled`, `structureMinDistance`, and `structureChanceMultiplier`.
+
+
+## Lore structure batch 1
+
+Four additional lore sites extend the additive feature pool:
+- **Research Facility** — buried observation and containment rooms, implying earlier attempts to study the entities.
+- **Apostle Cathedral** — a ruined sanctuary with seven sealed niches and a central altar, tied to the Almighty and the Apostles.
+- **Forsaken Settlement** — a small cluster of damaged homes, a dry well and abandoned supplies, suggesting an abrupt disappearance.
+- **Last Outpost** — a barricaded field position with lookout posts and a command cache, showing a failed attempt to hold the wilderness.
+
+These use compact footprints that fit the existing single-chunk placement model. They are generated only in newly generated chunks and do not modify vanilla terrain generation rules or existing structures.

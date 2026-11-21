@@ -3,6 +3,8 @@ package com.relaymann.theoutlands.worldgen;
 import com.relaymann.theoutlands.OutlandsConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
@@ -12,6 +14,7 @@ import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
@@ -27,7 +30,8 @@ public final class OutlandsStructureFeature extends Feature<NoneFeatureConfigura
         // Keep the largest 9x9 footprint inside the chunk being decorated.
         int x=(c.origin().getX() & ~15)+3, z=(c.origin().getZ() & ~15)+3;
         int y=l.getHeight(Heightmap.Types.WORLD_SURFACE_WG,x,z);
-        double dx=x-l.getLevelData().getXSpawn(), dz=z-l.getLevelData().getZSpawn();
+        BlockPos sharedSpawn=l.getLevel().getSharedSpawnPos();
+        double dx=x-sharedSpawn.getX(), dz=z-sharedSpawn.getZ();
         double dist=Math.sqrt(dx*dx+dz*dz);
         double min=Math.max(1_000.0D,OutlandsConfig.STRUCTURE_MIN_DISTANCE.get());
         if(dist<min||!stable(l,x,z,y)) return false;
@@ -37,12 +41,17 @@ public final class OutlandsStructureFeature extends Feature<NoneFeatureConfigura
                 .map(k->k.location().getPath()).orElse("");
         boolean forest=biome.contains("forest")||biome.contains("taiga")
                 ||biome.contains("grove")||biome.contains("wooded");
-        if(forest&&roll(r,7_000,mult)){cabin(l,x,y,z,r);return true;}
-        if(dist>=Math.max(min,1_800)&&roll(r,9_000,mult)){tower(l,x,y,z,r);return true;}
-        if(dist>=Math.max(min,2_500)&&roll(r,11_000,mult)){bunker(l,x,y,z,r);return true;}
-        if(dist>=Math.max(min,15_000)&&roll(r,18_000,mult)){shrine(l,x,y,z,r);return true;}
-        if(forest&&dist>=Math.max(min,22_000)&&roll(r,26_000,mult)){observatory(l,x,y,z,r);return true;}
-        if(dist>=Math.max(min,50_000)&&roll(r,42_000,mult)){archive(l,x,y,z,r);return true;}
+        // Priority batch 1: lore-forward locations with distinct silhouettes and interiors.
+        if(forest&&roll(r,5_500,mult)){cabin(l,x,y,z,r);return true;}
+        if(dist>=Math.max(min,1_800)&&roll(r,7_000,mult)){tower(l,x,y,z,r);return true;}
+        if(dist>=Math.max(min,2_500)&&roll(r,8_500,mult)){bunker(l,x,y,z,r);return true;}
+        if(dist>=Math.max(min,15_000)&&roll(r,14_000,mult)){shrine(l,x,y,z,r);return true;}
+        if(forest&&dist>=Math.max(min,22_000)&&roll(r,20_000,mult)){observatory(l,x,y,z,r);return true;}
+        if(dist>=Math.max(min,50_000)&&roll(r,32_000,mult)){archive(l,x,y,z,r);return true;}
+        if(dist>=Math.max(min,3_000)&&roll(r,10_000,mult)){researchFacility(l,x,y,z,r);return true;}
+        if(dist>=Math.max(min,12_000)&&roll(r,16_000,mult)){apostleCathedral(l,x,y,z,r);return true;}
+        if(dist>=Math.max(min,2_000)&&roll(r,8_000,mult)){forsakenSettlement(l,x,y,z,r);return true;}
+        if(dist>=Math.max(min,4_000)&&roll(r,12_000,mult)){lastOutpost(l,x,y,z,r);return true;}
         return false;
     }
 
@@ -62,7 +71,7 @@ public final class OutlandsStructureFeature extends Feature<NoneFeatureConfigura
     private static void chest(WorldGenLevel l,int x,int y,int z,String loot,RandomSource r){
         BlockPos pos=new BlockPos(x,y,z);l.setBlock(pos,Blocks.CHEST.defaultBlockState(),2);
         if(l.getBlockEntity(pos) instanceof RandomizableContainerBlockEntity c)
-            c.setLootTable(ResourceLocation.parse("minecraft:chests/"+loot),r.nextLong());
+            c.setLootTable(ResourceKey.create(Registries.LOOT_TABLE,ResourceLocation.parse("minecraft:chests/"+loot)),r.nextLong());
     }
     private static BlockState log(){return Blocks.SPRUCE_LOG.defaultBlockState()
             .setValue(RotatedPillarBlock.AXIS,Direction.Axis.Y);}
@@ -190,4 +199,86 @@ public final class OutlandsStructureFeature extends Feature<NoneFeatureConfigura
         p(l,x+4,surface,z+2,Blocks.IRON_TRAPDOOR.defaultBlockState());
         chest(l,x+4,y+1,z+3,"ancient_city",r);
     }
+    // Research Facility: buried test rooms, glass observation bays and containment cells.
+    private static void researchFacility(WorldGenLevel l,int x,int surface,int z,RandomSource r){
+        int y=surface-12;
+        for(int a=0;a<9;a++)for(int b=0;b<7;b++){
+            p(l,x+a,y,z+b,Blocks.POLISHED_ANDESITE.defaultBlockState());
+            p(l,x+a,y+4,z+b,Blocks.IRON_BLOCK.defaultBlockState());
+            for(int h=1;h<4;h++){
+                boolean edge=a==0||a==8||b==0||b==6;
+                if(!edge)air(l,x+a,y+h,z+b);
+                else p(l,x+a,y+h,z+b,(h==2&&(a==0||a==8))?Blocks.GLASS.defaultBlockState():Blocks.IRON_BLOCK.defaultBlockState());
+            }
+        }
+        // Two containment bays divided by a reinforced central corridor.
+        for(int h=1;h<=3;h++){p(l,x+4,y+h,z+1,Blocks.IRON_BARS.defaultBlockState());p(l,x+4,y+h,z+5,Blocks.IRON_BARS.defaultBlockState());}
+        p(l,x+2,y+1,z+2,Blocks.REDSTONE_LAMP.defaultBlockState());
+        p(l,x+6,y+1,z+2,Blocks.REDSTONE_LAMP.defaultBlockState());
+        p(l,x+2,y+1,z+4,Blocks.LECTERN.defaultBlockState());
+        p(l,x+6,y+1,z+4,Blocks.CRYING_OBSIDIAN.defaultBlockState());
+        for(int h=y+4;h<surface;h++){air(l,x+4,h,z+1);p(l,x+3,h,z+1,Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING,Direction.SOUTH));}
+        air(l,x+4,surface,z+1);p(l,x+3,surface,z+1,Blocks.IRON_TRAPDOOR.defaultBlockState());
+        chest(l,x+7,y+1,z+3,"stronghold_corridor",r);
+    }
+
+    // Apostle Cathedral: a compact ruined sanctuary with seven sealed niches around an altar.
+    private static void apostleCathedral(WorldGenLevel l,int x,int y,int z,RandomSource r){
+        for(int a=0;a<9;a++)for(int b=0;b<9;b++){
+            boolean edge=a==0||a==8||b==0||b==8;
+            p(l,x+a,y,z+b,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState());
+            if(edge)for(int h=1;h<=5;h++)p(l,x+a,y+h,z+b,Blocks.CRACKED_STONE_BRICKS.defaultBlockState());
+        }
+        for(int a=2;a<=6;a+=2)for(int h=1;h<=4;h++){
+            p(l,x+a,y+h,z+1,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState());
+            p(l,x+a,y+h,z+7,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState());
+        }
+        for(int h=1;h<=3;h++){p(l,x+1,y+h,z+1,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState());p(l,x+7,y+h,z+1,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState());}
+        p(l,x+4,y+1,z+4,Blocks.CRYING_OBSIDIAN.defaultBlockState());
+        p(l,x+4,y+2,z+4,Blocks.SOUL_LANTERN.defaultBlockState());
+        for(int a=1;a<=7;a++)if(a!=4)p(l,x+a,y+1,z+7,Blocks.IRON_BARS.defaultBlockState());
+        chest(l,x+4,y+1,z+2,"woodland_mansion",r);
+    }
+
+    // Forsaken Settlement: a tightly clustered pair of ruined homes around an empty well.
+    private static void forsakenSettlement(WorldGenLevel l,int x,int y,int z,RandomSource r){
+        // Shared square of broken road and the dry well at its center.
+        for(int a=0;a<9;a++)for(int b=0;b<9;b++)if(a==4||b==4)p(l,x+a,y,z+b,Blocks.COBBLESTONE.defaultBlockState());
+        for(int a=2;a<=6;a++)for(int b=2;b<=6;b++)if(a==2||a==6||b==2||b==6)
+            p(l,x+a,y+1,z+b,Blocks.MOSSY_COBBLESTONE.defaultBlockState());
+        for(int h=1;h<=3;h++)p(l,x+4,y+h,z+4,Blocks.COBBLESTONE.defaultBlockState());
+        air(l,x+4,y+3,z+4);
+        // Two roofless, partially collapsed houses at opposite corners.
+        for(int[] o:new int[][]{{0,0},{6,6}}){
+            for(int a=0;a<3;a++)for(int b=0;b<3;b++){
+                p(l,x+o[0]+a,y,z+o[1]+b,Blocks.OAK_PLANKS.defaultBlockState());
+                if(a==0||a==2||b==0||b==2){
+                    for(int h=1;h<=2;h++)if(!(a==1&&b==0))p(l,x+o[0]+a,y+h,z+o[1]+b,Blocks.OAK_LOG.defaultBlockState());
+                }
+            }
+            p(l,x+o[0]+1,y+3,z+o[1]+1,Blocks.SPRUCE_PLANKS.defaultBlockState());
+        }
+        p(l,x+1,y+1,z+1,Blocks.BARREL.defaultBlockState());
+        p(l,x+7,y+1,z+7,Blocks.COBWEB.defaultBlockState());
+        chest(l,x+2,y+1,z+1,"village_taiga_house",r);
+    }
+
+    // Last Outpost: a barricaded perimeter, lookout corners and an abandoned command post.
+    private static void lastOutpost(WorldGenLevel l,int x,int y,int z,RandomSource r){
+        for(int a=0;a<9;a++)for(int b=0;b<9;b++){
+            if(a==0||a==8||b==0||b==8){
+                p(l,x+a,y,z+b,Blocks.COBBLESTONE_WALL.defaultBlockState());
+                if((a+b)%3==0)p(l,x+a,y+1,z+b,Blocks.OAK_FENCE.defaultBlockState());
+            }else p(l,x+a,y,z+b,Blocks.COARSE_DIRT.defaultBlockState());
+        }
+        int[][] posts={{1,1},{7,1},{1,7},{7,7}};
+        for(int[] q:posts)for(int h=1;h<=4;h++)p(l,x+q[0],y+h,z+q[1],Blocks.SPRUCE_LOG.defaultBlockState().setValue(RotatedPillarBlock.AXIS,Direction.Axis.Y));
+        for(int a=3;a<=5;a++)for(int b=3;b<=5;b++)if(a==3||a==5||b==3||b==5)
+            p(l,x+a,y+1,z+b,Blocks.SPRUCE_PLANKS.defaultBlockState());
+        p(l,x+4,y+1,z+4,Blocks.CRAFTING_TABLE.defaultBlockState());
+        p(l,x+4,y+2,z+4,Blocks.LANTERN.defaultBlockState());
+        for(int a=2;a<=6;a++)p(l,x+a,y+1,z+2,Blocks.SPRUCE_FENCE.defaultBlockState());
+        chest(l,x+6,y+1,z+6,"bastion_treasure",r);
+    }
+
 }
