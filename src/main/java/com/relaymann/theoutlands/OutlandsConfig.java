@@ -21,6 +21,9 @@ public final class OutlandsConfig {
     public static final ModConfigSpec.BooleanValue ENTITY_INTELLIGENCE_ENABLED;
     public static final ModConfigSpec.BooleanValue ENTITY_ECOSYSTEM_ENABLED;
     public static final ModConfigSpec.BooleanValue ENTITY_SPAWN_BALANCE_ENABLED;
+    public static final ModConfigSpec.BooleanValue OUTLANDS_STRUCTURES_ENABLED;
+    public static final ModConfigSpec.DoubleValue STRUCTURE_MIN_DISTANCE;
+    public static final ModConfigSpec.DoubleValue STRUCTURE_CHANCE_MULTIPLIER;
     public static final ModConfigSpec.DoubleValue AMBIENT_ANOMALY_MIN_DISTANCE;
     public static final ModConfigSpec SPEC;
 
@@ -83,6 +86,15 @@ public final class OutlandsConfig {
         ENTITY_SPAWN_BALANCE_ENABLED = BUILDER
                 .comment("Enables distance-based natural spawning and nearby Outlands threat limits. Disable only for unrestricted testing.")
                 .define("entitySpawnBalanceEnabled", true);
+        OUTLANDS_STRUCTURES_ENABLED = BUILDER
+                .comment("Enables rare additive Outlands structures. Vanilla terrain and structures remain enabled.")
+                .define("outlandsStructuresEnabled", true);
+        STRUCTURE_MIN_DISTANCE = BUILDER
+                .comment("Minimum horizontal distance from the original shared Overworld spawn for Outlands structures.")
+                .defineInRange("structureMinDistance", 1_000.0D, 0.0D, 30_000_000.0D);
+        STRUCTURE_CHANCE_MULTIPLIER = BUILDER
+                .comment("Multiplies Outlands structure frequency. 1.0 is the intended default.")
+                .defineInRange("structureChanceMultiplier", 1.0D, 0.0D, 10.0D);
         BUILDER.pop();
 
         SPEC = BUILDER.build();

@@ -73,3 +73,18 @@ The opening 500 blocks are protected from ordinary Outlands natural spawns. Comm
 Natural encounters also use a nearby threat budget. Each entity has a threat cost, and the allowed local population grows gradually with distance: one entity/one threat point before 1,000 blocks, two/two from 1,000–2,000, three/four from 2,000–4,000, four/six from 4,000–7,000, and five/nine beyond 7,000. Existing Outlands creatures near the nearest survival player consume that budget, preventing repeated spawn attempts from stacking multiple powerful threats. Spawn eggs, commands, conversions, and other non-natural spawn reasons are not blocked by the progression gate. The entire balancing layer can be disabled with the common config option `entitySpawnBalanceEnabled` for controlled testing.
 
 Surface and cave biome weights were modestly raised for common and mid-tier threats; rare story entities retain low weights and their larger distance requirements. Existing biome, light, height, and cave predicates remain in force.
+
+
+## Additive Outlands structures
+
+The Overworld receives a rare, configurable structure-feature layer registered through a NeoForge biome modifier on the existing Overworld biome tag. Vanilla biome sources, terrain noise, caves, and vanilla structure sets are not replaced or rewritten. The feature keeps its maximum 9x9 footprint inside the chunk being decorated, rejects sites within the configured distance from the original shared spawn, and requires a relatively level non-fluid surface.
+
+The structures are:
+- **Abandoned cabin** — forest/taiga wilderness, beyond 1,000 blocks.
+- **Watchtower** — isolated observation post, beyond 1,800 blocks.
+- **Sealed bunker** — buried stone room with a surface access shaft, beyond 2,500 blocks.
+- **Silent shrine** — Fear-associated stone and crying-obsidian site, beyond 15,000 blocks.
+- **Null observatory** — remote forest ring and dark pillars, beyond 22,000 blocks.
+- **Death archive** — buried deepslate chamber, beyond 50,000 blocks.
+
+Each structure uses a dedicated vanilla loot table appropriate to its setting. The structures do not place progression-gated ARG artifacts directly, preserving the existing Death clue chain. Player-specific false structures remain separate temporary illusions and never write permanent terrain changes. Common config options are `outlandsStructuresEnabled`, `structureMinDistance`, and `structureChanceMultiplier`.
