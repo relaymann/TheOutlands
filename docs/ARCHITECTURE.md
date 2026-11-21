@@ -153,7 +153,7 @@ Every structure also receives a concealed lower service chamber, reached through
 
 ## Structure atmosphere and encounters (Phase 2D–2F)
 
-Structure ambience is player-private and only runs while a living, non-creative player is inside a registered Outlands structure. Cues are sparse, use positional audio, and have per-player cooldowns. The current implementation reuses vanilla sound events with structure-specific pitch and volume; bespoke recorded structure soundscapes remain an asset-quality follow-up.
+Structure ambience is player-private and only runs while a living, non-creative player is inside a registered Outlands structure. Cues are sparse, use positional audio, and have per-player cooldowns. Every structure identity now has its own original procedurally synthesized OGG atmosphere, registered as a dedicated sound event and played privately with structure-specific volume and pitch. The sound generator is deterministic and runs in the release workflow.
 
 A structure can produce at most one deterministic, rare encounter during its center-chunk generation pass. Each site has a themed entity pool and respects existing progression milestones for Null, Null's Apostles, and Death. Encounters are not guaranteed, and the manager is gated by the entity-balance and ecosystem settings. Structure layouts also select seeded variations such as damaged rooms, extra wings, debris, and altered furnishings. All generated block writes, including chests and lower chambers, are clipped to the active structure-piece chunk box.
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create original, deterministic entity sound effects for The Outlands.
+"""Create original, deterministic entity and structure sound effects for The Outlands.
 
 Requires Python 3 and ffmpeg. The script writes mono OGG Vorbis files directly
 into the mod resource tree so CI packages the same sounds as local builds.
@@ -246,7 +246,7 @@ def almighty_presence(t, d, i, n):
 almighty_presence.a, almighty_presence.b = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
 make("almighty_presence", 3.6, almighty_presence)
 
-print("Generated all original Outlands entity sound effects in", OUT)
+print("Generated original Outlands entity and structure sound effects in", OUT)
 
 
 # Structure-specific atmospheres: original procedural cues, not borrowed vanilla sounds.
