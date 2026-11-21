@@ -1,0 +1,7 @@
+{
+  "type": "theoutlands:outlands_multi_piece",
+  "biomes": "#theoutlands:structure_land",
+  "step": "surface_structures",
+  "terrain_adaptation": "none",
+  "size": 48
+}

@@ -21,7 +21,8 @@ public final class TheOutlands {
         OutlandsEntities.ENTITY_TYPES.register(modEventBus);
         OutlandsItems.ITEMS.register(modEventBus);
         OutlandsSounds.SOUNDS.register(modEventBus);
-        com.relaymann.theoutlands.worldgen.OutlandsWorldgen.FEATURES.register(modEventBus);
+        com.relaymann.theoutlands.worldgen.OutlandsWorldgen.STRUCTURE_TYPES.register(modEventBus);
+        com.relaymann.theoutlands.worldgen.OutlandsWorldgen.STRUCTURE_PIECES.register(modEventBus);
         LOGGER.info("The Outlands is loading. The world is still ordinary.");
     }
 }

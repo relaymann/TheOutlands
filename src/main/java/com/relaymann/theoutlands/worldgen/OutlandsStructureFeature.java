@@ -1,6 +1,5 @@
 package com.relaymann.theoutlands.worldgen;
 
-import com.relaymann.theoutlands.OutlandsConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
@@ -14,118 +13,222 @@ import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
-import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 
-/** Rare additive structures; vanilla terrain and structure generation remain untouched. */
-public final class OutlandsStructureFeature extends Feature<NoneFeatureConfiguration> {
-    public OutlandsStructureFeature() { super(NoneFeatureConfiguration.CODEC); }
+/** Deterministic, chunk-clipped layout builders used by the native structure piece. */
+public final class OutlandsStructureFeature {
+    private OutlandsStructureFeature() {}
 
-    @Override public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> c) {
-        if (!OutlandsConfig.OUTLANDS_STRUCTURES_ENABLED.get()) return false;
-        WorldGenLevel level = c.level();
-        int chunkX = Math.floorDiv(c.origin().getX(), 16);
-        int chunkZ = Math.floorDiv(c.origin().getZ(), 16);
-        long worldSeed = level.getLevel().getSeed();
-        int spacing = OutlandsConfig.STRUCTURE_SPACING_CHUNKS.get();
-        if (!StructurePlacementPolicy.isSpacedAnchor(worldSeed, chunkX, chunkZ, spacing)) return false;
-
-        RandomSource random = RandomSource.create(StructurePlacementPolicy.chunkSeed(worldSeed, chunkX, chunkZ));
-        int x = chunkX * 16 + 3;
-        int z = chunkZ * 16 + 3;
-        int y = level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, x, z);
-        BlockPos sharedSpawn = level.getLevel().getSharedSpawnPos();
-        double dx = x - sharedSpawn.getX();
-        double dz = z - sharedSpawn.getZ();
-        double distance = Math.sqrt(dx * dx + dz * dz);
-        double minimumDistance = Math.max(1_000.0D, OutlandsConfig.STRUCTURE_MIN_DISTANCE.get());
-        if (distance < minimumDistance || !stable(level, x, z, y)) return false;
-
-        String biome = level.getBiome(new BlockPos(x, y, z)).unwrapKey()
-                .map(key -> key.location().getPath()).orElse("");
-        boolean forest = biome.contains("forest") || biome.contains("taiga")
-                || biome.contains("grove") || biome.contains("wooded");
-        if (biome.contains("ocean") || biome.contains("river") || biome.contains("beach")) return false;
-
-        double multiplier = OutlandsConfig.STRUCTURE_CHANCE_MULTIPLIER.get();
-        if (multiplier <= 0.0D) return false;
-        double cellScale = StructurePlacementPolicy.CELL_CHUNKS * StructurePlacementPolicy.CELL_CHUNKS;
+    public static String chooseLayout(long seed, double distance, boolean forest,
+                                      double configuredMinimum, double multiplier) {
+        if (distance < configuredMinimum || multiplier <= 0.0D) return null;
+        double scale = StructurePlacementPolicy.CELL_CHUNKS * StructurePlacementPolicy.CELL_CHUNKS;
         double[] weights = new double[14];
-        weights[0] = forest ? eligibleWeight(distance, minimumDistance, 1_000, 5_500, multiplier, cellScale) : 0;
-        weights[1] = eligibleWeight(distance, minimumDistance, 1_800, 7_000, multiplier, cellScale);
-        weights[2] = eligibleWeight(distance, minimumDistance, 2_500, 8_500, multiplier, cellScale);
-        weights[3] = eligibleWeight(distance, minimumDistance, 15_000, 14_000, multiplier, cellScale);
-        weights[4] = forest ? eligibleWeight(distance, minimumDistance, 22_000, 20_000, multiplier, cellScale) : 0;
-        weights[5] = eligibleWeight(distance, minimumDistance, 50_000, 32_000, multiplier, cellScale);
-        weights[6] = eligibleWeight(distance, minimumDistance, 3_000, 10_000, multiplier, cellScale);
-        weights[7] = eligibleWeight(distance, minimumDistance, 12_000, 16_000, multiplier, cellScale);
-        weights[8] = eligibleWeight(distance, minimumDistance, 2_000, 8_000, multiplier, cellScale);
-        weights[9] = eligibleWeight(distance, minimumDistance, 4_000, 12_000, multiplier, cellScale);
-        weights[10] = eligibleWeight(distance, minimumDistance, 5_000, 15_000, multiplier, cellScale);
-        weights[11] = eligibleWeight(distance, minimumDistance, 25_000, 28_000, multiplier, cellScale);
-        weights[12] = eligibleWeight(distance, minimumDistance, 35_000, 30_000, multiplier, cellScale);
-        weights[13] = eligibleWeight(distance, minimumDistance, 18_000, 22_000, multiplier, cellScale);
-
-        double totalWeight = 0.0D;
-        for (double weight : weights) totalWeight += weight;
-        if (totalWeight <= 0.0D || random.nextDouble() >= Math.min(1.0D, totalWeight)) return false;
-        double choice = random.nextDouble() * totalWeight;
-        int selected = weights.length - 1;
-        for (int i = 0; i < weights.length; i++) {
-            choice -= weights[i];
-            if (choice < 0.0D) { selected = i; break; }
-        }
-        switch (selected) {
-            case 0 -> cabin(level, x, y, z, random);
-            case 1 -> tower(level, x, y, z, random);
-            case 2 -> bunker(level, x, y, z, random);
-            case 3 -> shrine(level, x, y, z, random);
-            case 4 -> observatory(level, x, y, z, random);
-            case 5 -> archive(level, x, y, z, random);
-            case 6 -> researchFacility(level, x, y, z, random);
-            case 7 -> apostleCathedral(level, x, y, z, random);
-            case 8 -> forsakenSettlement(level, x, y, z, random);
-            case 9 -> lastOutpost(level, x, y, z, random);
-            case 10 -> forgottenStation(level, x, y, z, random);
-            case 11 -> nullChamber(level, x, y, z, random);
-            case 12 -> hollowCrypt(level, x, y, z, random);
-            case 13 -> boundaryMonument(level, x, y, z, random);
-            default -> { return false; }
-        }
-        return true;
+        weights[0] = forest ? weight(distance, 1_000, 5_500, multiplier, scale) : 0;
+        weights[1] = weight(distance, 1_800, 7_000, multiplier, scale);
+        weights[2] = weight(distance, 2_500, 8_500, multiplier, scale);
+        weights[3] = weight(distance, 15_000, 14_000, multiplier, scale);
+        weights[4] = forest ? weight(distance, 22_000, 20_000, multiplier, scale) : 0;
+        weights[5] = weight(distance, 50_000, 32_000, multiplier, scale);
+        weights[6] = weight(distance, 3_000, 10_000, multiplier, scale);
+        weights[7] = weight(distance, 12_000, 16_000, multiplier, scale);
+        weights[8] = weight(distance, 2_000, 8_000, multiplier, scale);
+        weights[9] = weight(distance, 4_000, 12_000, multiplier, scale);
+        weights[10] = weight(distance, 5_000, 15_000, multiplier, scale);
+        weights[11] = weight(distance, 25_000, 28_000, multiplier, scale);
+        weights[12] = weight(distance, 35_000, 30_000, multiplier, scale);
+        weights[13] = weight(distance, 18_000, 22_000, multiplier, scale);
+        double total=0.0D; for(double w:weights) total+=w;
+        if(total<=0.0D) return null;
+        RandomSource random=RandomSource.create(seed);
+        if(random.nextDouble()>=Math.min(1.0D,total)) return null;
+        double pick=random.nextDouble()*total;
+        String[] ids={"cabin","tower","bunker","shrine","observatory","archive",
+                "research_facility","apostle_cathedral","forsaken_settlement","last_outpost",
+                "forgotten_station","null_chamber","hollow_crypt","boundary_monument"};
+        for(int i=0;i<weights.length;i++){pick-=weights[i];if(pick<0.0D)return ids[i];}
+        return ids[ids.length-1];
     }
 
-    private static double eligibleWeight(double distance, double configuredMinimum, double structureMinimum,
-                                         int denominator, double multiplier, double cellScale) {
-        return distance >= Math.max(configuredMinimum, structureMinimum)
-                ? cellScale * multiplier / denominator : 0.0D;
+    private static double weight(double distance,int minimum,int denominator,double multiplier,double scale) {
+        return distance>=minimum ? scale*multiplier/denominator : 0.0D;
     }
 
-    private static boolean stable(WorldGenLevel level, int x, int z, int surfaceY) {
-        if (surfaceY <= level.getMinBuildHeight() + 32 || surfaceY >= level.getMaxBuildHeight() - 16) return false;
-        int lowest = Integer.MAX_VALUE;
-        int highest = Integer.MIN_VALUE;
-        for (int dx = 0; dx < 9; dx++) {
-            for (int dz = 0; dz < 9; dz++) {
-                int height = level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, x + dx, z + dz);
-                lowest = Math.min(lowest, height);
-                highest = Math.max(highest, height);
-                BlockPos surface = new BlockPos(x + dx, height - 1, z + dz);
-                BlockState top = level.getBlockState(surface);
-                if (top.isAir() || !top.getFluidState().isEmpty()
-                        || top.is(net.minecraft.tags.BlockTags.LEAVES)
-                        || top.is(net.minecraft.tags.BlockTags.LOGS)) return false;
+    public static void generateLayout(String id, WorldGenLevel level, int x, int surfaceY, int z,
+                                      RandomSource random, BoundingBox clip) {
+        ACTIVE_CLIP.set(clip);
+        try {
+            int coreX=x+19, coreZ=z+19;
+            switch(id) {
+                case "cabin" -> cabin(level,coreX,surfaceY,coreZ,random);
+                case "tower" -> tower(level,coreX,surfaceY,coreZ,random);
+                case "bunker" -> bunker(level,coreX,surfaceY,coreZ,random);
+                case "shrine" -> shrine(level,coreX,surfaceY,coreZ,random);
+                case "observatory" -> observatory(level,coreX,surfaceY,coreZ,random);
+                case "archive" -> archive(level,coreX,surfaceY,coreZ,random);
+                case "research_facility" -> researchFacility(level,coreX,surfaceY,coreZ,random);
+                case "apostle_cathedral" -> apostleCathedral(level,coreX,surfaceY,coreZ,random);
+                case "forsaken_settlement" -> forsakenSettlement(level,coreX,surfaceY,coreZ,random);
+                case "last_outpost" -> lastOutpost(level,coreX,surfaceY,coreZ,random);
+                case "forgotten_station" -> forgottenStation(level,coreX,surfaceY,coreZ,random);
+                case "null_chamber" -> nullChamber(level,coreX,surfaceY,coreZ,random);
+                case "hollow_crypt" -> hollowCrypt(level,coreX,surfaceY,coreZ,random);
+                case "boundary_monument" -> boundaryMonument(level,coreX,surfaceY,coreZ,random);
+                default -> { return; }
+            }
+            expand(id,level,x,surfaceY,z);
+        } finally {
+            ACTIVE_CLIP.remove();
+        }
+    }
+
+    private static void expand(String id,WorldGenLevel l,int x,int y,int z) {
+        switch(id) {
+            case "cabin" -> {
+                yard(l,x,y,z,Blocks.OAK_FENCE.defaultBlockState());
+                shed(l,x+3,y,z+3,Blocks.SPRUCE_PLANKS.defaultBlockState());
+                pathX(l,x+10,y,z+23,18,Blocks.GRAVEL.defaultBlockState());
+            }
+            case "tower" -> {
+                yard(l,x,y,z,Blocks.SPRUCE_FENCE.defaultBlockState());
+                room(l,x+3,y,z+3,11,9,3,Blocks.COBBLESTONE.defaultBlockState(),Blocks.OAK_PLANKS.defaultBlockState(),Blocks.SPRUCE_PLANKS.defaultBlockState());
+                pathX(l,x+14,y,z+23,16,Blocks.COARSE_DIRT.defaultBlockState());
+            }
+            case "bunker" -> {
+                int d=y-14;
+                room(l,x+2,d,z+18,12,10,4,Blocks.POLISHED_DEEPSLATE.defaultBlockState(),Blocks.CRACKED_STONE_BRICKS.defaultBlockState(),Blocks.STONE_BRICKS.defaultBlockState());
+                room(l,x+34,d,z+18,12,10,4,Blocks.POLISHED_DEEPSLATE.defaultBlockState(),Blocks.CRACKED_STONE_BRICKS.defaultBlockState(),Blocks.STONE_BRICKS.defaultBlockState());
+                hallX(l,x+14,d,z+22,20,Blocks.DEEPSLATE_BRICKS.defaultBlockState());
+            }
+            case "shrine" -> {
+                courtyard(l,x,y,z,Blocks.CRACKED_STONE_BRICKS.defaultBlockState());
+                for(int[] q:new int[][]{{4,4},{40,4},{4,40},{40,40}})obelisk(l,x+q[0],y,z+q[1],5,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState());
+            }
+            case "observatory" -> {
+                ring(l,x,y,z,24,Blocks.DEEPSLATE_BRICKS.defaultBlockState());
+                for(int[] q:new int[][]{{5,5},{40,5},{5,40},{40,40}})obelisk(l,x+q[0],y,z+q[1],7,Blocks.BLACKSTONE.defaultBlockState());
+            }
+            case "archive" -> {
+                int d=y-27;
+                room(l,x+2,d,z+18,12,10,5,Blocks.DEEPSLATE_BRICKS.defaultBlockState(),Blocks.BOOKSHELF.defaultBlockState(),Blocks.POLISHED_DEEPSLATE.defaultBlockState());
+                room(l,x+34,d,z+18,12,10,5,Blocks.DEEPSLATE_BRICKS.defaultBlockState(),Blocks.BOOKSHELF.defaultBlockState(),Blocks.POLISHED_DEEPSLATE.defaultBlockState());
+                hallX(l,x+14,d,z+22,20,Blocks.CRACKED_DEEPSLATE_BRICKS.defaultBlockState());
+            }
+            case "research_facility" -> {
+                int d=y-12;
+                room(l,x+2,d,z+18,12,12,4,Blocks.IRON_BLOCK.defaultBlockState(),Blocks.POLISHED_ANDESITE.defaultBlockState(),Blocks.IRON_BLOCK.defaultBlockState());
+                room(l,x+34,d,z+18,12,12,4,Blocks.IRON_BLOCK.defaultBlockState(),Blocks.POLISHED_ANDESITE.defaultBlockState(),Blocks.IRON_BLOCK.defaultBlockState());
+                room(l,x+18,d,z+2,12,12,4,Blocks.IRON_BLOCK.defaultBlockState(),Blocks.POLISHED_ANDESITE.defaultBlockState(),Blocks.IRON_BLOCK.defaultBlockState());
+                room(l,x+18,d,z+34,12,12,4,Blocks.IRON_BLOCK.defaultBlockState(),Blocks.POLISHED_ANDESITE.defaultBlockState(),Blocks.IRON_BLOCK.defaultBlockState());
+                hallX(l,x+14,d,z+23,20,Blocks.IRON_BLOCK.defaultBlockState());
+                hallZ(l,x+23,d,z+14,20,Blocks.IRON_BLOCK.defaultBlockState());
+            }
+            case "apostle_cathedral" -> {
+                room(l,x+3,y,z+3,13,38,8,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState(),Blocks.CRACKED_STONE_BRICKS.defaultBlockState(),Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState());
+                room(l,x+32,y,z+3,13,38,8,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState(),Blocks.CRACKED_STONE_BRICKS.defaultBlockState(),Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState());
+                hallZ(l,x+23,y,z+2,44,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState());
+                for(int a=8;a<40;a+=8)obelisk(l,x+22,y,z+a,7,Blocks.CHISELED_POLISHED_BLACKSTONE.defaultBlockState());
+            }
+            case "forsaken_settlement" -> {
+                house(l,x+2,y,z+2); house(l,x+35,y,z+2); house(l,x+2,y,z+35); house(l,x+35,y,z+35);
+                pathX(l,x+8,y,z+23,32,Blocks.DIRT_PATH.defaultBlockState());
+                pathZ(l,x+23,y,z+8,32,Blocks.DIRT_PATH.defaultBlockState());
+                well(l,x+20,y,z+20);
+            }
+            case "last_outpost" -> {
+                yard(l,x,y,z,Blocks.COBBLESTONE_WALL.defaultBlockState());
+                for(int[] q:new int[][]{{3,3},{40,3},{3,40},{40,40}})watchPost(l,x+q[0],y,z+q[1]);
+                room(l,x+18,y,z+18,12,12,4,Blocks.COBBLESTONE.defaultBlockState(),Blocks.SPRUCE_PLANKS.defaultBlockState(),Blocks.SPRUCE_PLANKS.defaultBlockState());
+                pathX(l,x+12,y,z+23,6,Blocks.COARSE_DIRT.defaultBlockState());
+            }
+            case "forgotten_station" -> {
+                int d=y-10;
+                hallX(l,x+1,d,z+22,46,Blocks.POLISHED_ANDESITE.defaultBlockState());
+                for(int a=1;a<47;a++){p(l,x+a,d+1,z+20,Blocks.RAIL.defaultBlockState());p(l,x+a,d+1,z+26,Blocks.RAIL.defaultBlockState());}
+                room(l,x+2,d,z+3,12,12,4,Blocks.DEEPSLATE_BRICKS.defaultBlockState(),Blocks.STONE_BRICKS.defaultBlockState(),Blocks.POLISHED_ANDESITE.defaultBlockState());
+                room(l,x+34,d,z+33,12,12,4,Blocks.DEEPSLATE_BRICKS.defaultBlockState(),Blocks.STONE_BRICKS.defaultBlockState(),Blocks.POLISHED_ANDESITE.defaultBlockState());
+            }
+            case "null_chamber" -> {
+                int d=y-20;
+                room(l,x+10,d,z+10,28,28,6,Blocks.BLACKSTONE.defaultBlockState(),Blocks.POLISHED_DEEPSLATE.defaultBlockState(),Blocks.BLACKSTONE.defaultBlockState());
+                for(int[] q:new int[][]{{13,13},{34,13},{13,34},{34,34}})obelisk(l,x+q[0],d,z+q[1],5,Blocks.BLACKSTONE.defaultBlockState());
+                p(l,x+23,d+1,z+23,Blocks.CRYING_OBSIDIAN.defaultBlockState());
+            }
+            case "hollow_crypt" -> {
+                int d=y-24;
+                for(int ix=0;ix<3;ix++)for(int iz=0;iz<3;iz++){
+                    int rx=x+2+ix*15, rz=z+2+iz*15;
+                    room(l,rx,d,rz,11,11,4,Blocks.DEEPSLATE_BRICKS.defaultBlockState(),Blocks.POLISHED_DEEPSLATE.defaultBlockState(),Blocks.DEEPSLATE_BRICKS.defaultBlockState());
+                    p(l,rx+5,d+1,rz+5,Blocks.CRYING_OBSIDIAN.defaultBlockState());
+                }
+                hallX(l,x+2,d,z+23,44,Blocks.CRACKED_DEEPSLATE_BRICKS.defaultBlockState());
+                hallZ(l,x+23,d,z+2,44,Blocks.CRACKED_DEEPSLATE_BRICKS.defaultBlockState());
+            }
+            case "boundary_monument" -> {
+                ring(l,x,y,z,23,Blocks.CRACKED_STONE_BRICKS.defaultBlockState());
+                for(int[] q:new int[][]{{4,4},{40,4},{4,40},{40,40},{22,3},{22,42},{3,22},{42,22}})
+                    obelisk(l,x+q[0],y,z+q[1],8,Blocks.CHISELED_STONE_BRICKS.defaultBlockState());
             }
         }
-        return highest - lowest <= 2;
     }
 
-    private static void p(WorldGenLevel l,int x,int y,int z,BlockState s){l.setBlock(new BlockPos(x,y,z),s,2);}
+    private static void yard(WorldGenLevel l,int x,int y,int z,BlockState fence) {
+        for(int a=2;a<46;a++){p(l,x+a,y+1,z+2,fence);p(l,x+a,y+1,z+45,fence);p(l,x+2,y+1,z+a,fence);p(l,x+45,y+1,z+a,fence);}
+        for(int a=22;a<=25;a++)air(l,x+a,y+1,z+2);
+    }
+    private static void room(WorldGenLevel l,int x,int y,int z,int w,int d,int h,BlockState wall,BlockState floor,BlockState roof) {
+        for(int a=0;a<w;a++)for(int b=0;b<d;b++){
+            p(l,x+a,y,z+b,floor);
+            p(l,x+a,y+h,z+b,roof);
+            for(int v=1;v<h;v++){
+                boolean edge=a==0||a==w-1||b==0||b==d-1;
+                if(edge)p(l,x+a,y+v,z+b,wall);else air(l,x+a,y+v,z+b);
+            }
+        }
+        air(l,x+w/2,y+1,z,); 
+    }
+    private static void hallX(WorldGenLevel l,int x,int y,int z,int length,BlockState block) {
+        for(int a=0;a<length;a++)for(int b=-2;b<=2;b++){
+            p(l,x+a,y,z+b,block);
+            if(Math.abs(b)==2)for(int h=1;h<=3;h++)p(l,x+a,y+h,z+b,block);
+        }
+    }
+    private static void hallZ(WorldGenLevel l,int x,int y,int z,int length,BlockState block) {
+        for(int b=0;b<length;b++)for(int a=-2;a<=2;a++){
+            p(l,x+a,y,z+b,block);
+            if(Math.abs(a)==2)for(int h=1;h<=3;h++)p(l,x+a,y+h,z+b,block);
+        }
+    }
+    private static void pathX(WorldGenLevel l,int x,int y,int z,int length,BlockState block){for(int a=0;a<length;a++)for(int b=-1;b<=1;b++)p(l,x+a,y,z+b,block);}
+    private static void pathZ(WorldGenLevel l,int x,int y,int z,int length,BlockState block){for(int b=0;b<length;b++)for(int a=-1;a<=1;a++)p(l,x+a,y,z+b,block);}
+    private static void obelisk(WorldGenLevel l,int x,int y,int z,int h,BlockState block){for(int v=0;v<=h;v++)p(l,x,y+v,z,block);}
+    private static void shed(WorldGenLevel l,int x,int y,int z,BlockState wall){room(l,x,y,z,10,8,3,wall,Blocks.COBBLESTONE.defaultBlockState(),Blocks.SPRUCE_SLAB.defaultBlockState());}
+    private static void house(WorldGenLevel l,int x,int y,int z){
+        room(l,x,y,z,9,9,4,Blocks.OAK_LOG.defaultBlockState(),Blocks.OAK_PLANKS.defaultBlockState(),Blocks.SPRUCE_PLANKS.defaultBlockState());
+        p(l,x+4,y+1,z,Blocks.OAK_DOOR.defaultBlockState());
+        p(l,x+2,y+2,z+2,Blocks.GLASS_PANE.defaultBlockState());
+        p(l,x+6,y+2,z+6,Blocks.BARREL.defaultBlockState());
+    }
+    private static void well(WorldGenLevel l,int x,int y,int z){
+        for(int a=0;a<5;a++)for(int b=0;b<5;b++)if(a==0||a==4||b==0||b==4)p(l,x+a,y+1,z+b,Blocks.MOSSY_COBBLESTONE.defaultBlockState());
+        air(l,x+2,y+1,z+2);p(l,x+2,y+2,z+2,Blocks.WATER.defaultBlockState());
+    }
+    private static void watchPost(WorldGenLevel l,int x,int y,int z){
+        for(int h=1;h<=6;h++)p(l,x,y+h,z,Blocks.SPRUCE_LOG.defaultBlockState().setValue(RotatedPillarBlock.AXIS,Direction.Axis.Y));
+        for(int a=-2;a<=2;a++)for(int b=-2;b<=2;b++)if(Math.abs(a)==2||Math.abs(b)==2)p(l,x+a,y+5,z+b,Blocks.SPRUCE_PLANKS.defaultBlockState());
+    }
+
+    private static final ThreadLocal<BoundingBox> ACTIVE_CLIP = new ThreadLocal<>();
+    private static void p(WorldGenLevel l,int x,int y,int z,BlockState s){
+        BoundingBox clip=ACTIVE_CLIP.get();
+        if(clip!=null&&(x<clip.minX()||x>clip.maxX()||y<clip.minY()||y>clip.maxY()||z<clip.minZ()||z>clip.maxZ()))return;
+        l.setBlock(new BlockPos(x,y,z),s,2);
+    }
     private static void air(WorldGenLevel l,int x,int y,int z){p(l,x,y,z,Blocks.AIR.defaultBlockState());}
     private static void chest(WorldGenLevel l,int x,int y,int z,String loot,RandomSource r){
+        BoundingBox clip=ACTIVE_CLIP.get();
+        if(clip!=null&&(x<clip.minX()||x>clip.maxX()||y<clip.minY()||y>clip.maxY()||z<clip.minZ()||z>clip.maxZ()))return;
         BlockPos pos=new BlockPos(x,y,z);l.setBlock(pos,Blocks.CHEST.defaultBlockState(),2);
         if(l.getBlockEntity(pos) instanceof RandomizableContainerBlockEntity c)
             c.setLootTable(ResourceKey.create(Registries.LOOT_TABLE,ResourceLocation.parse("minecraft:chests/"+loot)),r.nextLong());
