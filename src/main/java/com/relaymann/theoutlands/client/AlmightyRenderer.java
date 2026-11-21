@@ -23,7 +23,7 @@ public final class AlmightyRenderer extends MobRenderer<AlmightyEntity, Almighty
     }
 
     public static LayerDefinition createBodyLayer() {
-        return LayerDefinition.create(HumanoidModel.createMesh(new CubeDeformation(0.12F), 0.0F), 64, 64);
+        return AlmightyModel.createBodyLayer();;
     }
 
     @Override

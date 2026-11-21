@@ -31,5 +31,8 @@ public final class OutlandsSounds {
  public static final DeferredHolder<SoundEvent,SoundEvent> DREDGE_CRAWL=register("dredge_crawl");
  public static final DeferredHolder<SoundEvent,SoundEvent> DREDGE_LUNGE=register("dredge_lunge");
  public static final DeferredHolder<SoundEvent,SoundEvent> DREDGE_HIT=register("dredge_hit");
+ public static final DeferredHolder<SoundEvent,SoundEvent> FEAR_PRESENCE=register("fear_presence");
+ public static final DeferredHolder<SoundEvent,SoundEvent> DEATH_PRESENCE=register("death_presence");
+ public static final DeferredHolder<SoundEvent,SoundEvent> ALMIGHTY_PRESENCE=register("almighty_presence");
  private OutlandsSounds(){}
 }

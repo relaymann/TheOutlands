@@ -7,6 +7,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
 import java.util.UUID;
 
@@ -43,7 +45,18 @@ public final class NullApostleEntity extends Monster {
         super.tick();
         if (!level().isClientSide && temporaryExpiresAt >= 0L && level().getGameTime() >= temporaryExpiresAt) { discard(); return; }
         setNoGravity(true);
-        setDeltaMovement(0.0D, 0.0D, 0.0D);
+        Player watched = level().getNearestPlayer(this, 40.0D);
+        if (watched != null && watched.isAlive() && !watched.isCreative() && !watched.isSpectator()) {
+            getLookControl().setLookAt(watched, 18.0F, 18.0F);
+            Vec3 offset = watched.position().subtract(position());
+            double distance = offset.length();
+            Vec3 drift = Vec3.ZERO;
+            if (distance > 14.0D && distance < 40.0D) drift = offset.normalize().scale(0.025D);
+            else if (distance < 6.0D && distance > 0.001D) drift = offset.normalize().scale(-0.018D);
+            setDeltaMovement(drift.x, Math.sin(tickCount * 0.075D) * 0.004D, drift.z);
+        } else {
+            setDeltaMovement(0.0D, Math.sin(tickCount * 0.075D) * 0.004D, 0.0D);
+        }
     }
     @Override protected net.minecraft.sounds.SoundEvent getAmbientSound() { return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.NULL_APOSTLE_WHISPER.get() : null; }
     @Override protected net.minecraft.sounds.SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) { return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.NULL_APOSTLE_WHISPER.get() : null; }

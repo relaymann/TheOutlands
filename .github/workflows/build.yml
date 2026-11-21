@@ -32,11 +32,17 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ffmpeg
 
-      - name: Validate entity audio generator
-        run: python3 -m py_compile tools/generate_entity_audio.py
+      - name: Validate entity generators and registry audit
+        run: python3 -m py_compile tools/generate_entity_audio.py tools/generate_entity_textures.py tools/validate_entity_registry.py
+
+      - name: Generate unique entity textures
+        run: python3 tools/generate_entity_textures.py
 
       - name: Generate original entity audio
         run: python3 tools/generate_entity_audio.py
+
+      - name: Audit every registered entity
+        run: python3 tools/validate_entity_registry.py
 
       - name: Set up Gradle 9.2.1
         uses: gradle/actions/setup-gradle@v4

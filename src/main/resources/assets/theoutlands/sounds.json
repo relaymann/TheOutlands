@@ -10,9 +10,8 @@
   "null_apostle_whisper": {
     "sounds": [
       {
-        "name": "theoutlands:null_presence",
-        "volume": 0.16,
-        "pitch": 0.62
+        "name": "theoutlands:null_apostle_whisper",
+        "volume": 0.16
       }
     ]
   },
@@ -166,6 +165,30 @@
       {
         "name": "theoutlands:dredge_hit",
         "volume": 0.75
+      }
+    ]
+  },
+  "fear_presence": {
+    "sounds": [
+      {
+        "name": "theoutlands:fear_presence",
+        "volume": 0.2
+      }
+    ]
+  },
+  "death_presence": {
+    "sounds": [
+      {
+        "name": "theoutlands:death_presence",
+        "volume": 0.26
+      }
+    ]
+  },
+  "almighty_presence": {
+    "sounds": [
+      {
+        "name": "theoutlands:almighty_presence",
+        "volume": 0.78
       }
     ]
   }

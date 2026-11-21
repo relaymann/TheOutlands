@@ -13,6 +13,6 @@ public final class NullApostleRenderer extends MobRenderer<NullApostleEntity,Nul
  public static final ModelLayerLocation LAYER=new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(TheOutlands.MOD_ID,"null_apostle"),"main");
  private static final ResourceLocation TEXTURE=ResourceLocation.fromNamespaceAndPath(TheOutlands.MOD_ID,"textures/entity/null_apostle.png");
  public NullApostleRenderer(EntityRendererProvider.Context context){super(context,new NullApostleModel(context.bakeLayer(LAYER)),0.35F);}
- public static LayerDefinition createBodyLayer(){return LayerDefinition.create(HumanoidModel.createMesh(CubeDeformation.NONE,0.0F),64,64);}
+ return NullApostleModel.createBodyLayer();
  @Override public ResourceLocation getTextureLocation(NullApostleEntity entity){return TEXTURE;}
 }

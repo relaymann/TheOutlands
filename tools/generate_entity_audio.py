@@ -204,4 +204,46 @@ def dredge_hit(t, d, i, n):
 dredge_hit.a, dredge_hit.b = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
 make("dredge_hit", .7, dredge_hit)
 
-print("Generated sixteen original entity sound effects in", OUT)
+
+# Null's Apostle: close-mic breath through a narrow, hollow resonant filter.
+def apostle_whisper(t, d, i, n):
+    a = noise(t, 210, 980, apostle_whisper.a)
+    b = noise(t, 1250, 4700, apostle_whisper.b)
+    syllable = max(0.0, math.sin(2 * math.pi * .82 * t + .2)) ** 2
+    return fade(t, d, .18, .32) * (.24 * a * syllable + .12 * b * syllable
+                                    + .025 * math.sin(2 * math.pi * 118 * t))
+apostle_whisper.a, apostle_whisper.b = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
+make("null_apostle_whisper", 2.25, apostle_whisper)
+
+# Fear: a thin, distant harmonic presence with a slow, hollow beating pulse.
+def fear_presence(t, d, i, n):
+    a = noise(t, 110, 820, fear_presence.a)
+    b = noise(t, 900, 3600, fear_presence.b)
+    beat = math.sin(2 * math.pi * .31 * t)
+    tone = math.sin(2 * math.pi * (218 + 3 * beat) * t)
+    return fade(t, d, .45, .75) * (.16 * tone + .15 * a + .07 * b + .05 * math.sin(2*math.pi*109*t))
+fear_presence.a, fear_presence.b = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
+make("fear_presence", 3.2, fear_presence)
+
+# Death: sub-bass pressure and a slow, dry granular scrape; deliberately restrained.
+def death_presence(t, d, i, n):
+    a = noise(t, 35, 360, death_presence.a)
+    b = noise(t, 420, 1500, death_presence.b)
+    pulse = max(0.0, math.sin(2 * math.pi * .48 * t + .4)) ** 3
+    return fade(t, d, .25, .55) * (.32 * a * (.3 + pulse) + .09 * b * pulse
+                                    + .11 * math.sin(2*math.pi*(32-2*t)*t))
+death_presence.a, death_presence.b = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
+make("death_presence", 2.8, death_presence)
+
+# Almighty: three slightly detuned low harmonics with a slow, oppressive swell.
+def almighty_presence(t, d, i, n):
+    a = noise(t, 45, 520, almighty_presence.a)
+    b = noise(t, 300, 1700, almighty_presence.b)
+    swell = .35 + .65 * (0.5 + .5 * math.sin(2 * math.pi * .22 * t))
+    chord = (math.sin(2*math.pi*43*t) + .55*math.sin(2*math.pi*64.5*t)
+             + .28*math.sin(2*math.pi*86.4*t))
+    return fade(t, d, .35, .7) * swell * (.22 * chord + .16 * a + .07 * b)
+almighty_presence.a, almighty_presence.b = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
+make("almighty_presence", 3.6, almighty_presence)
+
+print("Generated all original Outlands entity sound effects in", OUT)

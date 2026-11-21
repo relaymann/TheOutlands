@@ -112,7 +112,8 @@ public final class OutlandsIntelligenceManager {
                 || mob instanceof StillbornStatueEntity || mob instanceof AgitatedOneEntity
                 || mob instanceof NullEntity || mob instanceof NullApostleEntity
                 || mob instanceof FearEntity || mob instanceof DeathEntity
-                || mob instanceof AlmightyEntity;
+                || mob instanceof AlmightyEntity || mob instanceof LurkerEntity
+                || mob instanceof HowlerEntity || mob instanceof DredgeEntity;
     }
 
     private static void record(ServerLevel level, BlockPos pos, UUID source, String kind) {
@@ -197,6 +198,13 @@ public final class OutlandsIntelligenceManager {
         if (mob instanceof AgitatedOneEntity) return 24;
         if (mob instanceof CaveJarEntity) return 34;
         if (mob instanceof BurrowerEntity) return 28;
+        if (mob instanceof StalkerEntity) return 42;
+        if (mob instanceof HunterEntity) return 38;
+        if (mob instanceof ObserverEntity) return 46;
+        if (mob instanceof LurkerEntity) return 24;
+        if (mob instanceof HowlerEntity) return 52;
+        if (mob instanceof DredgeEntity) return 30;
+        if (mob instanceof MimicEntity) return 18;
         return 0;
     }
 
@@ -206,7 +214,9 @@ public final class OutlandsIntelligenceManager {
         return mob instanceof CaveJarEntity || mob instanceof StalkerEntity
                 || mob instanceof HunterEntity || mob instanceof BurrowerEntity
                 || mob instanceof MimicEntity || mob instanceof StillbornStatueEntity
-                || mob instanceof AgitatedOneEntity || mob instanceof NullApostleEntity;
+                || mob instanceof AgitatedOneEntity || mob instanceof NullApostleEntity
+                || mob instanceof ObserverEntity || mob instanceof LurkerEntity
+                || mob instanceof HowlerEntity || mob instanceof DredgeEntity;
     }
 
     private static void adaptPursuit(Mob mob) {
@@ -220,7 +230,8 @@ public final class OutlandsIntelligenceManager {
         // Persistent sprinters are more likely to be intercepted. Frequent
         // crouching makes patient hunters favor the last physical disturbance
         // rather than repeatedly charging the player's current position.
-        if ((mob instanceof StalkerEntity || mob instanceof HunterEntity)
+        if ((mob instanceof StalkerEntity || mob instanceof HunterEntity
+                || mob instanceof LurkerEntity || mob instanceof DredgeEntity)
                 && sprintRatio > 0.52D && temperament.boldness() > 0.35D
                 && mob.distanceToSqr(target) > 100.0D && mob.tickCount % 50 == 0) {
             Vec3 lead = target.position().add(target.getDeltaMovement().scale(8.0D + temperament.boldness() * 8.0D));

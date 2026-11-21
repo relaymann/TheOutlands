@@ -22,7 +22,7 @@ public final class DeathRenderer extends MobRenderer<DeathEntity, DeathModel> {
     }
 
     public static LayerDefinition createBodyLayer() {
-        return LayerDefinition.create(HumanoidModel.createMesh(new CubeDeformation(0.02F), 0.0F), 64, 64);
+        return DeathModel.createBodyLayer();;
     }
 
     @Override

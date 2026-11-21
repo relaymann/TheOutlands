@@ -9,7 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
+import com.relaymann.theoutlands.sound.OutlandsSounds;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.damagesource.DamageSource;
@@ -86,7 +86,7 @@ public final class AlmightyEntity extends Monster {
             if (level() instanceof ServerLevel server) {
                 server.sendParticles(phase == 3 ? ParticleTypes.SOUL : ParticleTypes.REVERSE_PORTAL,
                         getX(), getY() + 1.0D, getZ(), 70, 8.0D, 3.0D, 8.0D, 0.04D);
-                if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) server.playSound(null, blockPosition(), SoundEvents.WARDEN_ROAR,
+                if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) server.playSound(null, blockPosition(), OutlandsSounds.ALMIGHTY_PRESENCE.get(),
                         SoundSource.HOSTILE, 1.0F, phase == 3 ? 0.32F : 0.48F);
             }
         }
@@ -161,5 +161,5 @@ public final class AlmightyEntity extends Monster {
 
     @Override protected net.minecraft.sounds.SoundEvent getAmbientSound() { return null; }
     @Override protected net.minecraft.sounds.SoundEvent getHurtSound(DamageSource source) { return null; }
-    @Override protected net.minecraft.sounds.SoundEvent getDeathSound() { return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? SoundEvents.WARDEN_DEATH : null; }
+    @Override protected net.minecraft.sounds.SoundEvent getDeathSound() { return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.ALMIGHTY_PRESENCE.get() : null; }
 }

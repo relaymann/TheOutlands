@@ -1,6 +1,9 @@
 package com.relaymann.theoutlands.entity;
 
+import com.relaymann.theoutlands.OutlandsConfig;
+import com.relaymann.theoutlands.sound.OutlandsSounds;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -77,6 +80,12 @@ public final class DeathEntity extends Monster {
         }
 
         double distance = distanceToSqr(target);
+        // Death's presence is almost silent: the sound is rare and only reaches a nearby quarry.
+        if (OutlandsConfig.HORROR_AUDIO_ENABLED.get() && tickCount % 120 == 0
+                && distance <= 36.0D * 36.0D && getRandom().nextInt(3) == 0) {
+            level().playSound(null, blockPosition(), OutlandsSounds.DEATH_PRESENCE.get(),
+                    SoundSource.HOSTILE, 0.24F, 0.68F + getRandom().nextFloat() * 0.1F);
+        }
         if (distance > 100.0D * 100.0D) farTicks++;
         else farTicks = 0;
 

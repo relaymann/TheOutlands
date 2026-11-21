@@ -12,6 +12,6 @@ public final class ObserverRenderer extends MobRenderer<ObserverEntity,ObserverM
  public static final ModelLayerLocation LAYER=new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(TheOutlands.MOD_ID,"observer"),"main");
  private static final ResourceLocation TEXTURE=ResourceLocation.fromNamespaceAndPath(TheOutlands.MOD_ID,"textures/entity/fear.png");
  public ObserverRenderer(EntityRendererProvider.Context c){super(c,new ObserverModel(c.bakeLayer(LAYER)),0.4F);}
- public static LayerDefinition createBodyLayer(){return LayerDefinition.create(HumanoidModel.createMesh(CubeDeformation.NONE,0.0F),64,64);}
+ return ObserverModel.createBodyLayer();
  @Override public ResourceLocation getTextureLocation(ObserverEntity e){return TEXTURE;}
 }
