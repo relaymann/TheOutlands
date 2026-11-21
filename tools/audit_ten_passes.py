@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CHECKS = (
     ("entity registry, models, textures, sounds, and natural spawning", "tools/validate_entity_registry.py"),
     ("structure layouts, loot, lore, generation, ambience, and encounter safety", "tools/validate_structure_phase2.py"),
+    ("Phase 3 behaviors, environmental presence, interior dressing, and exclusions", "tools/validate_phase3.py"),
 )
 
 def main() -> None:
