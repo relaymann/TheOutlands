@@ -48,7 +48,7 @@ public final class OutlandsStructure extends Structure {
         }
         if(max-min>5) return Optional.empty();
         int surfaceY=Structure.getMeanFirstOccupiedHeight(context,x,x+size-1,z,z+size-1);
-        if(surfaceY<=context.heightAccessor().getMinBuildHeight()+48
+        if(surfaceY<=context.heightAccessor().getMinBuildHeight()+32
                 ||surfaceY>=context.heightAccessor().getMaxBuildHeight()-16) return Optional.empty();
 
         long pieceSeed=StructurePlacementPolicy.chunkSeed(context.seed(),chunkX,chunkZ);
