@@ -78,7 +78,6 @@ public final class OutlandsStructureFeature {
                 default -> { return; }
             }
             expand(id,level,x,surfaceY,z);
-            hiddenCache(id,level,x,surfaceY,z,random);
         } finally {
             ACTIVE_CLIP.remove();
         }
@@ -245,36 +244,8 @@ public final class OutlandsStructureFeature {
         if(clip!=null&&(x<clip.minX()||x>clip.maxX()||y<clip.minY()||y>clip.maxY()||z<clip.minZ()||z>clip.maxZ()))return;
         BlockPos pos=new BlockPos(x,y,z);l.setBlock(pos,Blocks.CHEST.defaultBlockState(),2);
         if(l.getBlockEntity(pos) instanceof RandomizableContainerBlockEntity c)
-            c.setLootTable(ResourceKey.create(Registries.LOOT_TABLE,ResourceLocation.parse(loot)),r.nextLong());
+            c.setLootTable(ResourceKey.create(Registries.LOOT_TABLE,ResourceLocation.parse("minecraft:chests/"+loot)),r.nextLong());
     }
-    /** Concealed lower service chamber shared by every structure identity. */
-    private static void hiddenCache(String id,WorldGenLevel l,int x,int surface,int z,RandomSource r) {
-        int y=surface-38, rx=x+33, rz=z+2;
-        room(l,rx,y,rz,9,7,4,Blocks.CRACKED_DEEPSLATE_BRICKS.defaultBlockState(),Blocks.POLISHED_DEEPSLATE.defaultBlockState(),Blocks.DEEPSLATE_BRICKS.defaultBlockState());
-        for(int h=y+1;h<surface-1;h++){air(l,x+38,h,z+5);p(l,x+37,h,z+5,Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING,Direction.SOUTH));}
-        p(l,x+38,surface-1,z+5,Blocks.IRON_TRAPDOOR.defaultBlockState());
-        p(l,x+38,surface,z+5,Blocks.MOSS_CARPET.defaultBlockState());
-        p(l,rx+2,y+1,rz+2,Blocks.COBWEB.defaultBlockState());p(l,rx+6,y+1,rz+2,Blocks.LECTERN.defaultBlockState());
-        p(l,rx+6,y+1,rz+5,Blocks.SOUL_LANTERN.defaultBlockState());
-        switch(id) {
-            case "cabin" -> { p(l,rx+2,y+1,rz+4,Blocks.BARREL.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.CAMPFIRE.defaultBlockState()); }
-            case "tower" -> { p(l,rx+2,y+1,rz+4,Blocks.TARGET.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.HAY_BLOCK.defaultBlockState()); }
-            case "bunker" -> { p(l,rx+2,y+1,rz+4,Blocks.IRON_BARS.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.REDSTONE_LAMP.defaultBlockState()); }
-            case "shrine" -> { p(l,rx+2,y+1,rz+4,Blocks.CRYING_OBSIDIAN.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.BLACKSTONE.defaultBlockState()); }
-            case "observatory" -> { p(l,rx+2,y+1,rz+4,Blocks.END_ROD.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.AMETHYST_BLOCK.defaultBlockState()); }
-            case "archive" -> { p(l,rx+2,y+1,rz+4,Blocks.BOOKSHELF.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.LECTERN.defaultBlockState()); }
-            case "research_facility" -> { p(l,rx+2,y+1,rz+4,Blocks.GLASS.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.IRON_BARS.defaultBlockState()); }
-            case "apostle_cathedral" -> { p(l,rx+2,y+1,rz+4,Blocks.CHISELED_POLISHED_BLACKSTONE.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.CRYING_OBSIDIAN.defaultBlockState()); }
-            case "forsaken_settlement" -> { p(l,rx+2,y+1,rz+4,Blocks.BARREL.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.WHITE_BED.defaultBlockState()); }
-            case "last_outpost" -> { p(l,rx+2,y+1,rz+4,Blocks.COBBLESTONE_WALL.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.TARGET.defaultBlockState()); }
-            case "forgotten_station" -> { p(l,rx+2,y+1,rz+4,Blocks.RAIL.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.POWERED_RAIL.defaultBlockState()); }
-            case "null_chamber" -> { p(l,rx+2,y+1,rz+4,Blocks.BLACK_CONCRETE.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.CRYING_OBSIDIAN.defaultBlockState()); }
-            case "hollow_crypt" -> { p(l,rx+2,y+1,rz+4,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.BONE_BLOCK.defaultBlockState()); }
-            case "boundary_monument" -> { p(l,rx+2,y+1,rz+4,Blocks.CHISELED_STONE_BRICKS.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.CRYING_OBSIDIAN.defaultBlockState()); }
-        }
-        chest(l,rx+6,y+1,rz+4,"theoutlands:structures/hidden_cache",r);
-    }
-
     private static BlockState log(){return Blocks.SPRUCE_LOG.defaultBlockState()
             .setValue(RotatedPillarBlock.AXIS,Direction.Axis.Y);}
 
@@ -300,7 +271,7 @@ public final class OutlandsStructureFeature {
         p(l,x+2,y+1,z+2,Blocks.LANTERN.defaultBlockState());
         p(l,x+5,y+1,z+4,Blocks.BARREL.defaultBlockState());
         for(int h=1;h<=3;h++)p(l,x+5,y+h,z+5,Blocks.COBBLESTONE.defaultBlockState());
-        chest(l,x+4,y+1,z+4,"theoutlands:structures/cabin",r);
+        chest(l,x+4,y+1,z+4,"abandoned_mineshaft",r);
     }
 
     // A narrow timber tower with an observation deck and stored arrows.
@@ -317,7 +288,7 @@ public final class OutlandsStructureFeature {
         for(int h=1;h<=6;h++)p(l,x+2,y+h,z+1,
                 Blocks.OAK_STAIRS.defaultBlockState().setValue(StairBlock.FACING,Direction.EAST));
         p(l,x+2,y+8,z+2,Blocks.LANTERN.defaultBlockState());
-        chest(l,x+3,y+8,z+3,"theoutlands:structures/tower",r);
+        chest(l,x+3,y+8,z+3,"pillager_outpost",r);
     }
 
     // A buried bunker with a narrow surface shaft; no blocks outside its footprint are changed.
@@ -344,7 +315,7 @@ public final class OutlandsStructureFeature {
         p(l,x+3,surface,z+1,Blocks.STONE_BRICKS.defaultBlockState());
         p(l,x+5,surface,z+1,Blocks.STONE_BRICKS.defaultBlockState());
         p(l,x+4,surface,z+2,Blocks.IRON_TRAPDOOR.defaultBlockState());
-        chest(l,x+6,y+1,z+4,"theoutlands:structures/bunker",r);
+        chest(l,x+6,y+1,z+4,"abandoned_mineshaft",r);
     }
 
     // A Fear-associated shrine marked by crying obsidian and silent blackstone pillars.
@@ -355,7 +326,7 @@ public final class OutlandsStructureFeature {
         for(int[] q:c)for(int h=1;h<=3;h++)p(l,x+q[0],y+h,z+q[1],Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState());
         p(l,x+3,y+1,z+3,Blocks.CRYING_OBSIDIAN.defaultBlockState());
         p(l,x+3,y+2,z+3,Blocks.SOUL_LANTERN.defaultBlockState());
-        chest(l,x+5,y+1,z+3,"theoutlands:structures/shrine",r);
+        chest(l,x+5,y+1,z+3,"ancient_city",r);
     }
 
     // A remote Null observatory: a ring, four featureless pillars and no obvious entrance.
@@ -371,7 +342,7 @@ public final class OutlandsStructureFeature {
         }
         p(l,x+4,y+1,z+4,Blocks.CRYING_OBSIDIAN.defaultBlockState());
         p(l,x+4,y+2,z+4,Blocks.SOUL_LANTERN.defaultBlockState());
-        chest(l,x+4,y+1,z+6,"theoutlands:structures/observatory",r);
+        chest(l,x+4,y+1,z+6,"ancient_city",r);
     }
 
     // A deep Death archive with bookshelves, iron bars and a single cache.
@@ -399,7 +370,7 @@ public final class OutlandsStructureFeature {
         p(l,x+3,surface,z+1,Blocks.DEEPSLATE_BRICKS.defaultBlockState());
         p(l,x+5,surface,z+1,Blocks.DEEPSLATE_BRICKS.defaultBlockState());
         p(l,x+4,surface,z+2,Blocks.IRON_TRAPDOOR.defaultBlockState());
-        chest(l,x+4,y+1,z+3,"theoutlands:structures/archive",r);
+        chest(l,x+4,y+1,z+3,"ancient_city",r);
     }
     // Research Facility: buried test rooms, glass observation bays and containment cells.
     private static void researchFacility(WorldGenLevel l,int x,int surface,int z,RandomSource r){
@@ -421,7 +392,7 @@ public final class OutlandsStructureFeature {
         p(l,x+6,y+1,z+4,Blocks.CRYING_OBSIDIAN.defaultBlockState());
         for(int h=y+4;h<surface;h++){air(l,x+4,h,z+1);p(l,x+3,h,z+1,Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING,Direction.SOUTH));}
         air(l,x+4,surface,z+1);p(l,x+3,surface,z+1,Blocks.IRON_TRAPDOOR.defaultBlockState());
-        chest(l,x+7,y+1,z+3,"theoutlands:structures/research_facility",r);
+        chest(l,x+7,y+1,z+3,"stronghold_corridor",r);
     }
 
     // Apostle Cathedral: a compact ruined sanctuary with seven sealed niches around an altar.
@@ -439,7 +410,7 @@ public final class OutlandsStructureFeature {
         p(l,x+4,y+1,z+4,Blocks.CRYING_OBSIDIAN.defaultBlockState());
         p(l,x+4,y+2,z+4,Blocks.SOUL_LANTERN.defaultBlockState());
         for(int a=1;a<=7;a++)if(a!=4)p(l,x+a,y+1,z+7,Blocks.IRON_BARS.defaultBlockState());
-        chest(l,x+4,y+1,z+2,"theoutlands:structures/apostle_cathedral",r);
+        chest(l,x+4,y+1,z+2,"woodland_mansion",r);
     }
 
     // Forsaken Settlement: a tightly clustered pair of ruined homes around an empty well.
@@ -462,7 +433,7 @@ public final class OutlandsStructureFeature {
         }
         p(l,x+1,y+1,z+1,Blocks.BARREL.defaultBlockState());
         p(l,x+7,y+1,z+7,Blocks.COBWEB.defaultBlockState());
-        chest(l,x+2,y+1,z+1,"theoutlands:structures/forsaken_settlement",r);
+        chest(l,x+2,y+1,z+1,"village/village_taiga_house",r);
     }
 
     // Last Outpost: a barricaded perimeter, lookout corners and an abandoned command post.
@@ -480,7 +451,7 @@ public final class OutlandsStructureFeature {
         p(l,x+4,y+1,z+4,Blocks.CRAFTING_TABLE.defaultBlockState());
         p(l,x+4,y+2,z+4,Blocks.LANTERN.defaultBlockState());
         for(int a=2;a<=6;a++)p(l,x+a,y+1,z+2,Blocks.SPRUCE_FENCE.defaultBlockState());
-        chest(l,x+6,y+1,z+6,"theoutlands:structures/last_outpost",r);
+        chest(l,x+6,y+1,z+6,"bastion_treasure",r);
     }
 
     // Forgotten Station: a buried platform with a short track section that ends at a sealed wall.
@@ -501,7 +472,7 @@ public final class OutlandsStructureFeature {
         p(l,x+4,y+1,z+1,Blocks.COBWEB.defaultBlockState());
         for(int h=y+4;h<surface;h++){air(l,x+4,h,z+1);p(l,x+3,h,z+1,Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING,Direction.SOUTH));}
         air(l,x+4,surface,z+1);p(l,x+3,surface,z+1,Blocks.IRON_TRAPDOOR.defaultBlockState());
-        chest(l,x+2,y+1,z+7,"theoutlands:structures/forgotten_station",r);
+        chest(l,x+2,y+1,z+7,"mineshaft",r);
     }
 
     // Null Chamber: exceptionally rare, almost empty, with four silent pillars and one marker.
@@ -518,7 +489,7 @@ public final class OutlandsStructureFeature {
         p(l,x+3,y+2,z+3,Blocks.BLACK_CONCRETE.defaultBlockState());p(l,x+3,y+3,z+3,Blocks.BLACK_CONCRETE.defaultBlockState());
         for(int h=y+4;h<surface;h++){air(l,x+3,h,z+1);p(l,x+2,h,z+1,Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING,Direction.SOUTH));}
         air(l,x+3,surface,z+1);p(l,x+2,surface,z+1,Blocks.IRON_TRAPDOOR.defaultBlockState());
-        chest(l,x+5,y+1,z+3,"theoutlands:structures/null_chamber",r);
+        chest(l,x+5,y+1,z+3,"ancient_city",r);
     }
 
     // Hollow Crypt: connected burial halls, side corridors, empty alcoves and a sealed central tomb.
@@ -540,7 +511,7 @@ public final class OutlandsStructureFeature {
         for(int h=y+4;h<surface;h++){air(l,x+4,h,z+1);p(l,x+3,h,z+1,Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING,Direction.SOUTH));}
         air(l,x+4,surface,z+1);p(l,x+3,surface,z+1,Blocks.DEEPSLATE_BRICKS.defaultBlockState());
         p(l,x+5,surface,z+1,Blocks.DEEPSLATE_BRICKS.defaultBlockState());p(l,x+4,surface,z+2,Blocks.IRON_TRAPDOOR.defaultBlockState());
-        chest(l,x+7,y+1,z+4,"theoutlands:structures/hollow_crypt",r);
+        chest(l,x+7,y+1,z+4,"ancient_city",r);
     }
 
     // Boundary Monument: towering broken concentric rings and an empty freestanding frame.
@@ -558,7 +529,7 @@ public final class OutlandsStructureFeature {
         for(int h=1;h<=5;h++){p(l,x+3,y+h,z+4,Blocks.CHISELED_STONE_BRICKS.defaultBlockState());p(l,x+5,y+h,z+4,Blocks.CHISELED_STONE_BRICKS.defaultBlockState());}
         for(int a=3;a<=5;a++)if(a!=4)p(l,x+a,y+5,z+4,Blocks.CHISELED_STONE_BRICKS.defaultBlockState());
         p(l,x+4,y+1,z+4,Blocks.CRYING_OBSIDIAN.defaultBlockState());air(l,x+4,y+2,z+4);
-        chest(l,x+2,y+1,z+4,"theoutlands:structures/boundary_monument",r);
+        chest(l,x+2,y+1,z+4,"ruined_portal",r);
     }
 
 

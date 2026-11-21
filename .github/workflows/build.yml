@@ -33,7 +33,7 @@ jobs:
           sudo apt-get install -y ffmpeg
 
       - name: Validate entity generators and registry audit
-        run: python3 -m py_compile tools/generate_entity_audio.py tools/generate_entity_textures.py tools/validate_entity_registry.py
+        run: python3 -m py_compile tools/generate_entity_audio.py tools/generate_entity_textures.py tools/validate_entity_registry.py tools/validate_structure_phase2.py
 
       - name: Generate unique entity textures
         run: python3 tools/generate_entity_textures.py
@@ -43,6 +43,9 @@ jobs:
 
       - name: Audit every registered entity
         run: python3 tools/validate_entity_registry.py
+
+      - name: Audit structure loot, lore, and secret chambers
+        run: python3 tools/validate_structure_phase2.py
 
       - name: Set up Gradle 9.2.1
         uses: gradle/actions/setup-gradle@v4
