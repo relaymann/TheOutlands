@@ -35,7 +35,8 @@
                   "author": "M. Vale",
                   "pages": [
                     "{\"text\":\"The stove was cold when we arrived. There were four cups on the table, but only three sets of tracks leaving the house.\"}",
-                    "{\"text\":\"Do not follow the fourth set into the trees. It does not disturb the snow.\"}"
+                    "{\"text\":\"Do not follow the fourth set into the trees. It does not disturb the snow.\"}",
+                    "{\"text\":\"A mark is repeated in every hidden lower chamber: three short strokes around an empty center. The three-stroke mark appears again in the station ledger. Vale wrote that the outpost crew refused to carry anything bearing it.\"}"
                   ]
                 },
                 "minecraft:custom_name": "{\"text\":\"Recovered field record\",\"italic\":false}"

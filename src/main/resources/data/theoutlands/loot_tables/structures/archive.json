@@ -35,7 +35,8 @@
                   "author": "Archivist",
                   "pages": [
                     "{\"text\":\"The final pages were removed. The index still lists a witness who was never admitted.\"}",
-                    "{\"text\":\"The shelves are not arranged by date. They are arranged by the order in which people disappeared.\"}"
+                    "{\"text\":\"The shelves are not arranged by date. They are arranged by the order in which people disappeared.\"}",
+                    "{\"text\":\"A mark is repeated in every hidden lower chamber: three short strokes around an empty center. The crypt ledger lists names that also appear in the facility's missing-person register. Several entries were dated before the facility was built.\"}"
                   ]
                 },
                 "minecraft:custom_name": "{\"text\":\"Recovered field record\",\"italic\":false}"

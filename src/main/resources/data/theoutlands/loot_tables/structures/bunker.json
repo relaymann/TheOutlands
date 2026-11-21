@@ -35,7 +35,8 @@
                   "author": "Quartermaster",
                   "pages": [
                     "{\"text\":\"The inner door was sealed from this side. The stores were untouched. Someone took every map and left the food.\"}",
-                    "{\"text\":\"If the ventilation starts, do not open the hatch.\"}"
+                    "{\"text\":\"If the ventilation starts, do not open the hatch.\"}",
+                    "{\"text\":\"A mark is repeated in every hidden lower chamber: three short strokes around an empty center. A cathedral inventory lists this mark beside seven sealed names. The outpost report says the same symbol was painted on their inner barricade.\"}"
                   ]
                 },
                 "minecraft:custom_name": "{\"text\":\"Recovered field record\",\"italic\":false}"

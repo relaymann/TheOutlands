@@ -35,7 +35,8 @@
                   "author": "Unknown",
                   "pages": [
                     "{\"text\":\"We were told not to speak the name aloud. The stones were arranged before we arrived.\"}",
-                    "{\"text\":\"At dusk the shadows pointed toward the forest, even when the sun was behind us.\"}"
+                    "{\"text\":\"At dusk the shadows pointed toward the forest, even when the sun was behind us.\"}",
+                    "{\"text\":\"A mark is repeated in every hidden lower chamber: three short strokes around an empty center. The station map ends at a blank square. The mapmaker drew this mark there, then crossed out every route leading north.\"}"
                   ]
                 },
                 "minecraft:custom_name": "{\"text\":\"Recovered field record\",\"italic\":false}"

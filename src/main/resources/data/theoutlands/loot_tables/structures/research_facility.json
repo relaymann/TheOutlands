@@ -35,7 +35,8 @@
                   "author": "Dr. Hallow",
                   "pages": [
                     "{\"text\":\"The glass held. The locks held. The subject was not inside the chamber when the lights returned.\"}",
-                    "{\"text\":\"There were wet footprints on the observation side of the glass.\"}"
+                    "{\"text\":\"There were wet footprints on the observation side of the glass.\"}",
+                    "{\"text\":\"A mark is repeated in every hidden lower chamber: three short strokes around an empty center. A field report from the last outpost mentions a glass room and a subject that was never logged. The report carries the same three-stroke mark.\"}"
                   ]
                 },
                 "minecraft:custom_name": "{\"text\":\"Recovered field record\",\"italic\":false}"

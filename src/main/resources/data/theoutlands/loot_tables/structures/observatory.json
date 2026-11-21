@@ -35,7 +35,8 @@
                   "author": "Researcher 12",
                   "pages": [
                     "{\"text\":\"No movement was recorded between the pillars. The instrument nevertheless measured a second presence.\"}",
-                    "{\"text\":\"The next report came from a site that does not appear on our survey.\"}"
+                    "{\"text\":\"The next report came from a site that does not appear on our survey.\"}",
+                    "{\"text\":\"A mark is repeated in every hidden lower chamber: three short strokes around an empty center. The cathedral record describes seven niches. A later hand says the same arrangement was measured beneath this observatory.\"}"
                   ]
                 },
                 "minecraft:custom_name": "{\"text\":\"Recovered field record\",\"italic\":false}"
