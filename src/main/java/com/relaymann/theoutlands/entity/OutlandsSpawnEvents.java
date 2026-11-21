@@ -82,9 +82,9 @@ public final class OutlandsSpawnEvents {
 
         if (distance < profile.minimumDistance()) return false;
 
-        int distanceDenominator = distance < 1_000.0D ? 32
-                : distance < 2_000.0D ? 12
-                : distance < 4_000.0D ? 4
+        int distanceDenominator = distance < 1_000.0D ? 8
+                : distance < 2_000.0D ? 5
+                : distance < 4_000.0D ? 3
                 : distance < 7_000.0D ? 2 : 1;
         int denominator = distanceDenominator * profile.rarityMultiplier();
         if (denominator > 1 && random.nextInt(denominator) != 0) return false;
@@ -101,14 +101,14 @@ public final class OutlandsSpawnEvents {
             threatPoints += existing == null ? 1 : existing.threatCost();
         }
 
-        int maxEntities = distance < 1_000.0D ? 1
-                : distance < 2_000.0D ? 2
-                : distance < 4_000.0D ? 3
-                : distance < 7_000.0D ? 4 : 5;
-        int threatBudget = distance < 1_000.0D ? 1
-                : distance < 2_000.0D ? 2
+        int maxEntities = distance < 1_000.0D ? 2
+                : distance < 2_000.0D ? 3
                 : distance < 4_000.0D ? 4
-                : distance < 7_000.0D ? 6 : 9;
+                : distance < 7_000.0D ? 5 : 6;
+        int threatBudget = distance < 1_000.0D ? 2
+                : distance < 2_000.0D ? 4
+                : distance < 4_000.0D ? 6
+                : distance < 7_000.0D ? 8 : 11;
 
         return nearby.size() < maxEntities
                 && threatPoints + profile.threatCost() <= threatBudget;
