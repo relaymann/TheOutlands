@@ -52,7 +52,7 @@ public final class OutlandsStructure extends Structure {
                 ||surfaceY>=context.heightAccessor().getMaxBuildHeight()-16) return Optional.empty();
 
         long pieceSeed=StructurePlacementPolicy.chunkSeed(context.seed(),chunkX,chunkZ);
-        BlockPos origin=new BlockPos(x,surfaceY,z);
+        BlockPos origin=new BlockPos(context.chunkPos().getMiddleBlockX(),surfaceY,context.chunkPos().getMiddleBlockZ());
         return Optional.of(new GenerationStub(origin,builder ->
                 builder.addPiece(new OutlandsStructurePiece(x,surfaceY,z,size,pieceSeed))));
     }

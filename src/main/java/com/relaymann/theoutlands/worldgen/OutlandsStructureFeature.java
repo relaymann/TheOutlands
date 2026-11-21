@@ -173,6 +173,19 @@ public final class OutlandsStructureFeature {
         }
     }
 
+    private static void courtyard(WorldGenLevel l,int x,int y,int z,BlockState block) {
+        for(int a=3;a<45;a++)for(int b=3;b<45;b++) {
+            if(a==3||a==44||b==3||b==44||(a%8==0&&b%8==0)) p(l,x+a,y,z+b,block);
+        }
+    }
+    private static void ring(WorldGenLevel l,int x,int y,int z,int radius,BlockState block) {
+        int cx=x+24,cz=z+24;
+        int outer=radius*radius,inner=Math.max(0,radius-2)*Math.max(0,radius-2);
+        for(int dx=-radius;dx<=radius;dx++)for(int dz=-radius;dz<=radius;dz++) {
+            int distance=dx*dx+dz*dz;
+            if(distance<=outer&&distance>=inner) p(l,cx+dx,y,cz+dz,block);
+        }
+    }
     private static void yard(WorldGenLevel l,int x,int y,int z,BlockState fence) {
         for(int a=2;a<46;a++){p(l,x+a,y+1,z+2,fence);p(l,x+a,y+1,z+45,fence);p(l,x+2,y+1,z+a,fence);p(l,x+45,y+1,z+a,fence);}
         for(int a=22;a<=25;a++)air(l,x+a,y+1,z+2);
