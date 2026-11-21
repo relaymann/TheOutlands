@@ -3,7 +3,7 @@
 import glob, json, os, re, struct, sys
 
 ROOT = "src/main"
-EXPECTED = 16
+EXPECTED = 19
 PASSES = 15
 
 def read(path):
@@ -45,7 +45,7 @@ sound_map = {
  "cave_jar":"cavejar_stalk", "stalker":"stalker_breath", "observer":"observer_click",
  "hunter":"hunter_stalk", "burrower":"burrower_rise", "mimic":"mimic_reveal",
  "stillborn_statue":"stillborn_stone", "agitated_one":"agitated_warning",
- "lurker":"lurker_breath", "howler":"howler_call", "dredge":"dredge_crawl"
+ "lurker":"lurker_breath", "howler":"howler_call", "dredge":"dredge_crawl", "pilgrim":"pilgrim_breath", "ceiling_dweller":"ceiling_crawl", "colossus":"colossus_step"
 }
 model_map = {
  "null":"NullModel", "fear":"FearModel", "death":"DeathModel", "almighty":"AlmightyModel",
@@ -53,7 +53,7 @@ model_map = {
  "observer":"ObserverModel", "hunter":"HunterModel", "burrower":"BurrowerModel",
  "mimic":"MimicModel", "stillborn_statue":"StillbornStatueModel",
  "agitated_one":"AgitatedOneModel", "lurker":"LurkerModel",
- "howler":"HowlerModel", "dredge":"DredgeModel"
+ "howler":"HowlerModel", "dredge":"DredgeModel", "pilgrim":"PilgrimModel", "ceiling_dweller":"CeilingDwellerModel", "colossus":"ColossusModel"
 }
 
 renderer_models = {}
@@ -64,7 +64,10 @@ for field, entity_id in fields.items():
     if not match:
         continue
     renderer_name = match.group(1)
-    src = read("java/com/relaymann/theoutlands/client/" + renderer_name + ".java")
+    renderer_path = "java/com/relaymann/theoutlands/client/" + renderer_name + ".java"
+    if not os.path.isfile(os.path.join(ROOT, renderer_path)):
+        renderer_path = "java/com/relaymann/theoutlands/client/NewEntityRenderers.java"
+    src = read(renderer_path)
     model_match = re.search(r'new\s+([A-Za-z0-9_]+Model)\s*\(', src)
     texture_match = re.search(r'textures/entity/([^"]+\.png)', src)
     if model_match:
@@ -90,7 +93,7 @@ def audit_once():
 
         model = model_map.get(entity_id)
         model_path = "java/com/relaymann/theoutlands/client/" + str(model) + ".java"
-        if not model or not os.path.isfile(os.path.join(ROOT, model_path)):
+        if not model or (not os.path.isfile(os.path.join(ROOT, model_path)) and ("class " + str(model)).encode() not in read("java/com/relaymann/theoutlands/client/NewEntityRenderers.java").encode()):
             errors.append(entity_id + ": missing model")
         elif "setupAnim" not in read(model_path):
             errors.append(entity_id + ": missing animation method")
