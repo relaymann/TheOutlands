@@ -50,6 +50,7 @@ public final class OutlandsStructureFeature {
             expand(id,level,x,surfaceY,z);
             hiddenCache(id,level,x,surfaceY,z,random);
             applyVariations(id,level,x,surfaceY,z,random);
+            StructureInteriorDressing.apply(id,level,x,surfaceY,z,random,clip);
         } finally {
             ACTIVE_CLIP.remove();
         }
