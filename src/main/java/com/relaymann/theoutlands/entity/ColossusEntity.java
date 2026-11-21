@@ -1,0 +1,15 @@
+package com.relaymann.theoutlands.entity;
+import com.relaymann.theoutlands.OutlandsConfig;import com.relaymann.theoutlands.sound.OutlandsSounds;import net.minecraft.nbt.CompoundTag;import net.minecraft.sounds.SoundEvent;import net.minecraft.world.entity.EntityType;import net.minecraft.world.entity.ai.attributes.AttributeSupplier;import net.minecraft.world.entity.ai.attributes.Attributes;import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;import net.minecraft.world.entity.ai.goal.RandomStrollGoal;import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;import net.minecraft.world.entity.monster.Monster;import net.minecraft.world.entity.player.Player;import net.minecraft.world.level.Level;import net.minecraft.world.phys.Vec3;
+/** A colossal territorial giant in distant wilderness, slow and dangerous at close range. */
+public final class ColossusEntity extends Monster{
+ private int heavyStep,warningTicks;
+ public ColossusEntity(EntityType<? extends Monster> t,Level l){super(t,l);xpReward=18;}
+ public static AttributeSupplier.Builder createAttributes(){return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH,180).add(Attributes.MOVEMENT_SPEED,.105).add(Attributes.FOLLOW_RANGE,38).add(Attributes.ATTACK_DAMAGE,15).add(Attributes.ARMOR,8).add(Attributes.KNOCKBACK_RESISTANCE,.95);}
+ @Override protected void registerGoals(){goalSelector.addGoal(1,new MeleeAttackGoal(this,.82D,true));goalSelector.addGoal(6,new RandomStrollGoal(this,.35D,.002F));goalSelector.addGoal(7,new RandomLookAroundGoal(this));targetSelector.addGoal(1,new HurtByTargetGoal(this));targetSelector.addGoal(2,new NearestAttackableTargetGoal<>(this,Player.class,18,true,false,p->p instanceof Player x&&x.isAlive()&&!x.isCreative()&&!x.isSpectator()&&distanceToSqr(x)<400));}
+ @Override public void tick(){super.tick();if(level().isClientSide)return;if(heavyStep>0)heavyStep--;if(warningTicks>0)warningTicks--;if(getTarget() instanceof Player p&&p.isAlive()){double d=distanceToSqr(p);if(d>256){setTarget(null);getNavigation().stop();}else if(d<144&&warningTicks==0){warningTicks=160;getNavigation().stop();}if(d<25&&onGround()&&heavyStep==0){Vec3 v=p.position().subtract(position()).normalize();setDeltaMovement(getDeltaMovement().add(v.x*.2,.26,v.z*.2));hasImpulse=true;heavyStep=55;}}}
+ @Override protected SoundEvent getAmbientSound(){return OutlandsConfig.HORROR_AUDIO_ENABLED.get()?OutlandsSounds.COLOSSUS_STEP.get():null;}
+ @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource s){return OutlandsConfig.HORROR_AUDIO_ENABLED.get()?OutlandsSounds.COLOSSUS_HURT.get():null;}
+ @Override protected SoundEvent getDeathSound(){return getHurtSound(null);}
+ @Override public void addAdditionalSaveData(CompoundTag t){super.addAdditionalSaveData(t);t.putInt("step",heavyStep);t.putInt("warning",warningTicks);}
+ @Override public void readAdditionalSaveData(CompoundTag t){super.readAdditionalSaveData(t);heavyStep=t.getInt("step");warningTicks=t.getInt("warning");}
+}
