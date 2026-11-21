@@ -121,6 +121,8 @@ def audit_once():
     if len(set(model_map.values())) != EXPECTED: errors.append("entity model mapping is not unique")
     if len(layer_fields) != EXPECTED: errors.append("not all entity model layers are registered")
     if "SoundEvents.WARDEN_ROAR" in almighty_encounter: errors.append("Almighty uses a vanilla placeholder sound")
+    mimic_src = read("java/com/relaymann/theoutlands/entity/MimicEntity.java")
+    if mimic_src.count("!p.isCreative()") < 2: errors.append("Mimic watcher checks do not ignore creative players")
     if intelligence.count("event.isCanceled()") < 4:
         errors.append("intelligence handlers do not consistently ignore canceled actions")
     return errors

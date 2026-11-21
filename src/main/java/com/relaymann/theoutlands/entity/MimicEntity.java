@@ -143,13 +143,14 @@ public final class MimicEntity extends Monster {
 
     private boolean isWatchedByAnyPlayer() {
         return level().players().stream()
-                .anyMatch(p -> p.isAlive() && !p.isSpectator() && p.hasLineOfSight(this));
+                .anyMatch(p -> p.isAlive() && !p.isCreative() && !p.isSpectator() && p.hasLineOfSight(this));
     }
 
     private Player getNearestVisiblePlayer(double range) {
         double rangeSqr = range * range;
         return level().getEntitiesOfClass(Player.class, getBoundingBox().inflate(range),
-                p -> p.isAlive() && !p.isSpectator() && distanceToSqr(p) <= rangeSqr && p.hasLineOfSight(this))
+                p -> p.isAlive() && !p.isCreative() && !p.isSpectator()
+                        && distanceToSqr(p) <= rangeSqr && p.hasLineOfSight(this))
                 .stream().min(java.util.Comparator.comparingDouble(this::distanceToSqr)).orElse(null);
     }
 
