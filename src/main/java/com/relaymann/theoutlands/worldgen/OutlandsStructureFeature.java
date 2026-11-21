@@ -293,7 +293,7 @@ public final class OutlandsStructureFeature {
                 if(variant==3) p(l,x+23,y+7,z+23,Blocks.CHAIN.defaultBlockState());
             }
             case "forsaken_settlement" -> {
-                if(variant==1||variant==2) shed(l,x+33,y,z+19,Blocks.MOSSY_OAK_PLANKS.defaultBlockState());
+                if(variant==1||variant==2) shed(l,x+33,y,z+19,Blocks.SPRUCE_PLANKS.defaultBlockState());
                 if(variant==3) { p(l,x+22,y+1,z+22,Blocks.COBWEB.defaultBlockState()); p(l,x+23,y+1,z+22,Blocks.BARREL.defaultBlockState()); }
             }
             case "last_outpost" -> {
