@@ -129,3 +129,14 @@ Eligible structures are selected with one weighted roll rather than a sequence o
 Sites reject ocean, river, and beach biomes, water/fluid surfaces, leaf/log canopy tops, steep footprints, and unsafe build-height margins. The 9x9 placement footprint remains inside the generating chunk. Vanilla terrain, caves, biome sources, and vanilla structure sets are unchanged.
 
 This is the generation-policy foundation; the current 14 structure builders are still single-chunk features. A native multi-chunk piece/template migration is a separate next step and is not claimed as complete by this phase.
+
+
+## Native multi-chunk structure pipeline
+
+Outlands sites are now generated through Minecraft's native structure, structure-set, and structure-piece pipeline rather than a biome-injected configured feature. One seed-stable structure candidate is considered per chunk; the deterministic placement policy chooses an anchor from each 8x8-chunk cell and rejects nearby competing anchors using the configurable spacing value. A single structure set owns all Outlands sites, so they share one spacing/placement field and cannot be independently stacked by separate sets.
+
+The native piece spans a 48x48-block footprint (normally three chunks across). Minecraft persists the piece and invokes it for each intersecting chunk; each invocation writes only the supplied chunk intersection. Layout selection is deterministic from the world seed and anchor coordinates, while the final distance gate uses the actual shared Overworld spawn available to the generation level. The existing distance/rarity progression is retained. The 14 site identities now receive larger connected wings, corridors, yards, side rooms, tunnels, crypt cells, and perimeter features around their original focal builds.
+
+Candidate sites use a 3x3 sample of generator height averages and reject footprints with more than five blocks of height variation or unsafe build-height margins. The structure biome tag includes land-oriented Overworld biomes and excludes oceans, rivers, and beaches. Structure terrain adaptation is none; the mod does not alter vanilla noise settings, cave carvers, biome sources, or vanilla structure sets. Existing chunks are not retroactively populated.
+
+The native structure JSON is data-driven, while the custom codec only carries the footprint size. Structure pieces persist their anchor, surface height, size, and seed in NBT. All block writes are clipped to the current structure-piece chunk box, including chest placement, so generation does not force-load or write into adjacent chunks.
