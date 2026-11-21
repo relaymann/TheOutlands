@@ -6,7 +6,7 @@ import java.util.List;
 /** Pacing and weighted event selection from distance, pressure, and local context. */
 public final class HorrorDirector {
     public static final double EVENT_PRESSURE_THRESHOLD = 10.0D;
-    public static final long MINIMUM_QUIET_TICKS = 240L, MAXIMUM_QUIET_TICKS = 730L;
+    public static final long MINIMUM_QUIET_TICKS = 180L, MAXIMUM_QUIET_TICKS = 480L;
     private static final List<HorrorEventDefinition> EVENTS = List.of(
             new HorrorEventDefinition("ambient_displacement", 1_000, 10, 8, 1_200, 3),
             new HorrorEventDefinition("false_footsteps", 1_500, 11, 6, 1_600, 4),
