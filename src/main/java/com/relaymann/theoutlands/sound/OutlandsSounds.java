@@ -21,6 +21,7 @@ public final class OutlandsSounds {
  public static final DeferredHolder<SoundEvent,SoundEvent> STILLBORN_STRIKE=register("stillborn_strike");
  public static final DeferredHolder<SoundEvent,SoundEvent> AGITATED_WARNING=register("agitated_warning");
  public static final DeferredHolder<SoundEvent,SoundEvent> AGITATED_CHARGE=register("agitated_charge");
+ public static final DeferredHolder<SoundEvent,SoundEvent> PILGRIM_BREATH=register("pilgrim_breath"), PILGRIM_HURT=register("pilgrim_hurt"), CEILING_CRAWL=register("ceiling_crawl"), CEILING_HIT=register("ceiling_hit"), COLOSSUS_STEP=register("colossus_step"), COLOSSUS_HURT=register("colossus_hurt");
  private static DeferredHolder<SoundEvent,SoundEvent> register(String name){ResourceLocation id=ResourceLocation.fromNamespaceAndPath(TheOutlands.MOD_ID,name);return SOUNDS.register(name,()->SoundEvent.createVariableRangeEvent(id));}
 
  public static final DeferredHolder<SoundEvent,SoundEvent> LURKER_BREATH=register("lurker_breath");
