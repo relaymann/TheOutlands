@@ -351,5 +351,37 @@
         "volume": 0.95
       }
     ]
+  },
+  "pilgrim_step": {
+    "sounds": [
+      {
+        "name": "theoutlands:pilgrim_step",
+        "volume": 0.25
+      }
+    ]
+  },
+  "ceiling_drop": {
+    "sounds": [
+      {
+        "name": "theoutlands:ceiling_drop",
+        "volume": 0.8
+      }
+    ]
+  },
+  "colossus_warning": {
+    "sounds": [
+      {
+        "name": "theoutlands:colossus_warning",
+        "volume": 0.8
+      }
+    ]
+  },
+  "colossus_stomp": {
+    "sounds": [
+      {
+        "name": "theoutlands:colossus_stomp",
+        "volume": 1.5
+      }
+    ]
   }
 }
