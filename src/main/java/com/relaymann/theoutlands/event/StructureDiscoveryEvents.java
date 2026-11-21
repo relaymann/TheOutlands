@@ -40,7 +40,7 @@ public final class StructureDiscoveryEvents {
         String layout=OutlandsStructureFeature.chooseLayout(seed,distance,forest,
                 Math.max(1_000.0D,OutlandsConfig.STRUCTURE_MIN_DISTANCE.get()),OutlandsConfig.STRUCTURE_CHANCE_MULTIPLIER.get());
         if(layout==null)return;
-        HorrorMemory.recordDiscovery(player,"structure_"+layout);
-        HorrorMemory.recordDiscovery(player,"shared_structure_mark");
+        HorrorMemory.recordDiscovery(player, "structure_" + layout);
+        HorrorMemory.recordDiscovery(player, "shared_structure_mark");
     }
 }
