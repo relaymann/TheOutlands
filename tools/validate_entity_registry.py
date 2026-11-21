@@ -129,10 +129,11 @@ def audit_once():
     config = read("java/com/relaymann/theoutlands/OutlandsConfig.java")
     required_spawn_rules = [
         "ENTITY_SPAWN_BALANCE_ENABLED", "new SpawnProfile(500.0D, 1, 1)",
-        "new SpawnProfile(1_500.0D, 2, 2)", "new SpawnProfile(1_800.0D, 2, 2)",
-        "new SpawnProfile(2_500.0D, 4, 3)", "new SpawnProfile(3_500.0D, 4, 4)",
-        "new SpawnProfile(7_000.0D, 7, 8)", "FEAR_FIRST_APPEARANCE_DISTANCE.get()",
-        "DEATH_FIRST_APPEARANCE_DISTANCE.get()", "threatPoints + profile.threatCost() <= threatBudget"
+        "new SpawnProfile(1_200.0D, 2, 1)", "new SpawnProfile(1_500.0D, 2, 2)",
+        "new SpawnProfile(2_000.0D, 3, 2)", "new SpawnProfile(2_500.0D, 3, 3)",
+        "new SpawnProfile(5_000.0D, 5, 4)", "FEAR_FIRST_APPEARANCE_DISTANCE.get()",
+        "DEATH_FIRST_APPEARANCE_DISTANCE.get()", "int denominator = profile.rarityMultiplier()",
+        "threatPoints + profile.threatCost() <= threatBudget"
     ]
     for rule in required_spawn_rules:
         if rule not in placements + config:
