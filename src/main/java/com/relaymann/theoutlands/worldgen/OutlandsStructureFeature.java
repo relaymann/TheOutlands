@@ -251,7 +251,7 @@ public final class OutlandsStructureFeature {
     private static void hiddenCache(String id,WorldGenLevel l,int x,int surface,int z,RandomSource r) {
         int y=surface-38, rx=x+33, rz=z+2;
         room(l,rx,y,rz,9,7,4,Blocks.CRACKED_DEEPSLATE_BRICKS.defaultBlockState(),Blocks.POLISHED_DEEPSLATE.defaultBlockState(),Blocks.DEEPSLATE_BRICKS.defaultBlockState());
-        for(int h=y+1;h<surface-1;h++){air(l,x+38,h,z+5);p(l,x+37,h,z+5,Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING,Direction.SOUTH));}
+        for(int h=y+1;h<surface-1;h++){air(l,x+38,h,z+5);p(l,x+37,h,z+5,Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING,Direction.EAST));}
         p(l,x+38,surface-1,z+5,Blocks.IRON_TRAPDOOR.defaultBlockState());
         p(l,x+38,surface,z+5,Blocks.MOSS_CARPET.defaultBlockState());
         p(l,rx+2,y+1,rz+2,Blocks.COBWEB.defaultBlockState());p(l,rx+6,y+1,rz+2,Blocks.LECTERN.defaultBlockState());
@@ -338,7 +338,7 @@ public final class OutlandsStructureFeature {
         p(l,x+6,y+1,z+2,Blocks.LANTERN.defaultBlockState());
         for(int h=y+4;h<surface;h++){
             air(l,x+4,h,z+1);
-            p(l,x+3,h,z+1,Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING,Direction.SOUTH));
+            p(l,x+3,h,z+1,Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING,Direction.EAST));
         }
         air(l,x+4,surface,z+1);
         p(l,x+3,surface,z+1,Blocks.STONE_BRICKS.defaultBlockState());
@@ -393,7 +393,7 @@ public final class OutlandsStructureFeature {
         p(l,x+4,y+2,z+3,Blocks.IRON_BARS.defaultBlockState());
         for(int h=y+4;h<surface;h++){
             air(l,x+4,h,z+1);
-            p(l,x+3,h,z+1,Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING,Direction.SOUTH));
+            p(l,x+3,h,z+1,Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING,Direction.EAST));
         }
         air(l,x+4,surface,z+1);
         p(l,x+3,surface,z+1,Blocks.DEEPSLATE_BRICKS.defaultBlockState());
@@ -419,7 +419,7 @@ public final class OutlandsStructureFeature {
         p(l,x+6,y+1,z+2,Blocks.REDSTONE_LAMP.defaultBlockState());
         p(l,x+2,y+1,z+4,Blocks.LECTERN.defaultBlockState());
         p(l,x+6,y+1,z+4,Blocks.CRYING_OBSIDIAN.defaultBlockState());
-        for(int h=y+4;h<surface;h++){air(l,x+4,h,z+1);p(l,x+3,h,z+1,Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING,Direction.SOUTH));}
+        for(int h=y+4;h<surface;h++){air(l,x+4,h,z+1);p(l,x+3,h,z+1,Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING,Direction.EAST));}
         air(l,x+4,surface,z+1);p(l,x+3,surface,z+1,Blocks.IRON_TRAPDOOR.defaultBlockState());
         chest(l,x+7,y+1,z+3,"theoutlands:structures/research_facility",r);
     }
@@ -499,7 +499,7 @@ public final class OutlandsStructureFeature {
         for(int a=1;a<=3;a++)p(l,x+a,y+1,z+2,Blocks.OAK_PLANKS.defaultBlockState());
         p(l,x+2,y+2,z+2,Blocks.LANTERN.defaultBlockState());p(l,x+2,y+1,z+6,Blocks.BARREL.defaultBlockState());
         p(l,x+4,y+1,z+1,Blocks.COBWEB.defaultBlockState());
-        for(int h=y+4;h<surface;h++){air(l,x+4,h,z+1);p(l,x+3,h,z+1,Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING,Direction.SOUTH));}
+        for(int h=y+4;h<surface;h++){air(l,x+4,h,z+1);p(l,x+3,h,z+1,Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING,Direction.EAST));}
         air(l,x+4,surface,z+1);p(l,x+3,surface,z+1,Blocks.IRON_TRAPDOOR.defaultBlockState());
         chest(l,x+2,y+1,z+7,"theoutlands:structures/forgotten_station",r);
     }
@@ -516,7 +516,7 @@ public final class OutlandsStructureFeature {
         for(int[] q:pillars)for(int h=1;h<=3;h++)p(l,x+q[0],y+h,z+q[1],Blocks.BLACKSTONE.defaultBlockState());
         p(l,x+3,y+1,z+3,Blocks.CRYING_OBSIDIAN.defaultBlockState());
         p(l,x+3,y+2,z+3,Blocks.BLACK_CONCRETE.defaultBlockState());p(l,x+3,y+3,z+3,Blocks.BLACK_CONCRETE.defaultBlockState());
-        for(int h=y+4;h<surface;h++){air(l,x+3,h,z+1);p(l,x+2,h,z+1,Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING,Direction.SOUTH));}
+        for(int h=y+4;h<surface;h++){air(l,x+3,h,z+1);p(l,x+2,h,z+1,Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING,Direction.EAST));}
         air(l,x+3,surface,z+1);p(l,x+2,surface,z+1,Blocks.IRON_TRAPDOOR.defaultBlockState());
         chest(l,x+5,y+1,z+3,"theoutlands:structures/null_chamber",r);
     }
@@ -537,7 +537,7 @@ public final class OutlandsStructureFeature {
         for(int b=2;b<=6;b++)p(l,x+4,y+1,z+b,Blocks.CRACKED_DEEPSLATE_BRICKS.defaultBlockState());
         for(int a=3;a<=5;a++)for(int b=3;b<=5;b++)p(l,x+a,y+1,z+b,Blocks.CRYING_OBSIDIAN.defaultBlockState());
         p(l,x+4,y+2,z+4,Blocks.IRON_BARS.defaultBlockState());
-        for(int h=y+4;h<surface;h++){air(l,x+4,h,z+1);p(l,x+3,h,z+1,Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING,Direction.SOUTH));}
+        for(int h=y+4;h<surface;h++){air(l,x+4,h,z+1);p(l,x+3,h,z+1,Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING,Direction.EAST));}
         air(l,x+4,surface,z+1);p(l,x+3,surface,z+1,Blocks.DEEPSLATE_BRICKS.defaultBlockState());
         p(l,x+5,surface,z+1,Blocks.DEEPSLATE_BRICKS.defaultBlockState());p(l,x+4,surface,z+2,Blocks.IRON_TRAPDOOR.defaultBlockState());
         chest(l,x+7,y+1,z+4,"theoutlands:structures/hollow_crypt",r);
