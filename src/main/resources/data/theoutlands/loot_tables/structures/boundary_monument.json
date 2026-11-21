@@ -35,7 +35,8 @@
                   "author": "A. Senn",
                   "pages": [
                     "{\"text\":\"The rings do not align with the compass. The frame contains nothing, but the measurements change when viewed from the other side.\"}",
-                    "{\"text\":\"Do not mark a route through the center.\"}"
+                    "{\"text\":\"Do not mark a route through the center.\"}",
+                    "{\"text\":\"A mark is repeated in every hidden lower chamber: three short strokes around an empty center. A research diagram labels this frame as a boundary, then draws the same mark on both sides. The note beneath it reads: 'There was no other side.'\"}"
                   ]
                 },
                 "minecraft:custom_name": "{\"text\":\"Recovered field record\",\"italic\":false}"

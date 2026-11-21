@@ -35,7 +35,8 @@
                   "author": "Captain Rusk",
                   "pages": [
                     "{\"text\":\"The perimeter was intact at first watch. At second watch, every lookout reported movement beyond a different wall.\"}",
-                    "{\"text\":\"We were ordered to hold position. The command post was empty.\"}"
+                    "{\"text\":\"We were ordered to hold position. The command post was empty.\"}",
+                    "{\"text\":\"A mark is repeated in every hidden lower chamber: three short strokes around an empty center. The station timetable lists a final departure after the line had been sealed. The destination is written only as 'below'.\"}"
                   ]
                 },
                 "minecraft:custom_name": "{\"text\":\"Recovered field record\",\"italic\":false}"

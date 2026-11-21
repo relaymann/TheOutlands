@@ -35,7 +35,8 @@
                   "author": "Keeper",
                   "pages": [
                     "{\"text\":\"Three alcoves were prepared and left empty. The central tomb was sealed before the burial rites.\"}",
-                    "{\"text\":\"The stone above it is warm. The corridor is not.\"}"
+                    "{\"text\":\"The stone above it is warm. The corridor is not.\"}",
+                    "{\"text\":\"A mark is repeated in every hidden lower chamber: three short strokes around an empty center. The archive's oldest page lists these empty alcoves as 'occupied'. No names were ever added to the tombs.\"}"
                   ]
                 },
                 "minecraft:custom_name": "{\"text\":\"Recovered field record\",\"italic\":false}"

@@ -35,7 +35,8 @@
                   "author": "Station Clerk",
                   "pages": [
                     "{\"text\":\"Service suspended until further notice. No trains are scheduled, and no line is shown beyond the western tunnel.\"}",
-                    "{\"text\":\"The timetable has one departure written in fresh ink.\"}"
+                    "{\"text\":\"The timetable has one departure written in fresh ink.\"}",
+                    "{\"text\":\"A mark is repeated in every hidden lower chamber: three short strokes around an empty center. The crypt's oldest stone carries the station mark. The rail map and burial plan use the same impossible measurements.\"}"
                   ]
                 },
                 "minecraft:custom_name": "{\"text\":\"Recovered field record\",\"italic\":false}"

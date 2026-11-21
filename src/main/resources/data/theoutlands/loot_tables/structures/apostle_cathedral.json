@@ -35,7 +35,8 @@
                   "author": "A Prior",
                   "pages": [
                     "{\"text\":\"Seven alcoves. Seven vows. None of the names were written down.\"}",
-                    "{\"text\":\"The central altar was built last. The builders refused to enter the nave after sunset.\"}"
+                    "{\"text\":\"The central altar was built last. The builders refused to enter the nave after sunset.\"}",
+                    "{\"text\":\"A mark is repeated in every hidden lower chamber: three short strokes around an empty center. The settlement's well stones carry this mark. Its final inventory lists seven missing people, though the village had only six houses.\"}"
                   ]
                 },
                 "minecraft:custom_name": "{\"text\":\"Recovered field record\",\"italic\":false}"

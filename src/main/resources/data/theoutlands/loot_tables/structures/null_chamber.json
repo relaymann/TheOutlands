@@ -35,7 +35,8 @@
                   "author": "Observer",
                   "pages": [
                     "{\"text\":\"There is no instrument in this room. There is no reason for the needle to move.\"}",
-                    "{\"text\":\"I removed the marker. It was back when I returned, facing the door.\"}"
+                    "{\"text\":\"I removed the marker. It was back when I returned, facing the door.\"}",
+                    "{\"text\":\"A mark is repeated in every hidden lower chamber: three short strokes around an empty center. The observatory notes say the central mark was copied from a room with no recorded entrance. This chamber has the same measurements.\"}"
                   ]
                 },
                 "minecraft:custom_name": "{\"text\":\"Recovered field record\",\"italic\":false}"

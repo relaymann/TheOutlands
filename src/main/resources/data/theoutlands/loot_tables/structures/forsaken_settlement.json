@@ -35,7 +35,8 @@
                   "author": "E. Rowan",
                   "pages": [
                     "{\"text\":\"The harvest was stored and the doors were barred from the outside.\"}",
-                    "{\"text\":\"Every family left a place setting for someone who had not yet arrived.\"}"
+                    "{\"text\":\"Every family left a place setting for someone who had not yet arrived.\"}",
+                    "{\"text\":\"A mark is repeated in every hidden lower chamber: three short strokes around an empty center. The outpost roster names a settlement that does not appear on any surviving map. Its evacuation date is earlier than the first barricade order.\"}"
                   ]
                 },
                 "minecraft:custom_name": "{\"text\":\"Recovered field record\",\"italic\":false}"
