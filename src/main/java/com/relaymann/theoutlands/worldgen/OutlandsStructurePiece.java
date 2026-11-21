@@ -81,10 +81,10 @@ public final class OutlandsStructurePiece extends StructurePiece {
     private static boolean hasSuitableSurface(WorldGenLevel level,BoundingBox box,int expectedY) {
         for(int x=box.minX();x<=box.maxX();x+=4) {
             for(int z=box.minZ();z<=box.maxZ();z+=4) {
-                int top=level.getHeight(Heightmap.Types.WORLD_SURFACE_WG,x,z);
-                if(top<=level.getMinBuildHeight()||Math.abs(top-expectedY)>5) return false;
+                int top=level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,x,z);
+                if(top<=level.getMinBuildHeight()||Math.abs((top-1)-expectedY)>5) return false;
                 var surface=level.getBlockState(new BlockPos(x,top-1,z));
-                if(!surface.getFluidState().isEmpty()||surface.is(BlockTags.LEAVES)||surface.is(BlockTags.LOGS)) return false;
+                if(!surface.getFluidState().isEmpty()||surface.is(BlockTags.LOGS)) return false;
             }
         }
         return true;

@@ -37,17 +37,17 @@ public final class OutlandsStructure extends Structure {
 
         int x=context.chunkPos().getMinBlockX()-(size-16)/2;
         int z=context.chunkPos().getMinBlockZ()-(size-16)/2;
-        int sampleStep=Math.max(8,size/3);
         int min=Integer.MAX_VALUE,max=Integer.MIN_VALUE;
         for(int sx=0;sx<3;sx++)for(int sz=0;sz<3;sz++){
-            int x1=x+sx*sampleStep, z1=z+sz*sampleStep;
-            int x2=Math.min(x+size-1,x1+sampleStep-1);
-            int z2=Math.min(z+size-1,z1+sampleStep-1);
-            int height=Structure.getMeanFirstOccupiedHeight(context,x1,x2,z1,z2);
+            int sampleX=x+sx*(size-1)/2;
+            int sampleZ=z+sz*(size-1)/2;
+            int height=context.chunkGenerator().getFirstOccupiedHeight(sampleX,sampleZ,
+                    Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,context.heightAccessor(),context.randomState());
             min=Math.min(min,height);max=Math.max(max,height);
         }
         if(max-min>5) return Optional.empty();
-        int surfaceY=Structure.getMeanFirstOccupiedHeight(context,x,x+size-1,z,z+size-1);
+        int surfaceY=context.chunkGenerator().getFirstOccupiedHeight(x+size/2,z+size/2,
+                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,context.heightAccessor(),context.randomState());
         if(surfaceY<=context.heightAccessor().getMinBuildHeight()+48
                 ||surfaceY>=context.heightAccessor().getMaxBuildHeight()-16) return Optional.empty();
 
