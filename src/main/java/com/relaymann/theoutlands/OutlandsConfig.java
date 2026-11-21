@@ -24,6 +24,7 @@ public final class OutlandsConfig {
     public static final ModConfigSpec.BooleanValue OUTLANDS_STRUCTURES_ENABLED;
     public static final ModConfigSpec.DoubleValue STRUCTURE_MIN_DISTANCE;
     public static final ModConfigSpec.DoubleValue STRUCTURE_CHANCE_MULTIPLIER;
+    public static final ModConfigSpec.IntValue STRUCTURE_SPACING_CHUNKS;
     public static final ModConfigSpec.DoubleValue AMBIENT_ANOMALY_MIN_DISTANCE;
     public static final ModConfigSpec SPEC;
 
@@ -95,6 +96,9 @@ public final class OutlandsConfig {
         STRUCTURE_CHANCE_MULTIPLIER = BUILDER
                 .comment("Multiplies Outlands structure frequency. 1.0 is the intended default.")
                 .defineInRange("structureChanceMultiplier", 1.0D, 0.0D, 10.0D);
+        STRUCTURE_SPACING_CHUNKS = BUILDER
+                .comment("Minimum chunk spacing between Outlands structure candidate sites. Vanilla structures are unaffected.")
+                .defineInRange("structureSpacingChunks", 4, 1, 16);
         BUILDER.pop();
 
         SPEC = BUILDER.build();

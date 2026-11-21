@@ -26,51 +26,103 @@ public final class OutlandsStructureFeature extends Feature<NoneFeatureConfigura
 
     @Override public boolean place(FeaturePlaceContext<NoneFeatureConfiguration> c) {
         if (!OutlandsConfig.OUTLANDS_STRUCTURES_ENABLED.get()) return false;
-        WorldGenLevel l=c.level(); RandomSource r=c.random();
-        // Keep the largest 9x9 footprint inside the chunk being decorated.
-        int x=(c.origin().getX() & ~15)+3, z=(c.origin().getZ() & ~15)+3;
-        int y=l.getHeight(Heightmap.Types.WORLD_SURFACE_WG,x,z);
-        BlockPos sharedSpawn=l.getLevel().getSharedSpawnPos();
-        double dx=x-sharedSpawn.getX(), dz=z-sharedSpawn.getZ();
-        double dist=Math.sqrt(dx*dx+dz*dz);
-        double min=Math.max(1_000.0D,OutlandsConfig.STRUCTURE_MIN_DISTANCE.get());
-        if(dist<min||!stable(l,x,z,y)) return false;
-        double mult=OutlandsConfig.STRUCTURE_CHANCE_MULTIPLIER.get();
-        if(mult<=0) return false;
-        String biome=l.getBiome(new BlockPos(x,y,z)).unwrapKey()
-                .map(k->k.location().getPath()).orElse("");
-        boolean forest=biome.contains("forest")||biome.contains("taiga")
-                ||biome.contains("grove")||biome.contains("wooded");
-        // Priority batch 1: lore-forward locations with distinct silhouettes and interiors.
-        if(forest&&roll(r,5_500,mult)){cabin(l,x,y,z,r);return true;}
-        if(dist>=Math.max(min,1_800)&&roll(r,7_000,mult)){tower(l,x,y,z,r);return true;}
-        if(dist>=Math.max(min,2_500)&&roll(r,8_500,mult)){bunker(l,x,y,z,r);return true;}
-        if(dist>=Math.max(min,15_000)&&roll(r,14_000,mult)){shrine(l,x,y,z,r);return true;}
-        if(forest&&dist>=Math.max(min,22_000)&&roll(r,20_000,mult)){observatory(l,x,y,z,r);return true;}
-        if(dist>=Math.max(min,50_000)&&roll(r,32_000,mult)){archive(l,x,y,z,r);return true;}
-        if(dist>=Math.max(min,3_000)&&roll(r,10_000,mult)){researchFacility(l,x,y,z,r);return true;}
-        if(dist>=Math.max(min,12_000)&&roll(r,16_000,mult)){apostleCathedral(l,x,y,z,r);return true;}
-        if(dist>=Math.max(min,2_000)&&roll(r,8_000,mult)){forsakenSettlement(l,x,y,z,r);return true;}
-        if(dist>=Math.max(min,4_000)&&roll(r,12_000,mult)){lastOutpost(l,x,y,z,r);return true;}
-        // Priority batch 2: rarer, deeper sites with stronger ties to Null and Death.
-        if(dist>=Math.max(min,5_000)&&roll(r,15_000,mult)){forgottenStation(l,x,y,z,r);return true;}
-        if(dist>=Math.max(min,25_000)&&roll(r,28_000,mult)){nullChamber(l,x,y,z,r);return true;}
-        if(dist>=Math.max(min,35_000)&&roll(r,30_000,mult)){hollowCrypt(l,x,y,z,r);return true;}
-        if(dist>=Math.max(min,18_000)&&roll(r,22_000,mult)){boundaryMonument(l,x,y,z,r);return true;}
-        return false;
+        WorldGenLevel level = c.level();
+        int chunkX = Math.floorDiv(c.origin().getX(), 16);
+        int chunkZ = Math.floorDiv(c.origin().getZ(), 16);
+        long worldSeed = level.getLevel().getSeed();
+        int spacing = OutlandsConfig.STRUCTURE_SPACING_CHUNKS.get();
+        if (!StructurePlacementPolicy.isSpacedAnchor(worldSeed, chunkX, chunkZ, spacing)) return false;
+
+        RandomSource random = RandomSource.create(StructurePlacementPolicy.chunkSeed(worldSeed, chunkX, chunkZ));
+        int x = chunkX * 16 + 3;
+        int z = chunkZ * 16 + 3;
+        int y = level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, x, z);
+        BlockPos sharedSpawn = level.getLevel().getSharedSpawnPos();
+        double dx = x - sharedSpawn.getX();
+        double dz = z - sharedSpawn.getZ();
+        double distance = Math.sqrt(dx * dx + dz * dz);
+        double minimumDistance = Math.max(1_000.0D, OutlandsConfig.STRUCTURE_MIN_DISTANCE.get());
+        if (distance < minimumDistance || !stable(level, x, z, y)) return false;
+
+        String biome = level.getBiome(new BlockPos(x, y, z)).unwrapKey()
+                .map(key -> key.location().getPath()).orElse("");
+        boolean forest = biome.contains("forest") || biome.contains("taiga")
+                || biome.contains("grove") || biome.contains("wooded");
+        if (biome.contains("ocean") || biome.contains("river") || biome.contains("beach")) return false;
+
+        double multiplier = OutlandsConfig.STRUCTURE_CHANCE_MULTIPLIER.get();
+        if (multiplier <= 0.0D) return false;
+        double cellScale = StructurePlacementPolicy.CELL_CHUNKS * StructurePlacementPolicy.CELL_CHUNKS;
+        double[] weights = new double[14];
+        weights[0] = forest ? eligibleWeight(distance, minimumDistance, 1_000, 5_500, multiplier, cellScale) : 0;
+        weights[1] = eligibleWeight(distance, minimumDistance, 1_800, 7_000, multiplier, cellScale);
+        weights[2] = eligibleWeight(distance, minimumDistance, 2_500, 8_500, multiplier, cellScale);
+        weights[3] = eligibleWeight(distance, minimumDistance, 15_000, 14_000, multiplier, cellScale);
+        weights[4] = forest ? eligibleWeight(distance, minimumDistance, 22_000, 20_000, multiplier, cellScale) : 0;
+        weights[5] = eligibleWeight(distance, minimumDistance, 50_000, 32_000, multiplier, cellScale);
+        weights[6] = eligibleWeight(distance, minimumDistance, 3_000, 10_000, multiplier, cellScale);
+        weights[7] = eligibleWeight(distance, minimumDistance, 12_000, 16_000, multiplier, cellScale);
+        weights[8] = eligibleWeight(distance, minimumDistance, 2_000, 8_000, multiplier, cellScale);
+        weights[9] = eligibleWeight(distance, minimumDistance, 4_000, 12_000, multiplier, cellScale);
+        weights[10] = eligibleWeight(distance, minimumDistance, 5_000, 15_000, multiplier, cellScale);
+        weights[11] = eligibleWeight(distance, minimumDistance, 25_000, 28_000, multiplier, cellScale);
+        weights[12] = eligibleWeight(distance, minimumDistance, 35_000, 30_000, multiplier, cellScale);
+        weights[13] = eligibleWeight(distance, minimumDistance, 18_000, 22_000, multiplier, cellScale);
+
+        double totalWeight = 0.0D;
+        for (double weight : weights) totalWeight += weight;
+        if (totalWeight <= 0.0D || random.nextDouble() >= Math.min(1.0D, totalWeight)) return false;
+        double choice = random.nextDouble() * totalWeight;
+        int selected = weights.length - 1;
+        for (int i = 0; i < weights.length; i++) {
+            choice -= weights[i];
+            if (choice < 0.0D) { selected = i; break; }
+        }
+        switch (selected) {
+            case 0 -> cabin(level, x, y, z, random);
+            case 1 -> tower(level, x, y, z, random);
+            case 2 -> bunker(level, x, y, z, random);
+            case 3 -> shrine(level, x, y, z, random);
+            case 4 -> observatory(level, x, y, z, random);
+            case 5 -> archive(level, x, y, z, random);
+            case 6 -> researchFacility(level, x, y, z, random);
+            case 7 -> apostleCathedral(level, x, y, z, random);
+            case 8 -> forsakenSettlement(level, x, y, z, random);
+            case 9 -> lastOutpost(level, x, y, z, random);
+            case 10 -> forgottenStation(level, x, y, z, random);
+            case 11 -> nullChamber(level, x, y, z, random);
+            case 12 -> hollowCrypt(level, x, y, z, random);
+            case 13 -> boundaryMonument(level, x, y, z, random);
+            default -> { return false; }
+        }
+        return true;
     }
 
-    private static boolean roll(RandomSource r,int n,double m){return r.nextInt(Math.max(1,(int)Math.ceil(n/m)))==0;}
-    private static boolean stable(WorldGenLevel l,int x,int z,int y){
-        int lo=Integer.MAX_VALUE,hi=Integer.MIN_VALUE;
-        for(int a=0;a<9;a++)for(int b=0;b<9;b++){
-            int h=l.getHeight(Heightmap.Types.WORLD_SURFACE_WG,x+a,z+b);
-            lo=Math.min(lo,h);hi=Math.max(hi,h);
-            BlockState s=l.getBlockState(new BlockPos(x+a,h-1,z+b));
-            if(s.isAir()||!s.getFluidState().isEmpty())return false;
-        }
-        return hi-lo<=2&&y>l.getMinBuildHeight()+32;
+    private static double eligibleWeight(double distance, double configuredMinimum, double structureMinimum,
+                                         int denominator, double multiplier, double cellScale) {
+        return distance >= Math.max(configuredMinimum, structureMinimum)
+                ? cellScale * multiplier / denominator : 0.0D;
     }
+
+    private static boolean stable(WorldGenLevel level, int x, int z, int surfaceY) {
+        if (surfaceY <= level.getMinBuildHeight() + 32 || surfaceY >= level.getMaxBuildHeight() - 16) return false;
+        int lowest = Integer.MAX_VALUE;
+        int highest = Integer.MIN_VALUE;
+        for (int dx = 0; dx < 9; dx++) {
+            for (int dz = 0; dz < 9; dz++) {
+                int height = level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, x + dx, z + dz);
+                lowest = Math.min(lowest, height);
+                highest = Math.max(highest, height);
+                BlockPos surface = new BlockPos(x + dx, height - 1, z + dz);
+                BlockState top = level.getBlockState(surface);
+                if (top.isAir() || !top.getFluidState().isEmpty()
+                        || top.is(net.minecraft.tags.BlockTags.LEAVES)
+                        || top.is(net.minecraft.tags.BlockTags.LOGS)) return false;
+            }
+        }
+        return highest - lowest <= 2;
+    }
+
     private static void p(WorldGenLevel l,int x,int y,int z,BlockState s){l.setBlock(new BlockPos(x,y,z),s,2);}
     private static void air(WorldGenLevel l,int x,int y,int z){p(l,x,y,z,Blocks.AIR.defaultBlockState());}
     private static void chest(WorldGenLevel l,int x,int y,int z,String loot,RandomSource r){

@@ -118,3 +118,14 @@ As with the first batch, these are compact single-chunk features, appear only in
 - Null Chamber remains intentionally sparse, with four pillars and a single central marker.
 - Hollow Crypt has connected corridors, multiple empty tomb alcoves, and a sealed central burial feature.
 - Boundary Monument has broken concentric rings, tall asymmetrical uprights, and an empty freestanding frame; it creates no portal.
+
+
+## Structure placement foundation (Phase 1)
+
+Outlands structure placement now uses deterministic 8x8-chunk candidate cells. A seed-derived anchor is selected per cell, and nearby anchors compete by stable priority using a configurable minimum chunk spacing (default 4 chunks). This avoids repeated per-chunk random rolls and reduces clusters without searching or force-loading neighboring chunks.
+
+Eligible structures are selected with one weighted roll rather than a sequence of independent early-return rolls, so structures later in the registry are no longer suppressed by earlier checks. Per-cell probabilities are scaled to preserve approximately the previous per-area encounter rate. Placement is deterministic from the world seed and chunk coordinates.
+
+Sites reject ocean, river, and beach biomes, water/fluid surfaces, leaf/log canopy tops, steep footprints, and unsafe build-height margins. The 9x9 placement footprint remains inside the generating chunk. Vanilla terrain, caves, biome sources, and vanilla structure sets are unchanged.
+
+This is the generation-policy foundation; the current 14 structure builders are still single-chunk features. A native multi-chunk piece/template migration is a separate next step and is not claimed as complete by this phase.
