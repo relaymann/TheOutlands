@@ -186,7 +186,7 @@ public final class OutlandsStructureFeature {
                 if(edge)p(l,x+a,y+v,z+b,wall);else air(l,x+a,y+v,z+b);
             }
         }
-        air(l,x+w/2,y+1,z,); 
+        // Doorways are left open by the room caller where required.
     }
     private static void hallX(WorldGenLevel l,int x,int y,int z,int length,BlockState block) {
         for(int a=0;a<length;a++)for(int b=-2;b<=2;b++){
