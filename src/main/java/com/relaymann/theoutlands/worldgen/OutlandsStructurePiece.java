@@ -2,6 +2,8 @@ package com.relaymann.theoutlands.worldgen;
 
 import com.relaymann.theoutlands.OutlandsConfig;
 import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
@@ -47,6 +49,7 @@ public final class OutlandsStructurePiece extends StructurePiece {
         if(!OutlandsConfig.OUTLANDS_STRUCTURES_ENABLED.get()) return;
         // Never overwrite another mod or vanilla structure in this chunk.
         if(!structures.startsForStructure(chunkPos, candidate -> !(candidate instanceof OutlandsStructure)).isEmpty()) return;
+        if(!hasSuitableSurface(level,box,surfaceY)) return;
         BlockPos spawn=level.getLevel().getSharedSpawnPos();
         double dx=(anchorX+size/2.0D)-spawn.getX(),dz=(anchorZ+size/2.0D)-spawn.getZ();
         double distance=Math.sqrt(dx*dx+dz*dz);
@@ -72,5 +75,18 @@ public final class OutlandsStructurePiece extends StructurePiece {
             StructureEncounterManager.trySpawn(layout,level,
                     new BlockPos(anchorX+size/2,encounterY,anchorZ+size/2),distance,seed);
         }
+    }
+
+    /** Reject wet, wooded, or unexpectedly uneven chunk intersections instead of cutting through them. */
+    private static boolean hasSuitableSurface(WorldGenLevel level,BoundingBox box,int expectedY) {
+        for(int x=box.minX();x<=box.maxX();x+=4) {
+            for(int z=box.minZ();z<=box.maxZ();z+=4) {
+                int top=level.getHeight(Heightmap.Types.WORLD_SURFACE_WG,x,z);
+                if(top<=level.getMinBuildHeight()||Math.abs(top-expectedY)>5) return false;
+                var surface=level.getBlockState(new BlockPos(x,top-1,z));
+                if(!surface.getFluidState().isEmpty()||surface.is(BlockTags.LEAVES)||surface.is(BlockTags.LOGS)) return false;
+            }
+        }
+        return true;
     }
 }
