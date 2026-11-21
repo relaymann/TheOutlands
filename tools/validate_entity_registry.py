@@ -65,7 +65,7 @@ for field, entity_id in fields.items():
         continue
     renderer_name = match.group(1)
     src = read("java/com/relaymann/theoutlands/client/" + renderer_name + ".java")
-    model_match = re.search(r'new\s+([A-Za-z0-9_]+)\s*\(', src)
+    model_match = re.search(r'new\s+([A-Za-z0-9_]+Model)\s*\(', src)
     texture_match = re.search(r'textures/entity/([^"]+\.png)', src)
     if model_match:
         renderer_models[entity_id] = model_match.group(1)
