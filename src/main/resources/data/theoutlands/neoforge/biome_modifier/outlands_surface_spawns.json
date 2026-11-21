@@ -2,13 +2,13 @@
   "type": "neoforge:add_spawns",
   "biomes": "#minecraft:is_overworld",
   "spawners": [
-    { "type": "theoutlands:agitated_one", "weight": 1, "minCount": 1, "maxCount": 1 },
-    { "type": "theoutlands:hunter", "weight": 9, "minCount": 1, "maxCount": 1 },
-    { "type": "theoutlands:stalker", "weight": 12, "minCount": 1, "maxCount": 1 },
-    { "type": "theoutlands:mimic", "weight": 6, "minCount": 1, "maxCount": 1 },
-    { "type": "theoutlands:observer", "weight": 5, "minCount": 1, "maxCount": 1 },
-    { "type": "theoutlands:lurker", "weight": 28, "minCount": 1, "maxCount": 1 },
-    { "type": "theoutlands:howler", "weight": 12, "minCount": 1, "maxCount": 1 },
-    { "type": "theoutlands:fear", "weight": 1, "minCount": 1, "maxCount": 1 }
+    { "type": "theoutlands:agitated_one", "weight": 2, "minCount": 1, "maxCount": 1 },
+    { "type": "theoutlands:hunter", "weight": 18, "minCount": 1, "maxCount": 1 },
+    { "type": "theoutlands:stalker", "weight": 24, "minCount": 1, "maxCount": 1 },
+    { "type": "theoutlands:mimic", "weight": 12, "minCount": 1, "maxCount": 1 },
+    { "type": "theoutlands:observer", "weight": 12, "minCount": 1, "maxCount": 1 },
+    { "type": "theoutlands:lurker", "weight": 40, "minCount": 1, "maxCount": 1 },
+    { "type": "theoutlands:howler", "weight": 18, "minCount": 1, "maxCount": 1 },
+    { "type": "theoutlands:fear", "weight": 2, "minCount": 1, "maxCount": 1 }
   ]
 }
