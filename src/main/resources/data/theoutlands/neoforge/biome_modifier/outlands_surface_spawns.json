@@ -52,13 +52,13 @@
     },
     {
       "type": "theoutlands:pilgrim",
-      "weight": 5,
+      "weight": 8,
       "minCount": 1,
       "maxCount": 1
     },
     {
       "type": "theoutlands:colossus",
-      "weight": 1,
+      "weight": 2,
       "minCount": 1,
       "maxCount": 1
     }
