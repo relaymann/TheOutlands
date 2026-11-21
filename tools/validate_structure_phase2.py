@@ -87,6 +87,7 @@ def main():
     ss=json.loads((ROOT/"src/main/resources/data/theoutlands/worldgen/structure_set/outlands_sites.json").read_text())
     bt=json.loads((ROOT/"src/main/resources/data/theoutlands/tags/worldgen/biome/structure_land.json").read_text())
     assert sj["size"]==48 and sj["terrain_adaptation"]=="none"
+    assert isinstance(sj.get("spawn_overrides"), dict), "structure codec requires spawn_overrides object"
     assert ss["placement"]["spacing"]==1 and ss["placement"]["separation"]==0
     assert ss["placement"]["exclusion_zone"]=={"other_set":"minecraft:villages","chunk_count":8}
     assert "startsForStructure(chunkPos, candidate -> !(candidate instanceof OutlandsStructure))" in piece
