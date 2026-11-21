@@ -60,5 +60,16 @@ public final class OutlandsEntities {
             ENTITY_TYPES.register("agitated_one", () -> EntityType.Builder.of(AgitatedOneEntity::new, MobCategory.MONSTER)
                     .sized(0.82F, 2.4F).clientTrackingRange(24).updateInterval(2).build("theoutlands:agitated_one"));
 
+
+    public static final DeferredHolder<EntityType<?>, EntityType<LurkerEntity>> LURKER =
+            ENTITY_TYPES.register("lurker", () -> EntityType.Builder.of(LurkerEntity::new, MobCategory.MONSTER)
+                    .sized(0.72F, 2.35F).clientTrackingRange(20).updateInterval(2).build("theoutlands:lurker"));
+    public static final DeferredHolder<EntityType<?>, EntityType<HowlerEntity>> HOWLER =
+            ENTITY_TYPES.register("howler", () -> EntityType.Builder.of(HowlerEntity::new, MobCategory.MONSTER)
+                    .sized(0.82F, 2.65F).clientTrackingRange(24).updateInterval(2).build("theoutlands:howler"));
+    public static final DeferredHolder<EntityType<?>, EntityType<DredgeEntity>> DREDGE =
+            ENTITY_TYPES.register("dredge", () -> EntityType.Builder.of(DredgeEntity::new, MobCategory.MONSTER)
+                    .sized(0.95F, 1.15F).clientTrackingRange(20).updateInterval(2).build("theoutlands:dredge"));
+
     private OutlandsEntities() {}
 }

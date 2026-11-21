@@ -135,4 +135,73 @@ def charge(t, d, i, n):
 charge.a, charge.b, charge.hit = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
 make("agitated_charge", 1.0, charge)
 
-print("Generated seven original entity sound effects in", OUT)
+
+# Lurker: close, wet breathing and a short claw scrape.
+def lurker_breath(t, d, i, n):
+    s = lurker_breath.state
+    air = noise(t, 180, 1450, s)
+    rasp = noise(t, 900, 3600, lurker_breath.grit)
+    pulse = max(0.0, math.sin(2 * math.pi * 0.72 * t + .3)) ** 2
+    return fade(t, d, .08, .24) * (.31 * air * (.2 + pulse) + .13 * rasp * pulse + .045 * math.sin(2 * math.pi * 49 * t))
+lurker_breath.state, lurker_breath.grit = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
+make("lurker_breath", 2.0, lurker_breath)
+
+def lurker_hit(t, d, i, n):
+    a = noise(t, 90, 900, lurker_hit.a)
+    b = noise(t, 1200, 5200, lurker_hit.b)
+    return .44 * a * math.exp(-t * 16) + .18 * b * math.exp(-t * 37) + .2 * math.sin(2 * math.pi * 63 * t) * math.exp(-t * 11)
+lurker_hit.a, lurker_hit.b = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
+make("lurker_hit", .72, lurker_hit)
+
+# Howler: a rising, breathy throat call with a long, uneven harmonic tail.
+def howler_call(t, d, i, n):
+    p = t / d
+    f = 72 + 112 * p
+    phase = 2 * math.pi * (72 * t + 56 * t * t / d)
+    a = noise(t, 130, 1000, howler_call.a)
+    b = noise(t, 700, 2600, howler_call.b)
+    wobble = math.sin(2 * math.pi * (2.1 + p) * t)
+    return fade(t, d, .16, .52) * (.34 * math.sin(phase + wobble) + .21 * math.sin(phase * 1.49) + .2 * a + .1 * b)
+howler_call.a, howler_call.b = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
+make("howler_call", 3.1, howler_call)
+
+def howler_breath(t, d, i, n):
+    a = noise(t, 100, 720, howler_breath.a)
+    b = noise(t, 600, 2100, howler_breath.b)
+    gate = max(0.0, math.sin(2 * math.pi * .55 * t)) ** 2
+    return fade(t, d, .1, .2) * (.3 * a * gate + .16 * b * gate)
+howler_breath.a, howler_breath.b = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
+make("howler_breath", 2.4, howler_breath)
+
+def howler_hit(t, d, i, n):
+    a = noise(t, 60, 1200, howler_hit.a)
+    b = noise(t, 900, 4300, howler_hit.b)
+    return .48 * a * math.exp(-t * 12) + .18 * b * math.exp(-t * 31)
+howler_hit.a, howler_hit.b = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
+make("howler_hit", .8, howler_hit)
+
+# Dredge: low, irregular scraping with a fast attack rush and impact.
+def dredge_crawl(t, d, i, n):
+    a = noise(t, 65, 500, dredge_crawl.a)
+    b = noise(t, 500, 2200, dredge_crawl.b)
+    grit = max(0.0, math.sin(2 * math.pi * 4.2 * t + .5)) ** 7
+    return fade(t, d, .04, .18) * (.32 * a + .2 * b * grit + .1 * math.sin(2 * math.pi * 37 * t))
+dredge_crawl.a, dredge_crawl.b = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
+make("dredge_crawl", 1.8, dredge_crawl)
+
+def dredge_lunge(t, d, i, n):
+    a = noise(t, 90, 1500, dredge_lunge.a)
+    b = noise(t, 1100, 6200, dredge_lunge.b)
+    sweep = math.sin(2 * math.pi * (160 * t - 75 * t * t))
+    return .32 * a * math.exp(-t * 3.8) + .2 * b * math.exp(-t * 8) + .12 * sweep * math.exp(-t * 5)
+dredge_lunge.a, dredge_lunge.b = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
+make("dredge_lunge", 1.05, dredge_lunge)
+
+def dredge_hit(t, d, i, n):
+    a = noise(t, 50, 800, dredge_hit.a)
+    b = noise(t, 800, 4600, dredge_hit.b)
+    return .5 * a * math.exp(-t * 15) + .22 * b * math.exp(-t * 34) + .12 * math.sin(2 * math.pi * 51 * t) * math.exp(-t * 9)
+dredge_hit.a, dredge_hit.b = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
+make("dredge_hit", .7, dredge_hit)
+
+print("Generated sixteen original entity sound effects in", OUT)

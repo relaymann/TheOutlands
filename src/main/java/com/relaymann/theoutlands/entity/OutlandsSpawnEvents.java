@@ -32,6 +32,9 @@ public final class OutlandsSpawnEvents {
         registerGround(event, OutlandsEntities.OBSERVER.get(), Monster::checkMonsterSpawnRules);
         registerGround(event, OutlandsEntities.STILLBORN_STATUE.get(), OutlandsSpawnEvents::statueSpawn);
         registerGround(event, OutlandsEntities.AGITATED_ONE.get(), Monster::checkMonsterSpawnRules);
+        registerGround(event, OutlandsEntities.LURKER.get(), OutlandsSpawnEvents::woodlandSpawn);
+        registerGround(event, OutlandsEntities.HOWLER.get(), Monster::checkMonsterSpawnRules);
+        registerGround(event, OutlandsEntities.DREDGE.get(), OutlandsSpawnEvents::dredgeSpawn);
     }
 
     private static <T extends net.minecraft.world.entity.Mob> void registerGround(
@@ -64,6 +67,23 @@ public final class OutlandsSpawnEvents {
         return Monster.checkMonsterSpawnRules(type, level, reason, pos, random)
                 && pos.getY() <= 64
                 && level.getBrightness(LightLayer.BLOCK, pos) <= 5;
+    }
+
+
+    private static boolean woodlandSpawn(net.minecraft.world.entity.EntityType<? extends Monster> type,
+            ServerLevelAccessor level, net.minecraft.world.entity.MobSpawnType reason,
+            BlockPos pos, RandomSource random) {
+        return Monster.checkMonsterSpawnRules(type, level, reason, pos, random)
+                && level.getBrightness(LightLayer.BLOCK, pos) <= 9
+                && level.getBiome(pos).is(net.minecraft.tags.BiomeTags.IS_FOREST);
+    }
+
+    private static boolean dredgeSpawn(net.minecraft.world.entity.EntityType<? extends Monster> type,
+            ServerLevelAccessor level, net.minecraft.world.entity.MobSpawnType reason,
+            BlockPos pos, RandomSource random) {
+        return Monster.checkMonsterSpawnRules(type, level, reason, pos, random)
+                && level.getBrightness(LightLayer.BLOCK, pos) <= 8
+                && pos.getY() <= 80;
     }
 
     private static boolean almightySpawn(net.minecraft.world.entity.EntityType<? extends Monster> type,

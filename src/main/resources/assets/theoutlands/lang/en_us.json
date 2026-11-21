@@ -9,5 +9,8 @@
   "item.theoutlands.almighty_fragment": "author.dat",
   "item.theoutlands.almighty_fragment.lore": "The file was not found in the mod. It was written into the world.",
   "item.theoutlands.the_last_page": "the_last_page",
-  "item.theoutlands.the_last_page.lore": "No source code. Only a world seed, a time, and one sentence: YOU WERE HERE BEFORE THE WORLD LOADED."
+  "item.theoutlands.the_last_page.lore": "No source code. Only a world seed, a time, and one sentence: YOU WERE HERE BEFORE THE WORLD LOADED.",
+  "entity.theoutlands.lurker": "The Lurker",
+  "entity.theoutlands.howler": "The Howler",
+  "entity.theoutlands.dredge": "The Dredge"
 }

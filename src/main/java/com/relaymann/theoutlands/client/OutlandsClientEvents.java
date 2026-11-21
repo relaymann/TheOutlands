@@ -25,6 +25,9 @@ public final class OutlandsClientEvents {
         event.registerEntityRenderer(OutlandsEntities.MIMIC.get(), MimicRenderer::new);
         event.registerEntityRenderer(OutlandsEntities.STILLBORN_STATUE.get(), StillbornStatueRenderer::new);
         event.registerEntityRenderer(OutlandsEntities.AGITATED_ONE.get(), AgitatedOneRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.LURKER.get(), LurkerRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.HOWLER.get(), HowlerRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.DREDGE.get(), DredgeRenderer::new);
     }
 
     @SubscribeEvent
@@ -42,5 +45,8 @@ public final class OutlandsClientEvents {
         event.registerLayerDefinition(MimicRenderer.LAYER, MimicRenderer::createBodyLayer);
         event.registerLayerDefinition(StillbornStatueRenderer.LAYER, StillbornStatueRenderer::createBodyLayer);
         event.registerLayerDefinition(AgitatedOneRenderer.LAYER, AgitatedOneRenderer::createBodyLayer);
+        event.registerLayerDefinition(LurkerRenderer.LAYER, LurkerRenderer::createBodyLayer);
+        event.registerLayerDefinition(HowlerRenderer.LAYER, HowlerRenderer::createBodyLayer);
+        event.registerLayerDefinition(DredgeRenderer.LAYER, DredgeRenderer::createBodyLayer);
     }
 }

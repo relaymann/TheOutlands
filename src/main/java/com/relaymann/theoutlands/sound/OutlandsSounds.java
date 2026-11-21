@@ -22,5 +22,14 @@ public final class OutlandsSounds {
  public static final DeferredHolder<SoundEvent,SoundEvent> AGITATED_WARNING=register("agitated_warning");
  public static final DeferredHolder<SoundEvent,SoundEvent> AGITATED_CHARGE=register("agitated_charge");
  private static DeferredHolder<SoundEvent,SoundEvent> register(String name){ResourceLocation id=ResourceLocation.fromNamespaceAndPath(TheOutlands.MOD_ID,name);return SOUNDS.register(name,()->SoundEvent.createVariableRangeEvent(id));}
+
+ public static final DeferredHolder<SoundEvent,SoundEvent> LURKER_BREATH=register("lurker_breath");
+ public static final DeferredHolder<SoundEvent,SoundEvent> LURKER_HIT=register("lurker_hit");
+ public static final DeferredHolder<SoundEvent,SoundEvent> HOWLER_BREATH=register("howler_breath");
+ public static final DeferredHolder<SoundEvent,SoundEvent> HOWLER_CALL=register("howler_call");
+ public static final DeferredHolder<SoundEvent,SoundEvent> HOWLER_HIT=register("howler_hit");
+ public static final DeferredHolder<SoundEvent,SoundEvent> DREDGE_CRAWL=register("dredge_crawl");
+ public static final DeferredHolder<SoundEvent,SoundEvent> DREDGE_LUNGE=register("dredge_lunge");
+ public static final DeferredHolder<SoundEvent,SoundEvent> DREDGE_HIT=register("dredge_hit");
  private OutlandsSounds(){}
 }
