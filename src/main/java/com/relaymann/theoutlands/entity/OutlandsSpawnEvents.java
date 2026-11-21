@@ -4,7 +4,6 @@ import com.relaymann.theoutlands.OutlandsConfig;
 import com.relaymann.theoutlands.TheOutlands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
@@ -26,7 +25,6 @@ import java.util.List;
 /** Server-side habitat rules and distance/threat-budget balancing for natural spawns. */
 @EventBusSubscriber(modid = TheOutlands.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public final class OutlandsSpawnEvents {
-    private static final double PLAYER_SCAN_RADIUS = 128.0D;
     private static final double ENCOUNTER_RADIUS = 96.0D;
 
     private OutlandsSpawnEvents() {}
@@ -91,24 +89,11 @@ public final class OutlandsSpawnEvents {
         int denominator = distanceDenominator * profile.rarityMultiplier();
         if (denominator > 1 && random.nextInt(denominator) != 0) return false;
 
-        List<ServerPlayer> players = serverLevel.getEntitiesOfClass(ServerPlayer.class,
-                new AABB(pos).inflate(PLAYER_SCAN_RADIUS),
-                player -> player.isAlive() && !player.isSpectator() && !player.isCreative());
-        ServerPlayer nearest = null;
-        double nearestDistance = Double.MAX_VALUE;
-        for (ServerPlayer player : players) {
-            double candidateDistance = player.distanceToSqr(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D);
-            if (candidateDistance < nearestDistance) {
-                nearestDistance = candidateDistance;
-                nearest = player;
-            }
-        }
-        // Natural spawn attempts outside an active player's vicinity are not
-        // part of a player encounter and should not be artificially throttled.
-        if (nearest == null) return true;
-
+        // Budget around the candidate spawn location rather than the nearest
+        // player. This also constrains chunk-generation spawns, which can run
+        // before a player is close enough to be found.
         List<Mob> nearby = serverLevel.getEntitiesOfClass(Mob.class,
-                new AABB(nearest.blockPosition()).inflate(ENCOUNTER_RADIUS),
+                new AABB(pos).inflate(ENCOUNTER_RADIUS),
                 OutlandsSpawnEvents::isOutlandsCreature);
         int threatPoints = 0;
         for (Mob mob : nearby) {
