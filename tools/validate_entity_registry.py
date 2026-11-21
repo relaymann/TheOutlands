@@ -113,8 +113,8 @@ def audit_once():
                 header = image.read(24)
             if len(header) != 24 or header[:8] != b"\x89PNG\r\n\x1a\n":
                 errors.append(entity_id + ": invalid PNG texture")
-            elif struct.unpack(">II", header[16:24]) != (64, 64):
-                errors.append(entity_id + ": texture is not 64x64")
+            elif struct.unpack(">II", header[16:24]) != ((128, 128) if entity_id == "colossus" else (64, 64)):
+                errors.append(entity_id + ": texture dimensions do not match model UV atlas")
 
         sound = sound_map.get(entity_id)
         if not sound or sound not in registered_sounds: errors.append(entity_id + ": unregistered sound")
@@ -125,6 +125,16 @@ def audit_once():
             if not generated and not committed: errors.append(entity_id + ": no generated/committed OGG")
 
     if len(set(textures.values())) != EXPECTED: errors.append("entity texture paths are not unique")
+    new_models = read("java/com/relaymann/theoutlands/client/NewEntityRenderers.java")
+    if "LayerDefinition.create(m,128,128)" not in new_models:
+        errors.append("Colossus 128x128 UV atlas is not registered")
+    for renderer in ("PilgrimRenderer", "CeilingDwellerRenderer", "ColossusRenderer"):
+        if renderer not in renderers:
+            errors.append(renderer + ": missing renderer registration")
+    if "COLOSSUS_WARNING" not in sounds_java or "COLOSSUS_STOMP" not in sounds_java:
+        errors.append("Colossus telegraph/impact sounds are not registered")
+    if "CEILING_DROP" not in sounds_java or "PILGRIM_STEP" not in sounds_java:
+        errors.append("new entity action sounds are not registered")
     if len(set(model_map.values())) != EXPECTED: errors.append("entity model mapping is not unique")
     if len(layer_fields) != EXPECTED: errors.append("not all entity model layers are registered")
     if "SoundEvents.WARDEN_ROAR" in almighty_encounter: errors.append("Almighty uses a vanilla placeholder sound")
