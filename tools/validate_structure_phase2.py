@@ -67,6 +67,8 @@ def main():
     bt=json.loads((ROOT/"src/main/resources/data/theoutlands/tags/worldgen/biome/structure_land.json").read_text())
     assert sj["size"]==48 and sj["terrain_adaptation"]=="none"
     assert ss["placement"]["spacing"]==1 and ss["placement"]["separation"]==0
+    assert ss["placement"]["exclusion_zone"]=={"other_set":"minecraft:villages","chunk_count":8}
+    assert "startsForStructure(chunkPos, candidate -> !(candidate instanceof OutlandsStructure))" in piece
     assert not any("ocean" in b or b.endswith(":river") or b.endswith(":beach") for b in bt["values"])
     excluded=(":stony_shore",":dripstone_caves",":lush_caves",":deep_dark",":swamp",":mangrove_swamp")
     assert not any(b.endswith(s) for b in bt["values"] for s in excluded)

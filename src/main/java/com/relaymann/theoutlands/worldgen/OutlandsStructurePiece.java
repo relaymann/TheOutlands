@@ -45,6 +45,8 @@ public final class OutlandsStructurePiece extends StructurePiece {
     public void postProcess(WorldGenLevel level,StructureManager structures,ChunkGenerator generator,
                             RandomSource random,BoundingBox box,ChunkPos chunkPos,BlockPos pivot) {
         if(!OutlandsConfig.OUTLANDS_STRUCTURES_ENABLED.get()) return;
+        // Never overwrite another mod or vanilla structure in this chunk.
+        if(!structures.startsForStructure(chunkPos, candidate -> !(candidate instanceof OutlandsStructure)).isEmpty()) return;
         BlockPos spawn=level.getLevel().getSharedSpawnPos();
         double dx=(anchorX+size/2.0D)-spawn.getX(),dz=(anchorZ+size/2.0D)-spawn.getZ();
         double distance=Math.sqrt(dx*dx+dz*dz);
