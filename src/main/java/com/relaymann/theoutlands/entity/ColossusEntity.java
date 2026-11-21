@@ -50,7 +50,7 @@ public final class ColossusEntity extends Monster {
 
     @Override
     protected void registerGoals() {
-        goalSelector.addGoal(6, new RandomStrollGoal(this, 0.48D, 0.002F));
+        goalSelector.addGoal(6, new RandomStrollGoal(this, 0.48D));
         goalSelector.addGoal(7, new RandomLookAroundGoal(this));
         targetSelector.addGoal(1, new HurtByTargetGoal(this));
         targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 24, true, false,
