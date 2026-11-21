@@ -258,7 +258,7 @@ public final class OutlandsStructureFeature {
         p(l,rx+6,y+1,rz+5,Blocks.SOUL_LANTERN.defaultBlockState());
         switch(id) {
             case "cabin" -> { p(l,rx+2,y+1,rz+4,Blocks.BARREL.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.CAMPFIRE.defaultBlockState()); }
-            case "tower" -> { p(l,rx+2,y+1,rz+4,Blocks.TARGET.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.ARROW.defaultBlockState()); }
+            case "tower" -> { p(l,rx+2,y+1,rz+4,Blocks.TARGET.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.HAY_BLOCK.defaultBlockState()); }
             case "bunker" -> { p(l,rx+2,y+1,rz+4,Blocks.IRON_BARS.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.REDSTONE_LAMP.defaultBlockState()); }
             case "shrine" -> { p(l,rx+2,y+1,rz+4,Blocks.CRYING_OBSIDIAN.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.BLACKSTONE.defaultBlockState()); }
             case "observatory" -> { p(l,rx+2,y+1,rz+4,Blocks.END_ROD.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.AMETHYST_BLOCK.defaultBlockState()); }
@@ -267,7 +267,7 @@ public final class OutlandsStructureFeature {
             case "apostle_cathedral" -> { p(l,rx+2,y+1,rz+4,Blocks.CHISELED_POLISHED_BLACKSTONE.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.CRYING_OBSIDIAN.defaultBlockState()); }
             case "forsaken_settlement" -> { p(l,rx+2,y+1,rz+4,Blocks.BARREL.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.WHITE_BED.defaultBlockState()); }
             case "last_outpost" -> { p(l,rx+2,y+1,rz+4,Blocks.COBBLESTONE_WALL.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.TARGET.defaultBlockState()); }
-            case "forgotten_station" -> { p(l,rx+2,y+1,rz+4,Blocks.RAIL.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.MINECART.defaultBlockState()); }
+            case "forgotten_station" -> { p(l,rx+2,y+1,rz+4,Blocks.RAIL.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.POWERED_RAIL.defaultBlockState()); }
             case "null_chamber" -> { p(l,rx+2,y+1,rz+4,Blocks.BLACK_CONCRETE.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.CRYING_OBSIDIAN.defaultBlockState()); }
             case "hollow_crypt" -> { p(l,rx+2,y+1,rz+4,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.BONE_BLOCK.defaultBlockState()); }
             case "boundary_monument" -> { p(l,rx+2,y+1,rz+4,Blocks.CHISELED_STONE_BRICKS.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.CRYING_OBSIDIAN.defaultBlockState()); }
