@@ -58,5 +58,17 @@ public final class OutlandsStructurePiece extends StructurePiece {
         if(layout==null) return;
         OutlandsStructureFeature.generateLayout(layout,level,anchorX,surfaceY,anchorZ,
                 RandomSource.create(seed ^ 0x6A09E667F3BCC909L),box);
+        int centerChunkX=Math.floorDiv(anchorX+size/2,16);
+        int centerChunkZ=Math.floorDiv(anchorZ+size/2,16);
+        if(chunkPos.x==centerChunkX&&chunkPos.z==centerChunkZ) {
+            int encounterY=switch(layout) {
+                case "bunker" -> surfaceY-12; case "archive" -> surfaceY-25;
+                case "research_facility" -> surfaceY-10; case "forgotten_station" -> surfaceY-8;
+                case "null_chamber" -> surfaceY-18; case "hollow_crypt" -> surfaceY-22;
+                default -> surfaceY+1;
+            };
+            StructureEncounterManager.trySpawn(layout,level,
+                    new BlockPos(anchorX+size/2,encounterY,anchorZ+size/2),distance,seed);
+        }
     }
 }

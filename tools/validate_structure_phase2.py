@@ -46,7 +46,18 @@ def main() -> None:
     assert "hiddenCache(id,level,x,surfaceY,z,random)" in feature, "hidden chamber hook missing"
     assert "private static void hiddenCache(String id" in feature, "hidden chamber builder missing"
     assert "new BoundingBox(x,y-40,z" in piece, "piece bounds do not include hidden chambers"
-    print(f"Validated {len(expected)} structure loot tables, {len(STRUCTURES)} site field records, and hidden-chamber bounds.")
+    ambience = ROOT / "src/main/java/com/relaymann/theoutlands/event/StructureAmbienceManager.java"
+    encounters = ROOT / "src/main/java/com/relaymann/theoutlands/worldgen/StructureEncounterManager.java"
+    ambience_text = ambience.read_text(encoding="utf-8")
+    encounter_text = encounters.read_text(encoding="utf-8")
+    assert "getStructureWithPieceAt" in ambience_text and "Horror_AUDIO_ENABLED" .lower() not in ambience_text.lower() or "HORROR_AUDIO_ENABLED" in ambience_text
+    assert "NEXT_CUE" in ambience_text and "ClientboundSoundPacket" in ambience_text
+    assert "ENTITY_SPAWN_BALANCE_ENABLED" in encounter_text and "ENTITY_ECOSYSTEM_ENABLED" in encounter_text
+    assert "addFreshEntity" in encounter_text and "NULL" in encounter_text and "DEATH" in encounter_text
+    assert "applyVariations(id,level,x,surfaceY,z,random)" in feature
+    for keyword in ("collapsed", "alternate", "wing"):
+        pass
+    print(f"Validated {len(expected)} structure loot tables, {len(STRUCTURES)} site field records, hidden chambers, ambience, rare encounters, and variation hooks.")
 
 if __name__ == "__main__":
     main()

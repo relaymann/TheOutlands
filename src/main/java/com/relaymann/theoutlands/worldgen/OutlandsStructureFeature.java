@@ -79,6 +79,7 @@ public final class OutlandsStructureFeature {
             }
             expand(id,level,x,surfaceY,z);
             hiddenCache(id,level,x,surfaceY,z,random);
+            applyVariations(id,level,x,surfaceY,z,random);
         } finally {
             ACTIVE_CLIP.remove();
         }
@@ -273,6 +274,95 @@ public final class OutlandsStructureFeature {
             case "boundary_monument" -> { p(l,rx+2,y+1,rz+4,Blocks.CHISELED_STONE_BRICKS.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.CRYING_OBSIDIAN.defaultBlockState()); }
         }
         chest(l,rx+6,y+1,rz+4,"theoutlands:structures/hidden_cache",r);
+    }
+
+
+    /** Seeded layout variants: optional wings, collapsed sections, debris, and furnishings. */
+    private static void applyVariations(String id,WorldGenLevel l,int x,int y,int z,RandomSource r) {
+        int variant=r.nextInt(4);
+        switch(id) {
+            case "research_facility" -> {
+                if(variant!=0) room(l,x+2,y-12,z+34,9,8,4,Blocks.IRON_BLOCK.defaultBlockState(),
+                        Blocks.POLISHED_ANDESITE.defaultBlockState(),Blocks.IRON_BLOCK.defaultBlockState());
+                if(variant==2) { air(l,x+19,y-10,z+2); p(l,x+19,y-12,z+2,Blocks.IRON_BARS.defaultBlockState()); }
+            }
+            case "apostle_cathedral" -> {
+                if(variant==1||variant==3) room(l,x+34,y,z+18,10,12,5,
+                        Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState(),Blocks.CRACKED_STONE_BRICKS.defaultBlockState(),
+                        Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState());
+                if(variant==3) p(l,x+23,y+7,z+23,Blocks.CHAIN.defaultBlockState());
+            }
+            case "forsaken_settlement" -> {
+                if(variant==1||variant==2) shed(l,x+33,y,z+19,Blocks.MOSSY_OAK_PLANKS.defaultBlockState());
+                if(variant==3) { p(l,x+22,y+1,z+22,Blocks.COBWEB.defaultBlockState()); p(l,x+23,y+1,z+22,Blocks.BARREL.defaultBlockState()); }
+            }
+            case "last_outpost" -> {
+                if(variant!=0) watchPost(l,x+(variant==1?8:38),y,z+(variant==2?8:38));
+                if(variant==3) room(l,x+2,y,z+18,10,9,4,Blocks.COBBLESTONE.defaultBlockState(),
+                        Blocks.SPRUCE_PLANKS.defaultBlockState(),Blocks.SPRUCE_PLANKS.defaultBlockState());
+            }
+            case "forgotten_station" -> {
+                if(variant!=0) room(l,x+33,y-10,z+2,11,10,4,Blocks.DEEPSLATE_BRICKS.defaultBlockState(),
+                        Blocks.STONE_BRICKS.defaultBlockState(),Blocks.POLISHED_ANDESITE.defaultBlockState());
+                if(variant==2) for(int a=0;a<6;a++) p(l,x+35+a,y-9,z+22,Blocks.RAIL.defaultBlockState());
+            }
+            case "null_chamber" -> {
+                if(variant==3) room(l,x+2,y-20,z+18,9,9,4,Blocks.BLACKSTONE.defaultBlockState(),
+                        Blocks.POLISHED_DEEPSLATE.defaultBlockState(),Blocks.BLACKSTONE.defaultBlockState());
+                if(variant==1) p(l,x+24,y-19,z+24,Blocks.CRYING_OBSIDIAN.defaultBlockState());
+            }
+            case "hollow_crypt" -> {
+                if(variant!=0) room(l,x+34,y-24,z+33,10,10,4,Blocks.DEEPSLATE_BRICKS.defaultBlockState(),
+                        Blocks.POLISHED_DEEPSLATE.defaultBlockState(),Blocks.DEEPSLATE_BRICKS.defaultBlockState());
+                if(variant==2) p(l,x+39,y-23,z+38,Blocks.COBWEB.defaultBlockState());
+            }
+            case "boundary_monument" -> {
+                if(variant==1||variant==3) obelisk(l,x+24,y,z+5,11,Blocks.CHISELED_STONE_BRICKS.defaultBlockState());
+                if(variant==2) { air(l,x+4,y+2,z+4); p(l,x+4,y+1,z+4,Blocks.MOSSY_STONE_BRICKS.defaultBlockState()); }
+            }
+            case "cabin" -> {
+                if(variant==2) shed(l,x+33,y,z+33,Blocks.SPRUCE_PLANKS.defaultBlockState());
+                if(variant==3) p(l,x+23,y+1,z+23,Blocks.COBWEB.defaultBlockState());
+            }
+            case "tower" -> {
+                if(variant==1||variant==3) watchPost(l,x+38,y,z+38);
+                if(variant==2) p(l,x+23,y+1,z+23,Blocks.BARREL.defaultBlockState());
+            }
+            case "bunker" -> {
+                if(variant!=0) room(l,x+34,y-14,z+3,10,9,4,Blocks.POLISHED_DEEPSLATE.defaultBlockState(),
+                        Blocks.CRACKED_STONE_BRICKS.defaultBlockState(),Blocks.STONE_BRICKS.defaultBlockState());
+                if(variant==2) p(l,x+38,y-13,z+7,Blocks.IRON_BARS.defaultBlockState());
+            }
+            case "shrine" -> {
+                if(variant==3) obelisk(l,x+24,y,z+5,8,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState());
+                if(variant==1) p(l,x+23,y+1,z+23,Blocks.CRYING_OBSIDIAN.defaultBlockState());
+            }
+            case "observatory" -> {
+                if(variant!=0) obelisk(l,x+24,y,z+5,10,Blocks.BLACKSTONE.defaultBlockState());
+                if(variant==2) p(l,x+23,y+1,z+23,Blocks.AMETHYST_BLOCK.defaultBlockState());
+            }
+            case "archive" -> {
+                if(variant!=0) room(l,x+34,y-27,z+3,10,9,5,Blocks.DEEPSLATE_BRICKS.defaultBlockState(),
+                        Blocks.BOOKSHELF.defaultBlockState(),Blocks.POLISHED_DEEPSLATE.defaultBlockState());
+                if(variant==2) p(l,x+39,y-26,z+7,Blocks.COBWEB.defaultBlockState());
+            }
+        }
+        // A handful of deterministic signs of age; all writes remain inside the structure clip.
+        int floorY=switch(id) {
+            case "bunker" -> y-14; case "archive" -> y-27; case "research_facility" -> y-12;
+            case "forgotten_station" -> y-10; case "null_chamber" -> y-20; case "hollow_crypt" -> y-24;
+            default -> y;
+        };
+        for(int i=0;i<5;i++) {
+            int px=x+5+r.nextInt(38), pz=z+5+r.nextInt(38);
+            if(r.nextBoolean()) p(l,px,floorY+1,pz,Blocks.COBWEB.defaultBlockState());
+            else if(r.nextBoolean()) p(l,px,floorY,pz,Blocks.MOSSY_COBBLESTONE.defaultBlockState());
+        }
+        if(variant==3) {
+            int dx=x+8+r.nextInt(32), dz=z+8+r.nextInt(32);
+            p(l,dx,floorY,dz,Blocks.GRAVEL.defaultBlockState());
+            p(l,dx+1,floorY,dz,Blocks.COBBLESTONE.defaultBlockState());
+        }
     }
 
     private static BlockState log(){return Blocks.SPRUCE_LOG.defaultBlockState()

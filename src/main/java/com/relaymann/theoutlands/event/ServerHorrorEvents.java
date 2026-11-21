@@ -38,6 +38,7 @@ public final class ServerHorrorEvents {
             ClientAfterimageManager.tick(level);
             if (event.getServer().getTickCount() % 20 == 0) {
                 EnvironmentalAnomalyManager.tick(level);
+                StructureAmbienceManager.tick(level);
             }
         }
     }
@@ -85,6 +86,7 @@ public final class ServerHorrorEvents {
         ClientAfterimageManager.clear();
         FootstepEchoManager.clear();
         EnvironmentalAnomalyManager.clear();
+        StructureAmbienceManager.clear();
         OutlandsIntelligenceManager.clear();
     }
 }

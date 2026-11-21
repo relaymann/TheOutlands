@@ -1,0 +1,91 @@
+package com.relaymann.theoutlands.event;
+
+import com.relaymann.theoutlands.OutlandsConfig;
+import com.relaymann.theoutlands.worldgen.OutlandsStructureFeature;
+import com.relaymann.theoutlands.worldgen.OutlandsWorldgen;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.protocol.game.ClientboundSoundPacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.level.Level;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+/** Quiet, player-private audio details while exploring an Outlands structure. */
+public final class StructureAmbienceManager {
+    private static final Map<UUID,Long> NEXT_CUE=new HashMap<>();
+    private StructureAmbienceManager() {}
+
+    public static void tick(ServerLevel level) {
+        if(!level.dimension().equals(Level.OVERWORLD)
+                || !OutlandsConfig.OUTLANDS_STRUCTURES_ENABLED.get()
+                || !OutlandsConfig.HORROR_AUDIO_ENABLED.get()
+                || level.getGameTime()%20L!=0L) return;
+        long now=level.getGameTime();
+        for(ServerPlayer player:level.players()) {
+            if(!player.isAlive()||player.isCreative()||player.isSpectator()
+                    ||player.isSleeping()||player.isPassenger()) continue;
+            long next=NEXT_CUE.getOrDefault(player.getUUID(),0L);
+            if(now<next) continue;
+            var start=level.structureManager().getStructureWithPieceAt(player.blockPosition(),
+                    OutlandsWorldgen.OUTLANDS_STRUCTURE_TYPE.get());
+            if(start==null||!start.isValid()) continue;
+            var bounds=start.getBoundingBox();
+            if(!bounds.isInside(player.blockPosition())) continue;
+            BlockPos center=new BlockPos((bounds.minX()+bounds.maxX())/2,
+                    (bounds.minY()+bounds.maxY())/2,(bounds.minZ()+bounds.maxZ())/2);
+            double dx=center.getX()-level.getSharedSpawnPos().getX();
+            double dz=center.getZ()-level.getSharedSpawnPos().getZ();
+            double distance=Math.sqrt(dx*dx+dz*dz);
+            int cx=Math.floorDiv(center.getX(),16),cz=Math.floorDiv(center.getZ(),16);
+            long seed=com.relaymann.theoutlands.worldgen.StructurePlacementPolicy.chunkSeed(level.getSeed(),cx,cz);
+            String biome=level.getBiome(new BlockPos(center.getX(),bounds.maxY()-8,center.getZ()))
+                    .unwrapKey().map(k->k.location().getPath()).orElse("");
+            boolean forest=biome.contains("forest")||biome.contains("taiga")||biome.contains("grove")||biome.contains("wooded");
+            String id=OutlandsStructureFeature.chooseLayout(seed,distance,forest,
+                    Math.max(1_000.0D,OutlandsConfig.STRUCTURE_MIN_DISTANCE.get()),
+                    OutlandsConfig.STRUCTURE_CHANCE_MULTIPLIER.get());
+            if(id==null) continue;
+            if(player.getRandom().nextInt(90)!=0) continue;
+            play(player,id,bounds,now);
+            NEXT_CUE.put(player.getUUID(),now+2_400L+player.getRandom().nextInt(2_401));
+        }
+    }
+
+    private static void play(ServerPlayer player,String id,net.minecraft.world.level.levelgen.structure.BoundingBox b,long now) {
+        double x=b.minX()+4+player.getRandom().nextDouble()*Math.max(1,b.getXSpan()-8);
+        double z=b.minZ()+4+player.getRandom().nextDouble()*Math.max(1,b.getZSpan()-8);
+        double y=Math.max(player.getY()-8,Math.min(player.getY()+8,b.maxY()-2));
+        switch(id) {
+            case "research_facility" -> send(player,SoundEvents.WOODEN_DOOR_OPEN,x,y,z,0.10F,0.52F);
+            case "apostle_cathedral" -> send(player,SoundEvents.AMBIENT_CAVE.value(),x,y,z,0.12F,0.45F);
+            case "forsaken_settlement" -> send(player,SoundEvents.GRASS_STEP,x,y,z,0.13F,0.62F);
+            case "last_outpost" -> send(player,SoundEvents.GRAVEL_STEP,x,y,z,0.12F,0.55F);
+            case "forgotten_station" -> send(player,SoundEvents.GRAVEL_STEP,x,y,z,0.10F,0.42F);
+            case "null_chamber" -> send(player,SoundEvents.AMBIENT_CAVE.value(),x,y,z,0.045F,0.34F);
+            case "hollow_crypt" -> send(player,SoundEvents.AMBIENT_CAVE.value(),x,y,z,0.08F,0.58F);
+            case "boundary_monument" -> send(player,SoundEvents.AMBIENT_CAVE.value(),x,y,z,0.07F,0.72F);
+            case "cabin" -> send(player,SoundEvents.WOODEN_DOOR_OPEN,x,y,z,0.09F,0.65F);
+            case "tower" -> send(player,SoundEvents.GRAVEL_STEP,x,y,z,0.08F,0.48F);
+            case "bunker" -> send(player,SoundEvents.WOODEN_DOOR_OPEN,x,y,z,0.07F,0.38F);
+            case "shrine" -> send(player,SoundEvents.AMBIENT_CAVE.value(),x,y,z,0.06F,0.62F);
+            case "observatory" -> send(player,SoundEvents.AMBIENT_CAVE.value(),x,y,z,0.05F,0.82F);
+            case "archive" -> send(player,SoundEvents.GRAVEL_STEP,x,y,z,0.07F,0.36F);
+            default -> { return; }
+        }
+    }
+
+    private static void send(ServerPlayer player,SoundEvent sound,double x,double y,double z,float volume,float pitch) {
+        player.connection.send(new ClientboundSoundPacket(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound),
+                SoundSource.AMBIENT,x,y,z,volume,pitch,player.getRandom().nextLong()));
+    }
+
+    public static void clear(ServerPlayer player){NEXT_CUE.remove(player.getUUID());}
+    public static void clear(){NEXT_CUE.clear();}
+}
