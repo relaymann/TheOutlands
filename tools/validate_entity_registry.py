@@ -117,7 +117,7 @@ def audit_once():
                 header = image.read(24)
             if len(header) != 24 or header[:8] != b"\x89PNG\r\n\x1a\n":
                 errors.append(entity_id + ": invalid PNG texture")
-            elif struct.unpack(">II", header[16:24]) != ((128, 128) if entity_id == "colossus" else (64, 64)):
+            elif struct.unpack(">II", header[16:24]) != ((128, 128) if entity_id == "colossus" else (64, 128) if entity_id == "pilgrim" else (64, 64)):
                 errors.append(entity_id + ": texture dimensions do not match model UV atlas")
 
         sound = sound_map.get(entity_id)
@@ -130,8 +130,8 @@ def audit_once():
 
     if len(set(textures.values())) != EXPECTED: errors.append("entity texture paths are not unique")
     new_models = read("java/com/relaymann/theoutlands/client/NewEntityRenderers.java")
-    if "LayerDefinition.create(m,128,128)" not in new_models:
-        errors.append("Colossus 128x128 UV atlas is not registered")
+    if "LayerDefinition.create(m,64,128)" not in new_models or "LayerDefinition.create(m,128,128)" not in new_models:
+        errors.append("Pilgrim/Colossus UV atlas dimensions are not registered")
     for renderer in ("PilgrimRenderer", "CeilingDwellerRenderer", "ColossusRenderer"):
         if renderer not in renderers:
             errors.append(renderer + ": missing renderer registration")
