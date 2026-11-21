@@ -126,7 +126,7 @@ Outlands structure placement now uses deterministic 8x8-chunk candidate cells. A
 
 Eligible structures are selected with one weighted roll rather than a sequence of independent early-return rolls, so structures later in the registry are no longer suppressed by earlier checks. Per-cell probabilities are scaled to preserve approximately the previous per-area encounter rate. Placement is deterministic from the world seed and chunk coordinates.
 
-Sites reject ocean, river, and beach biomes, water/fluid surfaces, leaf/log canopy tops, steep footprints, and unsafe build-height margins. The later native structure pipeline uses a 48x48 multi-chunk footprint clipped to each generating chunk. Vanilla terrain, caves, biome sources, and vanilla structure sets are unchanged.
+Sites reject ocean, river, and beach biomes, water/fluid surfaces, log-obstructed or uneven ground, and unsafe build-height margins. Ground sampling uses the no-leaves heightmap so tree canopies do not masquerade as terrain. The later native structure pipeline uses a 48x48 multi-chunk footprint clipped to each generating chunk. Vanilla terrain, caves, biome sources, and vanilla structure sets are unchanged.
 
 This describes the intermediate placement-policy stage. It was superseded by the native multi-chunk piece/template-system migration in the following Phase 1 section; the current 14 builders are procedural modules invoked through persisted native pieces.
 

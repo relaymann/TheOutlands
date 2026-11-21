@@ -68,8 +68,13 @@ def main():
     assert "getStructureWithPieceAt" in discovery and 'recordDiscovery(player, "structure_" + layout)' in discovery
     assert 'recordDiscovery(player, "shared_structure_mark")' in discovery
     assert "bounds.minX() + 39, bounds.maxY() - 49, bounds.minZ() + 6" in discovery
+    server_events=(ROOT/"src/main/java/com/relaymann/theoutlands/event/ServerHorrorEvents.java").read_text(encoding="utf-8")
     assert "ENTITY_SPAWN_BALANCE_ENABLED" in encounters and "ENTITY_ECOSYSTEM_ENABLED" in encounters
-    assert "addFreshEntity" in encounters and "NULL" in encounters and "DEATH" in encounters
+    assert "void tick(ServerLevel level)" in encounters and "RESOLVED_SITES" in encounters
+    assert "bounds.minX() + 24" in encounters and "level.noCollision(entity)" in encounters
+    assert "level.addFreshEntity(entity)" in encounters and "NULL" in encounters and "DEATH" in encounters
+    assert "StructureEncounterManager.tick(level)" in server_events
+    assert "addFreshEntity" not in piece and "StructureEncounterManager" not in piece
     layout_ids=set(re.findall(r'case "([a-z_]+)" ->',feature))
     assert STRUCTURES<=layout_ids, f"missing layouts: {STRUCTURES-layout_ids}"
     assert "applyVariations(id,level,x,surfaceY,z,random)" in feature
