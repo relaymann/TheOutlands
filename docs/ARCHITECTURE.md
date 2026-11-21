@@ -110,3 +110,11 @@ The second batch adds four more specialized locations:
 - **Boundary Monument** — broken stone rings and an empty central frame, suggesting a boundary without creating a portal or changing dimensions.
 
 As with the first batch, these are compact single-chunk features, appear only in newly generated chunks, and leave vanilla terrain and structure generation systems intact.
+
+
+### Batch 2 fidelity pass
+
+- Forgotten Station now has a waiting platform, benches, twin rails, and a blocked tunnel passage.
+- Null Chamber remains intentionally sparse, with four pillars and a single central marker.
+- Hollow Crypt has connected corridors, multiple empty tomb alcoves, and a sealed central burial feature.
+- Boundary Monument has broken concentric rings, tall asymmetrical uprights, and an empty freestanding frame; it creates no portal.
