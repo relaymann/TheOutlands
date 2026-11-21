@@ -297,7 +297,7 @@ def ceiling_hit(t,d,i,n): return .48*noise(t,65,900,ceiling_hit.a)*math.exp(-t*1
 ceiling_hit.a,ceiling_hit.b={"lp1":0.,"lp2":0.},{"lp1":0.,"lp2":0.};make("ceiling_hit",.72,ceiling_hit)
 def colossus_step(t,d,i,n):
  a=noise(t,28,180,colossus_step.a);b=noise(t,180,650,colossus_step.b);return fade(t,d,.02,.65)*(.38*a*math.exp(-t*1.7)+.18*b*math.exp(-t*4)+.26*math.sin(2*math.pi*(38-9*t)*t)*math.exp(-t*2.7))
-colossus_step.a,colossus_step.b={"lp1":0.,"lp2":0.},{"lp1":0.,"lp2":0.};make("colossus_step",2.2,colossus_step)
+colossus_step.a,colossus_step.b={"lp1":0.,"lp2":0.},{"lp1":0.,"lp2":0.};make("colossus_step",.72,colossus_step)
 def colossus_hurt(t,d,i,n): return .42*noise(t,25,260,colossus_hurt.a)*math.exp(-t*4)+.2*noise(t,240,1200,colossus_hurt.b)*math.exp(-t*11)
 colossus_hurt.a,colossus_hurt.b={"lp1":0.,"lp2":0.},{"lp1":0.,"lp2":0.};make("colossus_hurt",1.7,colossus_hurt)
 
