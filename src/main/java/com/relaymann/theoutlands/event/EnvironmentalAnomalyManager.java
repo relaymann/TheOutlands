@@ -47,7 +47,7 @@ public final class EnvironmentalAnomalyManager {
 
             playOne(player);
             NEXT_ALLOWED.put(player.getUUID(), now + MIN_COOLDOWN
-                    + player.getRandom().nextLong(COOLDOWN_VARIANCE));
+                    + player.getRandom().nextInt((int) COOLDOWN_VARIANCE));
         }
     }
 
