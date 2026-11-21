@@ -10,11 +10,9 @@ base { archivesName = mod_id }
 java { toolchain.languageVersion = JavaLanguageVersion.of(21) }
 sourceSets.main.resources {
     srcDir('src/generated/resources')
-    // Never package locally imported legacy texture or sound assets.
+    // Exclude only imported vanilla overrides; never exclude this mod's own assets.
     exclude('assets/minecraft/textures/**')
     exclude('assets/minecraft/sounds/**')
-    exclude('assets/theoutlands/textures/**')
-    exclude('assets/theoutlands/sounds/**')
     exclude('**/*.bbmodel')
 }
 neoForge {
