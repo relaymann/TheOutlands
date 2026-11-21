@@ -13,7 +13,7 @@ def main() -> None:
     feature = read("src/main/java/com/relaymann/theoutlands/worldgen/OutlandsStructureFeature.java")
     intelligence = read("src/main/java/com/relaymann/theoutlands/event/OutlandsIntelligenceManager.java")
     ecosystem = read("src/main/java/com/relaymann/theoutlands/event/OutlandsEcosystemManager.java")
-    assert "@EventBusSubscriber" in behavior and "stalkFromCover" in behavior and "coordinateCall" in behavior
+    assert "@EventBusSubscriber" in behavior and "stalkFromCover" in behavior and "LurkerEntity" in behavior
     assert "LURKER_BREATH" in ambience and "STALKER_BREATH" in ambience and "CAVEJAR_STALK" in ambience
     assert "NEXT_CUE.remove" in ambience and "NEXT_CUE.clear" in ambience
     assert "StructureInteriorDressing.apply(id,level,x,surfaceY,z,random,clip)" in feature
