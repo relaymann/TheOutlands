@@ -62,6 +62,7 @@ def main():
 
     assert "getStructureWithPieceAt" in discovery and 'recordDiscovery(player, "structure_" + layout)' in discovery
     assert 'recordDiscovery(player, "shared_structure_mark")' in discovery
+    assert "bounds.minX() + 39, bounds.maxY() - 49, bounds.minZ() + 6" in discovery
     assert "ENTITY_SPAWN_BALANCE_ENABLED" in encounters and "ENTITY_ECOSYSTEM_ENABLED" in encounters
     assert "addFreshEntity" in encounters and "NULL" in encounters and "DEATH" in encounters
     layout_ids=set(re.findall(r'case "([a-z_]+)" ->',feature))

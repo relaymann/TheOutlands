@@ -41,6 +41,10 @@ public final class StructureDiscoveryEvents {
                 Math.max(1_000.0D,OutlandsConfig.STRUCTURE_MIN_DISTANCE.get()),OutlandsConfig.STRUCTURE_CHANCE_MULTIPLIER.get());
         if(layout==null)return;
         HorrorMemory.recordDiscovery(player, "structure_" + layout);
-        HorrorMemory.recordDiscovery(player, "shared_structure_mark");
+        BlockPos hiddenCacheChest = new BlockPos(bounds.minX() + 39, bounds.maxY() - 49, bounds.minZ() + 6);
+        if (event.getPos().equals(hiddenCacheChest)) {
+            HorrorMemory.recordDiscovery(player, "hidden_lower_chamber");
+            HorrorMemory.recordDiscovery(player, "shared_structure_mark");
+        }
     }
 }
