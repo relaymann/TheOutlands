@@ -13,6 +13,8 @@ import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -75,6 +77,14 @@ public final class EnvironmentalPresenceManager {
                 x, y, z, 0.12F, 0.72F + player.getRandom().nextFloat() * 0.2F,
                 player.getRandom().nextLong()));
     }
+
+    @SubscribeEvent
+    public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+        NEXT_CUE.remove(event.getEntity().getUUID());
+    }
+
+    @SubscribeEvent
+    public static void onServerStopping(ServerStoppingEvent event) { NEXT_CUE.clear(); }
 
     public static void clear(ServerPlayer player) { NEXT_CUE.remove(player.getUUID()); }
     public static void clear() { NEXT_CUE.clear(); }
