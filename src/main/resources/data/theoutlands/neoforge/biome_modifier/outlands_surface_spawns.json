@@ -3,12 +3,12 @@
   "biomes": "#minecraft:is_overworld",
   "spawners": [
     { "type": "theoutlands:agitated_one", "weight": 1, "minCount": 1, "maxCount": 1 },
-    { "type": "theoutlands:hunter", "weight": 4, "minCount": 1, "maxCount": 1 },
-    { "type": "theoutlands:stalker", "weight": 4, "minCount": 1, "maxCount": 1 },
-    { "type": "theoutlands:mimic", "weight": 3, "minCount": 1, "maxCount": 1 },
-    { "type": "theoutlands:observer", "weight": 3, "minCount": 1, "maxCount": 1 },
-    { "type": "theoutlands:lurker", "weight": 14, "minCount": 1, "maxCount": 1 },
-    { "type": "theoutlands:howler", "weight": 9, "minCount": 1, "maxCount": 1 },
+    { "type": "theoutlands:hunter", "weight": 9, "minCount": 1, "maxCount": 1 },
+    { "type": "theoutlands:stalker", "weight": 12, "minCount": 1, "maxCount": 1 },
+    { "type": "theoutlands:mimic", "weight": 6, "minCount": 1, "maxCount": 1 },
+    { "type": "theoutlands:observer", "weight": 5, "minCount": 1, "maxCount": 1 },
+    { "type": "theoutlands:lurker", "weight": 28, "minCount": 1, "maxCount": 1 },
+    { "type": "theoutlands:howler", "weight": 12, "minCount": 1, "maxCount": 1 },
     { "type": "theoutlands:fear", "weight": 1, "minCount": 1, "maxCount": 1 }
   ]
 }
