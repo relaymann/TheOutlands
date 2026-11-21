@@ -39,6 +39,13 @@ public final class StructurePlacementPolicy {
         return new int[] {(int) (cellX * CELL_CHUNKS + offsetX), (int) (cellZ * CELL_CHUNKS + offsetZ)};
     }
 
+    /** Inclusive block clipping shared by every piece write and its tests. */
+    public static boolean containsBlock(int minX, int minY, int minZ,
+                                        int maxX, int maxY, int maxZ,
+                                        int x, int y, int z) {
+        return x >= minX && x <= maxX && y >= minY && y <= maxY && z >= minZ && z <= maxZ;
+    }
+
     public static long chunkSeed(long seed, int chunkX, int chunkZ) {
         return mix64(seed ^ ((long) chunkX * X_SALT) ^ Long.rotateLeft((long) chunkZ * Z_SALT, 27));
     }

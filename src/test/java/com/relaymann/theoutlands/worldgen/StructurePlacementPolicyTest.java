@@ -32,6 +32,14 @@ class StructurePlacementPolicyTest {
         }
     }
 
+    @Test void chunkClippingIncludesEdgesAndRejectsEveryOutsideAxis() {
+        assertTrue(StructurePlacementPolicy.containsBlock(0, 10, 20, 15, 30, 35, 0, 10, 20));
+        assertTrue(StructurePlacementPolicy.containsBlock(0, 10, 20, 15, 30, 35, 15, 30, 35));
+        assertFalse(StructurePlacementPolicy.containsBlock(0, 10, 20, 15, 30, 35, -1, 20, 25));
+        assertFalse(StructurePlacementPolicy.containsBlock(0, 10, 20, 15, 30, 35, 8, 9, 25));
+        assertFalse(StructurePlacementPolicy.containsBlock(0, 10, 20, 15, 30, 35, 8, 20, 36));
+    }
+
     @Test void chunkRandomSeedIsStableAndPositionSpecific() {
         assertEquals(StructurePlacementPolicy.chunkSeed(1L, -20, 40),
                 StructurePlacementPolicy.chunkSeed(1L, -20, 40));

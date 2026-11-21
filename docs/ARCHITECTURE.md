@@ -149,3 +149,20 @@ All 14 structure identities now use dedicated Outlands chest loot tables under `
 Each site chest can contain a written field record with location-specific observations. These records provide fragments rather than a narrator or a complete explanation; several references point toward other sites and leave the entities' origins unresolved.
 
 Every structure also receives a concealed lower service chamber, reached through a moss-covered surface hatch and ladder shaft. Each chamber has structure-specific physical clues, a small cache, and a recovered record. Its placement is clipped to the native structure piece bounds. The piece's vertical bounds and candidate height margin include the chamber. These additions affect only newly generated Outlands structure chunks; vanilla terrain noise, caves, biome sources, and vanilla structure sets remain untouched.
+
+
+## Structure atmosphere and encounters (Phase 2D–2F)
+
+Structure ambience is player-private and only runs while a living, non-creative player is inside a registered Outlands structure. Cues are sparse, use positional audio, and have per-player cooldowns. The current implementation reuses vanilla sound events with structure-specific pitch and volume; bespoke recorded structure soundscapes remain an asset-quality follow-up.
+
+A structure can produce at most one deterministic, rare encounter during its center-chunk generation pass. Each site has a themed entity pool and respects existing progression milestones for Null, Null's Apostles, and Death. Encounters are not guaranteed, and the manager is gated by the entity-balance and ecosystem settings. Structure layouts also select seeded variations such as damaged rooms, extra wings, debris, and altered furnishings. All generated block writes, including chests and lower chambers, are clipped to the active structure-piece chunk box.
+
+## Persistent structure discoveries (Phase 2G)
+
+Opening a chest belonging to an Outlands structure records that site in the player's existing bounded, persistent HorrorMemory discovery list. Discoveries are private, de-duplicated, and survive logout and respawn through the existing memory-copy path. Every site's concealed lower chamber contains the same three-stroke mark. Each recovered site record describes that mark and points toward another structure, forming a distributed clue network rather than one explanatory document. These clues do not grant, duplicate, or bypass Death's progression-gated artifacts or the Almighty ending reward.
+
+## Structure compatibility and verification (Phase 2H)
+
+The native structure set remains a single additive Outlands set. It does not replace vanilla structure sets, biome sources, terrain noise, or cave carvers. Candidate placement remains seed-stable and spaced; structure pieces persist their anchors and clip writes to the current chunk intersection. The placement policy exposes a pure inclusive-boundary predicate with unit tests for all six faces and out-of-bounds coordinates. The structure audit validates all 14 layout identities, all 15 loot tables, unique multi-page field records, cross-site clues, shared markings, the native 48-block structure definition, biome exclusions, chunk clipping hooks, ambience gating, and encounter progression guards.
+
+Automated checks are static/data and unit tests, not a substitute for dedicated-server world generation. Final compatibility release gates still include launching a dedicated server, generating fresh worlds across varied biomes and chunk borders, checking coexistence with vanilla structures, opening every loot table in-game, and multiplayer client audio/render testing. Existing chunks are not retroactively populated. No vanilla terrain or world-generation settings are changed.

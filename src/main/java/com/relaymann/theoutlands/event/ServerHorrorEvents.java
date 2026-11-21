@@ -50,6 +50,7 @@ public final class ServerHorrorEvents {
             AggressiveJumpscareManager.clear(player);
             FootstepEchoManager.clear(player);
             EnvironmentalAnomalyManager.clear(player);
+            StructureAmbienceManager.clear(player);
         }
         HorrorProgressionManager.remove(event.getEntity().getUUID());
     }

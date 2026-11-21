@@ -6,8 +6,6 @@
     "minecraft:snowy_plains",
     "minecraft:ice_spikes",
     "minecraft:desert",
-    "minecraft:swamp",
-    "minecraft:mangrove_swamp",
     "minecraft:forest",
     "minecraft:flower_forest",
     "minecraft:birch_forest",
@@ -35,10 +33,6 @@
     "minecraft:snowy_slopes",
     "minecraft:frozen_peaks",
     "minecraft:jagged_peaks",
-    "minecraft:stony_peaks",
-    "minecraft:stony_shore",
-    "minecraft:dripstone_caves",
-    "minecraft:lush_caves",
-    "minecraft:deep_dark"
+    "minecraft:stony_peaks"
   ]
 }

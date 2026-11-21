@@ -237,13 +237,15 @@ public final class OutlandsStructureFeature {
     private static final ThreadLocal<BoundingBox> ACTIVE_CLIP = new ThreadLocal<>();
     private static void p(WorldGenLevel l,int x,int y,int z,BlockState s){
         BoundingBox clip=ACTIVE_CLIP.get();
-        if(clip!=null&&(x<clip.minX()||x>clip.maxX()||y<clip.minY()||y>clip.maxY()||z<clip.minZ()||z>clip.maxZ()))return;
+        if(clip!=null&&!StructurePlacementPolicy.containsBlock(clip.minX(),clip.minY(),clip.minZ(),
+                clip.maxX(),clip.maxY(),clip.maxZ(),x,y,z))return;
         l.setBlock(new BlockPos(x,y,z),s,2);
     }
     private static void air(WorldGenLevel l,int x,int y,int z){p(l,x,y,z,Blocks.AIR.defaultBlockState());}
     private static void chest(WorldGenLevel l,int x,int y,int z,String loot,RandomSource r){
         BoundingBox clip=ACTIVE_CLIP.get();
-        if(clip!=null&&(x<clip.minX()||x>clip.maxX()||y<clip.minY()||y>clip.maxY()||z<clip.minZ()||z>clip.maxZ()))return;
+        if(clip!=null&&!StructurePlacementPolicy.containsBlock(clip.minX(),clip.minY(),clip.minZ(),
+                clip.maxX(),clip.maxY(),clip.maxZ(),x,y,z))return;
         BlockPos pos=new BlockPos(x,y,z);l.setBlock(pos,Blocks.CHEST.defaultBlockState(),2);
         if(l.getBlockEntity(pos) instanceof RandomizableContainerBlockEntity c)
             c.setLootTable(ResourceKey.create(Registries.LOOT_TABLE,ResourceLocation.parse(loot)),r.nextLong());
@@ -257,6 +259,10 @@ public final class OutlandsStructureFeature {
         p(l,x+38,surface,z+5,Blocks.MOSS_CARPET.defaultBlockState());
         p(l,rx+2,y+1,rz+2,Blocks.COBWEB.defaultBlockState());p(l,rx+6,y+1,rz+2,Blocks.LECTERN.defaultBlockState());
         p(l,rx+6,y+1,rz+5,Blocks.SOUL_LANTERN.defaultBlockState());
+        // The same three-stroke mark is hidden in every site's lower chamber.
+        p(l,rx+4,y+2,rz+1,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState());
+        p(l,rx+3,y+2,rz+2,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState());
+        p(l,rx+5,y+2,rz+2,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState());
         switch(id) {
             case "cabin" -> { p(l,rx+2,y+1,rz+4,Blocks.BARREL.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.CAMPFIRE.defaultBlockState()); }
             case "tower" -> { p(l,rx+2,y+1,rz+4,Blocks.TARGET.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.HAY_BLOCK.defaultBlockState()); }

@@ -34,7 +34,7 @@ public final class StructureAmbienceManager {
             long next=NEXT_CUE.getOrDefault(player.getUUID(),0L);
             if(now<next) continue;
             var start=level.structureManager().getStructureWithPieceAt(player.blockPosition(),
-                    OutlandsWorldgen.OUTLANDS_STRUCTURE_TYPE.get());
+                    holder -> holder.value() instanceof com.relaymann.theoutlands.worldgen.OutlandsStructure);
             if(start==null||!start.isValid()) continue;
             var bounds=start.getBoundingBox();
             if(!bounds.isInside(player.blockPosition())) continue;
