@@ -34,7 +34,7 @@
     },
     {
       "type": "theoutlands:ceiling_dweller",
-      "weight": 8,
+      "weight": 12,
       "minCount": 1,
       "maxCount": 1
     }
