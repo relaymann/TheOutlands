@@ -32,7 +32,7 @@ def main() -> None:
             "the core mod entry point must not load optional API classes")
     require("@ForgeVoicechatPlugin" in plugin and "connection.getPlayer().getPlayer()" in plugin,
             "voice plugin discovery and API-to-Minecraft player conversion must be present")
-    require("net.minecraft.client" not in plugin and "DistExecutor.unsafeRunWhenOn" in plugin,
+    require("net.minecraft.client" not in plugin and "FMLEnvironment.dist == Dist.CLIENT" in plugin,
             "client classes must stay isolated from dedicated-server plugin loading")
     require("ClientSoundEvent" in hooks and "VoiceLevelHud.acceptAudio" in hooks,
             "client microphone activity must feed the local meter")
