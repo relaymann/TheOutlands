@@ -33,7 +33,19 @@ neoForge {
     mods { "${mod_id}" { sourceSet(sourceSets.main) } }
 }
 configurations { runtimeClasspath.extendsFrom localRuntime }
+repositories {
+    maven { url = 'https://maven.maxhenkel.de/repository/public' }
+    maven {
+        name = "Modrinth"
+        url = "https://api.modrinth.com/maven"
+        content { includeGroup "maven.modrinth" }
+    }
+}
+
 dependencies {
+    // Compile against the API without bundling it: Simple Voice Chat remains optional at runtime.
+    compileOnly "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
+    localRuntime "maven.modrinth:simple-voice-chat:neoforge-${voicechat_mod_version}"
     testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.11.4'
 }
