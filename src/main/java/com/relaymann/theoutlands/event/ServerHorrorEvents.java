@@ -46,6 +46,7 @@ public final class ServerHorrorEvents {
             ClientAfterimageManager.tick(level);
             if (event.getServer().getTickCount() % 20 == 0) {
                 EnvironmentalAnomalyManager.tick(level);
+                EntityTraceManager.tick(level);
                 StructureAmbienceManager.tick(level);
                 StructureEncounterManager.tick(level);
             }
@@ -100,6 +101,7 @@ public final class ServerHorrorEvents {
         StructureEncounterManager.clear();
         OutlandsIntelligenceManager.clear();
         PredatoryStalkingManager.clear();
+        EntityTraceManager.clear();
         NightmareMode.clear();
     }
 }
