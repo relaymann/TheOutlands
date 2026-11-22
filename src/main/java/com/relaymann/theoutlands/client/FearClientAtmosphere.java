@@ -62,7 +62,12 @@ public final class FearClientAtmosphere {
         double weather = level.getRainLevel(1.0F) * 0.12D + level.getThunderLevel(1.0F) * 0.10D;
         double depth = player.getY() < 48.0D ? Math.min(0.22D, (48.0D - player.getY()) / 220.0D) : 0.0D;
         double night = level.getSkyDarken() > 8 ? 0.07D : 0.0D;
-        return Math.min(0.34D, biomeFactor + weather + depth + night);
+        boolean nearbyTerritory = !level.getEntitiesOfClass(net.minecraft.world.entity.Mob.class,
+                player.getBoundingBox().inflate(42.0D),
+                mob -> mob.isAlive() && net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE
+                        .getKey(mob.getType()).getNamespace().equals(TheOutlands.MOD_ID)).isEmpty();
+        double presence = nearbyTerritory ? 0.13D : 0.0D;
+        return Math.min(0.38D, biomeFactor + weather + depth + night + presence);
     }
 
     private static double combinedStrength(LocalPlayer player) {
@@ -73,7 +78,7 @@ public final class FearClientAtmosphere {
     public static void onFogColor(ViewportEvent.ComputeFogColor event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null || event.getCamera().getFluidInCamera() != FogType.NONE) return;
-        double strength = territoryStrength(player);
+        double strength = combinedStrength(player);
         if (strength <= 0.0D) return;
         float blend = (float) (0.24D + strength * 0.18D);
         event.setRed(event.getRed() * (1.0F - blend) + 0.035F * blend);
