@@ -35,14 +35,7 @@ public final class VoiceLevelHud {
     /** Receives one unencoded PCM frame from the SVC client API; samples are never retained. */
     public static void acceptAudio(short[] samples, boolean isWhispering) {
         if (!connected || samples == null || samples.length == 0) return;
-        double sum = 0.0D;
-        for (short sample : samples) {
-            double normalized = sample / 32768.0D;
-            sum += normalized * normalized;
-        }
-        double rms = Math.sqrt(sum / samples.length);
-        double dbfs = rms <= 0.000001D ? -120.0D : 20.0D * Math.log10(rms);
-        int level = (int) Math.round(Math.max(0.0D, Math.min(100.0D, (dbfs + 60.0D) * (100.0D / 54.0D))));
+        int level = VoiceLevelMath.fromPcm(samples);
         currentLevel = level;
         whispering = isWhispering;
         lastAudioNanos = System.nanoTime();
