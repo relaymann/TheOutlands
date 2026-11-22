@@ -54,7 +54,7 @@ def main():
     assert "three-stroke mark" in feature
     assert "new BoundingBox(x,y-40,z" in piece
     assert "StructureEncounterManager.tick(level)" in (ROOT/"src/main/java/com/relaymann/theoutlands/event/ServerHorrorEvents.java").read_text(encoding="utf-8")
-    assert "void tick(ServerLevel level)" in encounters and "RESOLVED_SITES" in encounters
+    assert "void tick(ServerLevel level)" in encounters and "StructureEncounterSavedData.get(level)" in encounters
     assert "bounds.minX() + 24" in encounters and "center.getY() - 12" in encounters and "center.getY() - 25" in encounters
     assert "bounds.minX()+24" in ambience and "bounds.minX()+24" in discovery
     assert "addFreshEntity(entity)" in encounters and "addFreshEntity" not in piece
@@ -72,8 +72,13 @@ def main():
     assert "bounds.minX() + 39, bounds.maxY() - 49, bounds.minZ() + 6" in discovery
     server_events=(ROOT/"src/main/java/com/relaymann/theoutlands/event/ServerHorrorEvents.java").read_text(encoding="utf-8")
     assert "ENTITY_SPAWN_BALANCE_ENABLED" in encounters and "ENTITY_ECOSYSTEM_ENABLED" in encounters
-    assert "void tick(ServerLevel level)" in encounters and "RESOLVED_SITES" in encounters
+    assert "void tick(ServerLevel level)" in encounters and "StructureEncounterSavedData.get(level)" in encounters
     assert "bounds.minX() + 24" in encounters and "level.noCollision(entity)" in encounters
+    assert "resolvedSites.hasResolved(key)" in encounters and "resolvedSites.markResolved(key)" in encounters
+    assert "RESOLVED_SITES" not in encounters
+    saved_encounters = (ROOT/"src/main/java/com/relaymann/theoutlands/worldgen/StructureEncounterSavedData.java").read_text(encoding="utf-8")
+    assert "extends SavedData" in saved_encounters and "setDirty()" in saved_encounters
+    assert "getDataStorage().computeIfAbsent" in saved_encounters and "resolved_sites" in saved_encounters
     assert "int[][] offsets" in encounters and "level.addFreshEntity(entity)" in encounters
     assert "level.addFreshEntity(entity)" in encounters and "NULL" in encounters and "DEATH" in encounters
     assert "StructureEncounterManager.tick(level)" in server_events
