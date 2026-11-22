@@ -51,10 +51,12 @@ public final class VoicePerceptionManager {
 
     /** Called only after Simple Voice Chat confirms an actual microphone packet. */
     /** Thread-safe limiter called from the voice-chat packet thread before scheduling server work. */
-    public static boolean shouldAcceptVoicePacket(UUID playerId) {
+    public static synchronized boolean shouldAcceptVoicePacket(UUID playerId) {
         long now = System.nanoTime();
-        Long previous = PACKET_THROTTLES.put(playerId, now);
-        return previous == null || now - previous >= 75_000_000L;
+        Long previous = PACKET_THROTTLES.get(playerId);
+        if (previous != null && now - previous < 75_000_000L) return false;
+        PACKET_THROTTLES.put(playerId, now);
+        return true;
     }
 
     public static void onVoicePacket(ServerPlayer player, boolean whispering) {
