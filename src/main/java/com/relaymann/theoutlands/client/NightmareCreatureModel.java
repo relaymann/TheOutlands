@@ -15,13 +15,13 @@ import net.minecraft.util.Mth;
 public final class NightmareCreatureModel extends HumanoidModel<NightmareCreature> {
     private final ModelPart crown;
     private final ModelPart ribCage;
-    private final ModelPart mantle;
+    private final ModelPart mantle;\n    private final ModelPart snout;\n    private final ModelPart tail;\n    private final ModelPart dorsalSpines;
 
     public NightmareCreatureModel(ModelPart root) {
         super(root);
         crown = root.getChild("head").getChild("crown");
         ribCage = root.getChild("body").getChild("rib_cage");
-        mantle = root.getChild("body").getChild("mantle");
+        mantle = root.getChild("body").getChild("mantle");\n        snout = root.getChild("head").getChild("snout");\n        tail = root.getChild("body").getChild("tail");\n        dorsalSpines = root.getChild("body").getChild("dorsal_spines");
     }
 
     public static LayerDefinition createBodyLayer() {
@@ -35,7 +35,7 @@ public final class NightmareCreatureModel extends HumanoidModel<NightmareCreatur
                 CubeListBuilder.create().texOffs(32, 32)
                         .addBox(-3.5F, -1.0F, -2.6F, 7.0F, 7.0F, 1.0F),
                 PartPose.ZERO);
-        root.getChild("body").addOrReplaceChild("mantle",
+        root.getChild("head").addOrReplaceChild("snout",\n                CubeListBuilder.create().texOffs(0, 48).addBox(-2.0F, -2.0F, -5.0F, 4.0F, 3.0F, 4.0F),\n                PartPose.ZERO);\n        root.getChild("body").addOrReplaceChild("tail",\n                CubeListBuilder.create().texOffs(16, 48).addBox(-1.5F, 7.0F, 1.0F, 3.0F, 7.0F, 3.0F),\n                PartPose.ZERO);\n        root.getChild("body").addOrReplaceChild("dorsal_spines",\n                CubeListBuilder.create().texOffs(32, 48).addBox(-3.0F, -4.0F, 1.5F, 6.0F, 4.0F, 2.0F),\n                PartPose.ZERO);\n        root.getChild("body").addOrReplaceChild("mantle",
                 CubeListBuilder.create().texOffs(0, 40)
                         .addBox(-4.5F, -1.0F, 1.5F, 9.0F, 10.0F, 1.0F),
                 PartPose.ZERO);
@@ -61,7 +61,7 @@ public final class NightmareCreatureModel extends HumanoidModel<NightmareCreatur
         rightLeg.xScale = leftLeg.xScale = 1.0F;
         crown.yRot = Mth.sin(ageInTicks * 0.035F) * 0.025F;
         ribCage.xRot = 0.02F + Mth.sin(ageInTicks * 0.08F) * 0.018F;
-        mantle.xRot = 0.04F + Mth.sin(ageInTicks * 0.045F) * 0.025F;
+        mantle.xRot = 0.04F + Mth.sin(ageInTicks * 0.045F) * 0.025F;\n        snout.visible = entity.isVariant("nightmare_hound");\n        tail.visible = entity.isVariant("nightmare_hound");\n        dorsalSpines.visible = entity.isVariant("nightmare_wardened") || entity.isVariant("nightmare_unbound");\n        tail.xRot = 0.18F + Mth.sin(ageInTicks * 0.22F) * 0.14F;\n        dorsalSpines.xRot = Mth.sin(ageInTicks * 0.09F) * 0.025F;
 
         if (entity.isVariant("nightmare_hound")) {
             body.xRot = 0.62F + limbSwingAmount * 0.12F;
