@@ -13,12 +13,9 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.Level;
 
-import java.util.HashSet;
-import java.util.Set;
 
 /** Resolves rare encounters on the main server tick when a player explores a site. */
 public final class StructureEncounterManager {
-    private static final Set<String> RESOLVED_SITES = new HashSet<>();
     private static final long ENCOUNTER_SALT = 0x3C6EF372FE94F82BL;
 
     private StructureEncounterManager() {}
@@ -28,6 +25,7 @@ public final class StructureEncounterManager {
                 || !OutlandsConfig.OUTLANDS_STRUCTURES_ENABLED.get()
                 || !OutlandsConfig.ENTITY_SPAWN_BALANCE_ENABLED.get()
                 || !OutlandsConfig.ENTITY_ECOSYSTEM_ENABLED.get()) return;
+        StructureEncounterSavedData resolvedSites = StructureEncounterSavedData.get(level);
         for (ServerPlayer player : level.players()) {
             if (!player.isAlive() || player.isCreative() || player.isSpectator()
                     || player.isSleeping() || player.isPassenger()) continue;
@@ -43,7 +41,7 @@ public final class StructureEncounterManager {
             long seed = StructurePlacementPolicy.chunkSeed(level.getSeed(), centerChunkX, centerChunkZ);
             String key = level.dimension().location() + ":" + level.getSeed()
                     + ":" + bounds.minX() + ":" + bounds.minZ();
-            if (RESOLVED_SITES.contains(key)) continue;
+            if (resolvedSites.hasResolved(key)) continue;
             BlockPos center = new BlockPos(centerX, bounds.maxY() - 12, centerZ);
             if (!level.hasChunkAt(center)) continue;
             double dx = centerX - level.getSharedSpawnPos().getX();
@@ -62,7 +60,7 @@ public final class StructureEncounterManager {
             // Resolve each site once. A blocked spawn position must not trigger an
             // expensive deterministic retry every second for the rest of the session.
             if (layout != null) resolve(level, layout, center, distance, seed);
-            RESOLVED_SITES.add(key);
+            resolvedSites.markResolved(key);
         }
     }
 
@@ -136,5 +134,4 @@ public final class StructureEncounterManager {
         return false;
     }
 
-    public static void clear() { RESOLVED_SITES.clear(); }
 }
