@@ -29,9 +29,9 @@ public final class EntityBehaviorDirector {
 
     @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
-        if (!OutlandsConfig.ENTITY_INTELLIGENCE_ENABLED.get()
-                || event.getServer().getTickCount() % 10 != 0) return;
+        if (event.getServer().getTickCount() % 10 != 0) return;
         PROCESSED.clear();
+        if (!OutlandsConfig.ENTITY_INTELLIGENCE_ENABLED.get()) return;
         for (ServerLevel level : event.getServer().getAllLevels()) {
             for (ServerPlayer observer : level.players()) {
                 if (!eligible(observer)) continue;
