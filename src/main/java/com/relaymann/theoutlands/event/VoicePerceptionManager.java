@@ -193,7 +193,8 @@ public final class VoicePerceptionManager {
             } else {
                 mob.getNavigation().stop();
             }
-            if (intensity >= 28 && mob.getRandom().nextInt(8) == 0) {
+            if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()
+                    && intensity >= 28 && mob.getRandom().nextInt(8) == 0) {
                 Vec3 falseOrigin = player.position().add(
                         mob.getRandom().nextBoolean() ? 8.0D : -8.0D, 0.0D,
                         mob.getRandom().nextBoolean() ? 6.0D : -6.0D);
@@ -204,7 +205,8 @@ public final class VoicePerceptionManager {
         }
 
         if (profile.behavior() == Behavior.HOWLER) {
-            if (intensity >= 72 && mob.getRandom().nextInt(8) == 0) {
+            if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()
+                    && intensity >= 72 && mob.getRandom().nextInt(8) == 0) {
                 level.playSound(null, mob.blockPosition(), OutlandsSounds.HOWLER_CALL.get(),
                         SoundSource.HOSTILE, 0.72F, 0.82F + mob.getRandom().nextFloat() * 0.18F);
                 alertNearby(level, mob, player, now);
@@ -230,7 +232,7 @@ public final class VoicePerceptionManager {
     /** Rare knocks from an existing nearby door after an unusually loud call. */
     private static void maybeVoiceKnock(ServerLevel level, ServerPlayer player, VoiceSignal signal, long now) {
         PlayerEventCooldown cooldown = PLAYER_EVENT_COOLDOWNS.get(player.getUUID());
-        if (signal.whispering() || signal.level() < 82
+        if (!OutlandsConfig.HORROR_AUDIO_ENABLED.get() || signal.whispering() || signal.level() < 82
                 || (cooldown != null && cooldown.dimension().equals(level.dimension())
                 && now < cooldown.until()) || player.getRandom().nextInt(240) != 0) return;
         BlockPos origin = player.blockPosition();
