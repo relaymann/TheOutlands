@@ -51,7 +51,7 @@ public final class EntityTraceManager {
                         player.getRandom().nextInt(17) - 8);
                 var state = level.getBlockState(candidate);
                 if (!(state.getBlock() instanceof DoorBlock) && !(state.getBlock() instanceof TrapDoorBlock)) continue;
-                if (candidate.distToCenterSqr(source.position()) > 14.0D * 14.0D) continue;
+                if (net.minecraft.world.phys.Vec3.atCenterOf(candidate).distanceToSqr(source.position()) > 14.0D * 14.0D) continue;
                 level.sendParticles(ParticleTypes.CRIT, candidate.getX() + 0.5D,
                         candidate.getY() + 0.9D, candidate.getZ() + 0.5D,
                         3, 0.16D, 0.12D, 0.16D, 0.015D);
