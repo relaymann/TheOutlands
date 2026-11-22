@@ -44,8 +44,10 @@ def main() -> None:
             "queued meter packets must be guarded against world disconnects")
     require("VoicePerceptionManager.clear(player.getUUID())" in events,
             "voice perception state must be cleared on player logout")
-    require("VoiceLevelMathTest.java" in (ROOT / "src/test/java/com/relaymann/theoutlands/client/VoiceLevelMathTest.java").name,
+    require((ROOT / "src/test/java/com/relaymann/theoutlands/client/VoiceLevelMathTest.java").is_file(),
             "microphone level tests must be present")
+    require("shouldAcceptLevelReport" in perception and "normalizeLevel" in perception,
+            "client meter reports must be rate-limited and whisper-capped")
     require((ROOT / "src/test/java/com/relaymann/theoutlands/event/VoiceHearingMathTest.java").is_file(),
             "hearing range tests must be present")
     print("Optional Simple Voice Chat integration checks passed.")
