@@ -4,6 +4,11 @@ package com.relaymann.theoutlands.event;
 public final class VoiceHearingMath {
     private VoiceHearingMath() {}
 
+    public static int normalizeLevel(int level, boolean whispering) {
+        int clamped = Math.max(0, Math.min(100, level));
+        return whispering ? Math.min(38, clamped) : clamped;
+    }
+
     public static double effectiveRange(double baseRange, double speciesScale, int level,
                                         boolean whispering, boolean lineOfSight,
                                         boolean raining, boolean thundering, boolean underground) {
