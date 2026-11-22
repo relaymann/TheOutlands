@@ -103,7 +103,7 @@ public final class ServerHorrorEvents {
         StructureAmbienceManager.clear();
         StructureEncounterManager.clear();
         OutlandsIntelligenceManager.clear();
-        PredatoryStalkingManager.clear();
+        PredatoryStalkingManager.clear(event.getServer().getAllLevels());
         EntityTraceManager.clear();
         VoicePerceptionManager.clear();
         NightmareMode.clear();
