@@ -48,6 +48,8 @@ def main() -> None:
             "microphone level tests must be present")
     require("shouldAcceptLevelReport" in perception and "normalizeLevel" in perception,
             "client meter reports must be rate-limited and whisper-capped")
+    require("HORROR_AUDIO_ENABLED.get()" in perception,
+            "voice-triggered creature sounds must respect the audio toggle")
     require((ROOT / "src/test/java/com/relaymann/theoutlands/event/VoiceHearingMathTest.java").is_file(),
             "hearing range tests must be present")
     print("Optional Simple Voice Chat integration checks passed.")
