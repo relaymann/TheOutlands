@@ -15,7 +15,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.neoforge.event.entity.living.LivingHurtEvent;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
@@ -68,6 +67,7 @@ public final class NightmareModeManager {
             if (!level.dimension().equals(Level.OVERWORLD) || !NightmareMode.isEnabled(level)) continue;
             for (ServerPlayer player : level.players()) {
                 if (!eligible(player)) continue;
+                coordinateNightmarePack(player);
                 long now = level.getGameTime();
                 Long next = NEXT_EVENT.get(player.getUUID());
                 if (next == null) {
@@ -197,19 +197,13 @@ public final class NightmareModeManager {
                 player.getRandom().nextLong()));
     }
 
-    /** A hit on one Nightmare pack member alerts its nearby companions. */
-    @SubscribeEvent
-    public static void onNightmareCreatureHurt(LivingHurtEvent event) {
-        if (!(event.getEntity() instanceof Mob injured)
-                || !injured.getTags().contains("theoutlands_nightmare_spawn")
-                || !(event.getSource().getEntity() instanceof ServerPlayer attacker)
-                || !(injured.level() instanceof ServerLevel level)
-                || !NightmareMode.isEnabled(level)) return;
-        for (Mob ally : level.getEntitiesOfClass(Mob.class,
-                new AABB(injured.blockPosition()).inflate(40.0D),
+    /** Nearby Nightmare event-spawned creatures continually coordinate on the same target. */
+    private static void coordinateNightmarePack(ServerPlayer player) {
+        for (Mob ally : player.serverLevel().getEntitiesOfClass(Mob.class,
+                player.getBoundingBox().inflate(48.0D),
                 candidate -> candidate.isAlive()
                         && candidate.getTags().contains("theoutlands_nightmare_spawn"))) {
-            ally.setTarget(attacker);
+            if (ally.getTarget() != player) ally.setTarget(player);
         }
     }
 

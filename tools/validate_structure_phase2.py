@@ -84,7 +84,7 @@ def main():
     assert "bloodMoon(player)" in nightmare_manager and "silence(player)" in nightmare_manager
     assert "unusualActivity(player)" in nightmare_manager and "containmentFailure(player)" in nightmare_manager
     assert "thePursuit(player)" in nightmare_manager and "theoutlands_nightmare_stalker" in nightmare_manager
-    assert "onNightmareCreatureHurt" in nightmare_manager and "setTarget(attacker)" in nightmare_manager
+    assert "coordinateNightmarePack" in nightmare_manager and "setTarget(player)" in nightmare_manager
     assert "nightmare_records" in feature
     assert "applyVariations(id,level,x,surfaceY,z,random)" in feature
     assert "StructurePlacementPolicy.containsBlock" in feature and "public static boolean containsBlock" in policy
