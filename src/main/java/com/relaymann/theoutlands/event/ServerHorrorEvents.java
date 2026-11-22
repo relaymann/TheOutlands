@@ -101,7 +101,6 @@ public final class ServerHorrorEvents {
         FootstepEchoManager.clear();
         EnvironmentalAnomalyManager.clear();
         StructureAmbienceManager.clear();
-        StructureEncounterManager.clear();
         OutlandsIntelligenceManager.clear();
         PredatoryStalkingManager.clear(event.getServer().getAllLevels());
         EntityTraceManager.clear();
