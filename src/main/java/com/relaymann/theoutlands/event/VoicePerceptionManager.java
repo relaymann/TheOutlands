@@ -40,7 +40,7 @@ public final class VoicePerceptionManager {
         if (!OutlandsConfig.VOICE_HORROR_ENABLED.get()) return;
         int clamped = Math.max(0, Math.min(100, level));
         REPORTED_LEVELS.put(player.getUUID(), new ReportedLevel(clamped, whispering,
-                player.serverLevel().getGameTime()));
+                player.serverLevel().getGameTime(), player.serverLevel().dimension()));
         VoiceSignal active = ACTIVE_VOICES.get(player.getUUID());
         if (active != null) {
             ACTIVE_VOICES.put(player.getUUID(), new VoiceSignal(player.position(),
@@ -49,7 +49,6 @@ public final class VoicePerceptionManager {
         }
     }
 
-    /** Called only after Simple Voice Chat confirms an actual microphone packet. */
     /** Thread-safe limiter called from the voice-chat packet thread before scheduling server work. */
     public static synchronized boolean shouldAcceptVoicePacket(UUID playerId) {
         long now = System.nanoTime();
@@ -80,8 +79,10 @@ public final class VoicePerceptionManager {
         }
         wasVoiceEnabled = true;
         long now = level.getGameTime();
-        ACTIVE_VOICES.entrySet().removeIf(entry -> now - entry.getValue().lastPacket() > ACTIVE_PACKET_TTL);
-        REPORTED_LEVELS.entrySet().removeIf(entry -> now - entry.getValue().gameTime() > 40L);
+        ACTIVE_VOICES.entrySet().removeIf(entry -> entry.getValue().dimension().equals(level.dimension())
+                && now - entry.getValue().lastPacket() > ACTIVE_PACKET_TTL);
+        REPORTED_LEVELS.entrySet().removeIf(entry -> entry.getValue().dimension().equals(level.dimension())
+                && now - entry.getValue().gameTime() > 40L);
 
         for (var iterator = ACTIVE_VOICES.entrySet().iterator(); iterator.hasNext();) {
             var entry = iterator.next();
@@ -97,7 +98,8 @@ public final class VoicePerceptionManager {
 
         investigateRemembered(level, now);
         if (now % 40L == 0L) {
-            ENTITY_MEMORY.entrySet().removeIf(entry -> now - entry.getValue().lastHeard() > MEMORY_TTL);
+            ENTITY_MEMORY.entrySet().removeIf(entry -> entry.getValue().dimension().equals(level.dimension())
+                    && now - entry.getValue().lastHeard() > MEMORY_TTL);
         }
     }
 
@@ -333,7 +335,8 @@ public final class VoicePerceptionManager {
     private enum Behavior { STALK, HUNT, OBSERVE, FLANK, UNDERGROUND, TERRITORIAL, MIMIC, HOWLER }
     private record HearingProfile(double rangeScale, double speed, double approachDistance,
                                   int cooldown, Behavior behavior) {}
-    private record ReportedLevel(int level, boolean whispering, long gameTime) {}
+    private record ReportedLevel(int level, boolean whispering, long gameTime,
+                                 ResourceKey<Level> dimension) {}
     private record VoiceSignal(Vec3 position, ResourceKey<Level> dimension, int level,
                                boolean whispering, long lastPacket) {}
     private record VoiceMemory(Vec3 position, UUID player, ResourceKey<Level> dimension,
