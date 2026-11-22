@@ -56,7 +56,7 @@ public final class StructureEncounterManager {
                     : Math.max(1_000.0D, OutlandsConfig.STRUCTURE_MIN_DISTANCE.get());
             double frequency = OutlandsConfig.STRUCTURE_CHANCE_MULTIPLIER.get() * (nightmare ? 2.5D : 1.0D);
             String layout = OutlandsStructureFeature.chooseLayout(seed, distance, forest,
-                    minimumDistance, frequency);
+                    minimumDistance, frequency, nightmare);
             if (layout == null || resolve(level, layout, center, distance, seed)) {
                 RESOLVED_SITES.add(key);
             }
@@ -95,6 +95,10 @@ public final class StructureEncounterManager {
                 else { selected = OutlandsEntities.DREDGE.get(); denominator = 38; }
             }
             case "boundary_monument" -> { if (distance >= 18_000) { selected = OutlandsEntities.NULL_APOSTLE.get(); denominator = 100; } }
+            case "nightmare_containment" -> { selected = OutlandsEntities.STILLBORN_STATUE.get(); denominator = 10; }
+            case "blood_moon_shrine" -> { selected = OutlandsEntities.NULL_APOSTLE.get(); denominator = 8; }
+            case "nightmare_outpost" -> { selected = OutlandsEntities.STALKER.get(); denominator = 7; }
+            case "black_site" -> { selected = OutlandsEntities.AGITATED_ONE.get(); denominator = 8; }
         }
         if (NightmareMode.isEnabled(level) && denominator > 0) denominator = Math.max(3, denominator / 3);
         if (selected == null || (denominator > 0 && random.nextInt(denominator) != 0)) return true;

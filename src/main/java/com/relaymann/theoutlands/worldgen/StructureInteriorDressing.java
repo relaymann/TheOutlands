@@ -7,7 +7,7 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 
-/** Small, deterministic interior dressing pass shared by all fourteen sites. */
+/** Small, deterministic interior dressing pass shared by all eighteen sites. */
 public final class StructureInteriorDressing {
     private StructureInteriorDressing() {}
 

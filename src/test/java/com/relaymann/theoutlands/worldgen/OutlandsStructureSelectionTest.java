@@ -32,6 +32,22 @@ class OutlandsStructureSelectionTest {
         assertTrue(foundCabin, "The forest cabin should be reachable at its minimum distance");
     }
 
+
+    @Test
+    void nightmareLayoutsAreExclusiveAndSelectable() {
+        Set<String> nightmareOnly = Set.of(
+                "nightmare_containment", "blood_moon_shrine", "nightmare_outpost", "black_site");
+        boolean foundNightmare = false;
+        for (long seed = 0; seed < 20_000 && !foundNightmare; seed++) {
+            String survival = StructureLayoutPolicy.chooseLayout(seed, 60_000.0D, true, 250.0D, 2.5D);
+            assertFalse(nightmareOnly.contains(survival), "Nightmare-only site leaked into Survival");
+            String nightmare = StructureLayoutPolicy.chooseLayout(
+                    seed, 60_000.0D, true, 250.0D, 2.5D, true);
+            foundNightmare = nightmareOnly.contains(nightmare);
+        }
+        assertTrue(foundNightmare, "NIGHTMARE should be able to select an exclusive structure");
+    }
+
     @Test
     void seededLayoutSelectionIsRepeatable() {
         boolean found = false;

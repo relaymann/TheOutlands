@@ -63,7 +63,7 @@ public final class OutlandsStructurePiece extends StructurePiece {
                 ? Math.max(250.0D, OutlandsConfig.STRUCTURE_MIN_DISTANCE.get() * 0.25D)
                 : Math.max(1_000.0D, OutlandsConfig.STRUCTURE_MIN_DISTANCE.get());
         double frequency = OutlandsConfig.STRUCTURE_CHANCE_MULTIPLIER.get() * (nightmare ? 2.5D : 1.0D);
-        String layout=OutlandsStructureFeature.chooseLayout(seed,distance,forest,minimumDistance,frequency);
+        String layout=OutlandsStructureFeature.chooseLayout(seed,distance,forest,minimumDistance,frequency,nightmare);
         if(layout==null) return;
         OutlandsStructureFeature.generateLayout(layout,level,anchorX,surfaceY,anchorZ,
                 RandomSource.create(seed ^ 0x6A09E667F3BCC909L),box);

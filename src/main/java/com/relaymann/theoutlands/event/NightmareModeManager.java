@@ -14,6 +14,8 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.phys.AABB;
+import net.neoforged.neoforge.event.entity.living.LivingHurtEvent;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
@@ -45,8 +47,7 @@ public final class NightmareModeManager {
                 OutlandsEntities.LURKER.get(), OutlandsEntities.DREDGE.get(),
                 OutlandsEntities.MIMIC.get(), OutlandsEntities.OBSERVER.get(),
                 OutlandsEntities.HOWLER.get(), OutlandsEntities.PILGRIM.get(),
-                OutlandsEntities.BURROWER.get(), OutlandsEntities.CAVE_JAR.get(),
-                OutlandsEntities.CEILING_DWELLER.get());
+                OutlandsEntities.STILLBORN_STATUE.get(), OutlandsEntities.AGITATED_ONE.get());
     }
 
     private NightmareModeManager() {}
@@ -87,6 +88,10 @@ public final class NightmareModeManager {
     }
 
     private static void triggerEvent(ServerPlayer player) {
+        if (player.getRandom().nextInt(100) < 5) {
+            thePursuit(player);
+            return;
+        }
         switch (player.getRandom().nextInt(4)) {
             case 0 -> bloodMoon(player);
             case 1 -> silence(player);
@@ -109,7 +114,6 @@ public final class NightmareModeManager {
     /** Briefly cuts ambient audio, then leaves one distant sign behind. */
     private static void silence(ServerPlayer player) {
         player.connection.send(new ClientboundStopSoundPacket(Optional.empty(), Optional.of(SoundSource.AMBIENT)));
-        play(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT, 0.07F, 0.35F);
         player.serverLevel().sendParticles(ParticleTypes.ASH, player.getX(), player.getY() + 1.0D,
                 player.getZ(), 12, 0.7D, 0.8D, 0.7D, 0.002D);
     }
@@ -118,6 +122,14 @@ public final class NightmareModeManager {
     private static void unusualActivity(ServerPlayer player) {
         play(player, SoundEvents.WARDEN_HEARTBEAT, SoundSource.HOSTILE, 0.24F, 0.55F);
         spawnThreats(player, 2, true);
+    }
+
+    /** Rare multi-hunter encounter; the marked Stalkers are the NIGHTMARE-only variant. */
+    private static void thePursuit(ServerPlayer player) {
+        play(player, SoundEvents.WARDEN_HEARTBEAT, SoundSource.HOSTILE, 0.18F, 0.42F);
+        spawnThreat(player, OutlandsEntities.STALKER.get(), true);
+        spawnThreat(player, OutlandsEntities.STALKER.get(), true);
+        spawnThreat(player, OutlandsEntities.HUNTER.get(), true);
     }
 
     /** A much more dangerous group encounter, exclusive to NIGHTMARE. */
@@ -129,46 +141,53 @@ public final class NightmareModeManager {
     }
 
     private static void spawnThreats(ServerPlayer player, int count, boolean empowered) {
-        ServerLevel level = player.serverLevel();
+        List<net.minecraft.world.entity.EntityType<? extends Mob>> threats = threatTypes();
         for (int i = 0; i < count; i++) {
-            double angle = player.getRandom().nextDouble() * Math.PI * 2.0D;
-            double distance = 22.0D + player.getRandom().nextDouble() * 15.0D;
-            int x = net.minecraft.util.Mth.floor(player.getX() + Math.cos(angle) * distance);
-            int z = net.minecraft.util.Mth.floor(player.getZ() + Math.sin(angle) * distance);
-            BlockPos column = new BlockPos(x, net.minecraft.util.Mth.floor(player.getY()), z);
-            if (!level.hasChunkAt(column)) continue;
-            int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
-            BlockPos spawn = new BlockPos(x, y, z);
-            if (!level.hasChunkAt(spawn)) continue;
-
-            List<net.minecraft.world.entity.EntityType<? extends Mob>> threats = threatTypes();
-            var type = threats.get(player.getRandom().nextInt(threats.size()));
-            Mob mob = type.create(level);
-            if (mob == null) continue;
-            mob.moveTo(x + 0.5D, y, z + 0.5D, player.getRandom().nextFloat() * 360.0F, 0.0F);
-            if (!level.noCollision(mob, mob.getBoundingBox())) {
-                mob.discard();
-                continue;
-            }
-            if (empowered) empower(mob);
-            mob.addTag("theoutlands_nightmare_spawn");
-            mob.setPersistenceRequired();
-            mob.setTarget(player);
-            if (!level.addFreshEntity(mob)) mob.discard();
+            spawnThreat(player, threats.get(player.getRandom().nextInt(threats.size())), empowered);
         }
+    }
+
+    private static void spawnThreat(ServerPlayer player,
+                                    net.minecraft.world.entity.EntityType<? extends Mob> type,
+                                    boolean empowered) {
+        ServerLevel level = player.serverLevel();
+        double angle = player.getRandom().nextDouble() * Math.PI * 2.0D;
+        double distance = 22.0D + player.getRandom().nextDouble() * 15.0D;
+        int x = net.minecraft.util.Mth.floor(player.getX() + Math.cos(angle) * distance);
+        int z = net.minecraft.util.Mth.floor(player.getZ() + Math.sin(angle) * distance);
+        BlockPos column = new BlockPos(x, net.minecraft.util.Mth.floor(player.getY()), z);
+        if (!level.hasChunkAt(column)) return;
+        int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
+        BlockPos spawn = new BlockPos(x, y, z);
+        if (!level.hasChunkAt(spawn)) return;
+
+        Mob mob = type.create(level);
+        if (mob == null) return;
+        mob.moveTo(x + 0.5D, y, z + 0.5D, player.getRandom().nextFloat() * 360.0F, 0.0F);
+        if (!level.noCollision(mob, mob.getBoundingBox())) {
+            mob.discard();
+            return;
+        }
+        if (empowered) empower(mob);
+        mob.addTag("theoutlands_nightmare_spawn");
+        if (type == OutlandsEntities.STALKER.get()) mob.addTag("theoutlands_nightmare_stalker");
+        mob.setPersistenceRequired();
+        mob.setTarget(player);
+        if (!level.addFreshEntity(mob)) mob.discard();
     }
 
     /** NIGHTMARE event-spawned creatures are faster and tougher, not merely more numerous. */
     private static void empower(Mob mob) {
+        boolean stalkerVariant = mob.getType() == OutlandsEntities.STALKER.get();
         AttributeInstance speed = mob.getAttribute(Attributes.MOVEMENT_SPEED);
-        if (speed != null) speed.setBaseValue(Math.min(0.65D, speed.getBaseValue() * 1.18D));
+        if (speed != null) speed.setBaseValue(Math.min(0.70D, speed.getBaseValue() * (stalkerVariant ? 1.32D : 1.18D)));
         AttributeInstance health = mob.getAttribute(Attributes.MAX_HEALTH);
         if (health != null) {
-            health.setBaseValue(health.getBaseValue() * 1.15D);
+            health.setBaseValue(health.getBaseValue() * (stalkerVariant ? 1.30D : 1.15D));
             mob.setHealth(mob.getMaxHealth());
         }
         AttributeInstance damage = mob.getAttribute(Attributes.ATTACK_DAMAGE);
-        if (damage != null) damage.setBaseValue(damage.getBaseValue() * 1.15D);
+        if (damage != null) damage.setBaseValue(damage.getBaseValue() * (stalkerVariant ? 1.25D : 1.15D));
     }
 
     private static void play(ServerPlayer player, SoundEvent sound, SoundSource source,
@@ -177,6 +196,22 @@ public final class NightmareModeManager {
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), source,
                 player.getX(), player.getY(), player.getZ(), volume, pitch,
                 player.getRandom().nextLong()));
+    }
+
+    /** A hit on one Nightmare pack member alerts its nearby companions. */
+    @SubscribeEvent
+    public static void onNightmareCreatureHurt(LivingHurtEvent event) {
+        if (!(event.getEntity() instanceof Mob injured)
+                || !injured.getTags().contains("theoutlands_nightmare_spawn")
+                || !(event.getSource().getEntity() instanceof ServerPlayer attacker)
+                || !(injured.level() instanceof ServerLevel level)
+                || !NightmareMode.isEnabled(level)) return;
+        for (Mob ally : level.getEntitiesOfClass(Mob.class,
+                new AABB(injured.blockPosition()).inflate(40.0D),
+                candidate -> candidate.isAlive()
+                        && candidate.getTags().contains("theoutlands_nightmare_spawn"))) {
+            ally.setTarget(attacker);
+        }
     }
 
     @SubscribeEvent

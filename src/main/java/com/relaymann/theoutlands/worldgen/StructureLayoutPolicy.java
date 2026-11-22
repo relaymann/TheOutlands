@@ -7,16 +7,22 @@ public final class StructureLayoutPolicy {
     private static final String[] IDS = {
             "cabin", "tower", "bunker", "shrine", "observatory", "archive",
             "research_facility", "apostle_cathedral", "forsaken_settlement", "last_outpost",
-            "forgotten_station", "null_chamber", "hollow_crypt", "boundary_monument"
+            "forgotten_station", "null_chamber", "hollow_crypt", "boundary_monument",
+            "nightmare_containment", "blood_moon_shrine", "nightmare_outpost", "black_site"
     };
 
     private StructureLayoutPolicy() {}
 
     public static String chooseLayout(long seed, double distance, boolean forest,
                                       double configuredMinimum, double multiplier) {
+        return chooseLayout(seed, distance, forest, configuredMinimum, multiplier, false);
+    }
+
+    public static String chooseLayout(long seed, double distance, boolean forest,
+                                      double configuredMinimum, double multiplier, boolean nightmare) {
         if (!Double.isFinite(distance) || distance < configuredMinimum || multiplier <= 0.0D) return null;
         double scale = StructurePlacementPolicy.CELL_CHUNKS * StructurePlacementPolicy.CELL_CHUNKS;
-        double[] weights = new double[14];
+        double[] weights = new double[IDS.length];
         weights[0] = forest ? weight(distance, 1_000, 5_500, multiplier, scale) : 0;
         weights[1] = weight(distance, 1_800, 7_000, multiplier, scale);
         weights[2] = weight(distance, 2_500, 8_500, multiplier, scale);
@@ -31,6 +37,16 @@ public final class StructureLayoutPolicy {
         weights[11] = weight(distance, 25_000, 28_000, multiplier, scale);
         weights[12] = weight(distance, 35_000, 30_000, multiplier, scale);
         weights[13] = weight(distance, 18_000, 22_000, multiplier, scale);
+
+        // These four identities are never selected in ordinary Survival worlds.
+        if (nightmare) {
+            double nightmareScale = multiplier * 1.8D;
+            weights[14] = weight(distance, 250, 4_500, nightmareScale, scale);
+            weights[15] = weight(distance, 750, 6_500, nightmareScale, scale);
+            weights[16] = forest ? weight(distance, 500, 5_500, nightmareScale, scale) : 0;
+            weights[17] = weight(distance, 3_000, 10_000, nightmareScale, scale);
+        }
+
         double total = 0.0D;
         for (double weight : weights) total += weight;
         if (total <= 0.0D) return null;

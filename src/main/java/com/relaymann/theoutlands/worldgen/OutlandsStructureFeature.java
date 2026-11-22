@@ -22,7 +22,12 @@ public final class OutlandsStructureFeature {
 
     public static String chooseLayout(long seed, double distance, boolean forest,
                                       double configuredMinimum, double multiplier) {
-        return StructureLayoutPolicy.chooseLayout(seed,distance,forest,configuredMinimum,multiplier);
+        return chooseLayout(seed, distance, forest, configuredMinimum, multiplier, false);
+    }
+
+    public static String chooseLayout(long seed, double distance, boolean forest,
+                                      double configuredMinimum, double multiplier, boolean nightmare) {
+        return StructureLayoutPolicy.chooseLayout(seed, distance, forest, configuredMinimum, multiplier, nightmare);
     }
 
     public static void generateLayout(String id, WorldGenLevel level, int x, int surfaceY, int z,
@@ -45,6 +50,10 @@ public final class OutlandsStructureFeature {
                 case "null_chamber" -> nullChamber(level,coreX,surfaceY,coreZ,random);
                 case "hollow_crypt" -> hollowCrypt(level,coreX,surfaceY,coreZ,random);
                 case "boundary_monument" -> boundaryMonument(level,coreX,surfaceY,coreZ,random);
+                case "nightmare_containment" -> nightmareContainment(level,coreX,surfaceY,coreZ,random);
+                case "blood_moon_shrine" -> bloodMoonShrine(level,coreX,surfaceY,coreZ,random);
+                case "nightmare_outpost" -> nightmareOutpost(level,coreX,surfaceY,coreZ,random);
+                case "black_site" -> blackSite(level,coreX,surfaceY,coreZ,random);
                 default -> { return; }
             }
             expand(id,level,x,surfaceY,z);
@@ -142,6 +151,49 @@ public final class OutlandsStructureFeature {
                 ring(l,x,y,z,23,Blocks.CRACKED_STONE_BRICKS.defaultBlockState());
                 for(int[] q:new int[][]{{4,4},{40,4},{4,40},{40,40},{22,3},{22,42},{3,22},{42,22}})
                     obelisk(l,x+q[0],y,z+q[1],8,Blocks.CHISELED_STONE_BRICKS.defaultBlockState());
+            }
+            case "nightmare_containment" -> {
+                int d=y-18;
+                room(l,x+2,d,z+2,13,13,5,Blocks.IRON_BLOCK.defaultBlockState(),Blocks.POLISHED_DEEPSLATE.defaultBlockState(),Blocks.IRON_BLOCK.defaultBlockState());
+                room(l,x+33,d,z+2,13,13,5,Blocks.IRON_BLOCK.defaultBlockState(),Blocks.POLISHED_DEEPSLATE.defaultBlockState(),Blocks.IRON_BLOCK.defaultBlockState());
+                room(l,x+2,d,z+33,13,13,5,Blocks.IRON_BLOCK.defaultBlockState(),Blocks.POLISHED_DEEPSLATE.defaultBlockState(),Blocks.IRON_BLOCK.defaultBlockState());
+                room(l,x+33,d,z+33,13,13,5,Blocks.IRON_BLOCK.defaultBlockState(),Blocks.POLISHED_DEEPSLATE.defaultBlockState(),Blocks.IRON_BLOCK.defaultBlockState());
+                hallX(l,x+15,d,z+23,18,Blocks.IRON_BARS.defaultBlockState());
+                hallZ(l,x+23,d,z+15,18,Blocks.IRON_BARS.defaultBlockState());
+                p(l,x+23,d+1,z+23,Blocks.CRYING_OBSIDIAN.defaultBlockState());
+                p(l,x+23,d+2,z+23,Blocks.REDSTONE_LAMP.defaultBlockState());
+            }
+            case "blood_moon_shrine" -> {
+                courtyard(l,x,y,z,Blocks.RED_NETHER_BRICKS.defaultBlockState());
+                ring(l,x,y,z,19,Blocks.BLACKSTONE.defaultBlockState());
+                for(int[] q:new int[][]{{5,5},{39,5},{5,39},{39,39}})
+                    obelisk(l,x+q[0],y,z+q[1],8,Blocks.CRYING_OBSIDIAN.defaultBlockState());
+                p(l,x+23,y+1,z+23,Blocks.REDSTONE_LAMP.defaultBlockState());
+                p(l,x+23,y+2,z+23,Blocks.CHAIN.defaultBlockState());
+            }
+            case "nightmare_outpost" -> {
+                yard(l,x,y,z,Blocks.POLISHED_BLACKSTONE_BRICK_WALL.defaultBlockState());
+                for(int[] q:new int[][]{{3,3},{40,3},{3,40},{40,40}}) watchPost(l,x+q[0],y,z+q[1]);
+                room(l,x+16,y,z+16,16,16,5,Blocks.DEEPSLATE_BRICKS.defaultBlockState(),
+                        Blocks.CRACKED_DEEPSLATE_BRICKS.defaultBlockState(),Blocks.DEEPSLATE_BRICKS.defaultBlockState());
+                room(l,x+3,y,z+18,10,8,4,Blocks.COBBLED_DEEPSLATE.defaultBlockState(),
+                        Blocks.POLISHED_DEEPSLATE.defaultBlockState(),Blocks.COBBLED_DEEPSLATE.defaultBlockState());
+                pathX(l,x+12,y,z+24,20,Blocks.COARSE_DIRT.defaultBlockState());
+            }
+            case "black_site" -> {
+                int d=y-30;
+                room(l,x+4,d,z+4,40,40,7,Blocks.POLISHED_DEEPSLATE.defaultBlockState(),
+                        Blocks.DEEPSLATE_TILES.defaultBlockState(),Blocks.POLISHED_DEEPSLATE.defaultBlockState());
+                room(l,x+8,d+1,z+8,10,10,4,Blocks.IRON_BLOCK.defaultBlockState(),
+                        Blocks.POLISHED_ANDESITE.defaultBlockState(),Blocks.IRON_BLOCK.defaultBlockState());
+                room(l,x+30,d+1,z+8,10,10,4,Blocks.IRON_BLOCK.defaultBlockState(),
+                        Blocks.POLISHED_ANDESITE.defaultBlockState(),Blocks.IRON_BLOCK.defaultBlockState());
+                room(l,x+8,d+1,z+30,10,10,4,Blocks.IRON_BLOCK.defaultBlockState(),
+                        Blocks.POLISHED_ANDESITE.defaultBlockState(),Blocks.IRON_BLOCK.defaultBlockState());
+                hallX(l,x+18,d+1,z+23,12,Blocks.IRON_BARS.defaultBlockState());
+                p(l,x+23,d+2,z+23,Blocks.CRYING_OBSIDIAN.defaultBlockState());
+                for(int[] q:new int[][]{{7,7},{40,7},{7,40},{40,40}})
+                    p(l,x+q[0],d+1,z+q[1],Blocks.REDSTONE_LAMP.defaultBlockState());
             }
         }
     }
@@ -250,7 +302,10 @@ public final class OutlandsStructureFeature {
             case "hollow_crypt" -> { p(l,rx+2,y+1,rz+4,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.BONE_BLOCK.defaultBlockState()); }
             case "boundary_monument" -> { p(l,rx+2,y+1,rz+4,Blocks.CHISELED_STONE_BRICKS.defaultBlockState()); p(l,rx+3,y+1,rz+4,Blocks.CRYING_OBSIDIAN.defaultBlockState()); }
         }
-        chest(l,rx+6,y+1,rz+4,"theoutlands:structures/hidden_cache",r);
+        String loot = id.equals("nightmare_containment") || id.equals("blood_moon_shrine")
+                || id.equals("nightmare_outpost") || id.equals("black_site")
+                ? "theoutlands:structures/nightmare_records" : "theoutlands:structures/hidden_cache";
+        chest(l,rx+6,y+1,rz+4,loot,r);
     }
 
 
@@ -608,6 +663,55 @@ public final class OutlandsStructureFeature {
         air(l,x+4,surface,z+1);p(l,x+3,surface,z+1,Blocks.DEEPSLATE_BRICKS.defaultBlockState());
         p(l,x+5,surface,z+1,Blocks.DEEPSLATE_BRICKS.defaultBlockState());p(l,x+4,surface,z+2,Blocks.IRON_TRAPDOOR.defaultBlockState());
         chest(l,x+7,y+1,z+4,"theoutlands:structures/hollow_crypt",r);
+    }
+
+ 
+    // NIGHTMARE-only identities are distinct sites, not recolors of the ordinary structures.
+    private static void nightmareContainment(WorldGenLevel l,int x,int y,int z,RandomSource r) {
+        int ox=x-19, oz=z-19;
+        for(int[] q:new int[][]{{2,2},{33,2},{2,33},{33,33}})
+            obelisk(l,ox+q[0],y-18,oz+q[1],6,Blocks.IRON_BLOCK.defaultBlockState());
+        for(int a=0;a<4;a++) p(l,ox+21+a,y-17,oz+23,Blocks.IRON_BARS.defaultBlockState());
+        p(l,ox+23,y-16,oz+23,Blocks.CRYING_OBSIDIAN.defaultBlockState());
+        p(l,ox+23,y-15,oz+23,Blocks.REDSTONE_LAMP.defaultBlockState());
+    }
+
+    private static void bloodMoonShrine(WorldGenLevel l,int x,int y,int z,RandomSource r) {
+        int ox=x-19, oz=z-19;
+        courtyard(l,ox,y,oz,Blocks.RED_NETHER_BRICKS.defaultBlockState());
+        ring(l,ox,y,oz,19,Blocks.BLACKSTONE.defaultBlockState());
+        for(int[] q:new int[][]{{7,7},{41,7},{7,41},{41,41}})
+            obelisk(l,ox+q[0],y,oz+q[1],8,Blocks.CRYING_OBSIDIAN.defaultBlockState());
+        p(l,ox+23,y+1,oz+23,Blocks.REDSTONE_LAMP.defaultBlockState());
+        p(l,ox+23,y+2,oz+23,Blocks.CHAIN.defaultBlockState());
+    }
+
+    private static void nightmareOutpost(WorldGenLevel l,int x,int y,int z,RandomSource r) {
+        int ox=x-19, oz=z-19;
+        for(int[] q:new int[][]{{4,4},{40,4},{4,40},{40,40}}) {
+            watchPost(l,ox+q[0],y,oz+q[1]);
+            p(l,ox+q[0],y+1,oz+q[1],Blocks.REDSTONE_LAMP.defaultBlockState());
+        }
+        room(l,ox+16,y,oz+16,16,14,5,Blocks.COBBLED_DEEPSLATE.defaultBlockState(),
+                Blocks.DEEPSLATE_BRICKS.defaultBlockState(),Blocks.COBBLED_DEEPSLATE.defaultBlockState());
+        room(l,ox+3,y,oz+18,10,8,4,Blocks.COBBLED_DEEPSLATE.defaultBlockState(),
+                Blocks.POLISHED_DEEPSLATE.defaultBlockState(),Blocks.COBBLED_DEEPSLATE.defaultBlockState());
+    }
+
+    private static void blackSite(WorldGenLevel l,int x,int y,int z,RandomSource r) {
+        int ox=x-19, oz=z-19, d=y-30;
+        room(l,ox+4,d,oz+4,40,40,7,Blocks.POLISHED_DEEPSLATE.defaultBlockState(),
+                Blocks.DEEPSLATE_TILES.defaultBlockState(),Blocks.POLISHED_DEEPSLATE.defaultBlockState());
+        room(l,ox+8,d+1,oz+8,10,10,4,Blocks.IRON_BLOCK.defaultBlockState(),
+                Blocks.POLISHED_ANDESITE.defaultBlockState(),Blocks.IRON_BLOCK.defaultBlockState());
+        room(l,ox+30,d+1,oz+8,10,10,4,Blocks.IRON_BLOCK.defaultBlockState(),
+                Blocks.POLISHED_ANDESITE.defaultBlockState(),Blocks.IRON_BLOCK.defaultBlockState());
+        room(l,ox+8,d+1,oz+30,10,10,4,Blocks.IRON_BLOCK.defaultBlockState(),
+                Blocks.POLISHED_ANDESITE.defaultBlockState(),Blocks.IRON_BLOCK.defaultBlockState());
+        hallX(l,ox+18,d+1,oz+23,12,Blocks.IRON_BARS.defaultBlockState());
+        p(l,ox+23,d+2,oz+23,Blocks.CRYING_OBSIDIAN.defaultBlockState());
+        for(int[] q:new int[][]{{7,7},{40,7},{7,40},{40,40}})
+            p(l,ox+q[0],d+1,oz+q[1],Blocks.REDSTONE_LAMP.defaultBlockState());
     }
 
     // Boundary Monument: towering broken concentric rings and an empty freestanding frame.

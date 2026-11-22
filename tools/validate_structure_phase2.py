@@ -14,9 +14,11 @@ AMBIENCE = ROOT / "src/main/java/com/relaymann/theoutlands/event/StructureAmbien
 DISCOVERY = ROOT / "src/main/java/com/relaymann/theoutlands/event/StructureDiscoveryEvents.java"
 ENCOUNTERS = ROOT / "src/main/java/com/relaymann/theoutlands/worldgen/StructureEncounterManager.java"
 STRUCTURE = ROOT / "src/main/java/com/relaymann/theoutlands/worldgen/OutlandsStructure.java"
-STRUCTURES = {"cabin","tower","bunker","shrine","observatory","archive","research_facility",
+BASE_STRUCTURES = {"cabin","tower","bunker","shrine","observatory","archive","research_facility",
 "apostle_cathedral","forsaken_settlement","last_outpost","forgotten_station","null_chamber",
 "hollow_crypt","boundary_monument"}
+NIGHTMARE_STRUCTURES = {"nightmare_containment","blood_moon_shrine","nightmare_outpost","black_site"}
+STRUCTURES = BASE_STRUCTURES | NIGHTMARE_STRUCTURES
 
 def walk(value):
     if isinstance(value, dict):
@@ -29,7 +31,7 @@ def main():
     feature, piece, policy = (p.read_text(encoding="utf-8") for p in (FEATURE, PIECE, POLICY))
     ambience, discovery, encounters, structure = (p.read_text(encoding="utf-8") for p in (AMBIENCE, DISCOVERY, ENCOUNTERS, STRUCTURE))
     refs=set(re.findall(r'theoutlands:structures/([a-z_]+)',feature))
-    expected=STRUCTURES|{"hidden_cache"}
+    expected=BASE_STRUCTURES|{"hidden_cache","nightmare_records"}
     assert refs==expected, f"loot references mismatch: missing={expected-refs}, extra={refs-expected}"
     titles=set()
     for name in expected:
@@ -78,6 +80,12 @@ def main():
     assert "addFreshEntity" not in piece and "StructureEncounterManager" not in piece
     layout_ids=set(re.findall(r'case "([a-z_]+)" ->',feature))
     assert STRUCTURES<=layout_ids, f"missing layouts: {STRUCTURES-layout_ids}"
+    nightmare_manager=(ROOT/"src/main/java/com/relaymann/theoutlands/event/NightmareModeManager.java").read_text(encoding="utf-8")
+    assert "bloodMoon(player)" in nightmare_manager and "silence(player)" in nightmare_manager
+    assert "unusualActivity(player)" in nightmare_manager and "containmentFailure(player)" in nightmare_manager
+    assert "thePursuit(player)" in nightmare_manager and "theoutlands_nightmare_stalker" in nightmare_manager
+    assert "onNightmareCreatureHurt" in nightmare_manager and "setTarget(attacker)" in nightmare_manager
+    assert "nightmare_records" in feature
     assert "applyVariations(id,level,x,surfaceY,z,random)" in feature
     assert "StructurePlacementPolicy.containsBlock" in feature and "public static boolean containsBlock" in policy
     assert "StructurePlacementPolicy.isSpacedAnchor" in structure and "max-min>5" in structure

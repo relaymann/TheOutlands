@@ -1,6 +1,7 @@
 package com.relaymann.theoutlands.event;
 
 import com.relaymann.theoutlands.TheOutlands;
+import com.relaymann.theoutlands.NightmareMode;
 import com.relaymann.theoutlands.OutlandsConfig;
 import com.relaymann.theoutlands.horror.HorrorMemory;
 import com.relaymann.theoutlands.worldgen.OutlandsStructure;
@@ -39,8 +40,12 @@ public final class StructureDiscoveryEvents {
         long seed=StructurePlacementPolicy.chunkSeed(level.getSeed(),chunkX,chunkZ);
         String biome=level.getBiome(center).unwrapKey().map(k->k.location().getPath()).orElse("");
         boolean forest=biome.contains("forest")||biome.contains("taiga")||biome.contains("grove")||biome.contains("wooded");
-        String layout=OutlandsStructureFeature.chooseLayout(seed,distance,forest,
-                Math.max(1_000.0D,OutlandsConfig.STRUCTURE_MIN_DISTANCE.get()),OutlandsConfig.STRUCTURE_CHANCE_MULTIPLIER.get());
+        boolean nightmare = NightmareMode.isEnabled(level);
+        double minimumDistance = nightmare
+                ? Math.max(250.0D, OutlandsConfig.STRUCTURE_MIN_DISTANCE.get() * 0.25D)
+                : Math.max(1_000.0D, OutlandsConfig.STRUCTURE_MIN_DISTANCE.get());
+        double frequency = OutlandsConfig.STRUCTURE_CHANCE_MULTIPLIER.get() * (nightmare ? 2.5D : 1.0D);
+        String layout=OutlandsStructureFeature.chooseLayout(seed,distance,forest,minimumDistance,frequency,nightmare);
         if(layout==null)return;
         HorrorMemory.recordDiscovery(player, "structure_" + layout);
         BlockPos hiddenCacheChest = new BlockPos(bounds.minX() + 39, bounds.maxY() - 49, bounds.minZ() + 6);

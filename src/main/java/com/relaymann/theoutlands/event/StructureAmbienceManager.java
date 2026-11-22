@@ -1,6 +1,7 @@
 package com.relaymann.theoutlands.event;
 
 import com.relaymann.theoutlands.OutlandsConfig;
+import com.relaymann.theoutlands.NightmareMode;
 import com.relaymann.theoutlands.worldgen.OutlandsStructureFeature;
 import com.relaymann.theoutlands.sound.OutlandsSounds;
 import com.relaymann.theoutlands.worldgen.OutlandsWorldgen;
@@ -48,9 +49,12 @@ public final class StructureAmbienceManager {
             String biome=level.getBiome(new BlockPos(center.getX(),bounds.maxY()-8,center.getZ()))
                     .unwrapKey().map(k->k.location().getPath()).orElse("");
             boolean forest=biome.contains("forest")||biome.contains("taiga")||biome.contains("grove")||biome.contains("wooded");
-            String id=OutlandsStructureFeature.chooseLayout(seed,distance,forest,
-                    Math.max(1_000.0D,OutlandsConfig.STRUCTURE_MIN_DISTANCE.get()),
-                    OutlandsConfig.STRUCTURE_CHANCE_MULTIPLIER.get());
+            boolean nightmare = NightmareMode.isEnabled(level);
+            double minimumDistance = nightmare
+                    ? Math.max(250.0D, OutlandsConfig.STRUCTURE_MIN_DISTANCE.get() * 0.25D)
+                    : Math.max(1_000.0D, OutlandsConfig.STRUCTURE_MIN_DISTANCE.get());
+            double frequency = OutlandsConfig.STRUCTURE_CHANCE_MULTIPLIER.get() * (nightmare ? 2.5D : 1.0D);
+            String id=OutlandsStructureFeature.chooseLayout(seed,distance,forest,minimumDistance,frequency,nightmare);
             if(id==null) continue;
             if(player.getRandom().nextInt(90)!=0) continue;
             play(player,id,bounds,now);
@@ -77,6 +81,10 @@ public final class StructureAmbienceManager {
             case "shrine" -> send(player,OutlandsSounds.STRUCTURE_SHRINE.get(),x,y,z,0.18F,0.62F);
             case "observatory" -> send(player,OutlandsSounds.STRUCTURE_OBSERVATORY.get(),x,y,z,0.16F,0.84F);
             case "archive" -> send(player,OutlandsSounds.STRUCTURE_ARCHIVE.get(),x,y,z,0.18F,0.42F);
+            case "nightmare_containment" -> send(player,OutlandsSounds.STRUCTURE_RESEARCH.get(),x,y,z,0.30F,0.38F);
+            case "blood_moon_shrine" -> send(player,OutlandsSounds.STRUCTURE_SHRINE.get(),x,y,z,0.28F,0.42F);
+            case "nightmare_outpost" -> send(player,OutlandsSounds.STRUCTURE_OUTPOST.get(),x,y,z,0.28F,0.52F);
+            case "black_site" -> send(player,OutlandsSounds.STRUCTURE_NULL_CHAMBER.get(),x,y,z,0.16F,0.30F);
             default -> { return; }
         }
     }

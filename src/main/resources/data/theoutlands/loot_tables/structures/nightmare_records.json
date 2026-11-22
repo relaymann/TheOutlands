@@ -1,0 +1,92 @@
+{
+  "type": "minecraft:chest",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:written_book",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "minecraft:written_book_content": {
+                  "title": "Containment Record 04",
+                  "author": "Outlands Field Archive",
+                  "pages": [
+                    "{\"text\":\"SITE: C-04\\nSTATUS: SEALED\\n\\nThe locks were intact when the first sound came from inside the empty cell.\"}",
+                    "{\"text\":\"The night crew heard footsteps crossing the ceiling. There is no upper floor on the plans.\"}",
+                    "{\"text\":\"Do not open the door because the knocking sounds familiar. That is how it learns which voice to use.\"}"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:written_book",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "minecraft:written_book_content": {
+                  "title": "Red Sky Observation",
+                  "author": "Outlands Field Archive",
+                  "pages": [
+                    "{\"text\":\"OBSERVATION: RED HORIZON\\n\\nThe sky changed color without a weather front. Every clock in the shrine stopped for eleven seconds.\"}",
+                    "{\"text\":\"Something moved between the trees while the instruments were pointed at the moon. No photograph contains the same shape twice.\"}"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:written_book",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "minecraft:written_book_content": {
+                  "title": "Outpost Night Log",
+                  "author": "Outlands Field Archive",
+                  "pages": [
+                    "{\"text\":\"SHIFT 19\\n\\nThree patrols returned. Four shadows crossed the floodlights. We stopped counting the shadows after the second night.\"}",
+                    "{\"text\":\"If the perimeter alarm sounds once, stay inside. If it sounds twice, do not answer the radio. If it sounds three times, the perimeter is already behind you.\"}"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:written_book",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "minecraft:written_book_content": {
+                  "title": "Black Site Transfer",
+                  "author": "Outlands Field Archive",
+                  "pages": [
+                    "{\"text\":\"TRANSFER ORDER\\n\\nThe lower rooms were not built for storage. They were built to keep the upper rooms from hearing what was moved below.\"}",
+                    "{\"text\":\"The manifest lists one subject. The transport log records two sets of footprints entering and none leaving.\"}",
+                    "{\"text\":\"Destroy this record if the lights turn on by themselves.\"}"
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
