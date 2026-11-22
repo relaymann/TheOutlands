@@ -250,6 +250,10 @@ public final class VoicePerceptionManager {
             HearingProfile profile = profile(mob);
             if (profile == null || profile.behavior() == Behavior.TERRITORIAL
                     || now - memory.lastReaction() < 24L) continue;
+            if (mob.distanceToSqr(memory.position()) <= 3.5D * 3.5D) {
+                mob.getNavigation().stop();
+                continue;
+            }
             moveToward(mob, memory.position(), profile.speed() * 0.68D);
             ENTITY_MEMORY.put(entry.getKey(), new VoiceMemory(memory.position(), memory.player(),
                     memory.dimension(), memory.lastHeard(), now, memory.intensity(), memory.whispering()));
