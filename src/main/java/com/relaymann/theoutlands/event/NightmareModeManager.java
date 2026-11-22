@@ -457,7 +457,9 @@ public final class NightmareModeManager {
 
     @SubscribeEvent
     public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
-        NEXT_EVENT.remove(event.getEntity().getUUID());
+        UUID playerId = event.getEntity().getUUID();
+        NEXT_EVENT.remove(playerId);
+        PURSUIT_MEMORY.entrySet().removeIf(entry -> entry.getValue().player().equals(playerId));
     }
 
     private record StructureState(long startedAt, int stage) {}
