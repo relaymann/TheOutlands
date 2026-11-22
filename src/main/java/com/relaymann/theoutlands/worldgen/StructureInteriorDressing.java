@@ -23,7 +23,8 @@ public final class StructureInteriorDressing {
             default -> surfaceY;
         };
 
-        for (int i = 0; i < 5; i++) {
+        int detailCount = id.equals("forsaken_settlement") || id.equals("last_outpost") ? 12 : 5;
+        for (int i = 0; i < detailCount; i++) {
             int px = x + 17 + random.nextInt(14);
             int pz = z + 17 + random.nextInt(14);
             BlockPos pos = new BlockPos(px, floorY + 1, pz);
@@ -57,7 +58,7 @@ public final class StructureInteriorDressing {
                     case 2 -> Blocks.COBWEB.defaultBlockState();
                     default -> Blocks.CRACKED_DEEPSLATE_BRICKS.defaultBlockState();
                 };
-                case "forsaken_settlement", "settlement", "last_outpost", "outpost" -> switch (random.nextInt(8)) {
+                case "forsaken_settlement", "settlement", "last_outpost", "outpost" -> switch (random.nextInt(12)) {
                     case 0 -> Blocks.CHEST.defaultBlockState();
                     case 1 -> Blocks.CRAFTING_TABLE.defaultBlockState();
                     case 2 -> Blocks.CAMPFIRE.defaultBlockState();
@@ -65,7 +66,11 @@ public final class StructureInteriorDressing {
                     case 4 -> Blocks.BARREL.defaultBlockState();
                     case 5 -> Blocks.WHITE_BED.defaultBlockState();
                     case 6 -> Blocks.FURNACE.defaultBlockState();
-                    default -> Blocks.COBWEB.defaultBlockState();
+                    case 7 -> Blocks.COBWEB.defaultBlockState();
+                    case 8 -> Blocks.CRACKED_STONE_BRICKS.defaultBlockState();
+                    case 9 -> Blocks.MOSSY_COBBLESTONE.defaultBlockState();
+                    case 10 -> Blocks.BONE_BLOCK.defaultBlockState();
+                    default -> Blocks.TORCH.defaultBlockState();
                 };
                 case "hollow_crypt" -> switch (random.nextInt(4)) {
                     case 0 -> Blocks.BONE_BLOCK.defaultBlockState();
