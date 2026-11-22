@@ -71,7 +71,7 @@ public final class EnvironmentalAnomalyManager {
         double x = player.getX() + Math.cos(angle) * distance;
         double z = player.getZ() + Math.sin(angle) * distance;
         double y = player.getY();
-        switch (player.getRandom().nextInt(6)) {
+        switch (player.getRandom().nextInt(7)) {
             case 0 -> {
                 // A short pair of steps, far enough away to invite a look without starting a chase.
                 send(player, SoundEvents.GRAVEL_STEP, SoundSource.BLOCKS, x, y, z,
@@ -96,6 +96,15 @@ public final class EnvironmentalAnomalyManager {
                         x, aboveY, z, 0.11F, 0.48F);
                 send(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT,
                         x + 1.0D, aboveY, z - 1.0D, 0.07F, 0.52F);
+            }
+            case 5 -> send(player, OutlandsSounds.DREDGE_CRAWL.get(), SoundSource.AMBIENT,
+                    x, y - 1.0D, z, 0.09F, 0.55F);
+            case 6 -> {
+                // Two quiet knocks from a single distant direction, not a repeating event loop.
+                send(player, SoundEvents.WOODEN_DOOR_CLOSE, SoundSource.BLOCKS,
+                        x, y, z, 0.12F, 0.72F);
+                send(player, SoundEvents.WOODEN_DOOR_CLOSE, SoundSource.BLOCKS,
+                        x + 0.28D, y, z + 0.18D, 0.09F, 0.82F);
             }
             default -> send(player, SoundEvents.GRAVEL_STEP, SoundSource.BLOCKS,
                     x, y, z, 0.09F, 0.42F);
