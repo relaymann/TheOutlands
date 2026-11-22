@@ -166,6 +166,60 @@ def generate(name, palette, index):
         for x, y in ((32, 28), (78, 46), (54, 83), (96, 101)):
             line(pixels, x, y, x+7, y+11, palette[4])
             line(pixels, x+7, y+11, x+13, y+15, palette[3])
+    # Second-pass horror detailing: deliberately asymmetric faces, damaged flesh,
+    # exposed rib marks and entity-specific silhouettes readable at Minecraft scale.
+    if name not in ("burrower", "dredge", "colossus"):
+        # Deep eye sockets and uneven, light-catching pupils.
+        rect(pixels, 8, 8, 15, 11, palette[0])
+        left_eye = palette[4] if name not in ("fear", "null", "null_apostle", "observer") else palette[3]
+        right_eye = palette[3] if name in ("death", "hunter", "lurker", "howler", "mimic") else palette[4]
+        rect(pixels, 9, 9, 10, 10, left_eye)
+        rect(pixels, 13, 9, 14, 11, right_eye)
+        # Jagged mouths are intentionally not centered or perfectly symmetrical.
+        if name in ("mimic", "howler", "agitated_one", "cave_jar", "stalker",
+                    "death", "hunter", "lurker", "nightmare_hound", "nightmare_unbound"):
+            line(pixels, 9, 13, 14, 14, palette[0])
+            for tx, ty in ((10,13),(12,14),(14,13)):
+                rect(pixels, tx, ty, tx, ty+1, palette[4])
+        elif name in ("fear", "null", "null_apostle", "observer", "nightmare_watcher"):
+            line(pixels, 10, 14, 13, 13, palette[1])
+        # Torn tissue / robe folds / scar lines across the chest UV.
+        if name in ("fear", "death", "null", "null_apostle", "observer", "pilgrim",
+                    "almighty", "nightmare_false_survivor", "nightmare_watcher"):
+            line(pixels, 21, 20, 23, 30, palette[3])
+            line(pixels, 26, 22, 24, 31, palette[1])
+            line(pixels, 20, 25, 27, 27, palette[2])
+        # Visible rib cage, each creature gets a different rib spacing.
+        if name in ("stalker", "hunter", "agitated_one", "cave_jar", "lurker",
+                    "howler", "nightmare_hound", "nightmare_unbound"):
+            for ry in (22, 25, 28, 31):
+                line(pixels, 20, ry, 27, ry + (1 if ry % 2 else 0), palette[3])
+            line(pixels, 23, 21, 23, 32, palette[4])
+        # Mineral fractures and old cracks rather than clean decorative striping.
+        if name in ("stillborn_statue", "burrower", "dredge", "ceiling_dweller", "colossus"):
+            for sx, sy, ex, ey in ((20,20,24,26),(27,22,23,29),(21,31,26,35),(29,30,25,36)):
+                line(pixels, sx, sy, ex, ey, palette[3])
+        # Distinctive entity marks: one-sided wounds, extra eyes, or unnatural seams.
+        signatures = {
+            "null": lambda: (line(pixels, 11, 7, 12, 16, palette[3]), rect(pixels, 8, 23, 9, 28, palette[1])),
+            "null_apostle": lambda: (line(pixels, 11, 6, 11, 16, palette[3]), rect(pixels, 22, 20, 26, 21, palette[1])),
+            "fear": lambda: (rect(pixels, 10, 8, 13, 11, palette[0]), line(pixels, 11, 12, 12, 15, palette[4])),
+            "death": lambda: (line(pixels, 8, 12, 14, 8, palette[4]), line(pixels, 24, 20, 28, 32, palette[4])),
+            "almighty": lambda: (rect(pixels, 9, 9, 14, 10, palette[3]), line(pixels, 23, 20, 23, 34, palette[4])),
+            "observer": lambda: (rect(pixels, 8, 9, 15, 11, palette[0]), rect(pixels, 10, 9, 13, 10, palette[4])),
+            "mimic": lambda: (line(pixels, 8, 8, 14, 15, palette[4]), line(pixels, 14, 8, 9, 15, palette[2])),
+            "stillborn_statue": lambda: (line(pixels, 11, 7, 9, 16, palette[4]), line(pixels, 24, 20, 22, 34, palette[1])),
+            "pilgrim": lambda: (rect(pixels, 9, 9, 10, 10, palette[4]), rect(pixels, 13, 9, 14, 10, palette[0]), line(pixels, 24, 19, 27, 35, palette[3])),
+            "ceiling_dweller": lambda: (rect(pixels, 7, 9, 9, 11, palette[4]), rect(pixels, 12, 9, 14, 11, palette[4]), line(pixels, 22, 22, 18, 35, palette[3])),
+        }
+        if name in signatures:
+            signatures[name]()
+    # Limb and back UVs receive torn edges and bone-like highlights.
+    for lx in (1, 17, 40, 56):
+        for ly in (24, 28, 32, 36):
+            if lx < width and ly < height and (lx + ly + index) % 3 == 0:
+                pixels[ly][lx] = palette[3]
+
     # Give each NIGHTMARE identity its own generated skin file.
     target_dir = os.path.join(OUT, "nightmare") if name.startswith("nightmare_") else OUT
     os.makedirs(target_dir, exist_ok=True)
