@@ -2,6 +2,7 @@ package com.relaymann.theoutlands.client;
 
 import com.relaymann.theoutlands.TheOutlands;
 import com.relaymann.theoutlands.network.VoiceLevelPayload;
+import java.util.concurrent.atomic.AtomicInteger;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.neoforged.api.distmarker.Dist;
@@ -17,7 +18,7 @@ public final class VoiceLevelHud {
     private static volatile int currentLevel;
     private static volatile boolean whispering;
     private static volatile long lastAudioNanos;
-    private static int frameCounter;
+    private static final AtomicInteger FRAME_COUNTER = new AtomicInteger();
     private static float smoothedLevel;
 
     private VoiceLevelHud() {}
@@ -29,7 +30,7 @@ public final class VoiceLevelHud {
             whispering = false;
             lastAudioNanos = 0L;
             smoothedLevel = 0.0F;
-            frameCounter = 0;
+            FRAME_COUNTER.set(0);
         }
     }
 
@@ -42,7 +43,7 @@ public final class VoiceLevelHud {
         lastAudioNanos = System.nanoTime();
 
         // Four PCM frames per network update is enough for responsive detection without packet spam.
-        if (++frameCounter % 4 == 0) {
+        if (FRAME_COUNTER.incrementAndGet() % 4 == 0) {
             int sentLevel = level;
             Minecraft minecraft = Minecraft.getInstance();
             minecraft.execute(() -> {
