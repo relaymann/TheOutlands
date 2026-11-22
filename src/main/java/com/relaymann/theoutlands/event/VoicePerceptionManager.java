@@ -8,6 +8,9 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -26,6 +29,7 @@ public final class VoicePerceptionManager {
     private static final Map<UUID, ReportedLevel> REPORTED_LEVELS = new HashMap<>();
     private static final Map<UUID, VoiceSignal> ACTIVE_VOICES = new HashMap<>();
     private static final Map<UUID, VoiceMemory> ENTITY_MEMORY = new HashMap<>();
+    private static final Map<UUID, Long> PLAYER_EVENT_COOLDOWNS = new HashMap<>();
 
     private VoicePerceptionManager() {}
 
@@ -78,7 +82,8 @@ public final class VoicePerceptionManager {
 
     private static void hearVoice(ServerLevel level, ServerPlayer player, VoiceSignal signal, long now) {
         double configuredRange = OutlandsConfig.VOICE_DETECTION_RANGE.get();
-        AABB search = player.getBoundingBox().inflate(configuredRange + 18.0D);
+        maybeVoiceKnock(level, player, signal, now);
+        AABB search = player.getBoundingBox().inflate(configuredRange * 1.5D + 20.0D);
         List<Mob> nearby = level.getEntitiesOfClass(Mob.class, search,
                 mob -> mob.isAlive() && profile(mob) != null);
         for (Mob mob : nearby) {
@@ -157,7 +162,10 @@ public final class VoicePerceptionManager {
                 mob.getNavigation().stop();
             }
             if (intensity >= 28 && mob.getRandom().nextInt(4) == 0) {
-                level.playSound(null, mob.blockPosition(), OutlandsSounds.MIMIC_REVEAL.get(),
+                Vec3 falseOrigin = player.position().add(
+                        mob.getRandom().nextBoolean() ? 8.0D : -8.0D, 0.0D,
+                        mob.getRandom().nextBoolean() ? 6.0D : -6.0D);
+                level.playSound(null, BlockPos.containing(falseOrigin), OutlandsSounds.MIMIC_REVEAL.get(),
                         SoundSource.HOSTILE, 0.42F, 0.72F + mob.getRandom().nextFloat() * 0.22F);
             }
             return;
@@ -185,6 +193,31 @@ public final class VoicePerceptionManager {
         }
 
         moveToward(mob, memory.position(), profile.speed());
+    }
+
+    /** Rare knocks from an existing nearby door after an unusually loud call. */
+    private static void maybeVoiceKnock(ServerLevel level, ServerPlayer player, VoiceSignal signal, long now) {
+        if (signal.whispering() || signal.level() < 82
+                || now < PLAYER_EVENT_COOLDOWNS.getOrDefault(player.getUUID(), 0L)
+                || player.getRandom().nextInt(90) != 0) return;
+        BlockPos origin = player.blockPosition();
+        BlockPos nearest = null;
+        double nearestDistance = 15.0D * 15.0D;
+        for (BlockPos pos : BlockPos.betweenClosed(origin.offset(-14, -5, -14), origin.offset(14, 5, 14))) {
+            var block = level.getBlockState(pos).getBlock();
+            if (!(block instanceof DoorBlock) && !(block instanceof TrapDoorBlock)) continue;
+            double distance = pos.distToCenterSqr(player.position());
+            if (distance < nearestDistance) {
+                nearestDistance = distance;
+                nearest = pos.immutable();
+            }
+        }
+        if (nearest == null) return;
+        level.playSound(null, nearest, SoundEvents.WOODEN_DOOR_CLOSE,
+                SoundSource.BLOCKS, 0.42F, 0.72F);
+        level.playSound(null, nearest, SoundEvents.WOODEN_DOOR_CLOSE,
+                SoundSource.BLOCKS, 0.28F, 0.86F);
+        PLAYER_EVENT_COOLDOWNS.put(player.getUUID(), now + 600L);
     }
 
     private static void alertNearby(ServerLevel level, Mob caller, ServerPlayer player, long now) {
@@ -258,12 +291,14 @@ public final class VoicePerceptionManager {
         REPORTED_LEVELS.remove(playerId);
         ACTIVE_VOICES.remove(playerId);
         ENTITY_MEMORY.entrySet().removeIf(entry -> entry.getValue().player().equals(playerId));
+        PLAYER_EVENT_COOLDOWNS.remove(playerId);
     }
 
     public static void clear() {
         REPORTED_LEVELS.clear();
         ACTIVE_VOICES.clear();
         ENTITY_MEMORY.clear();
+        PLAYER_EVENT_COOLDOWNS.clear();
     }
 
     private enum Behavior { STALK, HUNT, OBSERVE, FLANK, UNDERGROUND, TERRITORIAL, MIMIC, HOWLER }
