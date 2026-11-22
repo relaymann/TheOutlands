@@ -9,6 +9,7 @@ import de.maxhenkel.voicechat.api.events.ClientSoundEvent;
 import de.maxhenkel.voicechat.api.events.ClientVoicechatConnectionEvent;
 import de.maxhenkel.voicechat.api.events.EventRegistration;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
+import de.maxhenkel.voicechat.api.events.PlayerStateChangedEvent;
 import de.maxhenkel.voicechat.api.VoicechatConnection;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.fml.loading.FMLEnvironment;
@@ -33,6 +34,7 @@ public final class OutlandsVoicechatPlugin implements VoicechatPlugin {
     @Override
     public void registerEvents(EventRegistration registration) {
         registration.registerEvent(MicrophonePacketEvent.class, this::onMicrophonePacket);
+        registration.registerEvent(PlayerStateChangedEvent.class, this::onPlayerStateChanged);
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
             registration.registerEvent(ClientSoundEvent.class, event ->
@@ -45,10 +47,20 @@ public final class OutlandsVoicechatPlugin implements VoicechatPlugin {
     private void onMicrophonePacket(MicrophonePacketEvent event) {
         VoicechatConnection connection = event.getSenderConnection();
         if (connection == null) return;
-        ServerPlayer player = connection.getPlayer();
-        if (player != null && player.getServer() != null) {
+        Object rawPlayer = connection.getPlayer().getPlayer();
+        if (rawPlayer instanceof ServerPlayer player && player.getServer() != null) {
             boolean whispering = event.getPacket().isWhispering();
-            player.getServer().execute(() -> VoicePerceptionManager.onVoicePacket(player, whispering));
+            player.getServer().execute(() -> {
+                if (!player.isRemoved() && player.isAlive()) {
+                    VoicePerceptionManager.onVoicePacket(player, whispering);
+                }
+            });
+        }
+    }
+
+    private void onPlayerStateChanged(PlayerStateChangedEvent event) {
+        if (event.isMuted() || event.isDisabled() || event.isDisconnected()) {
+            VoicePerceptionManager.clear(event.getPlayerUuid());
         }
     }
 }
