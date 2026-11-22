@@ -104,7 +104,9 @@ def main():
     assert "applyVariations(id,level,x,surfaceY,z,random)" in feature
     assert "StructurePlacementPolicy.containsBlock" in feature and "public static boolean containsBlock" in policy
     assert "StructurePlacementPolicy.isSpacedAnchor" in structure and "max-min>5" in structure
-    assert "int spacing = nightmare ? 3" in structure
+    assert "int configuredSpacing = nightmare ? 3" in structure
+    assert "minimumSpacingForFootprint(configuredSpacing, size)" in structure
+    assert "minimumSpacingForFootprint" in policy
     selection_test=(ROOT/"src/test/java/com/relaymann/theoutlands/worldgen/OutlandsStructureSelectionTest.java").read_text(encoding="utf-8")
     assert "seededLayoutSelectionIsRepeatable" in selection_test and "forestOnlyCabinRequiresForest" in selection_test
     assert "nightmareStructureAnchorsKeepFootprintsFromOverlapping" in selection_test
@@ -118,6 +120,8 @@ def main():
     assert "startsForStructure(chunkPos, candidate -> !(candidate instanceof OutlandsStructure))" in piece
     assert "hasSuitableSurface(level,box,surfaceY)" in piece
     assert "Heightmap.Types.MOTION_BLOCKING_NO_LEAVES" in piece and "BlockTags.LOGS" in piece
+    assert "BlockTags.LEAVES" in piece and "isWithinSurfaceTolerance" in piece
+    assert "while (groundY > level.getMinBuildHeight())" in piece
     assert "Heightmap.Types.MOTION_BLOCKING_NO_LEAVES" in structure
     assert "surfaceSampleOffsets(size,4)" in structure and "surfaceSampleOffsets(int size, int step)" in policy
     assert "Math.abs((top-1)-expectedY)>5" not in piece
