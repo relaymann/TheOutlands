@@ -6,6 +6,7 @@ import com.relaymann.theoutlands.entity.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Blocks;
@@ -34,7 +35,7 @@ public final class PredatoryStalkingManager {
     private static final String TEMPORARY_DISAPPEARANCE_TAG = "theoutlands_temporary_disappearance";
     private static final Map<UUID, Memory> MEMORIES = new HashMap<>();
     private static final Map<UUID, Long> BEHAVIOR_COOLDOWNS = new HashMap<>();
-    private static final Map<UUID, Long> DISAPPEAR_UNTIL = new HashMap<>();
+    private static final Map<UUID, Disappearance> DISAPPEAR_UNTIL = new HashMap<>();
     private static final Map<net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level>, ArrayDeque<BuildMark>> BUILD_MARKS = new HashMap<>();
 
     private PredatoryStalkingManager() {}
@@ -64,7 +65,15 @@ public final class PredatoryStalkingManager {
 
     @SubscribeEvent
     public static void onEntityJoinLevel(EntityJoinLevelEvent event) {
-        if (event.getEntity() instanceof Mob mob && mob.getTags().contains(TEMPORARY_DISAPPEARANCE_TAG)) {
+        if (!(event.getLevel() instanceof ServerLevel level)
+                || !(event.getEntity() instanceof Mob mob)
+                || !mob.getTags().contains(TEMPORARY_DISAPPEARANCE_TAG)) return;
+        Disappearance state = DISAPPEAR_UNTIL.get(mob.getUUID());
+        if (state == null || state.level() != level
+                && (!OutlandsConfig.ENTITY_INTELLIGENCE_ENABLED.get()
+                || level.getGameTime() >= state.expiresAt())
+                || !OutlandsConfig.ENTITY_INTELLIGENCE_ENABLED.get()
+                || level.getGameTime() >= state.expiresAt()) {
             // The marker survives chunk unloads and server restarts; never strand a mob invisible.
             mob.setInvisible(false);
             mob.removeTag(TEMPORARY_DISAPPEARANCE_TAG);
@@ -349,8 +358,8 @@ public final class PredatoryStalkingManager {
 
     /** Only the Watcher-like species can perform this rare, brief visual disappearance. */
     private static void restoreExpiredDisappearance(Mob mob, ServerLevel level) {
-        Long until = DISAPPEAR_UNTIL.get(mob.getUUID());
-        if (until != null && level.getGameTime() >= until) {
+        Disappearance state = DISAPPEAR_UNTIL.get(mob.getUUID());
+        if (state != null && state.level() == level && level.getGameTime() >= state.expiresAt()) {
             mob.setInvisible(false);
             mob.removeTag(TEMPORARY_DISAPPEARANCE_TAG);
             DISAPPEAR_UNTIL.remove(mob.getUUID());
@@ -366,7 +375,7 @@ public final class PredatoryStalkingManager {
                 || level.getGameTime() < BEHAVIOR_COOLDOWNS.getOrDefault(mob.getUUID(), 0L)) return;
         mob.setInvisible(true);
         mob.addTag(TEMPORARY_DISAPPEARANCE_TAG);
-        DISAPPEAR_UNTIL.put(mob.getUUID(), level.getGameTime() + 14L);
+        DISAPPEAR_UNTIL.put(mob.getUUID(), new Disappearance(level, level.getGameTime() + 14L));
         BEHAVIOR_COOLDOWNS.put(mob.getUUID(), level.getGameTime() + 420L);
     }
 
@@ -399,12 +408,14 @@ public final class PredatoryStalkingManager {
             var iterator = DISAPPEAR_UNTIL.entrySet().iterator();
             while (iterator.hasNext()) {
                 var entry = iterator.next();
+                Disappearance state = entry.getValue();
+                if (state.level() != level) continue;
                 Entity entity = level.getEntity(entry.getKey());
-                if (entity instanceof Mob mob && (force || level.getGameTime() >= entry.getValue())) {
+                if (entity instanceof Mob mob && (force || level.getGameTime() >= state.expiresAt())) {
                     mob.setInvisible(false);
                     mob.removeTag(TEMPORARY_DISAPPEARANCE_TAG);
                     iterator.remove();
-                } else if (entity == null && level.getGameTime() > entry.getValue() + 24_000L) {
+                } else if (entity == null && level.getGameTime() > state.expiresAt() + 24_000L) {
                     // If the entity is unloaded, its saved marker restores it when it is loaded again.
                     iterator.remove();
                 }
@@ -429,6 +440,7 @@ public final class PredatoryStalkingManager {
     private record Personality(Style style, double speed, double minimumRange, double maximumRange,
                                int cooldown, boolean disappearWhenWatched) {}
     private record BuildMark(BlockPos pos, UUID owner, long time, boolean doorway) {}
+    private record Disappearance(ServerLevel level, long expiresAt) {}
     private static final class Memory {
         private double x, y, z;
         private long lastSeen;
