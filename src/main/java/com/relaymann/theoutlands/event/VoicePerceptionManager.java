@@ -70,6 +70,7 @@ public final class VoicePerceptionManager {
             hearVoice(level, player, signal, now);
         }
 
+        investigateRemembered(level, now);
         if (now % 40L == 0L) {
             ENTITY_MEMORY.entrySet().removeIf(entry -> now - entry.getValue().lastHeard() > MEMORY_TTL);
         }
@@ -199,7 +200,7 @@ public final class VoicePerceptionManager {
 
     private static void moveToward(Mob mob, Vec3 position, double speed) {
         BlockPos destination = BlockPos.containing(position);
-        if (!mob.level().hasChunkAt(destination) || !mob.getNavigation().isDone()) return;
+        if (!mob.level().hasChunkAt(destination)) return;
         mob.getNavigation().moveTo(position.x, position.y, position.z, speed);
     }
 
