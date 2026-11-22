@@ -17,6 +17,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Server-side voice perception. Only the normalized activity percentage,
@@ -30,6 +31,7 @@ public final class VoicePerceptionManager {
     private static final Map<UUID, VoiceSignal> ACTIVE_VOICES = new HashMap<>();
     private static final Map<UUID, VoiceMemory> ENTITY_MEMORY = new HashMap<>();
     private static final Map<UUID, Long> PLAYER_EVENT_COOLDOWNS = new HashMap<>();
+    private static final ConcurrentHashMap<UUID, Long> PACKET_THROTTLES = new ConcurrentHashMap<>();
     private static boolean wasVoiceEnabled = true;
 
     private VoicePerceptionManager() {}
@@ -48,6 +50,13 @@ public final class VoicePerceptionManager {
     }
 
     /** Called only after Simple Voice Chat confirms an actual microphone packet. */
+    /** Thread-safe limiter called from the voice-chat packet thread before scheduling server work. */
+    public static boolean shouldAcceptVoicePacket(UUID playerId) {
+        long now = System.nanoTime();
+        Long previous = PACKET_THROTTLES.put(playerId, now);
+        return previous == null || now - previous >= 75_000_000L;
+    }
+
     public static void onVoicePacket(ServerPlayer player, boolean whispering) {
         if (!OutlandsConfig.VOICE_HORROR_ENABLED.get()
                 || !player.isAlive() || player.isCreative() || player.isSpectator()) return;
@@ -307,6 +316,7 @@ public final class VoicePerceptionManager {
         ACTIVE_VOICES.remove(playerId);
         ENTITY_MEMORY.entrySet().removeIf(entry -> entry.getValue().player().equals(playerId));
         PLAYER_EVENT_COOLDOWNS.remove(playerId);
+        PACKET_THROTTLES.remove(playerId);
     }
 
     public static void clear() {
@@ -315,6 +325,7 @@ public final class VoicePerceptionManager {
         wasVoiceEnabled = OutlandsConfig.VOICE_HORROR_ENABLED.get();
         ENTITY_MEMORY.clear();
         PLAYER_EVENT_COOLDOWNS.clear();
+        PACKET_THROTTLES.clear();
     }
 
     private enum Behavior { STALK, HUNT, OBSERVE, FLANK, UNDERGROUND, TERRITORIAL, MIMIC, HOWLER }
