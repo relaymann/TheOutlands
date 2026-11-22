@@ -49,12 +49,15 @@ public final class PredatoryStalkingManager {
         if (!OutlandsConfig.ENTITY_INTELLIGENCE_ENABLED.get()
                 || event.getServer().getTickCount() % SAMPLE_INTERVAL != 0) return;
         for (ServerLevel level : event.getServer().getAllLevels()) {
+            Set<UUID> processed = new HashSet<>();
             for (ServerPlayer player : level.players()) {
                 if (!eligible(player)) continue;
                 List<Mob> nearby = level.getEntitiesOfClass(Mob.class,
                         player.getBoundingBox().inflate(48.0D),
                         mob -> mob.isAlive() && personality(mob) != null);
                 for (Mob mob : nearby) {
+                    if (!processed.add(mob.getUUID())) continue;
+                    restoreExpiredDisappearance(mob, level);
                     if (mob.getTarget() instanceof Player target && eligible(target)) {
                         remember(mob, target, level.getGameTime());
                         applyPersonality(mob, target, level);
@@ -273,6 +276,14 @@ public final class PredatoryStalkingManager {
     }
 
     /** Only the Watcher-like species can perform this rare, brief visual disappearance. */
+    private static void restoreExpiredDisappearance(Mob mob, ServerLevel level) {
+        Long until = DISAPPEAR_UNTIL.get(mob.getUUID());
+        if (until != null && level.getGameTime() >= until) {
+            mob.setInvisible(false);
+            DISAPPEAR_UNTIL.remove(mob.getUUID());
+        }
+    }
+
     private static void maybeDisappearWhenWatched(Mob mob, ServerPlayer player, ServerLevel level) {
         Personality profile = personality(mob);
         if (profile == null || !profile.disappearWhenWatched() || mob.isInvisible()
@@ -294,21 +305,15 @@ public final class PredatoryStalkingManager {
         Set<UUID> active = new HashSet<>();
         for (ServerLevel level : levels) {
             long now = level.getGameTime();
-            for (Mob mob : level.getEntitiesOfClass(Mob.class,
-                    new net.minecraft.world.phys.AABB(-3.0E7D, level.getMinBuildHeight(), -3.0E7D,
-                            3.0E7D, level.getMaxBuildHeight(), 3.0E7D),
-                    candidate -> personality(candidate) != null)) active.add(mob.getUUID());
+            for (ServerPlayer player : level.players()) {
+                if (!eligible(player)) continue;
+                for (Mob mob : level.getEntitiesOfClass(Mob.class, player.getBoundingBox().inflate(128.0D),
+                        candidate -> personality(candidate) != null)) active.add(mob.getUUID());
+            }
             ArrayDeque<BuildMark> marks = BUILD_MARKS.get(level.dimension());
             if (marks != null) marks.removeIf(mark -> now - mark.time() > BUILD_MEMORY);
             for (var entry : new ArrayList<>(DISAPPEAR_UNTIL.entrySet())) {
-                if (entry.getValue() <= now) {
-                    // The entity is restored only when it is still loaded; unloaded
-                    // entities are made visible by their saved entity state on reload.
-                    level.getEntities().getAll().stream()
-                            .filter(entity -> entity.getUUID().equals(entry.getKey()) && entity instanceof Mob)
-                            .findFirst().ifPresent(entity -> entity.setInvisible(false));
-                    DISAPPEAR_UNTIL.remove(entry.getKey());
-                }
+                if (entry.getValue() <= now) DISAPPEAR_UNTIL.remove(entry.getKey());
             }
         }
         MEMORIES.keySet().removeIf(id -> !active.contains(id));
