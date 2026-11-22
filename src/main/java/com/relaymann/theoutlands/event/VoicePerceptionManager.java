@@ -30,23 +30,33 @@ public final class VoicePerceptionManager {
     private static final Map<UUID, ReportedLevel> REPORTED_LEVELS = new HashMap<>();
     private static final Map<UUID, VoiceSignal> ACTIVE_VOICES = new HashMap<>();
     private static final Map<UUID, VoiceMemory> ENTITY_MEMORY = new HashMap<>();
-    private static final Map<UUID, Long> PLAYER_EVENT_COOLDOWNS = new HashMap<>();
+    private static final Map<UUID, PlayerEventCooldown> PLAYER_EVENT_COOLDOWNS = new HashMap<>();
     private static final ConcurrentHashMap<UUID, Long> PACKET_THROTTLES = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<UUID, Long> LEVEL_REPORT_THROTTLES = new ConcurrentHashMap<>();
     private static boolean wasVoiceEnabled = true;
 
     private VoicePerceptionManager() {}
 
     public static void onClientLevel(ServerPlayer player, int level, boolean whispering) {
-        if (!OutlandsConfig.VOICE_HORROR_ENABLED.get()) return;
-        int clamped = Math.max(0, Math.min(100, level));
-        REPORTED_LEVELS.put(player.getUUID(), new ReportedLevel(clamped, whispering,
-                player.serverLevel().getGameTime(), player.serverLevel().dimension()));
+        if (!OutlandsConfig.VOICE_HORROR_ENABLED.get() || !player.isAlive()
+                || player.isCreative() || player.isSpectator()) return;
         VoiceSignal active = ACTIVE_VOICES.get(player.getUUID());
-        if (active != null) {
-            ACTIVE_VOICES.put(player.getUUID(), new VoiceSignal(player.position(),
-                    player.serverLevel().dimension(), clamped, whispering,
-                    player.serverLevel().getGameTime()));
-        }
+        if (active == null || !active.dimension().equals(player.serverLevel().dimension())) return;
+        int clamped = VoiceHearingMath.normalizeLevel(level, whispering);
+        long now = player.serverLevel().getGameTime();
+        REPORTED_LEVELS.put(player.getUUID(), new ReportedLevel(clamped, whispering,
+                now, player.serverLevel().dimension()));
+        ACTIVE_VOICES.put(player.getUUID(), new VoiceSignal(player.position(),
+                player.serverLevel().dimension(), clamped, whispering, now));
+    }
+
+    /** Rate-limits client meter reports before they enter the server work queue. */
+    public static synchronized boolean shouldAcceptLevelReport(UUID playerId) {
+        long now = System.nanoTime();
+        Long previous = LEVEL_REPORT_THROTTLES.get(playerId);
+        if (previous != null && now - previous < 60_000_000L) return false;
+        LEVEL_REPORT_THROTTLES.put(playerId, now);
+        return true;
     }
 
     /** Thread-safe limiter called from the voice-chat packet thread before scheduling server work. */
@@ -66,7 +76,7 @@ public final class VoicePerceptionManager {
         int level = reported != null && reported.dimension().equals(player.serverLevel().dimension())
                 && now - reported.gameTime() <= 12L ? reported.level() : 34;
         boolean whisper = whispering || (reported != null && reported.whispering());
-        if (whisper && level > 38) level = 38;
+        level = VoiceHearingMath.normalizeLevel(level, whisper);
         ACTIVE_VOICES.put(player.getUUID(), new VoiceSignal(player.position(),
                 player.serverLevel().dimension(), Math.max(12, level), whisper, now));
     }
@@ -218,7 +228,9 @@ public final class VoicePerceptionManager {
     /** Rare knocks from an existing nearby door after an unusually loud call. */
     private static void maybeVoiceKnock(ServerLevel level, ServerPlayer player, VoiceSignal signal, long now) {
         if (signal.whispering() || signal.level() < 82
-                || now < PLAYER_EVENT_COOLDOWNS.getOrDefault(player.getUUID(), 0L)
+                || (PLAYER_EVENT_COOLDOWNS.containsKey(player.getUUID())
+                && PLAYER_EVENT_COOLDOWNS.get(player.getUUID()).dimension().equals(level.dimension())
+                && now < PLAYER_EVENT_COOLDOWNS.get(player.getUUID()).until())
                 || player.getRandom().nextInt(240) != 0) return;
         BlockPos origin = player.blockPosition();
         BlockPos nearest = null;
@@ -237,7 +249,7 @@ public final class VoicePerceptionManager {
                 SoundSource.BLOCKS, 0.42F, 0.72F);
         level.playSound(null, nearest, SoundEvents.WOODEN_DOOR_CLOSE,
                 SoundSource.BLOCKS, 0.28F, 0.86F);
-        PLAYER_EVENT_COOLDOWNS.put(player.getUUID(), now + 1800L);
+        PLAYER_EVENT_COOLDOWNS.put(player.getUUID(), new PlayerEventCooldown(level.dimension(), now + 1800L));
     }
 
     private static void alertNearby(ServerLevel level, Mob caller, ServerPlayer player, long now) {
@@ -317,6 +329,7 @@ public final class VoicePerceptionManager {
         ENTITY_MEMORY.entrySet().removeIf(entry -> entry.getValue().player().equals(playerId));
         PLAYER_EVENT_COOLDOWNS.remove(playerId);
         PACKET_THROTTLES.remove(playerId);
+        LEVEL_REPORT_THROTTLES.remove(playerId);
     }
 
     public static void clear() {
@@ -326,11 +339,13 @@ public final class VoicePerceptionManager {
         ENTITY_MEMORY.clear();
         PLAYER_EVENT_COOLDOWNS.clear();
         PACKET_THROTTLES.clear();
+        LEVEL_REPORT_THROTTLES.clear();
     }
 
     private enum Behavior { STALK, HUNT, OBSERVE, FLANK, UNDERGROUND, TERRITORIAL, MIMIC, HOWLER }
     private record HearingProfile(double rangeScale, double speed, double approachDistance,
                                   int cooldown, Behavior behavior) {}
+    private record PlayerEventCooldown(ResourceKey<Level> dimension, long until) {}
     private record ReportedLevel(int level, boolean whispering, long gameTime,
                                  ResourceKey<Level> dimension) {}
     private record VoiceSignal(Vec3 position, ResourceKey<Level> dimension, int level,
