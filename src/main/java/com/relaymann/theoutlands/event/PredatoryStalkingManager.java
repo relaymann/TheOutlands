@@ -77,7 +77,6 @@ public final class PredatoryStalkingManager {
                     if (mob.getTarget() instanceof Player target && eligible(target)) {
                         remember(mob, target, level.getGameTime());
                         applyPersonality(mob, target, level);
-                        stalkOrDisengage(mob, target, level);
                     } else {
                         resumeLastKnownRoute(mob, level);
                         pressureSettlement(mob, player, level);
