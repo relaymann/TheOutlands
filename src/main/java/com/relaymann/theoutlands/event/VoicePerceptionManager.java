@@ -63,8 +63,8 @@ public final class VoicePerceptionManager {
                 || !player.isAlive() || player.isCreative() || player.isSpectator()) return;
         long now = player.serverLevel().getGameTime();
         ReportedLevel reported = REPORTED_LEVELS.get(player.getUUID());
-        int level = reported != null && now - reported.gameTime() <= 12L
-                ? reported.level() : 34;
+        int level = reported != null && reported.dimension().equals(player.serverLevel().dimension())
+                && now - reported.gameTime() <= 12L ? reported.level() : 34;
         boolean whisper = whispering || (reported != null && reported.whispering());
         if (whisper && level > 38) level = 38;
         ACTIVE_VOICES.put(player.getUUID(), new VoiceSignal(player.position(),
@@ -89,7 +89,8 @@ public final class VoicePerceptionManager {
             VoiceSignal signal = entry.getValue();
             if (!signal.dimension().equals(level.dimension())) continue;
             ServerPlayer player = level.getServer().getPlayerList().getPlayer(entry.getKey());
-            if (player == null || !player.isAlive() || player.serverLevel() != level) {
+            if (player == null || !player.isAlive() || player.isCreative() || player.isSpectator()
+                    || player.serverLevel() != level) {
                 iterator.remove();
                 continue;
             }
@@ -112,17 +113,12 @@ public final class VoicePerceptionManager {
         for (Mob mob : nearby) {
             if (mob.getTarget() != null && mob.getTarget() != player) continue;
             HearingProfile profile = profile(mob);
-            double range = configuredRange * profile.rangeScale();
-            range *= 0.25D + (signal.level() / 100.0D) * 0.75D;
-            if (signal.whispering()) range *= 0.48D;
-            else if (signal.level() >= 76) range *= 1.18D;
-
             boolean visible = mob.hasLineOfSight(player);
-            if (!visible) range *= 0.68D;
-            if (level.isRainingAt(player.blockPosition())) range *= 0.88D;
-            if (level.isThundering()) range *= 0.92D;
-            if (profile.behavior() == Behavior.UNDERGROUND
-                    && (player.getY() < 52.0D || mob.getY() < 52.0D)) range *= 1.28D;
+            boolean underground = profile.behavior() == Behavior.UNDERGROUND
+                    && (player.getY() < 52.0D || mob.getY() < 52.0D);
+            double range = VoiceHearingMath.effectiveRange(configuredRange, profile.rangeScale(),
+                    signal.level(), signal.whispering(), visible, level.isRainingAt(player.blockPosition()),
+                    level.isThundering(), underground);
 
             int nearbyVoices = 0;
             for (VoiceSignal other : ACTIVE_VOICES.values()) {
