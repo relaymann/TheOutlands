@@ -206,7 +206,7 @@ public final class VoicePerceptionManager {
         for (BlockPos pos : BlockPos.betweenClosed(origin.offset(-14, -5, -14), origin.offset(14, 5, 14))) {
             var block = level.getBlockState(pos).getBlock();
             if (!(block instanceof DoorBlock) && !(block instanceof TrapDoorBlock)) continue;
-            double distance = pos.distToCenterSqr(player.position());
+            double distance = Vec3.atCenterOf(pos).distanceToSqr(player.position());
             if (distance < nearestDistance) {
                 nearestDistance = distance;
                 nearest = pos.immutable();
