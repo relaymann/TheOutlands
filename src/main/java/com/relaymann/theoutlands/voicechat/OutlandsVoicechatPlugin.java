@@ -1,12 +1,9 @@
 package com.relaymann.theoutlands.voicechat;
 
-import com.relaymann.theoutlands.client.VoiceLevelHud;
 import com.relaymann.theoutlands.event.VoicePerceptionManager;
 import de.maxhenkel.voicechat.api.ForgeVoicechatPlugin;
 import de.maxhenkel.voicechat.api.VoicechatApi;
 import de.maxhenkel.voicechat.api.VoicechatPlugin;
-import de.maxhenkel.voicechat.api.events.ClientSoundEvent;
-import de.maxhenkel.voicechat.api.events.ClientVoicechatConnectionEvent;
 import de.maxhenkel.voicechat.api.events.EventRegistration;
 import de.maxhenkel.voicechat.api.events.MicrophonePacketEvent;
 import de.maxhenkel.voicechat.api.events.PlayerStateChangedEvent;
@@ -14,6 +11,7 @@ import de.maxhenkel.voicechat.api.VoicechatConnection;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.DistExecutor;
 
 
 /**
@@ -38,11 +36,8 @@ public final class OutlandsVoicechatPlugin implements VoicechatPlugin {
         registration.registerEvent(PlayerStateChangedEvent.class, this::onPlayerStateChanged);
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
-            registration.registerEvent(ClientSoundEvent.class, event ->
-                    VoiceLevelHud.acceptAudio(event.getRawAudio(), event.isWhispering()));
-            registration.registerEvent(ClientVoicechatConnectionEvent.class,
-                    event -> net.minecraft.client.Minecraft.getInstance().execute(
-                            () -> VoiceLevelHud.setConnected(event.isConnected())));
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
+                    () -> () -> ClientVoicechatHooks.register(registration));
         }
     }
 
