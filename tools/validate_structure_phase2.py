@@ -85,6 +85,21 @@ def main():
     assert "unusualActivity(player)" in nightmare_manager and "containmentFailure(player)" in nightmare_manager
     assert "thePursuit(player)" in nightmare_manager and "theoutlands_nightmare_stalker" in nightmare_manager
     assert "coordinateNightmarePack" in nightmare_manager and "setTarget(player)" in nightmare_manager
+    assert "NightmareBalancePolicy.nextEventDelayTicks" in nightmare_manager
+    assert "tickActiveStructure" in nightmare_manager and "BLOOD_MOON_STAGE" in nightmare_manager
+    assert "migrationSurge(player)" in nightmare_manager and "ashfall(player)" in nightmare_manager
+    assert "NightmareCreature" in nightmare_manager and "PURSUIT_MEMORY" in nightmare_manager
+    nightmare_entities = (ROOT/"src/main/java/com/relaymann/theoutlands/entity/OutlandsEntities.java").read_text(encoding="utf-8")
+    for entity_id in ("nightmare_watcher", "nightmare_hound", "nightmare_wardened",
+                      "nightmare_false_survivor", "nightmare_unbound"):
+        assert entity_id in nightmare_entities, f"missing exclusive entity {entity_id}"
+    nightmare_records = json.loads((DATA/"nightmare_records.json").read_text(encoding="utf-8"))
+    record_titles = {node["components"]["minecraft:written_book_content"]["title"]
+                     for node in walk(nightmare_records)
+                     if "minecraft:written_book_content" in node.get("components", {})}
+    for title in ("Watcher Survey", "Hound Handling Notes", "Wardened Test Log",
+                  "False Survivor Interview", "Unbound Observation"):
+        assert title in record_titles, f"missing Nightmare field record: {title}"
     assert "nightmare_records" in feature
     assert "applyVariations(id,level,x,surfaceY,z,random)" in feature
     assert "StructurePlacementPolicy.containsBlock" in feature and "public static boolean containsBlock" in policy

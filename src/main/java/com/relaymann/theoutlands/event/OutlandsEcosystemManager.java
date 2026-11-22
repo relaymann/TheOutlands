@@ -65,7 +65,8 @@ public final class OutlandsEcosystemManager {
                 || mob instanceof StillbornStatueEntity || mob instanceof AgitatedOneEntity
                 || mob instanceof NullEntity || mob instanceof NullApostleEntity || mob instanceof FearEntity
                 || mob instanceof DeathEntity || mob instanceof AlmightyEntity
-                || mob instanceof LurkerEntity || mob instanceof HowlerEntity || mob instanceof DredgeEntity;
+                || mob instanceof LurkerEntity || mob instanceof HowlerEntity || mob instanceof DredgeEntity
+                || mob instanceof NightmareCreature;
     }
 
     private static void interact(Mob a, Mob b, ServerPlayer witness) {
@@ -132,6 +133,23 @@ public final class OutlandsEcosystemManager {
         if (a instanceof AgitatedOneEntity && isPredator(b)) defendPlayerSpace((AgitatedOneEntity)a, witness);
         if (b instanceof AgitatedOneEntity && isPredator(a)) defendPlayerSpace((AgitatedOneEntity)b, witness);
 
+        // Nightmare Hounds and Unbound can inherit an active hunting target from established trackers.
+        if (a instanceof NightmareCreature nightmare && (nightmare.isVariant("nightmare_hound")
+                || nightmare.isVariant("nightmare_unbound"))
+                && (b instanceof HunterEntity || b instanceof StalkerEntity || b instanceof HowlerEntity)) {
+            shareTarget(b, a);
+        }
+        if (b instanceof NightmareCreature nightmare && (nightmare.isVariant("nightmare_hound")
+                || nightmare.isVariant("nightmare_unbound"))
+                && (a instanceof HunterEntity || a instanceof StalkerEntity || a instanceof HowlerEntity)) {
+            shareTarget(a, b);
+        }
+        // A Wardened presence is a territorial anchor; ordinary intruders give its chamber space.
+        if (a instanceof NightmareCreature nightmare && nightmare.isVariant("nightmare_wardened")
+                && isPredator(b)) yieldTerritory(a, b);
+        if (b instanceof NightmareCreature nightmare && nightmare.isVariant("nightmare_wardened")
+                && isPredator(a)) yieldTerritory(b, a);
+
         // A rare encounter: Hunters occasionally investigate a dormant Mimic.
         if (a instanceof HunterEntity && b instanceof MimicEntity) investigateMimic(a, b);
         if (b instanceof HunterEntity && a instanceof MimicEntity) investigateMimic(b, a);
@@ -173,7 +191,8 @@ public final class OutlandsEcosystemManager {
     private static boolean isPredator(Mob mob) {
         return mob instanceof CaveJarEntity || mob instanceof StalkerEntity || mob instanceof HunterEntity
                 || mob instanceof BurrowerEntity || mob instanceof MimicEntity || mob instanceof StillbornStatueEntity
-                || mob instanceof LurkerEntity || mob instanceof DredgeEntity || mob instanceof HowlerEntity;
+                || mob instanceof LurkerEntity || mob instanceof DredgeEntity || mob instanceof HowlerEntity
+                || mob instanceof NightmareCreature;
     }
 
     private static void defendPlayerSpace(AgitatedOneEntity entity, ServerPlayer witness) {

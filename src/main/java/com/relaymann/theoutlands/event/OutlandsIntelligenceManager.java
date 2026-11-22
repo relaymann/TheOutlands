@@ -113,7 +113,8 @@ public final class OutlandsIntelligenceManager {
                 || mob instanceof NullEntity || mob instanceof NullApostleEntity
                 || mob instanceof FearEntity || mob instanceof DeathEntity
                 || mob instanceof AlmightyEntity || mob instanceof LurkerEntity
-                || mob instanceof HowlerEntity || mob instanceof DredgeEntity;
+                || mob instanceof HowlerEntity || mob instanceof DredgeEntity
+                || mob instanceof NightmareCreature;
     }
 
     private static void record(ServerLevel level, BlockPos pos, UUID source, String kind) {
@@ -205,6 +206,16 @@ public final class OutlandsIntelligenceManager {
         if (mob instanceof HowlerEntity) return 52;
         if (mob instanceof DredgeEntity) return 30;
         if (mob instanceof MimicEntity) return 18;
+        if (mob instanceof NightmareCreature creature) {
+            return switch (creature.getVariantId()) {
+                case "nightmare_watcher" -> 72;
+                case "nightmare_hound" -> 42;
+                case "nightmare_wardened" -> 26;
+                case "nightmare_false_survivor" -> 48;
+                case "nightmare_unbound" -> 56;
+                default -> 32;
+            };
+        }
         return 0;
     }
 
@@ -216,7 +227,8 @@ public final class OutlandsIntelligenceManager {
                 || mob instanceof MimicEntity || mob instanceof StillbornStatueEntity
                 || mob instanceof AgitatedOneEntity || mob instanceof NullApostleEntity
                 || mob instanceof ObserverEntity || mob instanceof LurkerEntity
-                || mob instanceof HowlerEntity || mob instanceof DredgeEntity;
+                || mob instanceof HowlerEntity || mob instanceof DredgeEntity
+                || mob instanceof NightmareCreature;
     }
 
     private static void adaptPursuit(Mob mob) {

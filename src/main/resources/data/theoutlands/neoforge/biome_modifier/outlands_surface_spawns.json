@@ -61,6 +61,36 @@
       "weight": 2,
       "minCount": 1,
       "maxCount": 1
+    },
+    {
+      "type": "theoutlands:nightmare_watcher",
+      "weight": 12,
+      "minCount": 1,
+      "maxCount": 1
+    },
+    {
+      "type": "theoutlands:nightmare_hound",
+      "weight": 24,
+      "minCount": 1,
+      "maxCount": 1
+    },
+    {
+      "type": "theoutlands:nightmare_wardened",
+      "weight": 4,
+      "minCount": 1,
+      "maxCount": 1
+    },
+    {
+      "type": "theoutlands:nightmare_false_survivor",
+      "weight": 13,
+      "minCount": 1,
+      "maxCount": 1
+    },
+    {
+      "type": "theoutlands:nightmare_unbound",
+      "weight": 6,
+      "minCount": 1,
+      "maxCount": 1
     }
   ]
 }

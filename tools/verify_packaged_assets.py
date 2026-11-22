@@ -14,6 +14,9 @@ TEXTURES = (
     "mimic", "null", "null_apostle", "observer", "pilgrim", "stalker",
     "stillborn_statue",
 )
+NIGHTMARE_TEXTURES = (
+    "watcher", "hound", "wardened", "false_survivor", "unbound",
+)
 SOUNDS = (
     "null_presence", "fear_presence", "death_presence", "almighty_presence",
     "null_apostle_whisper", "cavejar_stalk", "stalker_breath", "observer_click",
@@ -29,6 +32,10 @@ with ZipFile(JARS[0]) as jar:
     names = set(jar.namelist())
     missing_textures = [name for name in TEXTURES
                         if f"assets/theoutlands/textures/entity/{name}.png" not in names]
+    missing_textures.extend(
+        f"nightmare/{name}" for name in NIGHTMARE_TEXTURES
+        if f"assets/theoutlands/textures/entity/nightmare/{name}.png" not in names
+    )
     missing_sounds = [name for name in SOUNDS
                       if f"assets/theoutlands/sounds/{name}.ogg" not in names]
     if "assets/theoutlands/sounds.json" not in names:
@@ -40,5 +47,5 @@ with ZipFile(JARS[0]) as jar:
             print("Missing packaged audio:", ", ".join(missing_sounds), file=sys.stderr)
         raise SystemExit(1)
 
-print(f"Packaged asset audit passed: {len(TEXTURES)} entity textures and "
+print(f"Packaged asset audit passed: {len(TEXTURES) + len(NIGHTMARE_TEXTURES)} entity textures and "
       f"{len(SOUNDS)} entity sounds are present in {JARS[0].name}.")

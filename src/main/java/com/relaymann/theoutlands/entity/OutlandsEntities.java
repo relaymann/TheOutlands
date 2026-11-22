@@ -75,5 +75,17 @@ public final class OutlandsEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<PilgrimEntity>> PILGRIM = ENTITY_TYPES.register("pilgrim", () -> EntityType.Builder.of(PilgrimEntity::new, MobCategory.MONSTER).sized(.9F,2.5F).clientTrackingRange(24).updateInterval(2).build("theoutlands:pilgrim"));
     public static final DeferredHolder<EntityType<?>, EntityType<CeilingDwellerEntity>> CEILING_DWELLER = ENTITY_TYPES.register("ceiling_dweller", () -> EntityType.Builder.of(CeilingDwellerEntity::new, MobCategory.MONSTER).sized(1.0F,1.4F).clientTrackingRange(20).updateInterval(2).build("theoutlands:ceiling_dweller"));
     public static final DeferredHolder<EntityType<?>, EntityType<ColossusEntity>> COLOSSUS = ENTITY_TYPES.register("colossus", () -> EntityType.Builder.of(ColossusEntity::new, MobCategory.MONSTER).sized(2.4F,5.6F).clientTrackingRange(48).updateInterval(3).build("theoutlands:colossus"));
+    public static final DeferredHolder<EntityType<?>, EntityType<NightmareCreature>> NIGHTMARE_WATCHER = nightmareCreature("nightmare_watcher", 0.62F, 2.35F);
+    public static final DeferredHolder<EntityType<?>, EntityType<NightmareCreature>> NIGHTMARE_HOUND = nightmareCreature("nightmare_hound", 1.05F, 1.35F);
+    public static final DeferredHolder<EntityType<?>, EntityType<NightmareCreature>> NIGHTMARE_WARDENED = nightmareCreature("nightmare_wardened", 1.05F, 2.75F);
+    public static final DeferredHolder<EntityType<?>, EntityType<NightmareCreature>> NIGHTMARE_FALSE_SURVIVOR = nightmareCreature("nightmare_false_survivor", 0.70F, 1.95F);
+    public static final DeferredHolder<EntityType<?>, EntityType<NightmareCreature>> NIGHTMARE_UNBOUND = nightmareCreature("nightmare_unbound", 0.76F, 2.45F);
+
+    private static DeferredHolder<EntityType<?>, EntityType<NightmareCreature>> nightmareCreature(
+            String id, float width, float height) {
+        return ENTITY_TYPES.register(id, () -> EntityType.Builder.of(NightmareCreature::new, MobCategory.MONSTER)
+                .sized(width, height).clientTrackingRange(24).updateInterval(2).build("theoutlands:" + id));
+    }
+
     private OutlandsEntities() {}
 }

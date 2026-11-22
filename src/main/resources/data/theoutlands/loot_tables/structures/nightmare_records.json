@@ -85,6 +85,106 @@
               }
             }
           ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:written_book",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "minecraft:written_book_content": {
+                  "title": "Watcher Survey",
+                  "author": "Outlands Field Archive",
+                  "pages": [
+                    "{\"text\":\"SUBJECT: W-01\\n\\nIt did not move while we watched the ridge. When the watch changed, the ridge was empty and the prints continued toward the camp.\"}",
+                    "{\"text\":\"The second team saw it from closer range. It remained still until the lantern went out. No one could agree which side of the fence it had been standing on.\"}"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:written_book",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "minecraft:written_book_content": {
+                  "title": "Hound Handling Notes",
+                  "author": "Outlands Field Archive",
+                  "pages": [
+                    "{\"text\":\"FIELD NOTE: HOUND\\n\\nDo not run in a straight line. It learns the route before it reaches the first turn.\"}",
+                    "{\"text\":\"The chain marks stop at the ravine. The tracks on the opposite side are deeper, as if it landed without slowing down.\"}"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:written_book",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "minecraft:written_book_content": {
+                  "title": "Wardened Test Log",
+                  "author": "Outlands Field Archive",
+                  "pages": [
+                    "{\"text\":\"CONTAINMENT CLASS: WARDENED\\n\\nSmall-caliber trials produced no useful result. The subject advanced only when the warning lights failed.\"}",
+                    "{\"text\":\"Do not confuse its slow approach with weakness. It crossed the lower chamber after the doors had been sealed.\"}"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:written_book",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "minecraft:written_book_content": {
+                  "title": "False Survivor Interview",
+                  "author": "Outlands Field Archive",
+                  "pages": [
+                    "{\"text\":\"INTERVIEW: UNIDENTIFIED\\n\\nThe figure used the correct emergency signal and knew the names on the duty roster.\"}",
+                    "{\"text\":\"It stopped walking whenever the searchlight crossed it. The footprints did not stop.\"}"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:written_book",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_components",
+              "components": {
+                "minecraft:written_book_content": {
+                  "title": "Unbound Observation",
+                  "author": "Outlands Field Archive",
+                  "pages": [
+                    "{\"text\":\"OBSERVATION: U-00\\n\\nThe subject did not follow the survey team. It moved between their intended destinations.\"}",
+                    "{\"text\":\"The map marks five sightings. The final report lists six observers. No one remembers the sixth person leaving.\"}"
+                  ]
+                }
+              }
+            }
+          ]
         }
       ]
     }

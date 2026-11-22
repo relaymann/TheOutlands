@@ -30,5 +30,10 @@ public final class OutlandsEntityEvents {
         event.put(OutlandsEntities.PILGRIM.get(), PilgrimEntity.createAttributes().build());
         event.put(OutlandsEntities.CEILING_DWELLER.get(), CeilingDwellerEntity.createAttributes().build());
         event.put(OutlandsEntities.COLOSSUS.get(), ColossusEntity.createAttributes().build());
+        event.put(OutlandsEntities.NIGHTMARE_WATCHER.get(), NightmareCreature.createAttributes().build());
+        event.put(OutlandsEntities.NIGHTMARE_HOUND.get(), NightmareCreature.createAttributes().build());
+        event.put(OutlandsEntities.NIGHTMARE_WARDENED.get(), NightmareCreature.createAttributes().build());
+        event.put(OutlandsEntities.NIGHTMARE_FALSE_SURVIVOR.get(), NightmareCreature.createAttributes().build());
+        event.put(OutlandsEntities.NIGHTMARE_UNBOUND.get(), NightmareCreature.createAttributes().build());
     }
 }

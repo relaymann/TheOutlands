@@ -95,10 +95,14 @@ public final class StructureEncounterManager {
                 else { selected = OutlandsEntities.DREDGE.get(); denominator = 38; }
             }
             case "boundary_monument" -> { if (distance >= 18_000) { selected = OutlandsEntities.NULL_APOSTLE.get(); denominator = 100; } }
-            case "nightmare_containment" -> { selected = OutlandsEntities.STILLBORN_STATUE.get(); denominator = 10; }
-            case "blood_moon_shrine" -> { selected = OutlandsEntities.NULL_APOSTLE.get(); denominator = 8; }
-            case "nightmare_outpost" -> { selected = OutlandsEntities.STALKER.get(); denominator = 7; }
-            case "black_site" -> { selected = OutlandsEntities.AGITATED_ONE.get(); denominator = 8; }
+            case "nightmare_containment" -> { selected = OutlandsEntities.NIGHTMARE_WARDENED.get(); denominator = 5; }
+            case "blood_moon_shrine" -> { selected = OutlandsEntities.NIGHTMARE_UNBOUND.get(); denominator = 5; }
+            case "nightmare_outpost" -> { selected = OutlandsEntities.NIGHTMARE_HOUND.get(); denominator = 4; }
+            case "black_site" -> {
+                selected = random.nextBoolean() ? OutlandsEntities.NIGHTMARE_FALSE_SURVIVOR.get()
+                        : OutlandsEntities.NIGHTMARE_WATCHER.get();
+                denominator = 4;
+            }
         }
         if (NightmareMode.isEnabled(level) && denominator > 0) denominator = Math.max(3, denominator / 3);
         if (selected == null || (denominator > 0 && random.nextInt(denominator) != 0)) return true;

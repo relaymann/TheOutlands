@@ -3,7 +3,7 @@
 import glob, json, os, re, struct, sys
 
 ROOT = "src/main"
-EXPECTED = 19
+EXPECTED = 24
 PASSES = 15
 
 def read(path):
@@ -22,6 +22,8 @@ audio_generator = open("tools/generate_entity_audio.py", encoding="utf-8").read(
 
 fields = dict((field, entity_id) for field, entity_id in re.findall(
     r'([A-Z][A-Z0-9_]*)\s*=\s*ENTITY_TYPES\.register\("([^"]+)"', registry))
+fields.update(dict((field, entity_id) for field, entity_id in re.findall(
+    r'([A-Z][A-Z0-9_]*)\s*=\s*nightmareCreature\("([^"]+)"', registry)))
 if len(fields) != EXPECTED:
     raise SystemExit("Expected %d registered entities; found %d: %s" % (EXPECTED, len(fields), fields))
 
@@ -45,7 +47,10 @@ sound_map = {
  "cave_jar":"cavejar_stalk", "stalker":"stalker_breath", "observer":"observer_click",
  "hunter":"hunter_stalk", "burrower":"burrower_rise", "mimic":"mimic_reveal",
  "stillborn_statue":"stillborn_stone", "agitated_one":"agitated_warning",
- "lurker":"lurker_breath", "howler":"howler_call", "dredge":"dredge_crawl", "pilgrim":"pilgrim_breath", "ceiling_dweller":"ceiling_crawl", "colossus":"colossus_step"
+ "lurker":"lurker_breath", "howler":"howler_call", "dredge":"dredge_crawl", "pilgrim":"pilgrim_breath", "ceiling_dweller":"ceiling_crawl", "colossus":"colossus_step",
+ "nightmare_watcher":"observer_click", "nightmare_hound":"howler_breath",
+ "nightmare_wardened":"stillborn_stone", "nightmare_false_survivor":"pilgrim_breath",
+ "nightmare_unbound":"null_presence"
 }
 model_map = {
  "null":"NullModel", "fear":"FearModel", "death":"DeathModel", "almighty":"AlmightyModel",
@@ -53,11 +58,21 @@ model_map = {
  "observer":"ObserverModel", "hunter":"HunterModel", "burrower":"BurrowerModel",
  "mimic":"MimicModel", "stillborn_statue":"StillbornStatueModel",
  "agitated_one":"AgitatedOneModel", "lurker":"LurkerModel",
- "howler":"HowlerModel", "dredge":"DredgeModel", "pilgrim":"PilgrimModel", "ceiling_dweller":"CeilingDwellerModel", "colossus":"ColossusModel"
+ "howler":"HowlerModel", "dredge":"DredgeModel", "pilgrim":"PilgrimModel", "ceiling_dweller":"CeilingDwellerModel", "colossus":"ColossusModel",
+ "nightmare_watcher":"NightmareCreatureModel", "nightmare_hound":"NightmareCreatureModel",
+ "nightmare_wardened":"NightmareCreatureModel", "nightmare_false_survivor":"NightmareCreatureModel",
+ "nightmare_unbound":"NightmareCreatureModel"
 }
 
 renderer_models = {}
 textures = {}
+nightmare_texture_map = {
+    "nightmare_watcher": "nightmare/watcher.png",
+    "nightmare_hound": "nightmare/hound.png",
+    "nightmare_wardened": "nightmare/wardened.png",
+    "nightmare_false_survivor": "nightmare/false_survivor.png",
+    "nightmare_unbound": "nightmare/unbound.png",
+}
 layer_fields = set(re.findall(r'event\.registerLayerDefinition\(([A-Za-z0-9_]+)Renderer\.LAYER', renderers))
 for field, entity_id in fields.items():
     match = re.search(r'registerEntityRenderer\(OutlandsEntities\.' + field + r'\.get\(\),\s*([A-Za-z0-9_]+)::new\)', renderers)
@@ -78,6 +93,10 @@ for field, entity_id in fields.items():
         renderer_models[entity_id] = model_match.group(1)
     if texture_match:
         textures[entity_id] = texture_match.group(1)
+
+for entity_id, texture in nightmare_texture_map.items():
+    renderer_models[entity_id] = "NightmareCreatureModel"
+    textures[entity_id] = texture
 
 def audit_once():
     errors = []
@@ -129,6 +148,8 @@ def audit_once():
             if not generated and not committed: errors.append(entity_id + ": no generated/committed OGG")
 
     expected_weights = {
+        "nightmare_watcher": 12, "nightmare_hound": 24, "nightmare_wardened": 4,
+        "nightmare_false_survivor": 13, "nightmare_unbound": 6,
         "stalker": 70, "lurker": 75, "dredge": 70, "hunter": 48,
         "observer": 38, "mimic": 32, "howler": 40, "pilgrim": 24,
         "cave_jar": 36, "burrower": 42, "ceiling_dweller": 28,
@@ -150,8 +171,16 @@ def audit_once():
         errors.append("Colossus telegraph/impact sounds are not registered")
     if "CEILING_DROP" not in sounds_java or "PILGRIM_STEP" not in sounds_java:
         errors.append("new entity action sounds are not registered")
-    if len(set(model_map.values())) != EXPECTED: errors.append("entity model mapping is not unique")
-    if len(layer_fields) != EXPECTED: errors.append("not all entity model layers are registered")
+    if len(set(model_map.values())) != EXPECTED - 4: errors.append("shared Nightmare model mapping is inconsistent")
+    if len(layer_fields) != EXPECTED - 4: errors.append("not all entity model layers are registered")
+    nightmare_model = read("java/com/relaymann/theoutlands/client/NightmareCreatureModel.java")
+    nightmare_renderer = read("java/com/relaymann/theoutlands/client/NightmareCreatureRenderer.java")
+    for field in ("NIGHTMARE_WATCHER", "NIGHTMARE_HOUND", "NIGHTMARE_WARDENED",
+                  "NIGHTMARE_FALSE_SURVIVOR", "NIGHTMARE_UNBOUND"):
+        if field not in registry or field not in placements or field not in attributes or field not in renderers:
+            errors.append(field.lower() + ": missing Nightmare registration path")
+    if "setupAnim" not in nightmare_model or "textures/entity/nightmare/" not in nightmare_renderer:
+        errors.append("Nightmare shared model/renderer is incomplete")
     if "SoundEvents.WARDEN_ROAR" in almighty_encounter: errors.append("Almighty uses a vanilla placeholder sound")
     mimic_src = read("java/com/relaymann/theoutlands/entity/MimicEntity.java")
     stalker_src = read("java/com/relaymann/theoutlands/entity/StalkerEntity.java")
@@ -171,11 +200,9 @@ def audit_once():
         "new SpawnProfile(OutlandsConfig.DEATH_FIRST_APPEARANCE_DISTANCE.get(), 8, 10)",
         "int denominator = profile.rarityMultiplier()",
         "threatPoints + profile.threatCost() <= threatBudget",
-        "double encounterRadius = nightmare ? 112.0D : 72.0D",
-        "distance < 1_000.0D ? 4", "distance < 2_000.0D ? 5",
-        "distance < 4_000.0D ? 7", "distance < 7_000.0D ? 8 : 9",
-        "distance < 1_000.0D ? 12", "distance < 2_000.0D ? 16",
-        "distance < 4_000.0D ? 20", "distance < 7_000.0D ? 22 : 24",
+        "double encounterRadius = nightmare ? 112.0D + pressureTier * 8.0D : 72.0D",
+        "NightmareBalancePolicy.entityCap(serverLevel.getDayTime(), distance)",
+        "NightmareBalancePolicy.threatBudget(serverLevel.getDayTime(), distance)",
         "minimumDistance *= distanceScale", "NightmareMode.isEnabled(serverLevel)"
     ]
     for rule in required_spawn_rules:

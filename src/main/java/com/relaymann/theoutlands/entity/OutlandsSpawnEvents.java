@@ -51,6 +51,11 @@ public final class OutlandsSpawnEvents {
         registerGround(event, OutlandsEntities.PILGRIM.get(), OutlandsSpawnEvents::pilgrimSpawn);
         registerGround(event, OutlandsEntities.CEILING_DWELLER.get(), OutlandsSpawnEvents::ceilingSpawn);
         registerGround(event, OutlandsEntities.COLOSSUS.get(), OutlandsSpawnEvents::colossusSpawn);
+        registerGround(event, OutlandsEntities.NIGHTMARE_WATCHER.get(), OutlandsSpawnEvents::nightmareSpawn);
+        registerGround(event, OutlandsEntities.NIGHTMARE_HOUND.get(), OutlandsSpawnEvents::nightmareSpawn);
+        registerGround(event, OutlandsEntities.NIGHTMARE_WARDENED.get(), OutlandsSpawnEvents::nightmareSpawn);
+        registerGround(event, OutlandsEntities.NIGHTMARE_FALSE_SURVIVOR.get(), OutlandsSpawnEvents::nightmareSpawn);
+        registerGround(event, OutlandsEntities.NIGHTMARE_UNBOUND.get(), OutlandsSpawnEvents::nightmareSpawn);
     }
 
     private static <T extends Mob> void registerGround(
@@ -68,13 +73,16 @@ public final class OutlandsSpawnEvents {
     private static <T extends Mob> boolean passesNaturalSpawnBalance(
             EntityType<T> type, ServerLevelAccessor level, MobSpawnType reason,
             BlockPos pos, RandomSource random) {
-        if (!OutlandsConfig.ENTITY_SPAWN_BALANCE_ENABLED.get()) return true;
         if (reason != MobSpawnType.NATURAL && reason != MobSpawnType.CHUNK_GENERATION) return true;
 
         ServerLevel serverLevel = level.getLevel();
         // Almighty has its own End-only rarity rule and is deliberately outside
         // the Overworld distance progression and encounter budget.
         if (!serverLevel.dimension().equals(Level.OVERWORLD) || type == OutlandsEntities.ALMIGHTY.get()) return true;
+
+        boolean nightmare = NightmareMode.isEnabled(serverLevel);
+        if (isNightmareExclusive(type) && !nightmare) return false;
+        if (!OutlandsConfig.ENTITY_SPAWN_BALANCE_ENABLED.get()) return true;
 
         SpawnProfile profile = profile(type);
         if (profile == null) return true;
@@ -84,7 +92,6 @@ public final class OutlandsSpawnEvents {
                 pos.getX() - worldSpawn.getX(),
                 pos.getZ() - worldSpawn.getZ());
 
-        boolean nightmare = NightmareMode.isEnabled(serverLevel);
         double minimumDistance = profile.minimumDistance();
         int denominator = profile.rarityMultiplier();
         if (nightmare) {
@@ -104,7 +111,9 @@ public final class OutlandsSpawnEvents {
         // player. This also constrains chunk-generation spawns, which can run
         // before a player is close enough to be found.
         boolean bloodMoon = nightmare && NightmareModeManager.isBloodMoonActive(serverLevel);
-        double encounterRadius = nightmare ? 112.0D : 72.0D;
+        int pressureTier = nightmare
+                ? com.relaymann.theoutlands.NightmareBalancePolicy.pressureTier(serverLevel.getDayTime(), distance) : 0;
+        double encounterRadius = nightmare ? 112.0D + pressureTier * 8.0D : 72.0D;
         List<Mob> nearby = serverLevel.getEntitiesOfClass(Mob.class,
                 new AABB(pos).inflate(encounterRadius),
                 OutlandsSpawnEvents::isOutlandsCreature);
@@ -115,13 +124,11 @@ public final class OutlandsSpawnEvents {
         }
 
         int maxEntities = nightmare
-                ? (distance < 1_000.0D ? 12 : distance < 2_000.0D ? 16
-                : distance < 4_000.0D ? 20 : distance < 7_000.0D ? 22 : 24)
+                ? com.relaymann.theoutlands.NightmareBalancePolicy.entityCap(serverLevel.getDayTime(), distance)
                 : (distance < 1_000.0D ? 4 : distance < 2_000.0D ? 5
                 : distance < 4_000.0D ? 7 : distance < 7_000.0D ? 8 : 9);
         int threatBudget = nightmare
-                ? (distance < 1_000.0D ? 22 : distance < 2_000.0D ? 30
-                : distance < 4_000.0D ? 40 : distance < 7_000.0D ? 48 : 56)
+                ? com.relaymann.theoutlands.NightmareBalancePolicy.threatBudget(serverLevel.getDayTime(), distance)
                 : (distance < 1_000.0D ? 5 : distance < 2_000.0D ? 7
                 : distance < 4_000.0D ? 10 : distance < 7_000.0D ? 13 : 16);
         if (bloodMoon) {
@@ -143,7 +150,8 @@ public final class OutlandsSpawnEvents {
                 || type == OutlandsEntities.MIMIC.get() || type == OutlandsEntities.STILLBORN_STATUE.get()
                 || type == OutlandsEntities.AGITATED_ONE.get() || type == OutlandsEntities.LURKER.get()
                 || type == OutlandsEntities.HOWLER.get() || type == OutlandsEntities.DREDGE.get()
-                || type == OutlandsEntities.PILGRIM.get() || type == OutlandsEntities.CEILING_DWELLER.get() || type == OutlandsEntities.COLOSSUS.get();
+                || type == OutlandsEntities.PILGRIM.get() || type == OutlandsEntities.CEILING_DWELLER.get()
+                || type == OutlandsEntities.COLOSSUS.get() || isNightmareExclusive(type);
     }
 
     private static SpawnProfile profile(EntityType<?> type) {
@@ -151,6 +159,11 @@ public final class OutlandsSpawnEvents {
         // session reliably encounters the mod, without flooding the spawn area.
         if (type == OutlandsEntities.LURKER.get() || type == OutlandsEntities.DREDGE.get()
                 || type == OutlandsEntities.STALKER.get()) return new SpawnProfile(250.0D, 1, 1);
+        if (type == OutlandsEntities.NIGHTMARE_HOUND.get()) return new SpawnProfile(500.0D, 2, 2);
+        if (type == OutlandsEntities.NIGHTMARE_FALSE_SURVIVOR.get()) return new SpawnProfile(750.0D, 2, 2);
+        if (type == OutlandsEntities.NIGHTMARE_WATCHER.get()) return new SpawnProfile(1_000.0D, 3, 3);
+        if (type == OutlandsEntities.NIGHTMARE_UNBOUND.get()) return new SpawnProfile(1_500.0D, 4, 4);
+        if (type == OutlandsEntities.NIGHTMARE_WARDENED.get()) return new SpawnProfile(2_500.0D, 6, 5);
         if (type == OutlandsEntities.HUNTER.get() || type == OutlandsEntities.OBSERVER.get()
                 || type == OutlandsEntities.BURROWER.get() || type == OutlandsEntities.MIMIC.get()) {
             return new SpawnProfile(500.0D, 2, 1);
@@ -173,6 +186,21 @@ public final class OutlandsSpawnEvents {
             return new SpawnProfile(OutlandsConfig.DEATH_FIRST_APPEARANCE_DISTANCE.get(), 8, 10);
         }
         return null;
+    }
+
+    private static boolean isNightmareExclusive(EntityType<?> type) {
+        return type == OutlandsEntities.NIGHTMARE_WATCHER.get()
+                || type == OutlandsEntities.NIGHTMARE_HOUND.get()
+                || type == OutlandsEntities.NIGHTMARE_WARDENED.get()
+                || type == OutlandsEntities.NIGHTMARE_FALSE_SURVIVOR.get()
+                || type == OutlandsEntities.NIGHTMARE_UNBOUND.get();
+    }
+
+    private static boolean nightmareSpawn(EntityType<? extends Monster> type,
+            ServerLevelAccessor level, MobSpawnType reason, BlockPos pos, RandomSource random) {
+        return NightmareMode.isEnabled(level.getLevel())
+                && Monster.checkMonsterSpawnRules(type, level, reason, pos, random)
+                && level.getBrightness(LightLayer.BLOCK, pos) <= 11;
     }
 
     private record SpawnProfile(double minimumDistance, int threatCost, int rarityMultiplier) {}

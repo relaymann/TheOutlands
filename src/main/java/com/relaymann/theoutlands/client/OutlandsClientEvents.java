@@ -32,6 +32,11 @@ public final class OutlandsClientEvents {
         event.registerEntityRenderer(OutlandsEntities.PILGRIM.get(), PilgrimRenderer::new);
         event.registerEntityRenderer(OutlandsEntities.CEILING_DWELLER.get(), CeilingDwellerRenderer::new);
         event.registerEntityRenderer(OutlandsEntities.COLOSSUS.get(), ColossusRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.NIGHTMARE_WATCHER.get(), ctx -> new NightmareCreatureRenderer(ctx, "watcher"));
+        event.registerEntityRenderer(OutlandsEntities.NIGHTMARE_HOUND.get(), ctx -> new NightmareCreatureRenderer(ctx, "hound"));
+        event.registerEntityRenderer(OutlandsEntities.NIGHTMARE_WARDENED.get(), ctx -> new NightmareCreatureRenderer(ctx, "wardened"));
+        event.registerEntityRenderer(OutlandsEntities.NIGHTMARE_FALSE_SURVIVOR.get(), ctx -> new NightmareCreatureRenderer(ctx, "false_survivor"));
+        event.registerEntityRenderer(OutlandsEntities.NIGHTMARE_UNBOUND.get(), ctx -> new NightmareCreatureRenderer(ctx, "unbound"));
     }
 
     @SubscribeEvent
@@ -55,5 +60,6 @@ public final class OutlandsClientEvents {
         event.registerLayerDefinition(PilgrimRenderer.LAYER, PilgrimRenderer::createBodyLayer);
         event.registerLayerDefinition(CeilingDwellerRenderer.LAYER, CeilingDwellerRenderer::createBodyLayer);
         event.registerLayerDefinition(ColossusRenderer.LAYER, ColossusRenderer::createBodyLayer);
+        event.registerLayerDefinition(NightmareCreatureRenderer.LAYER, NightmareCreatureRenderer::createBodyLayer);
     }
 }

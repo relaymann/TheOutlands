@@ -40,7 +40,8 @@ class OutlandsStructureSelectionTest {
         boolean foundNightmare = false;
         for (long seed = 0; seed < 20_000 && !foundNightmare; seed++) {
             String survival = StructureLayoutPolicy.chooseLayout(seed, 60_000.0D, true, 250.0D, 2.5D);
-            assertFalse(nightmareOnly.contains(survival), "Nightmare-only site leaked into Survival");
+            assertTrue(survival == null || !nightmareOnly.contains(survival),
+                    "Nightmare-only site leaked into Survival");
             String nightmare = StructureLayoutPolicy.chooseLayout(
                     seed, 60_000.0D, true, 250.0D, 2.5D, true);
             foundNightmare = nightmareOnly.contains(nightmare);
