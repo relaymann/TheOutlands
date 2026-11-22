@@ -161,7 +161,7 @@ public final class VoicePerceptionManager {
             } else {
                 mob.getNavigation().stop();
             }
-            if (intensity >= 28 && mob.getRandom().nextInt(4) == 0) {
+            if (intensity >= 28 && mob.getRandom().nextInt(8) == 0) {
                 Vec3 falseOrigin = player.position().add(
                         mob.getRandom().nextBoolean() ? 8.0D : -8.0D, 0.0D,
                         mob.getRandom().nextBoolean() ? 6.0D : -6.0D);
@@ -172,7 +172,7 @@ public final class VoicePerceptionManager {
         }
 
         if (profile.behavior() == Behavior.HOWLER) {
-            if (intensity >= 72 && mob.getRandom().nextInt(5) == 0) {
+            if (intensity >= 72 && mob.getRandom().nextInt(8) == 0) {
                 level.playSound(null, mob.blockPosition(), OutlandsSounds.HOWLER_CALL.get(),
                         SoundSource.HOSTILE, 0.72F, 0.82F + mob.getRandom().nextFloat() * 0.18F);
                 alertNearby(level, mob, player, now);
@@ -199,7 +199,7 @@ public final class VoicePerceptionManager {
     private static void maybeVoiceKnock(ServerLevel level, ServerPlayer player, VoiceSignal signal, long now) {
         if (signal.whispering() || signal.level() < 82
                 || now < PLAYER_EVENT_COOLDOWNS.getOrDefault(player.getUUID(), 0L)
-                || player.getRandom().nextInt(90) != 0) return;
+                || player.getRandom().nextInt(240) != 0) return;
         BlockPos origin = player.blockPosition();
         BlockPos nearest = null;
         double nearestDistance = 15.0D * 15.0D;
@@ -217,7 +217,7 @@ public final class VoicePerceptionManager {
                 SoundSource.BLOCKS, 0.42F, 0.72F);
         level.playSound(null, nearest, SoundEvents.WOODEN_DOOR_CLOSE,
                 SoundSource.BLOCKS, 0.28F, 0.86F);
-        PLAYER_EVENT_COOLDOWNS.put(player.getUUID(), now + 600L);
+        PLAYER_EVENT_COOLDOWNS.put(player.getUUID(), now + 1800L);
     }
 
     private static void alertNearby(ServerLevel level, Mob caller, ServerPlayer player, long now) {
