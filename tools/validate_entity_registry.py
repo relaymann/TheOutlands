@@ -154,6 +154,9 @@ def audit_once():
     if len(layer_fields) != EXPECTED: errors.append("not all entity model layers are registered")
     if "SoundEvents.WARDEN_ROAR" in almighty_encounter: errors.append("Almighty uses a vanilla placeholder sound")
     mimic_src = read("java/com/relaymann/theoutlands/entity/MimicEntity.java")
+    stalker_src = read("java/com/relaymann/theoutlands/entity/StalkerEntity.java")
+    if "if (isPassenger()) stopRiding();" not in stalker_src:
+        errors.append("Stalker can be neutralized by vehicle trapping")
     if mimic_src.count("!p.isCreative()") < 2: errors.append("Mimic watcher checks do not ignore creative players")
     if intelligence.count("event.isCanceled()") < 4:
         errors.append("intelligence handlers do not consistently ignore canceled actions")
