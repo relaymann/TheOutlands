@@ -23,6 +23,8 @@ SOUNDS = (
     "hunter_stalk", "burrower_rise", "mimic_reveal", "stillborn_stone",
     "agitated_warning", "lurker_breath", "howler_call", "dredge_crawl",
     "pilgrim_breath", "ceiling_crawl", "colossus_step",
+    "nightmare_watcher", "nightmare_hound", "nightmare_wardened",
+    "nightmare_false_survivor", "nightmare_unbound",
 )
 
 if len(JARS) != 1:
