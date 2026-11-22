@@ -11,7 +11,6 @@ import de.maxhenkel.voicechat.api.VoicechatConnection;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.api.distmarker.Dist;
-import net.neoforged.fml.DistExecutor;
 
 
 /**
@@ -36,8 +35,7 @@ public final class OutlandsVoicechatPlugin implements VoicechatPlugin {
         registration.registerEvent(PlayerStateChangedEvent.class, this::onPlayerStateChanged);
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
-            DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
-                    () -> () -> ClientVoicechatHooks.register(registration));
+            ClientVoicechatHooks.register(registration);
         }
     }
 
@@ -57,7 +55,7 @@ public final class OutlandsVoicechatPlugin implements VoicechatPlugin {
     }
 
     private void onPlayerStateChanged(PlayerStateChangedEvent event) {
-        if (event.isMuted() || event.isDisabled() || event.isDisconnected()) {
+        if (event.isDisabled() || event.isDisconnected()) {
             VoicePerceptionManager.clear(event.getPlayerUuid());
         }
     }
