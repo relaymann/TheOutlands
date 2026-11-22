@@ -73,9 +73,11 @@ public final class VoicePerceptionManager {
                 || !player.isAlive() || player.isCreative() || player.isSpectator()) return;
         long now = player.serverLevel().getGameTime();
         ReportedLevel reported = REPORTED_LEVELS.get(player.getUUID());
-        int level = reported != null && reported.dimension().equals(player.serverLevel().dimension())
-                && now - reported.gameTime() <= 12L ? reported.level() : 34;
-        boolean whisper = whispering || (reported != null && reported.whispering());
+        boolean hasFreshReport = reported != null
+                && reported.dimension().equals(player.serverLevel().dimension())
+                && now - reported.gameTime() <= 12L;
+        int level = hasFreshReport ? reported.level() : 34;
+        boolean whisper = whispering || (hasFreshReport && reported.whispering());
         level = VoiceHearingMath.normalizeLevel(level, whisper);
         ACTIVE_VOICES.put(player.getUUID(), new VoiceSignal(player.position(),
                 player.serverLevel().dimension(), Math.max(12, level), whisper, now));
