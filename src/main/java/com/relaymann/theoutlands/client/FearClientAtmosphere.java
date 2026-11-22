@@ -98,7 +98,7 @@ public final class FearClientAtmosphere {
     public static void onFog(ViewportEvent.RenderFog event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null || event.getType() != FogType.NONE) return;
-        double strength = territoryStrength(player);
+        double strength = combinedStrength(player);
         if (strength <= 0.0D) return;
         event.scaleFarPlaneDistance((float) (1.0D - strength * 0.32D));
         event.scaleNearPlaneDistance((float) (1.0D - strength * 0.12D));
