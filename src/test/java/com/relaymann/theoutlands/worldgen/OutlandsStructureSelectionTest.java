@@ -34,6 +34,28 @@ class OutlandsStructureSelectionTest {
 
 
     @Test
+    void nightmareStructureAnchorsKeepFootprintsFromOverlapping() {
+        for (long seed = 0; seed < 12; seed++) {
+            java.util.List<int[]> anchors = new java.util.ArrayList<>();
+            for (int cellX = -40; cellX <= 40; cellX++) {
+                for (int cellZ = -40; cellZ <= 40; cellZ++) {
+                    int[] point = StructurePlacementPolicy.anchorForCell(seed, cellX, cellZ, 4);
+                    if (StructurePlacementPolicy.isSpacedAnchor(seed, point[0], point[1], 3, 4)) {
+                        anchors.add(point);
+                    }
+                }
+            }
+            for (int i = 0; i < anchors.size(); i++) {
+                for (int j = i + 1; j < anchors.size(); j++) {
+                    int[] a = anchors.get(i), b = anchors.get(j);
+                    assertTrue(Math.max(Math.abs(a[0] - b[0]), Math.abs(a[1] - b[1])) >= 3,
+                            "NIGHTMARE structure anchors must leave at least 48 blocks between footprints");
+                }
+            }
+        }
+    }
+
+    @Test
     void nightmareLayoutsAreExclusiveAndSelectable() {
         Set<String> nightmareOnly = Set.of(
                 "nightmare_containment", "blood_moon_shrine", "nightmare_outpost", "black_site");

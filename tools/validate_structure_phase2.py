@@ -104,8 +104,10 @@ def main():
     assert "applyVariations(id,level,x,surfaceY,z,random)" in feature
     assert "StructurePlacementPolicy.containsBlock" in feature and "public static boolean containsBlock" in policy
     assert "StructurePlacementPolicy.isSpacedAnchor" in structure and "max-min>5" in structure
+    assert "int spacing = nightmare ? 3" in structure
     selection_test=(ROOT/"src/test/java/com/relaymann/theoutlands/worldgen/OutlandsStructureSelectionTest.java").read_text(encoding="utf-8")
     assert "seededLayoutSelectionIsRepeatable" in selection_test and "forestOnlyCabinRequiresForest" in selection_test
+    assert "nightmareStructureAnchorsKeepFootprintsFromOverlapping" in selection_test
     sj=json.loads((ROOT/"src/main/resources/data/theoutlands/worldgen/structure/outlands_sites.json").read_text())
     ss=json.loads((ROOT/"src/main/resources/data/theoutlands/worldgen/structure_set/outlands_sites.json").read_text())
     bt=json.loads((ROOT/"src/main/resources/data/theoutlands/tags/worldgen/biome/structure_land.json").read_text())
