@@ -227,11 +227,10 @@ public final class VoicePerceptionManager {
 
     /** Rare knocks from an existing nearby door after an unusually loud call. */
     private static void maybeVoiceKnock(ServerLevel level, ServerPlayer player, VoiceSignal signal, long now) {
+        PlayerEventCooldown cooldown = PLAYER_EVENT_COOLDOWNS.get(player.getUUID());
         if (signal.whispering() || signal.level() < 82
-                || (PLAYER_EVENT_COOLDOWNS.containsKey(player.getUUID())
-                && PLAYER_EVENT_COOLDOWNS.get(player.getUUID()).dimension().equals(level.dimension())
-                && now < PLAYER_EVENT_COOLDOWNS.get(player.getUUID()).until())
-                || player.getRandom().nextInt(240) != 0) return;
+                || (cooldown != null && cooldown.dimension().equals(level.dimension())
+                && now < cooldown.until()) || player.getRandom().nextInt(240) != 0) return;
         BlockPos origin = player.blockPosition();
         BlockPos nearest = null;
         double nearestDistance = 15.0D * 15.0D;
