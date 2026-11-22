@@ -39,6 +39,7 @@ public final class ServerHorrorEvents {
     @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
         for (ServerLevel level : event.getServer().getAllLevels()) {
+            if (event.getServer().getTickCount() % 10 == 0) VoicePerceptionManager.tick(level);
             NullWatcherManager.tick(level);
             NullApostleManager.tick(level);
             FearEncounterManager.tick(level);
@@ -102,6 +103,7 @@ public final class ServerHorrorEvents {
         OutlandsIntelligenceManager.clear();
         PredatoryStalkingManager.clear();
         EntityTraceManager.clear();
+        VoicePerceptionManager.clear();
         NightmareMode.clear();
     }
 }
