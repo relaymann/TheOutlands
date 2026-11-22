@@ -128,6 +128,17 @@ def audit_once():
             committed = os.path.isfile(os.path.join(ROOT, "resources/assets/theoutlands/sounds", sound + ".ogg"))
             if not generated and not committed: errors.append(entity_id + ": no generated/committed OGG")
 
+    expected_weights = {
+        "stalker": 70, "lurker": 75, "dredge": 70, "hunter": 48,
+        "observer": 38, "mimic": 32, "howler": 40, "pilgrim": 24,
+        "cave_jar": 36, "burrower": 42, "ceiling_dweller": 28,
+        "stillborn_statue": 5, "agitated_one": 5, "null": 6, "null_apostle": 6
+    }
+    for entity_id, expected_weight in expected_weights.items():
+        entries = spawn_entries.get(entity_id, [])
+        if not any(entry.get("weight") == expected_weight for _, entry, _ in entries):
+            errors.append(entity_id + ": natural spawn weight does not match balanced pacing target")
+
     if len(set(textures.values())) != EXPECTED: errors.append("entity texture paths are not unique")
     new_models = read("java/com/relaymann/theoutlands/client/NewEntityRenderers.java")
     if "LayerDefinition.create(m,64,128)" not in new_models or "LayerDefinition.create(m,128,128)" not in new_models:
@@ -149,12 +160,17 @@ def audit_once():
 
     config = read("java/com/relaymann/theoutlands/OutlandsConfig.java")
     required_spawn_rules = [
-        "ENTITY_SPAWN_BALANCE_ENABLED", "new SpawnProfile(500.0D, 1, 1)",
-        "new SpawnProfile(1_200.0D, 2, 1)", "new SpawnProfile(1_500.0D, 2, 2)",
-        "new SpawnProfile(2_000.0D, 3, 2)", "new SpawnProfile(2_500.0D, 3, 3)",
-        "new SpawnProfile(5_000.0D, 5, 4)", "FEAR_FIRST_APPEARANCE_DISTANCE.get()",
-        "DEATH_FIRST_APPEARANCE_DISTANCE.get()", "int denominator = profile.rarityMultiplier()",
-        "threatPoints + profile.threatCost() <= threatBudget"
+        "ENTITY_SPAWN_BALANCE_ENABLED", "new SpawnProfile(250.0D, 1, 1)",
+        "new SpawnProfile(500.0D, 2, 1)", "new SpawnProfile(600.0D, 2, 1)",
+        "new SpawnProfile(750.0D, 3, 1)", "new SpawnProfile(900.0D, 3, 2)",
+        "new SpawnProfile(3_000.0D, 6, 5)", "new SpawnProfile(2_000.0D, 4, 3)",
+        "new SpawnProfile(OutlandsConfig.FEAR_FIRST_APPEARANCE_DISTANCE.get(), 8, 6)",
+        "new SpawnProfile(OutlandsConfig.DEATH_FIRST_APPEARANCE_DISTANCE.get(), 8, 10)",
+        "int denominator = profile.rarityMultiplier()",
+        "threatPoints + profile.threatCost() <= threatBudget",
+        "private static final double ENCOUNTER_RADIUS = 72.0D",
+        "distance < 1_000.0D ? 4", "distance < 2_000.0D ? 5",
+        "distance < 4_000.0D ? 7", "distance < 7_000.0D ? 8 : 9"
     ]
     for rule in required_spawn_rules:
         if rule not in placements + config:
