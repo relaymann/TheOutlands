@@ -29,7 +29,6 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -113,7 +112,7 @@ public final class NightmareModeManager {
 
     /** Briefly cuts ambient audio, then leaves one distant sign behind. */
     private static void silence(ServerPlayer player) {
-        player.connection.send(new ClientboundStopSoundPacket(Optional.empty(), Optional.of(SoundSource.AMBIENT)));
+        player.connection.send(new ClientboundStopSoundPacket(null, SoundSource.AMBIENT));
         player.serverLevel().sendParticles(ParticleTypes.ASH, player.getX(), player.getY() + 1.0D,
                 player.getZ(), 12, 0.7D, 0.8D, 0.7D, 0.002D);
     }
