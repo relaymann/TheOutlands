@@ -1,6 +1,7 @@
 package com.relaymann.theoutlands.event;
 
 import com.relaymann.theoutlands.OutlandsConfig;
+import com.relaymann.theoutlands.sound.OutlandsSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
@@ -70,7 +71,7 @@ public final class EnvironmentalAnomalyManager {
         double x = player.getX() + Math.cos(angle) * distance;
         double z = player.getZ() + Math.sin(angle) * distance;
         double y = player.getY();
-        switch (player.getRandom().nextInt(4)) {
+        switch (player.getRandom().nextInt(6)) {
             case 0 -> {
                 // A short pair of steps, far enough away to invite a look without starting a chase.
                 send(player, SoundEvents.GRAVEL_STEP, SoundSource.BLOCKS, x, y, z,
@@ -85,6 +86,16 @@ public final class EnvironmentalAnomalyManager {
                 double behindZ = player.getZ() + Math.cos(Math.toRadians(player.getYRot())) * 3.2D;
                 send(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT,
                         behindX, player.getY() + 1.0D, behindZ, 0.10F, 0.48F);
+            }
+            case 3 -> send(player, OutlandsSounds.STALKER_BREATH.get(), SoundSource.AMBIENT,
+                    x, y + 1.0D, z, 0.075F, 0.62F + player.getRandom().nextFloat() * 0.16F);
+            case 4 -> {
+                // A faint scrape several blocks above the listener, most effective in caves.
+                double aboveY = Math.min(player.level().getMaxBuildHeight() - 2.0D, player.getY() + 5.0D);
+                send(player, SoundEvents.GRAVEL_STEP, SoundSource.BLOCKS,
+                        x, aboveY, z, 0.11F, 0.48F);
+                send(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT,
+                        x + 1.0D, aboveY, z - 1.0D, 0.07F, 0.52F);
             }
             default -> send(player, SoundEvents.GRAVEL_STEP, SoundSource.BLOCKS,
                     x, y, z, 0.09F, 0.42F);
