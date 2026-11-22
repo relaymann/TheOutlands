@@ -49,7 +49,9 @@ public final class VoiceLevelHud {
 
         // Four PCM frames per network update is enough for responsive detection without packet spam.
         if (++frameCounter % 4 == 0) {
-            PacketDistributor.sendToServer(new VoiceLevelPayload(level, isWhispering));
+            int sentLevel = level;
+            Minecraft.getInstance().execute(() -> PacketDistributor.sendToServer(
+                    new VoiceLevelPayload(sentLevel, isWhispering)));
         }
     }
 
