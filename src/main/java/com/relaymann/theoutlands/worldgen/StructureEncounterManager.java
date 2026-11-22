@@ -41,7 +41,6 @@ public final class StructureEncounterManager {
             long seed = StructurePlacementPolicy.chunkSeed(level.getSeed(), centerChunkX, centerChunkZ);
             String key = level.dimension().location() + ":" + level.getSeed()
                     + ":" + bounds.minX() + ":" + bounds.minZ();
-            if (resolvedSites.hasResolved(key)) continue;
             BlockPos center = new BlockPos(centerX, bounds.maxY() - 12, centerZ);
             if (!level.hasChunkAt(center)) continue;
             double dx = centerX - level.getSharedSpawnPos().getX();
@@ -55,11 +54,18 @@ public final class StructureEncounterManager {
                     ? Math.max(250.0D, OutlandsConfig.STRUCTURE_MIN_DISTANCE.get() * 0.25D)
                     : Math.max(1_000.0D, OutlandsConfig.STRUCTURE_MIN_DISTANCE.get());
             double frequency = OutlandsConfig.STRUCTURE_CHANCE_MULTIPLIER.get() * (nightmare ? 2.5D : 1.0D);
+            String noLayoutKey = key + ":no-layout:" + nightmare + ":"
+                    + Double.doubleToLongBits(minimumDistance) + ":" + Double.doubleToLongBits(frequency);
+            if (resolvedSites.hasResolved(key) || resolvedSites.hasResolved(noLayoutKey)) continue;
             String layout = OutlandsStructureFeature.chooseLayout(seed, distance, forest,
                     minimumDistance, frequency, nightmare);
-            // Resolve each site once. A blocked spawn position must not trigger an
-            // expensive deterministic retry every second after later visits or server restarts.
-            if (layout != null) resolve(level, layout, center, distance, seed);
+            if (layout == null) {
+                // A later Nightmare-mode or frequency change may make this site eligible.
+                resolvedSites.markResolved(noLayoutKey);
+                continue;
+            }
+            // Resolve each eligible site once, even when its deterministic spawn roll fails.
+            resolve(level, layout, center, distance, seed);
             resolvedSites.markResolved(key);
         }
     }
