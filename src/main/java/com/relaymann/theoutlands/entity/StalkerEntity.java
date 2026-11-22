@@ -47,6 +47,9 @@ public final class StalkerEntity extends Monster {
     @Override public void tick() {
         super.tick();
         if (level().isClientSide) return;
+        // Players must not be able to neutralize the Stalker by seating it in
+        // a boat or minecart. It immediately dismounts and resumes its hunt.
+        if (isPassenger()) stopRiding();
         if (interceptCooldown > 0) interceptCooldown--;
 
         if (getTarget() instanceof Player player && player.isAlive()) {
