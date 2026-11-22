@@ -1,6 +1,7 @@
 package com.relaymann.theoutlands.worldgen;
 
 import com.relaymann.theoutlands.OutlandsConfig;
+import com.relaymann.theoutlands.NightmareMode;
 import com.relaymann.theoutlands.entity.OutlandsEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -49,9 +50,13 @@ public final class StructureEncounterManager {
             String biome = level.getBiome(center).unwrapKey().map(k -> k.location().getPath()).orElse("");
             boolean forest = biome.contains("forest") || biome.contains("taiga")
                     || biome.contains("grove") || biome.contains("wooded");
+            boolean nightmare = NightmareMode.isEnabled(level);
+            double minimumDistance = nightmare
+                    ? Math.max(250.0D, OutlandsConfig.STRUCTURE_MIN_DISTANCE.get() * 0.25D)
+                    : Math.max(1_000.0D, OutlandsConfig.STRUCTURE_MIN_DISTANCE.get());
+            double frequency = OutlandsConfig.STRUCTURE_CHANCE_MULTIPLIER.get() * (nightmare ? 2.5D : 1.0D);
             String layout = OutlandsStructureFeature.chooseLayout(seed, distance, forest,
-                    Math.max(1_000.0D, OutlandsConfig.STRUCTURE_MIN_DISTANCE.get()),
-                    OutlandsConfig.STRUCTURE_CHANCE_MULTIPLIER.get());
+                    minimumDistance, frequency);
             if (layout == null || resolve(level, layout, center, distance, seed)) {
                 RESOLVED_SITES.add(key);
             }
@@ -91,6 +96,7 @@ public final class StructureEncounterManager {
             }
             case "boundary_monument" -> { if (distance >= 18_000) { selected = OutlandsEntities.NULL_APOSTLE.get(); denominator = 100; } }
         }
+        if (NightmareMode.isEnabled(level) && denominator > 0) denominator = Math.max(3, denominator / 3);
         if (selected == null || (denominator > 0 && random.nextInt(denominator) != 0)) return true;
         int spawnY = switch (structure) {
             case "bunker" -> center.getY() - 12;

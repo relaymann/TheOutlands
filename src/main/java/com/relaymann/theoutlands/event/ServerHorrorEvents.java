@@ -1,6 +1,7 @@
 package com.relaymann.theoutlands.event;
 
 import com.relaymann.theoutlands.TheOutlands;
+import com.relaymann.theoutlands.NightmareMode;
 import com.relaymann.theoutlands.horror.HorrorMemory;
 import com.relaymann.theoutlands.worldgen.StructureEncounterManager;
 import com.relaymann.theoutlands.horror.HorrorProgressionManager;
@@ -13,12 +14,18 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 @EventBusSubscriber(modid = TheOutlands.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public final class ServerHorrorEvents {
     private ServerHorrorEvents() {}
+
+    @SubscribeEvent
+    public static void onServerStarted(ServerStartedEvent event) {
+        for (ServerLevel level : event.getServer().getAllLevels()) NightmareMode.refresh(level);
+    }
 
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Post event) {
@@ -92,5 +99,6 @@ public final class ServerHorrorEvents {
         StructureAmbienceManager.clear();
         StructureEncounterManager.clear();
         OutlandsIntelligenceManager.clear();
+        NightmareMode.clear();
     }
 }

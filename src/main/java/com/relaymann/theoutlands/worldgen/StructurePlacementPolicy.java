@@ -9,19 +9,27 @@ public final class StructurePlacementPolicy {
     private StructurePlacementPolicy() {}
 
     public static boolean isSpacedAnchor(long seed, int chunkX, int chunkZ, int minimumSpacing) {
-        long cellX = Math.floorDiv(chunkX, CELL_CHUNKS);
-        long cellZ = Math.floorDiv(chunkZ, CELL_CHUNKS);
-        int[] ownAnchor = anchorForCell(seed, cellX, cellZ);
+        return isSpacedAnchor(seed, chunkX, chunkZ, minimumSpacing, CELL_CHUNKS);
+    }
+
+    /** NIGHTMARE uses smaller deterministic placement cells without changing vanilla world generation. */
+    public static boolean isSpacedAnchor(long seed, int chunkX, int chunkZ,
+                                         int minimumSpacing, int cellChunks) {
+        if (cellChunks < 1 || (cellChunks & (cellChunks - 1)) != 0)
+            throw new IllegalArgumentException("cellChunks must be a positive power of two");
+        long cellX = Math.floorDiv(chunkX, cellChunks);
+        long cellZ = Math.floorDiv(chunkZ, cellChunks);
+        int[] ownAnchor = anchorForCell(seed, cellX, cellZ, cellChunks);
         if (ownAnchor[0] != chunkX || ownAnchor[1] != chunkZ) return false;
         long ownPriority = priority(seed, cellX, cellZ);
         int spacing = Math.max(1, minimumSpacing);
-        int radius = (spacing + CELL_CHUNKS - 1) / CELL_CHUNKS + 1;
+        int radius = (spacing + cellChunks - 1) / cellChunks + 1;
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dz = -radius; dz <= radius; dz++) {
                 if (dx == 0 && dz == 0) continue;
                 long otherX = cellX + dx;
                 long otherZ = cellZ + dz;
-                int[] other = anchorForCell(seed, otherX, otherZ);
+                int[] other = anchorForCell(seed, otherX, otherZ, cellChunks);
                 if (Math.max(Math.abs(other[0] - chunkX), Math.abs(other[1] - chunkZ)) >= spacing) continue;
                 long otherPriority = priority(seed, otherX, otherZ);
                 if (Long.compareUnsigned(otherPriority, ownPriority) < 0
@@ -33,10 +41,18 @@ public final class StructurePlacementPolicy {
     }
 
     public static int[] anchorForCell(long seed, long cellX, long cellZ) {
+        return anchorForCell(seed, cellX, cellZ, CELL_CHUNKS);
+    }
+
+    public static int[] anchorForCell(long seed, long cellX, long cellZ, int cellChunks) {
+        if (cellChunks < 1 || (cellChunks & (cellChunks - 1)) != 0)
+            throw new IllegalArgumentException("cellChunks must be a positive power of two");
         long value = priority(seed, cellX, cellZ);
-        int offsetX = (int) (value & (CELL_CHUNKS - 1));
-        int offsetZ = (int) ((value >>> 3) & (CELL_CHUNKS - 1));
-        return new int[] {(int) (cellX * CELL_CHUNKS + offsetX), (int) (cellZ * CELL_CHUNKS + offsetZ)};
+        int shift = Integer.numberOfTrailingZeros(cellChunks);
+        int mask = cellChunks - 1;
+        int offsetX = (int) (value & mask);
+        int offsetZ = (int) ((value >>> shift) & mask);
+        return new int[] {(int) (cellX * cellChunks + offsetX), (int) (cellZ * cellChunks + offsetZ)};
     }
 
     /** Evenly samples a footprint and always includes its final block coordinate. */

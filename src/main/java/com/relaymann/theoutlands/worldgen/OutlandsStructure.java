@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.relaymann.theoutlands.OutlandsConfig;
+import com.relaymann.theoutlands.NightmareMode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.structure.Structure;
@@ -32,8 +33,11 @@ public final class OutlandsStructure extends Structure {
     public Optional<GenerationStub> findGenerationPoint(GenerationContext context) {
         if (!OutlandsConfig.OUTLANDS_STRUCTURES_ENABLED.get()) return Optional.empty();
         int chunkX=context.chunkPos().x, chunkZ=context.chunkPos().z;
-        if (!StructurePlacementPolicy.isSpacedAnchor(context.seed(),chunkX,chunkZ,
-                OutlandsConfig.STRUCTURE_SPACING_CHUNKS.get())) return Optional.empty();
+        boolean nightmare = NightmareMode.isSeedEnabled(context.seed());
+        int cellChunks = nightmare ? 4 : StructurePlacementPolicy.CELL_CHUNKS;
+        int spacing = nightmare ? 2 : OutlandsConfig.STRUCTURE_SPACING_CHUNKS.get();
+        if (!StructurePlacementPolicy.isSpacedAnchor(context.seed(), chunkX, chunkZ, spacing, cellChunks))
+            return Optional.empty();
 
         int x=context.chunkPos().getMinBlockX()-(size-16)/2;
         int z=context.chunkPos().getMinBlockZ()-(size-16)/2;

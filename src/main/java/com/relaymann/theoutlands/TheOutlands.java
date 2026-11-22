@@ -18,6 +18,7 @@ public final class TheOutlands {
 
     public TheOutlands(IEventBus modEventBus, ModContainer modContainer) {
         modContainer.registerConfig(ModConfig.Type.COMMON, OutlandsConfig.SPEC);
+        OutlandsGameRules.register();
         OutlandsEntities.ENTITY_TYPES.register(modEventBus);
         OutlandsItems.ITEMS.register(modEventBus);
         OutlandsSounds.SOUNDS.register(modEventBus);

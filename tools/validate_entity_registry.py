@@ -171,9 +171,12 @@ def audit_once():
         "new SpawnProfile(OutlandsConfig.DEATH_FIRST_APPEARANCE_DISTANCE.get(), 8, 10)",
         "int denominator = profile.rarityMultiplier()",
         "threatPoints + profile.threatCost() <= threatBudget",
-        "private static final double ENCOUNTER_RADIUS = 72.0D",
+        "double encounterRadius = nightmare ? 112.0D : 72.0D",
         "distance < 1_000.0D ? 4", "distance < 2_000.0D ? 5",
-        "distance < 4_000.0D ? 7", "distance < 7_000.0D ? 8 : 9"
+        "distance < 4_000.0D ? 7", "distance < 7_000.0D ? 8 : 9",
+        "distance < 1_000.0D ? 12", "distance < 2_000.0D ? 16",
+        "distance < 4_000.0D ? 20", "distance < 7_000.0D ? 22 : 24",
+        "minimumDistance *= distanceScale", "NightmareMode.isEnabled(serverLevel)"
     ]
     for rule in required_spawn_rules:
         if rule not in placements + config:

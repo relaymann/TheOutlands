@@ -1,6 +1,7 @@
 package com.relaymann.theoutlands.worldgen;
 
 import com.relaymann.theoutlands.OutlandsConfig;
+import com.relaymann.theoutlands.NightmareMode;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -57,9 +58,12 @@ public final class OutlandsStructurePiece extends StructurePiece {
                 .unwrapKey().map(key->key.location().getPath()).orElse("");
         boolean forest=biome.contains("forest")||biome.contains("taiga")
                 ||biome.contains("grove")||biome.contains("wooded");
-        String layout=OutlandsStructureFeature.chooseLayout(seed,distance,forest,
-                Math.max(1_000.0D,OutlandsConfig.STRUCTURE_MIN_DISTANCE.get()),
-                OutlandsConfig.STRUCTURE_CHANCE_MULTIPLIER.get());
+        boolean nightmare = NightmareMode.isEnabled(level.getLevel());
+        double minimumDistance = nightmare
+                ? Math.max(250.0D, OutlandsConfig.STRUCTURE_MIN_DISTANCE.get() * 0.25D)
+                : Math.max(1_000.0D, OutlandsConfig.STRUCTURE_MIN_DISTANCE.get());
+        double frequency = OutlandsConfig.STRUCTURE_CHANCE_MULTIPLIER.get() * (nightmare ? 2.5D : 1.0D);
+        String layout=OutlandsStructureFeature.chooseLayout(seed,distance,forest,minimumDistance,frequency);
         if(layout==null) return;
         OutlandsStructureFeature.generateLayout(layout,level,anchorX,surfaceY,anchorZ,
                 RandomSource.create(seed ^ 0x6A09E667F3BCC909L),box);

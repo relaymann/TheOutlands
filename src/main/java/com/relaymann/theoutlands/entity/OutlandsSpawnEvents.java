@@ -1,6 +1,8 @@
 package com.relaymann.theoutlands.entity;
 
 import com.relaymann.theoutlands.OutlandsConfig;
+import com.relaymann.theoutlands.NightmareMode;
+import com.relaymann.theoutlands.event.NightmareModeManager;
 import com.relaymann.theoutlands.TheOutlands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -25,7 +27,6 @@ import java.util.List;
 /** Server-side habitat rules and distance/threat-budget balancing for natural spawns. */
 @EventBusSubscriber(modid = TheOutlands.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public final class OutlandsSpawnEvents {
-    private static final double ENCOUNTER_RADIUS = 72.0D;
 
     private OutlandsSpawnEvents() {}
 
@@ -83,18 +84,29 @@ public final class OutlandsSpawnEvents {
                 pos.getX() - worldSpawn.getX(),
                 pos.getZ() - worldSpawn.getZ());
 
-        if (distance < profile.minimumDistance()) return false;
+        boolean nightmare = NightmareMode.isEnabled(serverLevel);
+        double minimumDistance = profile.minimumDistance();
+        int denominator = profile.rarityMultiplier();
+        if (nightmare) {
+            double distanceScale = type == OutlandsEntities.DEATH.get() ? 0.25D
+                    : type == OutlandsEntities.FEAR.get() ? 0.22D
+                    : type == OutlandsEntities.COLOSSUS.get() ? 0.15D : 0.10D;
+            minimumDistance *= distanceScale;
+            denominator = Math.max(1, (int) Math.ceil(denominator / 3.0D));
+        }
+        if (distance < minimumDistance) return false;
 
         // Distance is a progression gate, not a second rarity penalty. Once an
         // entity reaches its intended territory, only its own rarity applies.
-        int denominator = profile.rarityMultiplier();
         if (denominator > 1 && random.nextInt(denominator) != 0) return false;
 
         // Budget around the candidate spawn location rather than the nearest
         // player. This also constrains chunk-generation spawns, which can run
         // before a player is close enough to be found.
+        boolean bloodMoon = nightmare && NightmareModeManager.isBloodMoonActive(serverLevel);
+        double encounterRadius = nightmare ? 112.0D : 72.0D;
         List<Mob> nearby = serverLevel.getEntitiesOfClass(Mob.class,
-                new AABB(pos).inflate(ENCOUNTER_RADIUS),
+                new AABB(pos).inflate(encounterRadius),
                 OutlandsSpawnEvents::isOutlandsCreature);
         int threatPoints = 0;
         for (Mob mob : nearby) {
@@ -102,14 +114,20 @@ public final class OutlandsSpawnEvents {
             threatPoints += existing == null ? 1 : existing.threatCost();
         }
 
-        int maxEntities = distance < 1_000.0D ? 4
-                : distance < 2_000.0D ? 5
-                : distance < 4_000.0D ? 7
-                : distance < 7_000.0D ? 8 : 9;
-        int threatBudget = distance < 1_000.0D ? 5
-                : distance < 2_000.0D ? 7
-                : distance < 4_000.0D ? 10
-                : distance < 7_000.0D ? 13 : 16;
+        int maxEntities = nightmare
+                ? (distance < 1_000.0D ? 12 : distance < 2_000.0D ? 16
+                : distance < 4_000.0D ? 20 : distance < 7_000.0D ? 22 : 24)
+                : (distance < 1_000.0D ? 4 : distance < 2_000.0D ? 5
+                : distance < 4_000.0D ? 7 : distance < 7_000.0D ? 8 : 9);
+        int threatBudget = nightmare
+                ? (distance < 1_000.0D ? 22 : distance < 2_000.0D ? 30
+                : distance < 4_000.0D ? 40 : distance < 7_000.0D ? 48 : 56)
+                : (distance < 1_000.0D ? 5 : distance < 2_000.0D ? 7
+                : distance < 4_000.0D ? 10 : distance < 7_000.0D ? 13 : 16);
+        if (bloodMoon) {
+            maxEntities += 5;
+            threatBudget += 12;
+        }
 
         return nearby.size() < maxEntities
                 && threatPoints + profile.threatCost() <= threatBudget;
