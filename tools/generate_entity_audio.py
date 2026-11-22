@@ -34,7 +34,17 @@ def make(name, duration, sample_fn):
             frames = bytearray()
             for i in range(count):
                 t = i / RATE
-                value = clamp(sample_fn(t, duration, i, count))
+                value = sample_fn(t, duration, i, count)
+                # Give every creature cue a restrained infrasonic body and unstable
+                # throat resonance. Structure ambience is intentionally left untouched.
+                if not name.startswith("structure_"):
+                    pulse = 0.42 + 0.58 * (0.5 + 0.5 * math.sin(2 * math.pi * 0.73 * t + 0.4))
+                    envelope = min(1.0, t / 0.07) * min(1.0, max(0.0, (duration - t) / 0.24))
+                    warped = 38.0 + 3.2 * math.sin(2 * math.pi * 0.31 * t)
+                    undertone = math.sin(2 * math.pi * warped * t + 0.22 * math.sin(2 * math.pi * 1.1 * t))
+                    throat = math.sin(2 * math.pi * 76.0 * t + 0.35 * math.sin(2 * math.pi * 0.57 * t))
+                    value += envelope * pulse * (0.052 * undertone + 0.018 * throat)
+                value = clamp(value)
                 frames.extend(struct.pack("<h", int(value * 26000)))
             wav.writeframes(frames)
         subprocess.run([
