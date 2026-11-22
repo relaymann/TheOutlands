@@ -70,8 +70,6 @@ public final class PredatoryStalkingManager {
                 || !mob.getTags().contains(TEMPORARY_DISAPPEARANCE_TAG)) return;
         Disappearance state = DISAPPEAR_UNTIL.get(mob.getUUID());
         if (state == null || state.level() != level
-                && (!OutlandsConfig.ENTITY_INTELLIGENCE_ENABLED.get()
-                || level.getGameTime() >= state.expiresAt())
                 || !OutlandsConfig.ENTITY_INTELLIGENCE_ENABLED.get()
                 || level.getGameTime() >= state.expiresAt()) {
             // The marker survives chunk unloads and server restarts; never strand a mob invisible.
