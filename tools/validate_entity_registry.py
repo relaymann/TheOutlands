@@ -48,9 +48,9 @@ sound_map = {
  "hunter":"hunter_stalk", "burrower":"burrower_rise", "mimic":"mimic_reveal",
  "stillborn_statue":"stillborn_stone", "agitated_one":"agitated_warning",
  "lurker":"lurker_breath", "howler":"howler_call", "dredge":"dredge_crawl", "pilgrim":"pilgrim_breath", "ceiling_dweller":"ceiling_crawl", "colossus":"colossus_step",
- "nightmare_watcher":"observer_click", "nightmare_hound":"howler_breath",
- "nightmare_wardened":"stillborn_stone", "nightmare_false_survivor":"pilgrim_breath",
- "nightmare_unbound":"null_presence"
+ "nightmare_watcher":"nightmare_watcher", "nightmare_hound":"nightmare_hound",
+ "nightmare_wardened":"nightmare_wardened", "nightmare_false_survivor":"nightmare_false_survivor",
+ "nightmare_unbound":"nightmare_unbound"
 }
 model_map = {
  "null":"NullModel", "fear":"FearModel", "death":"DeathModel", "almighty":"AlmightyModel",

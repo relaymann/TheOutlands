@@ -66,7 +66,7 @@ class OutlandsStructureSelectionTest {
                     "Nightmare-only site leaked into Survival");
             String nightmare = StructureLayoutPolicy.chooseLayout(
                     seed, 60_000.0D, true, 250.0D, 2.5D, true);
-            foundNightmare = nightmareOnly.contains(nightmare);
+            foundNightmare = nightmare != null && nightmareOnly.contains(nightmare);
         }
         assertTrue(foundNightmare, "NIGHTMARE should be able to select an exclusive structure");
     }
