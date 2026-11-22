@@ -58,7 +58,7 @@ public final class StructureEncounterManager {
             String layout = OutlandsStructureFeature.chooseLayout(seed, distance, forest,
                     minimumDistance, frequency, nightmare);
             // Resolve each site once. A blocked spawn position must not trigger an
-            // expensive deterministic retry every second for the rest of the session.
+            // expensive deterministic retry every second after later visits or server restarts.
             if (layout != null) resolve(level, layout, center, distance, seed);
             resolvedSites.markResolved(key);
         }
