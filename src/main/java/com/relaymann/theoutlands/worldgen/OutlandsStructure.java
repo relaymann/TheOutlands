@@ -35,7 +35,8 @@ public final class OutlandsStructure extends Structure {
         int chunkX=context.chunkPos().x, chunkZ=context.chunkPos().z;
         boolean nightmare = NightmareMode.isSeedEnabled(context.seed());
         int cellChunks = nightmare ? 4 : StructurePlacementPolicy.CELL_CHUNKS;
-        int spacing = nightmare ? 3 : OutlandsConfig.STRUCTURE_SPACING_CHUNKS.get();
+        int configuredSpacing = nightmare ? 3 : OutlandsConfig.STRUCTURE_SPACING_CHUNKS.get();
+        int spacing = StructurePlacementPolicy.minimumSpacingForFootprint(configuredSpacing, size);
         if (!StructurePlacementPolicy.isSpacedAnchor(context.seed(), chunkX, chunkZ, spacing, cellChunks))
             return Optional.empty();
 

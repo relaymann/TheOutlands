@@ -69,14 +69,29 @@ public final class OutlandsStructurePiece extends StructurePiece {
                 RandomSource.create(seed ^ 0x6A09E667F3BCC909L),box);
     }
 
-    /** Reject wet, wooded, or unexpectedly uneven chunk intersections instead of cutting through them. */
+    /** Sample real ground below trunks/branches so one tree cannot cancel a whole chunk of the structure. */
     private static boolean hasSuitableSurface(WorldGenLevel level,BoundingBox box,int expectedY) {
         for(int x=box.minX();x<=box.maxX();x+=4) {
             for(int z=box.minZ();z<=box.maxZ();z+=4) {
                 int top=level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,x,z);
                 if(top<=level.getMinBuildHeight()) return false;
-                var surface=level.getBlockState(new BlockPos(x,top-1,z));
-                if(!surface.getFluidState().isEmpty()||surface.is(BlockTags.LOGS)) return false;
+                int groundY = top - 1;
+                while (groundY > level.getMinBuildHeight()) {
+                    BlockPos sample = new BlockPos(x, groundY, z);
+                    var state = level.getBlockState(sample);
+                    if (state.getFluidState().isEmpty()
+                            && (state.isAir() || state.is(BlockTags.LOGS) || state.is(BlockTags.LEAVES))) {
+                        groundY--;
+                        continue;
+                    }
+                    if (!state.getFluidState().isEmpty()) return false;
+                    break;
+                }
+                int sampledSurfaceY = groundY + 1;
+                if (groundY <= level.getMinBuildHeight()
+                        || !StructurePlacementPolicy.isWithinSurfaceTolerance(sampledSurfaceY, expectedY, 5)) {
+                    return false;
+                }
             }
         }
         return true;

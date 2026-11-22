@@ -8,6 +8,19 @@ public final class StructurePlacementPolicy {
 
     private StructurePlacementPolicy() {}
 
+    /** Prevents structure footprints from overlapping even when config spacing is set too low. */
+    public static int minimumSpacingForFootprint(int configuredSpacingChunks, int footprintSizeBlocks) {
+        if (footprintSizeBlocks < 1) throw new IllegalArgumentException("footprintSizeBlocks must be positive");
+        int footprintChunks = (footprintSizeBlocks + 15) / 16;
+        return Math.max(Math.max(1, configuredSpacingChunks), footprintChunks);
+    }
+
+    /** Allows small terrain variation but rejects chunks whose actual ground is too far from the anchor height. */
+    public static boolean isWithinSurfaceTolerance(int sampledSurfaceY, int expectedSurfaceY, int tolerance) {
+        return tolerance >= 0
+                && Math.abs((long) sampledSurfaceY - expectedSurfaceY) <= tolerance;
+    }
+
     public static boolean isSpacedAnchor(long seed, int chunkX, int chunkZ, int minimumSpacing) {
         return isSpacedAnchor(seed, chunkX, chunkZ, minimumSpacing, CELL_CHUNKS);
     }

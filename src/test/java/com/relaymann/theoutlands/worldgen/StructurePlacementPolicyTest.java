@@ -11,6 +11,23 @@ class StructurePlacementPolicyTest {
         assertTrue(first[1] >= 64 && first[1] < 72);
     }
 
+    @Test void structureSpacingNeverAllowsOverlappingFootprints() {
+        assertEquals(3, StructurePlacementPolicy.minimumSpacingForFootprint(1, 48));
+        assertEquals(3, StructurePlacementPolicy.minimumSpacingForFootprint(2, 48));
+        assertEquals(4, StructurePlacementPolicy.minimumSpacingForFootprint(4, 48));
+        assertEquals(4, StructurePlacementPolicy.minimumSpacingForFootprint(1, 64));
+        assertThrows(IllegalArgumentException.class,
+                () -> StructurePlacementPolicy.minimumSpacingForFootprint(4, 0));
+    }
+
+    @Test void terrainSurfaceToleranceUsesActualGroundHeight() {
+        assertTrue(StructurePlacementPolicy.isWithinSurfaceTolerance(65, 65, 5));
+        assertTrue(StructurePlacementPolicy.isWithinSurfaceTolerance(60, 65, 5));
+        assertFalse(StructurePlacementPolicy.isWithinSurfaceTolerance(59, 65, 5));
+        assertFalse(StructurePlacementPolicy.isWithinSurfaceTolerance(70, 65, 4));
+        assertFalse(StructurePlacementPolicy.isWithinSurfaceTolerance(65, 65, -1));
+    }
+
     @Test void onlyTheSelectedChunkCanAnchorItsCell() {
         int[] anchor = StructurePlacementPolicy.anchorForCell(99L, -2, 4);
         int count = 0;
