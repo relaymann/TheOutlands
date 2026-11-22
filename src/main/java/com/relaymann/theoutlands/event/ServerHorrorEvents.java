@@ -99,6 +99,7 @@ public final class ServerHorrorEvents {
         StructureAmbienceManager.clear();
         StructureEncounterManager.clear();
         OutlandsIntelligenceManager.clear();
+        PredatoryStalkingManager.clear();
         NightmareMode.clear();
     }
 }
