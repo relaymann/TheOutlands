@@ -109,6 +109,14 @@ public final class NightmareModeManager {
                 NEXT_EVENT.put(player.getUUID(), now + delay);
             }
         }
+        if (event.getServer().getTickCount() % 1200 == 0) {
+            for (ServerLevel level : event.getServer().getAllLevels()) {
+                long now = level.getGameTime();
+                PURSUIT_MEMORY.entrySet().removeIf(entry ->
+                        entry.getValue().dimension().equals(level.dimension())
+                                && now - entry.getValue().lastSeen() > 3_600L);
+            }
+        }
     }
 
     private static int nextEventDelay(ServerPlayer player, long dayTime, double distanceFromSpawn) {
