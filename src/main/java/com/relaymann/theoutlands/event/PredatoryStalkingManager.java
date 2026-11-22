@@ -15,6 +15,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
@@ -30,6 +31,7 @@ public final class PredatoryStalkingManager {
     private static final int SAMPLE_INTERVAL = 10;
     private static final int BUILD_MEMORY = 2400;
     private static final int MAX_BUILD_MARKS = 256;
+    private static final String TEMPORARY_DISAPPEARANCE_TAG = "theoutlands_temporary_disappearance";
     private static final Map<UUID, Memory> MEMORIES = new HashMap<>();
     private static final Map<UUID, Long> BEHAVIOR_COOLDOWNS = new HashMap<>();
     private static final Map<UUID, Long> DISAPPEAR_UNTIL = new HashMap<>();
@@ -61,9 +63,21 @@ public final class PredatoryStalkingManager {
     }
 
     @SubscribeEvent
+    public static void onEntityJoinLevel(EntityJoinLevelEvent event) {
+        if (event.getEntity() instanceof Mob mob && mob.getTags().contains(TEMPORARY_DISAPPEARANCE_TAG)) {
+            // The marker survives chunk unloads and server restarts; never strand a mob invisible.
+            mob.setInvisible(false);
+            mob.removeTag(TEMPORARY_DISAPPEARANCE_TAG);
+            DISAPPEAR_UNTIL.remove(mob.getUUID());
+        }
+    }
+
+    @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
-        if (!OutlandsConfig.ENTITY_INTELLIGENCE_ENABLED.get()
-                || event.getServer().getTickCount() % SAMPLE_INTERVAL != 0) return;
+        if (event.getServer().getTickCount() % SAMPLE_INTERVAL != 0) return;
+        boolean intelligenceEnabled = OutlandsConfig.ENTITY_INTELLIGENCE_ENABLED.get();
+        restoreTrackedDisappearances(event.getServer().getAllLevels(), !intelligenceEnabled);
+        if (!intelligenceEnabled) return;
         for (ServerLevel level : event.getServer().getAllLevels()) {
             Set<UUID> processed = new HashSet<>();
             for (ServerPlayer player : level.players()) {
@@ -338,6 +352,7 @@ public final class PredatoryStalkingManager {
         Long until = DISAPPEAR_UNTIL.get(mob.getUUID());
         if (until != null && level.getGameTime() >= until) {
             mob.setInvisible(false);
+            mob.removeTag(TEMPORARY_DISAPPEARANCE_TAG);
             DISAPPEAR_UNTIL.remove(mob.getUUID());
         }
     }
@@ -350,6 +365,7 @@ public final class PredatoryStalkingManager {
                 || mob.tickCount % 20 != 0 || mob.getRandom().nextInt(24) != 0
                 || level.getGameTime() < BEHAVIOR_COOLDOWNS.getOrDefault(mob.getUUID(), 0L)) return;
         mob.setInvisible(true);
+        mob.addTag(TEMPORARY_DISAPPEARANCE_TAG);
         DISAPPEAR_UNTIL.put(mob.getUUID(), level.getGameTime() + 14L);
         BEHAVIOR_COOLDOWNS.put(mob.getUUID(), level.getGameTime() + 420L);
     }
@@ -376,6 +392,29 @@ public final class PredatoryStalkingManager {
         }
         MEMORIES.keySet().removeIf(id -> !active.contains(id));
         BEHAVIOR_COOLDOWNS.keySet().removeIf(id -> !active.contains(id));
+    }
+
+    private static void restoreTrackedDisappearances(Iterable<ServerLevel> levels, boolean force) {
+        for (ServerLevel level : levels) {
+            var iterator = DISAPPEAR_UNTIL.entrySet().iterator();
+            while (iterator.hasNext()) {
+                var entry = iterator.next();
+                Entity entity = level.getEntity(entry.getKey());
+                if (entity instanceof Mob mob && (force || level.getGameTime() >= entry.getValue())) {
+                    mob.setInvisible(false);
+                    mob.removeTag(TEMPORARY_DISAPPEARANCE_TAG);
+                    iterator.remove();
+                } else if (entity == null && level.getGameTime() > entry.getValue() + 24_000L) {
+                    // If the entity is unloaded, its saved marker restores it when it is loaded again.
+                    iterator.remove();
+                }
+            }
+        }
+    }
+
+    public static void clear(Iterable<ServerLevel> levels) {
+        restoreTrackedDisappearances(levels, true);
+        clear();
     }
 
     public static void clear() {
