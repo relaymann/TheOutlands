@@ -29,6 +29,7 @@ public final class VoiceLevelHud {
             whispering = false;
             lastAudioNanos = 0L;
             smoothedLevel = 0.0F;
+            frameCounter = 0;
         }
     }
 
@@ -43,8 +44,13 @@ public final class VoiceLevelHud {
         // Four PCM frames per network update is enough for responsive detection without packet spam.
         if (++frameCounter % 4 == 0) {
             int sentLevel = level;
-            Minecraft.getInstance().execute(() -> PacketDistributor.sendToServer(
-                    new VoiceLevelPayload(sentLevel, isWhispering)));
+            Minecraft minecraft = Minecraft.getInstance();
+            minecraft.execute(() -> {
+                // A queued microphone frame can outlive a world disconnect.
+                if (connected && minecraft.player != null && minecraft.getConnection() != null) {
+                    PacketDistributor.sendToServer(new VoiceLevelPayload(sentLevel, isWhispering));
+                }
+            });
         }
     }
 
