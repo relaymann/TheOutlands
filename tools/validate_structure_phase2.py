@@ -88,7 +88,7 @@ def main():
     assert "NightmareBalancePolicy.nextEventDelayTicks" in nightmare_manager
     assert "tickActiveStructure" in nightmare_manager and "BLOOD_MOON_STAGE" in nightmare_manager
     assert "migrationSurge(player)" in nightmare_manager and "ashfall(player)" in nightmare_manager
-    assert "NightmareCreature" in nightmare_manager and "PURSUIT_MEMORY" in nightmare_manager
+    assert "NIGHTMARE_WATCHER" in nightmare_manager and "PURSUIT_MEMORY" in nightmare_manager
     nightmare_entities = (ROOT/"src/main/java/com/relaymann/theoutlands/entity/OutlandsEntities.java").read_text(encoding="utf-8")
     for entity_id in ("nightmare_watcher", "nightmare_hound", "nightmare_wardened",
                       "nightmare_false_survivor", "nightmare_unbound"):
