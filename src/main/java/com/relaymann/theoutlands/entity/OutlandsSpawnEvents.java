@@ -25,7 +25,7 @@ import java.util.List;
 /** Server-side habitat rules and distance/threat-budget balancing for natural spawns. */
 @EventBusSubscriber(modid = TheOutlands.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public final class OutlandsSpawnEvents {
-    private static final double ENCOUNTER_RADIUS = 96.0D;
+    private static final double ENCOUNTER_RADIUS = 72.0D;
 
     private OutlandsSpawnEvents() {}
 
@@ -102,14 +102,14 @@ public final class OutlandsSpawnEvents {
             threatPoints += existing == null ? 1 : existing.threatCost();
         }
 
-        int maxEntities = distance < 1_000.0D ? 2
-                : distance < 2_000.0D ? 3
-                : distance < 4_000.0D ? 4
-                : distance < 7_000.0D ? 5 : 6;
-        int threatBudget = distance < 1_000.0D ? 2
-                : distance < 2_000.0D ? 4
-                : distance < 4_000.0D ? 6
-                : distance < 7_000.0D ? 8 : 11;
+        int maxEntities = distance < 1_000.0D ? 4
+                : distance < 2_000.0D ? 5
+                : distance < 4_000.0D ? 7
+                : distance < 7_000.0D ? 8 : 9;
+        int threatBudget = distance < 1_000.0D ? 5
+                : distance < 2_000.0D ? 7
+                : distance < 4_000.0D ? 10
+                : distance < 7_000.0D ? 13 : 16;
 
         return nearby.size() < maxEntities
                 && threatPoints + profile.threatCost() <= threatBudget;
@@ -129,21 +129,24 @@ public final class OutlandsSpawnEvents {
     }
 
     private static SpawnProfile profile(EntityType<?> type) {
+        // Common territorial hunters begin close enough that a normal first
+        // session reliably encounters the mod, without flooding the spawn area.
         if (type == OutlandsEntities.LURKER.get() || type == OutlandsEntities.DREDGE.get()
-                || type == OutlandsEntities.STALKER.get()) return new SpawnProfile(500.0D, 1, 1);
-        if (type == OutlandsEntities.HOWLER.get()) return new SpawnProfile(1_200.0D, 2, 1);
-        if (type == OutlandsEntities.PILGRIM.get()) return new SpawnProfile(1_000.0D, 1, 2);
-        if (type == OutlandsEntities.CEILING_DWELLER.get()) return new SpawnProfile(1_800.0D, 2, 2);
-        if (type == OutlandsEntities.COLOSSUS.get()) return new SpawnProfile(6_000.0D, 6, 5);
+                || type == OutlandsEntities.STALKER.get()) return new SpawnProfile(250.0D, 1, 1);
         if (type == OutlandsEntities.HUNTER.get() || type == OutlandsEntities.OBSERVER.get()
                 || type == OutlandsEntities.BURROWER.get() || type == OutlandsEntities.MIMIC.get()) {
-            return new SpawnProfile(1_500.0D, 2, 2);
+            return new SpawnProfile(500.0D, 2, 1);
         }
-        if (type == OutlandsEntities.CAVE_JAR.get()) return new SpawnProfile(2_000.0D, 3, 2);
+        if (type == OutlandsEntities.HOWLER.get() || type == OutlandsEntities.PILGRIM.get()) {
+            return new SpawnProfile(600.0D, 2, 1);
+        }
+        if (type == OutlandsEntities.CAVE_JAR.get()) return new SpawnProfile(750.0D, 3, 1);
+        if (type == OutlandsEntities.CEILING_DWELLER.get()) return new SpawnProfile(900.0D, 3, 2);
         if (type == OutlandsEntities.STILLBORN_STATUE.get()
-                || type == OutlandsEntities.AGITATED_ONE.get()) return new SpawnProfile(2_500.0D, 3, 3);
+                || type == OutlandsEntities.AGITATED_ONE.get()) return new SpawnProfile(900.0D, 3, 2);
+        if (type == OutlandsEntities.COLOSSUS.get()) return new SpawnProfile(3_000.0D, 6, 5);
         if (type == OutlandsEntities.NULL.get() || type == OutlandsEntities.NULL_APOSTLE.get()) {
-            return new SpawnProfile(5_000.0D, 5, 4);
+            return new SpawnProfile(2_000.0D, 4, 3);
         }
         if (type == OutlandsEntities.FEAR.get()) {
             return new SpawnProfile(OutlandsConfig.FEAR_FIRST_APPEARANCE_DISTANCE.get(), 8, 6);
