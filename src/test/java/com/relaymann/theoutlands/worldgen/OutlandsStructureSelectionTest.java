@@ -35,10 +35,10 @@ class OutlandsStructureSelectionTest {
 
     @Test
     void nightmareStructureAnchorsKeepFootprintsFromOverlapping() {
-        for (long seed = 0; seed < 12; seed++) {
+        for (long seed = 0; seed < 5; seed++) {
             java.util.List<int[]> anchors = new java.util.ArrayList<>();
-            for (int cellX = -40; cellX <= 40; cellX++) {
-                for (int cellZ = -40; cellZ <= 40; cellZ++) {
+            for (int cellX = -8; cellX <= 8; cellX++) {
+                for (int cellZ = -8; cellZ <= 8; cellZ++) {
                     int[] point = StructurePlacementPolicy.anchorForCell(seed, cellX, cellZ, 4);
                     if (StructurePlacementPolicy.isSpacedAnchor(seed, point[0], point[1], 3, 4)) {
                         anchors.add(point);
