@@ -9,10 +9,13 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 import java.util.*;
@@ -40,11 +43,23 @@ public final class PredatoryStalkingManager {
                 || !(event.getEntity() instanceof ServerPlayer player)
                 || !player.isAlive() || player.isCreative() || player.isSpectator()) return;
         ArrayDeque<BuildMark> marks = BUILD_MARKS.computeIfAbsent(level.dimension(), ignored -> new ArrayDeque<>());
-        marks.addLast(new BuildMark(event.getPos().immutable(), player.getUUID(), level.getGameTime()));
+        marks.addLast(new BuildMark(event.getPos().immutable(), player.getUUID(), level.getGameTime(), false));
         while (marks.size() > MAX_BUILD_MARKS) marks.removeFirst();
     }
 
+
     @SubscribeEvent
+    public static void onDoorUsed(PlayerInteractEvent.RightClickBlock event) {
+        if (event.isCanceled() || !(event.getLevel() instanceof ServerLevel level)
+                || !(event.getEntity() instanceof ServerPlayer player)
+                || !player.isAlive() || player.isCreative() || player.isSpectator()) return;
+        var block = level.getBlockState(event.getPos()).getBlock();
+        if (!(block instanceof DoorBlock) && !(block instanceof TrapDoorBlock)) return;
+        ArrayDeque<BuildMark> marks = BUILD_MARKS.computeIfAbsent(level.dimension(), ignored -> new ArrayDeque<>());
+        marks.addLast(new BuildMark(event.getPos().immutable(), player.getUUID(), level.getGameTime(), true));
+        while (marks.size() > MAX_BUILD_MARKS) marks.removeFirst();
+    }
+\n    @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
         if (!OutlandsConfig.ENTITY_INTELLIGENCE_ENABLED.get()
                 || event.getServer().getTickCount() % SAMPLE_INTERVAL != 0) return;
@@ -134,6 +149,11 @@ public final class PredatoryStalkingManager {
 
         boolean seen = target.hasLineOfSight(mob);
         Vec3 destination = null;
+        if (profile.style() == Style.SHADOW || profile.style() == Style.PURSUIT
+                || profile.style() == Style.FLANK || profile.style() == Style.OBSERVE
+                || profile.style() == Style.DECOY) {
+            destination = routeAwareWaypoint(mob, target, level);
+        }
         switch (profile.style()) {
             case SHADOW, FLANK -> {
                 if (seen && distance > 100.0D) destination = flankPoint(mob, target, profile.style() == Style.SHADOW);
@@ -177,6 +197,44 @@ public final class PredatoryStalkingManager {
             mob.getNavigation().moveTo(destination.x, destination.y, destination.z, profile.speed());
             BEHAVIOR_COOLDOWNS.put(mob.getUUID(), now + profile.cooldown());
         }
+    }
+
+    /**
+     * Reads recently used doorways and player-placed obstructions along the
+     * predator's direct approach. It sends the mob to the doorway or around
+     * the barricade; vanilla navigation then calculates a collision-safe path.
+     */
+    private static Vec3 routeAwareWaypoint(Mob mob, Player target, ServerLevel level) {
+        ArrayDeque<BuildMark> marks = BUILD_MARKS.get(level.dimension());
+        if (marks == null || mob.distanceToSqr(target) < 64.0D) return null;
+        Vec3 start = mob.position();
+        Vec3 end = target.position();
+        Vec3 line = end.subtract(start);
+        double lengthSqr = line.horizontalDistanceSqr();
+        if (lengthSqr < 1.0D) return null;
+        BuildMark best = null;
+        double bestAlong = Double.MAX_VALUE;
+        long now = level.getGameTime();
+        for (BuildMark mark : marks) {
+            if (!mark.owner().equals(target.getUUID()) || now - mark.time() > BUILD_MEMORY
+                    || !level.isLoaded(mark.pos())) continue;
+            Vec3 relative = Vec3.atCenterOf(mark.pos()).subtract(start);
+            double along = (relative.x * line.x + relative.z * line.z) / lengthSqr;
+            if (along < 0.12D || along > 0.88D) continue;
+            Vec3 closest = start.add(line.scale(along));
+            double lateral = closest.distanceToSqr(Vec3.atCenterOf(mark.pos()));
+            if (lateral > 3.2D * 3.2D || along >= bestAlong) continue;
+            best = mark;
+            bestAlong = along;
+        }
+        if (best == null) return null;
+        if (best.doorway()) {
+            return new Vec3(best.pos().getX() + 0.5D, best.pos().getY(), best.pos().getZ() + 0.5D);
+        }
+        Vec3 perpendicular = new Vec3(-line.z, 0.0D, line.x).normalize();
+        Vec3 left = Vec3.atCenterOf(best.pos()).add(perpendicular.scale(3.6D));
+        Vec3 right = Vec3.atCenterOf(best.pos()).subtract(perpendicular.scale(3.6D));
+        return mob.position().distanceToSqr(left) < mob.position().distanceToSqr(right) ? left : right;
     }
 
     private static Vec3 lastKnown(Mob mob) {
@@ -331,7 +389,7 @@ public final class PredatoryStalkingManager {
         DROP_AMBUSH, STATUE, CHARGE, CALLER, INEVITABLE, PRESENCE, PATROL, DOMINANT, PILGRIM, DECOY }
     private record Personality(Style style, double speed, double minimumRange, double maximumRange,
                                int cooldown, boolean disappearWhenWatched) {}
-    private record BuildMark(BlockPos pos, UUID owner, long time) {}
+    private record BuildMark(BlockPos pos, UUID owner, long time, boolean doorway) {}
     private static final class Memory {
         private double x, y, z;
         private long lastSeen;
