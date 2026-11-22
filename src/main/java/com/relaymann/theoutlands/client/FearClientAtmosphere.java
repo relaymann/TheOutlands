@@ -38,7 +38,7 @@ public final class FearClientAtmosphere {
     @SubscribeEvent
     public static void onPlaySound(PlaySoundEvent event) {
         LocalPlayer player = Minecraft.getInstance().player;
-        double strength = territoryStrength(player);
+        double strength = combinedStrength(player);
         if (strength <= 0.0D) return;
         SoundInstance sound = event.getOriginalSound();
         SoundSource source = sound.getSource();
@@ -47,6 +47,26 @@ public final class FearClientAtmosphere {
         event.setSound(sound instanceof TickableSoundInstance ticking
                 ? new ScaledTickableSoundInstance(ticking, scale)
                 : new ScaledSoundInstance(sound, scale));
+    }
+
+    /** Weather, biome, depth and nearby territorial presence gently layer onto the existing Fear fog. */
+    private static double environmentalStrength(LocalPlayer player) {
+        if (player == null || player.level() == null || !player.isAlive()
+                || player.isCreative() || player.isSpectator()) return 0.0D;
+        var level = player.level();
+        var biomeKey = level.registryAccess().registryOrThrow(net.minecraft.core.registries.Registries.BIOME)
+                .getKey(level.getBiome(player.blockPosition()).value());
+        String biome = biomeKey == null ? "" : biomeKey.getPath();
+        double biomeFactor = (biome.contains("forest") || biome.contains("taiga")
+                || biome.contains("swamp") || biome.contains("dark_forest")) ? 0.16D : 0.0D;
+        double weather = level.getRainLevel(1.0F) * 0.12D + level.getThunderLevel(1.0F) * 0.10D;
+        double depth = player.getY() < 48.0D ? Math.min(0.22D, (48.0D - player.getY()) / 220.0D) : 0.0D;
+        double night = level.getSkyDarken() > 8 ? 0.07D : 0.0D;
+        return Math.min(0.34D, biomeFactor + weather + depth + night);
+    }
+
+    private static double combinedStrength(LocalPlayer player) {
+        return Math.min(0.82D, territoryStrength(player) + environmentalStrength(player));
     }
 
     @SubscribeEvent
@@ -59,6 +79,14 @@ public final class FearClientAtmosphere {
         event.setRed(event.getRed() * (1.0F - blend) + 0.035F * blend);
         event.setGreen(event.getGreen() * (1.0F - blend) + 0.045F * blend);
         event.setBlue(event.getBlue() * (1.0F - blend) + 0.055F * blend);
+        // A very brief, low-amplitude light instability in dark, threatening places.
+        if (player.level().getSkyDarken() > 8 && player.level().getGameTime() % 173L < 2L
+                && player.level().getMaxLocalRawBrightness(player.blockPosition()) > 7) {
+            float flicker = 0.975F + (float) ((player.blockPosition().asLong() & 3L) * 0.004D);
+            event.setRed(event.getRed() * flicker);
+            event.setGreen(event.getGreen() * flicker);
+            event.setBlue(event.getBlue() * flicker);
+        }
     }
 
     @SubscribeEvent
