@@ -83,7 +83,7 @@ public final class VoicePerceptionManager {
     private static void hearVoice(ServerLevel level, ServerPlayer player, VoiceSignal signal, long now) {
         double configuredRange = OutlandsConfig.VOICE_DETECTION_RANGE.get();
         maybeVoiceKnock(level, player, signal, now);
-        AABB search = player.getBoundingBox().inflate(configuredRange * 1.5D + 20.0D);
+        AABB search = player.getBoundingBox().inflate(configuredRange * 1.7D + 20.0D);
         List<Mob> nearby = level.getEntitiesOfClass(Mob.class, search,
                 mob -> mob.isAlive() && profile(mob) != null);
         for (Mob mob : nearby) {
@@ -107,6 +107,7 @@ public final class VoicePerceptionManager {
                         && other.position().distanceToSqr(player.position()) < 20.0D * 20.0D) nearbyVoices++;
             }
             if (nearbyVoices > 1) range *= 1.0D + Math.min(0.28D, (nearbyVoices - 1) * 0.10D);
+            range = Math.min(range, configuredRange * 1.65D);
             if (mob.distanceToSqr(player) > range * range) continue;
 
             VoiceMemory previous = ENTITY_MEMORY.get(mob.getUUID());
