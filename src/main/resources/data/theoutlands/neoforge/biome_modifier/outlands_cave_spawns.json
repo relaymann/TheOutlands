@@ -4,37 +4,37 @@
   "spawners": [
     {
       "type": "theoutlands:stillborn_statue",
-      "weight": 2,
+      "weight": 5,
       "minCount": 1,
       "maxCount": 1
     },
     {
       "type": "theoutlands:cave_jar",
-      "weight": 12,
+      "weight": 36,
       "minCount": 1,
       "maxCount": 1
     },
     {
       "type": "theoutlands:burrower",
-      "weight": 14,
+      "weight": 42,
       "minCount": 1,
       "maxCount": 1
     },
     {
       "type": "theoutlands:death",
-      "weight": 2,
+      "weight": 1,
       "minCount": 1,
       "maxCount": 1
     },
     {
       "type": "theoutlands:dredge",
-      "weight": 40,
+      "weight": 70,
       "minCount": 1,
       "maxCount": 1
     },
     {
       "type": "theoutlands:ceiling_dweller",
-      "weight": 12,
+      "weight": 28,
       "minCount": 1,
       "maxCount": 1
     }
