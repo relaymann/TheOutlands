@@ -50,7 +50,7 @@ public final class NightmareCreature extends Monster {
         goalSelector.addGoal(7, new RandomLookAroundGoal(this));
         targetSelector.addGoal(1, new HurtByTargetGoal(this));
         targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 10,
-                true, false, target -> target instanceof Player player && player.isAlive()\n                        && !player.isCreative() && !player.isSpectator()));
+                true, false, target -> target instanceof Player player && player.isAlive() && !player.isCreative() && !player.isSpectator()));
     }
 
     public String getVariantId() {
