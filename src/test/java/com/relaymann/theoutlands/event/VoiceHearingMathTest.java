@@ -8,6 +8,15 @@ class VoiceHearingMathTest {
     private static final double BASE = 52.0D;
 
     @Test
+    void whisperLevelIsCappedWithoutIncreasingQuietSpeech() {
+        assertEquals(38, VoiceHearingMath.normalizeLevel(100, true));
+        assertEquals(17, VoiceHearingMath.normalizeLevel(17, true));
+        assertEquals(100, VoiceHearingMath.normalizeLevel(100, false));
+        assertEquals(0, VoiceHearingMath.normalizeLevel(-20, false));
+        assertEquals(100, VoiceHearingMath.normalizeLevel(200, false));
+    }
+
+    @Test
     void louderSpeechIsHeardFartherThanQuietSpeech() {
         double quiet = VoiceHearingMath.effectiveRange(BASE, 1.0D, 10, false, true, false, false, false);
         double loud = VoiceHearingMath.effectiveRange(BASE, 1.0D, 100, false, true, false, false, false);
@@ -40,8 +49,8 @@ class VoiceHearingMathTest {
 
     @Test
     void invalidConfigurationCannotProduceNegativeOrInfiniteRange() {
-        assertEquals(0.0D, VoiceHearingMath.effectiveRange(-1.0D, 1.0D, 100, false, true, false, false, false));
-        assertEquals(0.0D, VoiceHearingMath.effectiveRange(BASE, Double.NaN, 100, false, true, false, false, false));
+        assertEquals(0.0D, VoiceHearingMath.effectiveRange(-1.0D, 1.0D, 100, false, true, false, false, false), 0.0001D);
+        assertEquals(0.0D, VoiceHearingMath.effectiveRange(BASE, Double.NaN, 100, false, true, false, false, false), 0.0001D);
     }
 
     @Test
