@@ -393,9 +393,6 @@ public final class PredatoryStalkingManager {
             }
             ArrayDeque<BuildMark> marks = BUILD_MARKS.get(level.dimension());
             if (marks != null) marks.removeIf(mark -> now - mark.time() > BUILD_MEMORY);
-            for (var entry : new ArrayList<>(DISAPPEAR_UNTIL.entrySet())) {
-                if (entry.getValue() <= now) DISAPPEAR_UNTIL.remove(entry.getKey());
-            }
         }
         MEMORIES.keySet().removeIf(id -> !active.contains(id));
         BEHAVIOR_COOLDOWNS.keySet().removeIf(id -> !active.contains(id));
