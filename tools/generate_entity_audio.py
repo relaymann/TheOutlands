@@ -333,3 +333,25 @@ def colossus_rumble(t,d,i,n):
     return fade(t,d,.3,.5)*(.34*low+.12*mid)*pulse
 colossus_rumble.low,colossus_rumble.mid={"lp1":0.,"lp2":0.},{"lp1":0.,"lp2":0.}
 make("colossus_rumble",2.8,colossus_rumble)
+
+# NIGHTMARE-only vocal identities: five distinct, original procedural signatures.
+def nightmare_voice(name, base, duration, roughness, pulse_rate):
+    state = {"lp1": 0.0, "lp2": 0.0}
+    grit = {"lp1": 0.0, "lp2": 0.0}
+    def sample(t, d, i, n):
+        p = t / d
+        f = base * (1.0 + 0.18 * math.sin(2 * math.pi * 0.37 * t) + 0.12 * p)
+        phase = 2 * math.pi * (base * t + base * 0.06 * t * t / d)
+        low = noise(t, max(22, base * 0.42), max(180, base * 3.8), state)
+        high = noise(t, max(260, base * 2.2), min(7000, base * 13), grit)
+        pulse = 0.25 + 0.75 * max(0.0, math.sin(2 * math.pi * pulse_rate * t + 0.4)) ** 2
+        tone = math.sin(phase) + 0.32 * math.sin(phase * 1.51 + 0.7)
+        return fade(t, d, 0.08, min(0.5, d * 0.24)) * pulse * (
+            0.22 * tone + roughness * 0.32 * low + roughness * 0.18 * high)
+    make(name, duration, sample)
+
+nightmare_voice("nightmare_watcher", 310, 2.4, 0.24, 0.62)
+nightmare_voice("nightmare_hound", 68, 1.55, 0.62, 1.8)
+nightmare_voice("nightmare_wardened", 43, 2.8, 0.38, 0.42)
+nightmare_voice("nightmare_false_survivor", 176, 2.1, 0.31, 0.84)
+nightmare_voice("nightmare_unbound", 92, 2.35, 0.58, 1.15)

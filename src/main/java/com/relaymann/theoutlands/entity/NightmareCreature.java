@@ -35,16 +35,16 @@ public final class NightmareCreature extends Monster {
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
                 .add(Attributes.MAX_HEALTH, 38.0D)
-                .add(Attributes.MOVEMENT_SPEED, 0.29D)
-                .add(Attributes.FOLLOW_RANGE, 64.0D)
-                .add(Attributes.ATTACK_DAMAGE, 6.0D)
+                .add(Attributes.MOVEMENT_SPEED, 0.33D)
+                .add(Attributes.FOLLOW_RANGE, 80.0D)
+                .add(Attributes.ATTACK_DAMAGE, 7.0D)
                 .add(Attributes.ARMOR, 2.0D)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 0.12D);
     }
 
     @Override
     protected void registerGoals() {
-        if (!isVariant("nightmare_watcher") && !isVariant("nightmare_false_survivor")) {
+        if (!isVariant("nightmare_false_survivor")) {
             goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.12D, true));
         }
         goalSelector.addGoal(7, new RandomLookAroundGoal(this));
@@ -100,12 +100,12 @@ public final class NightmareCreature extends Monster {
 
     private void houndBehavior(Player player, double distance) {
         setSprinting(distance > 20.0D && distance < 2_500.0D);
-        if (leapCooldown == 0 && distance > 25.0D && distance < 144.0D
+        if (leapCooldown == 0 && distance > 20.0D && distance < 225.0D
                 && onGround() && hasLineOfSight(player)) {
             Vec3 direction = player.position().subtract(position()).normalize();
-            setDeltaMovement(getDeltaMovement().add(direction.x * 0.78D, 0.34D, direction.z * 0.78D));
+            setDeltaMovement(getDeltaMovement().add(direction.x * 0.92D, 0.42D, direction.z * 0.92D));
             hasImpulse = true;
-            leapCooldown = 100 + getRandom().nextInt(50);
+            leapCooldown = 65 + getRandom().nextInt(35);
         }
     }
 
@@ -114,12 +114,12 @@ public final class NightmareCreature extends Monster {
         getLookControl().setLookAt(player, 22.0F, 18.0F);
         if (distance < 196.0D && hasLineOfSight(player)) {
             getNavigation().stop();
-        } else if (distance > 400.0D && distance < 3_600.0D && tickCount % 80 == 0
+        } else if (distance > 400.0D && distance < 6_400.0D && tickCount % 45 == 0
                 && getNavigation().isDone()) {
             Vec3 away = position().subtract(player.position());
             if (away.lengthSqr() < 0.001D) away = new Vec3(1.0D, 0.0D, 0.0D);
             Vec3 point = player.position().add(away.normalize().scale(11.0D));
-            getNavigation().moveTo(point.x, point.y, point.z, 0.78D);
+            getNavigation().moveTo(point.x, point.y, point.z, 1.02D);
         }
     }
 
@@ -132,7 +132,7 @@ public final class NightmareCreature extends Monster {
 
     private void falseSurvivorBehavior(Player player, double distance) {
         Vec3 toCreature = position().subtract(player.position()).normalize();
-        boolean beingWatched = distance < 784.0D && player.getLookAngle().dot(toCreature) > 0.82D;
+        boolean beingWatched = distance < 1_024.0D && player.getLookAngle().dot(toCreature) > 0.76D;
         if (beingWatched && hasLineOfSight(player)) {
             getNavigation().stop();
             setSprinting(false);
@@ -147,14 +147,14 @@ public final class NightmareCreature extends Monster {
     }
 
     private void unboundBehavior(Player player, double distance) {
-        setSprinting(distance > 16.0D && distance < 2_000.0D);
-        if (flankCooldown == 0 && distance < 1_600.0D && distance > 36.0D
+        setSprinting(distance > 16.0D && distance < 4_000.0D);
+        if (flankCooldown == 0 && distance < 3_600.0D && distance > 25.0D
                 && getNavigation().isDone()) {
             Vec3 direction = player.position().subtract(position()).normalize();
             Vec3 side = direction.yRot(getRandom().nextBoolean() ? 1.25F : -1.25F);
             Vec3 point = player.position().subtract(side.scale(5.0D + getRandom().nextDouble() * 4.0D));
             getNavigation().moveTo(point.x, point.y, point.z, 1.08D);
-            flankCooldown = 55 + getRandom().nextInt(45);
+            flankCooldown = 35 + getRandom().nextInt(35);
         }
     }
 
@@ -168,11 +168,11 @@ public final class NightmareCreature extends Monster {
     protected SoundEvent getAmbientSound() {
         if (!OutlandsConfig.HORROR_AUDIO_ENABLED.get()) return null;
         return switch (getVariantId()) {
-            case "nightmare_watcher" -> OutlandsSounds.OBSERVER_CLICK.get();
-            case "nightmare_hound" -> OutlandsSounds.HOWLER_BREATH.get();
-            case "nightmare_wardened" -> OutlandsSounds.STILLBORN_STONE.get();
-            case "nightmare_false_survivor" -> OutlandsSounds.PILGRIM_BREATH.get();
-            default -> OutlandsSounds.NULL_PRESENCE.get();
+            case "nightmare_watcher" -> OutlandsSounds.NIGHTMARE_WATCHER.get();
+            case "nightmare_hound" -> OutlandsSounds.NIGHTMARE_HOUND.get();
+            case "nightmare_wardened" -> OutlandsSounds.NIGHTMARE_WARDENED.get();
+            case "nightmare_false_survivor" -> OutlandsSounds.NIGHTMARE_FALSE_SURVIVOR.get();
+            default -> OutlandsSounds.NIGHTMARE_UNBOUND.get();
         };
     }
 

@@ -391,5 +391,45 @@
         "volume": 0.72
       }
     ]
+  },
+  "nightmare_watcher": {
+    "sounds": [
+      {
+        "name": "theoutlands:nightmare_watcher",
+        "volume": 0.52
+      }
+    ]
+  },
+  "nightmare_hound": {
+    "sounds": [
+      {
+        "name": "theoutlands:nightmare_hound",
+        "volume": 0.85
+      }
+    ]
+  },
+  "nightmare_wardened": {
+    "sounds": [
+      {
+        "name": "theoutlands:nightmare_wardened",
+        "volume": 0.85
+      }
+    ]
+  },
+  "nightmare_false_survivor": {
+    "sounds": [
+      {
+        "name": "theoutlands:nightmare_false_survivor",
+        "volume": 0.52
+      }
+    ]
+  },
+  "nightmare_unbound": {
+    "sounds": [
+      {
+        "name": "theoutlands:nightmare_unbound",
+        "volume": 0.52
+      }
+    ]
   }
 }

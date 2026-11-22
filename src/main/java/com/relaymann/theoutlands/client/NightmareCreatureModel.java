@@ -87,10 +87,10 @@ public final class NightmareCreatureModel extends HumanoidModel<NightmareCreatur
             body.xRot = 0.08F;
             rightArm.zRot = -0.06F;
             leftArm.zRot = 0.06F;
-            head.zRot = Mth.sin(ageInTicks * 0.022F) * 0.035F;
+            head.zRot = Mth.sin(ageInTicks * 0.022F) * 0.035F;\n            head.yRot += Mth.sin(ageInTicks * 0.11F) * 0.12F;\n            rightArm.xRot = -0.18F + Mth.sin(ageInTicks * 0.08F) * 0.035F;\n            leftArm.xRot = -0.18F - Mth.sin(ageInTicks * 0.08F) * 0.035F;
         } else if (entity.isVariant("nightmare_false_survivor")) {
             body.xRot = 0.06F + Mth.sin(ageInTicks * 0.04F) * 0.012F;
-            head.xRot += 0.025F;
+            head.xRot += 0.025F + Mth.sin(ageInTicks * 0.16F) * 0.045F;\n            head.yRot += Mth.sin(ageInTicks * 0.07F) * 0.035F;\n            body.yRot = Mth.sin(ageInTicks * 0.035F) * 0.025F;
             rightArm.zRot = -0.035F;
             leftArm.zRot = 0.035F;
         } else {

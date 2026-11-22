@@ -49,5 +49,5 @@ public final class OutlandsSounds {
  public static final DeferredHolder<SoundEvent,SoundEvent> STRUCTURE_NULL_CHAMBER=register("structure_null_chamber");
  public static final DeferredHolder<SoundEvent,SoundEvent> STRUCTURE_CRYPT=register("structure_hollow_crypt");
  public static final DeferredHolder<SoundEvent,SoundEvent> STRUCTURE_MONUMENT=register("structure_boundary_monument");
- private OutlandsSounds(){}
+ public static final DeferredHolder<SoundEvent,SoundEvent> NIGHTMARE_WATCHER=register("nightmare_watcher");\n public static final DeferredHolder<SoundEvent,SoundEvent> NIGHTMARE_HOUND=register("nightmare_hound");\n public static final DeferredHolder<SoundEvent,SoundEvent> NIGHTMARE_WARDENED=register("nightmare_wardened");\n public static final DeferredHolder<SoundEvent,SoundEvent> NIGHTMARE_FALSE_SURVIVOR=register("nightmare_false_survivor");\n public static final DeferredHolder<SoundEvent,SoundEvent> NIGHTMARE_UNBOUND=register("nightmare_unbound");\n private OutlandsSounds(){}
 }
