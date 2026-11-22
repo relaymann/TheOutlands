@@ -25,6 +25,7 @@ public final class StalkerEntity extends Monster {
     private int lostSightTicks;
     private int searchTicks;
     private int interceptCooldown;
+    private int audioCooldown;
     private boolean hasMemory;
 
     public StalkerEntity(EntityType<? extends Monster> type, Level level) { super(type, level); xpReward = 10; }
@@ -51,9 +52,22 @@ public final class StalkerEntity extends Monster {
         // a boat or minecart. It immediately dismounts and resumes its hunt.
         if (isPassenger()) stopRiding();
         if (interceptCooldown > 0) interceptCooldown--;
+        if (audioCooldown > 0) audioCooldown--;
 
         if (getTarget() instanceof Player player && player.isAlive()) {
             double distance = distanceToSqr(player);
+            if (OutlandsConfig.HORROR_AUDIO_ENABLED.get() && audioCooldown == 0
+                    && distance < 900.0D && distance > 100.0D) {
+                playSound(OutlandsSounds.STALKER_JOINT.get(), 0.62F,
+                        0.72F + getRandom().nextFloat() * 0.22F);
+                audioCooldown = 110 + getRandom().nextInt(110);
+            }
+            if (OutlandsConfig.HORROR_AUDIO_ENABLED.get() && audioCooldown == 0
+                    && distance < 100.0D && isSprinting()) {
+                playSound(OutlandsSounds.STALKER_LUNGE.get(), 0.92F,
+                        0.82F + getRandom().nextFloat() * 0.24F);
+                audioCooldown = 85;
+            }
             if (hasLineOfSight(player)) {
                 memoryX = player.getX(); memoryY = player.getY(); memoryZ = player.getZ();
                 hasMemory = true; lostSightTicks = 0; searchTicks = 0;

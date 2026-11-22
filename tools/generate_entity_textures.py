@@ -25,6 +25,11 @@ PALETTES = {
  "pilgrim": ((9,8,7),(27,24,21),(57,49,41),(105,91,76),(165,151,127)),
  "ceiling_dweller": ((5,7,8),(16,22,24),(38,49,51),(83,99,98),(155,169,158)),
  "colossus": ((8,8,7),(25,25,22),(53,54,47),(96,100,86),(158,164,139)),
+ "nightmare_watcher": ((2,3,6),(10,15,23),(28,39,49),(92,121,129),(205,225,218)),
+ "nightmare_hound": ((5,3,3),(23,13,12),(61,31,27),(133,66,48),(224,156,112)),
+ "nightmare_wardened": ((4,5,7),(18,22,28),(48,56,63),(103,117,121),(184,194,177)),
+ "nightmare_false_survivor": ((8,8,7),(27,26,24),(64,59,50),(126,111,89),(202,184,151)),
+ "nightmare_unbound": ((3,2,9),(16,9,29),(46,24,69),(111,55,137),(222,142,255)),
 }
 
 def chunk(kind, data):
@@ -102,6 +107,41 @@ def generate(name, palette, index):
     for coords in marks.get(name, ()):
         x0,y0,x1,y1=coords
         line(pixels,x0,y0,x1,y1,palette[4] if name not in ("null","null_apostle") else palette[3])
+    # Strong readable details on humanoid front-face and torso UVs.
+    if name in ("stalker", "nightmare_watcher", "nightmare_hound",
+                "nightmare_wardened", "nightmare_false_survivor", "nightmare_unbound"):
+        eye, shadow, mid = palette[4], palette[0], palette[2]
+        rect(pixels, 8, 9, 15, 11, shadow)
+        if name in ("stalker", "nightmare_watcher"):
+            rect(pixels, 9, 10, 9, 11, eye); rect(pixels, 14, 10, 14, 11, eye)
+        elif name == "nightmare_hound":
+            rect(pixels, 8, 10, 10, 11, eye); rect(pixels, 13, 10, 15, 11, eye)
+        elif name == "nightmare_wardened":
+            rect(pixels, 9, 10, 10, 10, eye); rect(pixels, 13, 10, 14, 10, eye)
+        elif name == "nightmare_false_survivor":
+            rect(pixels, 9, 10, 9, 10, eye); rect(pixels, 14, 10, 14, 11, eye)
+        else:
+            rect(pixels, 9, 9, 10, 11, eye); rect(pixels, 13, 9, 14, 11, eye)
+        if name in ("stalker", "nightmare_hound", "nightmare_unbound"):
+            rect(pixels, 10, 13, 13, 15, shadow)
+            for tooth_x in (10, 12, 13):
+                pixels[13][tooth_x] = palette[4]
+                pixels[15][tooth_x] = palette[3]
+        elif name == "nightmare_watcher":
+            line(pixels, 11, 12, 12, 15, palette[3]); rect(pixels, 10, 14, 13, 14, shadow)
+        elif name == "nightmare_wardened":
+            line(pixels, 11, 13, 12, 14, palette[3])
+        else:
+            line(pixels, 11, 12, 12, 15, shadow); pixels[14][11] = palette[4]
+        for x in (20, 22, 25, 27):
+            line(pixels, x, 21, x + (1 if x < 24 else -1), 29, mid)
+        if name in ("stalker", "nightmare_hound", "nightmare_unbound"):
+            line(pixels, 23, 20, 24, 31, palette[3])
+        if name == "nightmare_wardened":
+            rect(pixels, 20, 20, 27, 22, palette[1]); line(pixels, 23, 22, 23, 31, palette[4])
+        if name == "nightmare_false_survivor":
+            line(pixels, 20, 20, 27, 31, palette[3]); line(pixels, 27, 20, 20, 31, palette[1])
+
     if name == "observer":
         # The single unblinking eye mark.
         rect(pixels,29,24,34,25,palette[4])
@@ -126,8 +166,11 @@ def generate(name, palette, index):
         for x, y in ((32, 28), (78, 46), (54, 83), (96, 101)):
             line(pixels, x, y, x+7, y+11, palette[4])
             line(pixels, x+7, y+11, x+13, y+15, palette[3])
-    os.makedirs(OUT, exist_ok=True)
-    write_png(os.path.join(OUT,name+".png"), pixels)
+    # Give each NIGHTMARE identity its own generated skin file.
+    target_dir = os.path.join(OUT, "nightmare") if name.startswith("nightmare_") else OUT
+    os.makedirs(target_dir, exist_ok=True)
+    filename = name.removeprefix("nightmare_") if name.startswith("nightmare_") else name
+    write_png(os.path.join(target_dir, filename+".png"), pixels)
 
 def main():
     for index,(name,palette) in enumerate(PALETTES.items()):

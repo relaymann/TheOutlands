@@ -355,3 +355,45 @@ nightmare_voice("nightmare_hound", 68, 1.55, 0.62, 1.8)
 nightmare_voice("nightmare_wardened", 43, 2.8, 0.38, 0.42)
 nightmare_voice("nightmare_false_survivor", 176, 2.1, 0.31, 0.84)
 nightmare_voice("nightmare_unbound", 92, 2.35, 0.58, 1.15)
+
+
+# Stalker close-range tells: wet cartilage clicks before a sudden lunge.
+def stalker_joint(t, d, i, n):
+    low = noise(t, 55, 420, stalker_joint.low)
+    crack = noise(t, 900, 6200, stalker_joint.crack)
+    impacts = 0.0
+    for at, pitch in ((0.08, 740), (0.31, 1120), (0.68, 510)):
+        x = t - at
+        if 0.0 <= x < 0.075:
+            impacts += 0.36 * math.sin(2 * math.pi * pitch * x) * math.exp(-x * 48)
+    return fade(t, d, 0.002, 0.18) * (0.28 * low * math.exp(-t * 1.5)
+            + 0.18 * crack * math.exp(-t * 4.0) + impacts)
+stalker_joint.low, stalker_joint.crack = {"lp1": 0.0, "lp2": 0.0}, {"lp1": 0.0, "lp2": 0.0}
+make("stalker_joint", 0.92, stalker_joint)
+
+def stalker_lunge(t, d, i, n):
+    sub = noise(t, 28, 220, stalker_lunge.sub)
+    throat = noise(t, 180, 1450, stalker_lunge.throat)
+    grit = noise(t, 1300, 7000, stalker_lunge.grit)
+    snap = 0.0
+    if t < 0.045:
+        snap = 0.48 * math.sin(2 * math.pi * (210 - 90 * t) * t) * math.exp(-t * 28)
+    sweep = math.sin(2 * math.pi * (95 * t - 32 * t * t))
+    return snap + 0.34 * sub * math.exp(-t * 4.0) + 0.22 * throat * math.exp(-t * 3.0) + 0.16 * grit * math.exp(-t * 7.0) + 0.13 * sweep * math.exp(-t * 5.0)
+stalker_lunge.sub, stalker_lunge.throat, stalker_lunge.grit = (
+    {"lp1": 0.0, "lp2": 0.0}, {"lp1": 0.0, "lp2": 0.0}, {"lp1": 0.0, "lp2": 0.0})
+make("stalker_lunge", 0.88, stalker_lunge)
+
+# NIGHTMARE attack sting: a layered throat rupture, not a repeated ambient loop.
+def nightmare_screech(t, d, i, n):
+    p = t / d
+    f = 190 - 105 * p + 22 * math.sin(2 * math.pi * 7.0 * t)
+    phase = 2 * math.pi * (190 * t - 52.5 * t * t / d)
+    low = noise(t, 35, 620, nightmare_screech.low)
+    rasp = noise(t, 700, 6500, nightmare_screech.rasp)
+    pulse = 0.35 + 0.65 * max(0.0, math.sin(2 * math.pi * 5.2 * t)) ** 2
+    return fade(t, d, 0.006, 0.24) * pulse * (
+        0.25 * math.sin(phase) + 0.16 * math.sin(phase * 1.73 + 0.8)
+        + 0.27 * low + 0.20 * rasp)
+nightmare_screech.low, nightmare_screech.rasp = {"lp1": 0.0, "lp2": 0.0}, {"lp1": 0.0, "lp2": 0.0}
+make("nightmare_screech", 1.15, nightmare_screech)

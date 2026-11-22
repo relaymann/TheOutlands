@@ -431,5 +431,14 @@
         "volume": 0.52
       }
     ]
+  },
+  "stalker_joint": {
+    "sounds": [{"name": "theoutlands:stalker_joint", "volume": 0.62}]
+  },
+  "stalker_lunge": {
+    "sounds": [{"name": "theoutlands:stalker_lunge", "volume": 0.92}]
+  },
+  "nightmare_screech": {
+    "sounds": [{"name": "theoutlands:nightmare_screech", "volume": 0.82}]
   }
 }

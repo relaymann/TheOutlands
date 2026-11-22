@@ -23,6 +23,7 @@ public final class NightmareCreature extends Monster {
     private int leapCooldown;
     private int feintCooldown;
     private int flankCooldown;
+    private int screechCooldown;
     private double memoryX;
     private double memoryY;
     private double memoryZ;
@@ -69,6 +70,7 @@ public final class NightmareCreature extends Monster {
         if (leapCooldown > 0) leapCooldown--;
         if (feintCooldown > 0) feintCooldown--;
         if (flankCooldown > 0) flankCooldown--;
+        if (screechCooldown > 0) screechCooldown--;
 
         if (!(getTarget() instanceof Player player) || !player.isAlive()
                 || player.isCreative() || player.isSpectator()) {
@@ -77,6 +79,12 @@ public final class NightmareCreature extends Monster {
         }
 
         double distance = distanceToSqr(player);
+        if (OutlandsConfig.HORROR_AUDIO_ENABLED.get() && screechCooldown == 0
+                && distance < 100.0D && tickCount % 35 == 0) {
+            playSound(OutlandsSounds.NIGHTMARE_SCREECH.get(), 0.82F,
+                    0.76F + getRandom().nextFloat() * 0.30F);
+            screechCooldown = 150 + getRandom().nextInt(100);
+        }
         if (hasLineOfSight(player)) {
             memoryX = player.getX();
             memoryY = player.getY();
@@ -202,6 +210,7 @@ public final class NightmareCreature extends Monster {
         tag.putInt("nightmare_leap_cooldown", leapCooldown);
         tag.putInt("nightmare_feint_cooldown", feintCooldown);
         tag.putInt("nightmare_flank_cooldown", flankCooldown);
+        tag.putInt("nightmare_screech_cooldown", screechCooldown);
     }
 
     @Override
@@ -214,5 +223,6 @@ public final class NightmareCreature extends Monster {
         leapCooldown = tag.getInt("nightmare_leap_cooldown");
         feintCooldown = tag.getInt("nightmare_feint_cooldown");
         flankCooldown = tag.getInt("nightmare_flank_cooldown");
+        screechCooldown = tag.getInt("nightmare_screech_cooldown");
     }
 }

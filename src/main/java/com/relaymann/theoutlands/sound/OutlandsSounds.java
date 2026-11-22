@@ -14,6 +14,9 @@ public final class OutlandsSounds {
  public static final DeferredHolder<SoundEvent,SoundEvent> HUNTER_STALK=register("hunter_stalk");
  public static final DeferredHolder<SoundEvent,SoundEvent> CAVEJAR_STALK=register("cavejar_stalk");
  public static final DeferredHolder<SoundEvent,SoundEvent> STALKER_BREATH=register("stalker_breath");
+ public static final DeferredHolder<SoundEvent,SoundEvent> STALKER_JOINT=register("stalker_joint");
+ public static final DeferredHolder<SoundEvent,SoundEvent> STALKER_LUNGE=register("stalker_lunge");
+ public static final DeferredHolder<SoundEvent,SoundEvent> NIGHTMARE_SCREECH=register("nightmare_screech");
  public static final DeferredHolder<SoundEvent,SoundEvent> OBSERVER_CLICK=register("observer_click");
  public static final DeferredHolder<SoundEvent,SoundEvent> BURROWER_RISE=register("burrower_rise");
  public static final DeferredHolder<SoundEvent,SoundEvent> MIMIC_REVEAL=register("mimic_reveal");

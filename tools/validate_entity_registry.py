@@ -171,6 +171,23 @@ def audit_once():
         errors.append("Colossus telegraph/impact sounds are not registered")
     if "CEILING_DROP" not in sounds_java or "PILGRIM_STEP" not in sounds_java:
         errors.append("new entity action sounds are not registered")
+    for cue in ("STALKER_JOINT", "STALKER_LUNGE", "NIGHTMARE_SCREECH"):
+        if cue not in sounds_java or cue.lower() not in sound_data or ('make("%s"' % cue.lower()) not in audio_generator:
+            errors.append(cue.lower() + ": missing generated/registered horror cue")
+    stalker_model = read("java/com/relaymann/theoutlands/client/StalkerModel.java")
+    for part in ("jaw", "neck", "ribs", "spines", "leftHook", "rightHook"):
+        if part not in stalker_model:
+            errors.append("Stalker model missing horror anatomy: " + part)
+    if "jaw.xRot" not in stalker_model or "head.zRot" not in stalker_model:
+        errors.append("Stalker model is missing idle/attack animation detail")
+    for variant in ("nightmare_watcher", "nightmare_hound", "nightmare_wardened",
+                    "nightmare_false_survivor", "nightmare_unbound"):
+        if ('"%s"' % variant) not in open("tools/generate_entity_textures.py", encoding="utf-8").read():
+            errors.append(variant + ": no dedicated generated texture palette")
+    nightmare_model = read("java/com/relaymann/theoutlands/client/NightmareCreatureModel.java")
+    for part in ("left_horn", "right_horn", "left_tendril", "right_tendril", "jaw"):
+        if part not in nightmare_model:
+            errors.append("Nightmare model missing articulated horror anatomy: " + part)
     if len(set(model_map.values())) != EXPECTED - 4: errors.append("shared Nightmare model mapping is inconsistent")
     if len(layer_fields) != EXPECTED - 4: errors.append("not all entity model layers are registered")
     nightmare_model = read("java/com/relaymann/theoutlands/client/NightmareCreatureModel.java")
