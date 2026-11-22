@@ -72,6 +72,8 @@ public final class EntityTraceManager {
         }
     }
 
+    public static void clear(ServerPlayer player) { NEXT_TRACE.remove(player.getUUID()); }
+
     public static void clear() { NEXT_TRACE.clear(); }
 
     @SubscribeEvent
