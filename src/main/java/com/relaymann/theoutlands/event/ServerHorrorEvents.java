@@ -63,6 +63,7 @@ public final class ServerHorrorEvents {
             EnvironmentalAnomalyManager.clear(player);
             StructureAmbienceManager.clear(player);
             VoicePerceptionManager.clear(player.getUUID());
+            EntityTraceManager.clear(player);
         }
         HorrorProgressionManager.remove(event.getEntity().getUUID());
     }
