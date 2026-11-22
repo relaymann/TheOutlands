@@ -59,7 +59,8 @@ public final class PredatoryStalkingManager {
         marks.addLast(new BuildMark(event.getPos().immutable(), player.getUUID(), level.getGameTime(), true));
         while (marks.size() > MAX_BUILD_MARKS) marks.removeFirst();
     }
-\n    @SubscribeEvent
+
+    @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
         if (!OutlandsConfig.ENTITY_INTELLIGENCE_ENABLED.get()
                 || event.getServer().getTickCount() % SAMPLE_INTERVAL != 0) return;
