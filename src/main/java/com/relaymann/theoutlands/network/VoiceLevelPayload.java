@@ -30,7 +30,8 @@ public record VoiceLevelPayload(int level, boolean whispering) implements Custom
 
     public static void handle(VoiceLevelPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
-            if (context.player() instanceof ServerPlayer player) {
+            if (context.player() instanceof ServerPlayer player
+                    && VoicePerceptionManager.shouldAcceptLevelReport(player.getUUID())) {
                 VoicePerceptionManager.onClientLevel(player, payload.level(), payload.whispering());
             }
         });
