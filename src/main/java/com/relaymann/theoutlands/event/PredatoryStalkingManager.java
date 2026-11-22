@@ -210,7 +210,7 @@ public final class PredatoryStalkingManager {
         Vec3 start = mob.position();
         Vec3 end = target.position();
         Vec3 line = end.subtract(start);
-        double lengthSqr = line.horizontalDistanceSqr();
+        double lengthSqr = line.x * line.x + line.z * line.z;
         if (lengthSqr < 1.0D) return null;
         BuildMark best = null;
         double bestAlong = Double.MAX_VALUE;
@@ -286,7 +286,7 @@ public final class PredatoryStalkingManager {
         int count = 0;
         for (BuildMark mark : marks) {
             if (!mark.owner().equals(player.getUUID()) || now - mark.time() > BUILD_MEMORY
-                    || mark.pos().distToCenterSqr(player.position()) > 28.0D * 28.0D) continue;
+                    || Vec3.atCenterOf(mark.pos()).distanceToSqr(player.position()) > 28.0D * 28.0D) continue;
             sx += mark.pos().getX() + 0.5D;
             sy += mark.pos().getY();
             sz += mark.pos().getZ() + 0.5D;
