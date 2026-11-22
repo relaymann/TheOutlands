@@ -19,6 +19,8 @@ public final class OutlandsConfig {
     public static final ModConfigSpec.BooleanValue FEAR_AMBIENT_ATTENUATION;
     public static final ModConfigSpec.BooleanValue AMBIENT_ANOMALIES_ENABLED;
     public static final ModConfigSpec.BooleanValue ENTITY_INTELLIGENCE_ENABLED;
+    public static final ModConfigSpec.BooleanValue VOICE_HORROR_ENABLED;
+    public static final ModConfigSpec.DoubleValue VOICE_DETECTION_RANGE;
     public static final ModConfigSpec.BooleanValue ENTITY_ECOSYSTEM_ENABLED;
     public static final ModConfigSpec.BooleanValue ENTITY_SPAWN_BALANCE_ENABLED;
     public static final ModConfigSpec.BooleanValue OUTLANDS_STRUCTURES_ENABLED;
@@ -99,6 +101,12 @@ public final class OutlandsConfig {
         STRUCTURE_SPACING_CHUNKS = BUILDER
                 .comment("Minimum chunk spacing between Outlands structure candidate sites. Vanilla structures are unaffected.")
                 .defineInRange("structureSpacingChunks", 4, 1, 16);
+        VOICE_HORROR_ENABLED = BUILDER
+                .comment("Enables optional Simple Voice Chat hearing and voice-reactive entity behavior when Simple Voice Chat is installed.")
+                .define("voiceHorrorEnabled", true);
+        VOICE_DETECTION_RANGE = BUILDER
+                .comment("Base hearing range for Outlands entities when using optional voice chat integration.")
+                .defineInRange("voiceDetectionRange", 52.0D, 8.0D, 96.0D);
         BUILDER.pop();
 
         SPEC = BUILDER.build();
