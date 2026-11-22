@@ -1,7 +1,6 @@
 package com.relaymann.theoutlands.event;
 
 import com.relaymann.theoutlands.NightmareMode;
-import com.relaymann.theoutlands.OutlandsGameRules;
 import com.relaymann.theoutlands.TheOutlands;
 import com.relaymann.theoutlands.entity.OutlandsEntities;
 import net.minecraft.core.BlockPos;
@@ -14,7 +13,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -41,13 +39,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class NightmareModeManager {
     private static final Map<UUID, Long> NEXT_EVENT = new ConcurrentHashMap<>();
     private static final Map<ServerLevel, Long> BLOOD_MOON_UNTIL = new ConcurrentHashMap<>();
-    private static final List<net.minecraft.world.entity.EntityType<? extends Mob>> THREATS = List.of(
-            OutlandsEntities.STALKER.get(), OutlandsEntities.HUNTER.get(),
-            OutlandsEntities.LURKER.get(), OutlandsEntities.DREDGE.get(),
-            OutlandsEntities.MIMIC.get(), OutlandsEntities.OBSERVER.get(),
-            OutlandsEntities.HOWLER.get(), OutlandsEntities.PILGRIM.get(),
-            OutlandsEntities.BURROWER.get(), OutlandsEntities.CAVE_JAR.get(),
-            OutlandsEntities.CEILING_DWELLER.get());
+    private static List<net.minecraft.world.entity.EntityType<? extends Mob>> threatTypes() {
+        // Resolve deferred entity holders only after registries have completed loading.
+        return List.of(OutlandsEntities.STALKER.get(), OutlandsEntities.HUNTER.get(),
+                OutlandsEntities.LURKER.get(), OutlandsEntities.DREDGE.get(),
+                OutlandsEntities.MIMIC.get(), OutlandsEntities.OBSERVER.get(),
+                OutlandsEntities.HOWLER.get(), OutlandsEntities.PILGRIM.get(),
+                OutlandsEntities.BURROWER.get(), OutlandsEntities.CAVE_JAR.get(),
+                OutlandsEntities.CEILING_DWELLER.get());
+    }
 
     private NightmareModeManager() {}
 
@@ -141,7 +141,8 @@ public final class NightmareModeManager {
             BlockPos spawn = new BlockPos(x, y, z);
             if (!level.hasChunkAt(spawn)) continue;
 
-            var type = THREATS.get(player.getRandom().nextInt(THREATS.size()));
+            List<net.minecraft.world.entity.EntityType<? extends Mob>> threats = threatTypes();
+            var type = threats.get(player.getRandom().nextInt(threats.size()));
             Mob mob = type.create(level);
             if (mob == null) continue;
             mob.moveTo(x + 0.5D, y, z + 0.5D, player.getRandom().nextFloat() * 360.0F, 0.0F);
