@@ -15,12 +15,16 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.api.distmarker.Dist;
 
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Loaded by Simple Voice Chat's plugin discovery only when its API is present.
  * The Outlands core never references this class.
  */
 @ForgeVoicechatPlugin
 public final class OutlandsVoicechatPlugin implements VoicechatPlugin {
+    private static final ConcurrentHashMap<UUID, Long> LAST_ENQUEUED_PACKET = new ConcurrentHashMap<>();
     @Override
     public String getPluginId() {
         return "theoutlands";
@@ -49,6 +53,10 @@ public final class OutlandsVoicechatPlugin implements VoicechatPlugin {
         if (connection == null) return;
         Object rawPlayer = connection.getPlayer().getPlayer();
         if (rawPlayer instanceof ServerPlayer player && player.getServer() != null) {
+            long now = System.nanoTime();
+            long previous = LAST_ENQUEUED_PACKET.getOrDefault(player.getUUID(), 0L);
+            if (now - previous < 75_000_000L) return;
+            LAST_ENQUEUED_PACKET.put(player.getUUID(), now);
             boolean whispering = event.getPacket().isWhispering();
             player.getServer().execute(() -> {
                 if (!player.isRemoved() && player.isAlive()) {
@@ -61,6 +69,7 @@ public final class OutlandsVoicechatPlugin implements VoicechatPlugin {
     private void onPlayerStateChanged(PlayerStateChangedEvent event) {
         if (event.isMuted() || event.isDisabled() || event.isDisconnected()) {
             VoicePerceptionManager.clear(event.getPlayerUuid());
+            LAST_ENQUEUED_PACKET.remove(event.getPlayerUuid());
         }
     }
 }
