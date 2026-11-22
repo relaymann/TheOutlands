@@ -30,6 +30,7 @@ public final class VoicePerceptionManager {
     private static final Map<UUID, VoiceSignal> ACTIVE_VOICES = new HashMap<>();
     private static final Map<UUID, VoiceMemory> ENTITY_MEMORY = new HashMap<>();
     private static final Map<UUID, Long> PLAYER_EVENT_COOLDOWNS = new HashMap<>();
+    private static boolean wasVoiceEnabled = true;
 
     private VoicePerceptionManager() {}
 
@@ -61,7 +62,12 @@ public final class VoicePerceptionManager {
     }
 
     public static void tick(ServerLevel level) {
-        if (!OutlandsConfig.VOICE_HORROR_ENABLED.get()) return;
+        if (!OutlandsConfig.VOICE_HORROR_ENABLED.get()) {
+            if (wasVoiceEnabled) clear();
+            wasVoiceEnabled = false;
+            return;
+        }
+        wasVoiceEnabled = true;
         long now = level.getGameTime();
         ACTIVE_VOICES.entrySet().removeIf(entry -> now - entry.getValue().lastPacket() > ACTIVE_PACKET_TTL);
         REPORTED_LEVELS.entrySet().removeIf(entry -> now - entry.getValue().gameTime() > 40L);
@@ -70,7 +76,10 @@ public final class VoicePerceptionManager {
             VoiceSignal signal = entry.getValue();
             if (!signal.dimension().equals(level.dimension())) continue;
             ServerPlayer player = level.getServer().getPlayerList().getPlayer(entry.getKey());
-            if (player == null || !player.isAlive()) continue;
+            if (player == null || !player.isAlive() || player.serverLevel() != level) {
+                ACTIVE_VOICES.remove(entry.getKey());
+                continue;
+            }
             hearVoice(level, player, signal, now);
         }
 
@@ -83,7 +92,7 @@ public final class VoicePerceptionManager {
     private static void hearVoice(ServerLevel level, ServerPlayer player, VoiceSignal signal, long now) {
         double configuredRange = OutlandsConfig.VOICE_DETECTION_RANGE.get();
         maybeVoiceKnock(level, player, signal, now);
-        AABB search = player.getBoundingBox().inflate(configuredRange * 1.7D + 20.0D);
+        AABB search = player.getBoundingBox().inflate(configuredRange * 1.65D + 2.0D);
         List<Mob> nearby = level.getEntitiesOfClass(Mob.class, search,
                 mob -> mob.isAlive() && profile(mob) != null);
         for (Mob mob : nearby) {
@@ -302,6 +311,7 @@ public final class VoicePerceptionManager {
     public static void clear() {
         REPORTED_LEVELS.clear();
         ACTIVE_VOICES.clear();
+        wasVoiceEnabled = OutlandsConfig.VOICE_HORROR_ENABLED.get();
         ENTITY_MEMORY.clear();
         PLAYER_EVENT_COOLDOWNS.clear();
     }
