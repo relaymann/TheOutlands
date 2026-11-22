@@ -1,6 +1,7 @@
 package com.relaymann.theoutlands.entity;
 
 import com.relaymann.theoutlands.OutlandsConfig;
+import com.relaymann.theoutlands.NightmareBalancePolicy;
 import com.relaymann.theoutlands.sound.OutlandsSounds;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvent;
@@ -110,23 +111,28 @@ public final class NightmareCreature extends Monster {
     }
 
     private void watcherBehavior(Player player, double distance) {
-        setSprinting(false);
         getLookControl().setLookAt(player, 22.0F, 18.0F);
-        if (distance < 196.0D && hasLineOfSight(player)) {
+        Vec3 toWatcher = position().subtract(player.position());
+        double lookDot = toWatcher.lengthSqr() < 1.0E-6D
+                ? 1.0D : player.getLookAngle().dot(toWatcher.normalize());
+        if (NightmareBalancePolicy.watcherShouldFreeze(distance, lookDot, hasLineOfSight(player))) {
             getNavigation().stop();
-        } else if (distance > 400.0D && distance < 6_400.0D && tickCount % 45 == 0
-                && getNavigation().isDone()) {
-            Vec3 away = position().subtract(player.position());
-            if (away.lengthSqr() < 0.001D) away = new Vec3(1.0D, 0.0D, 0.0D);
-            Vec3 point = player.position().add(away.normalize().scale(11.0D));
-            getNavigation().moveTo(point.x, point.y, point.z, 1.02D);
+            setSprinting(false);
+            return;
+        }
+
+        // The Watcher advances whenever it is not being watched and becomes
+        // especially dangerous once it has closed the distance.
+        setSprinting(distance > 16.0D);
+        if (getNavigation().isDone() || tickCount % 12 == 0) {
+            getNavigation().moveTo(player, distance > 400.0D ? 1.04D : 1.20D);
         }
     }
 
     private void wardenedBehavior(Player player, double distance) {
-        setSprinting(false);
-        if (distance > 100.0D && getNavigation().isDone() && tickCount % 30 == 0) {
-            getNavigation().moveTo(player, 0.82D);
+        setSprinting(distance > 16.0D);
+        if (distance > 9.0D && (getNavigation().isDone() || tickCount % 18 == 0)) {
+            getNavigation().moveTo(player, 1.18D);
         }
     }
 

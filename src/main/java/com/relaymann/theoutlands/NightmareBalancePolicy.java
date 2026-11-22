@@ -25,6 +25,20 @@ public final class NightmareBalancePolicy {
         return 28 + pressureTier(dayTime, distanceFromSpawn) * 9;
     }
 
+    /** Scale event pacing by the configured frequency while keeping invalid values safe. */
+    public static int scaleEventDelayTicks(int baseDelayTicks, double frequencyMultiplier) {
+        if (baseDelayTicks <= 0) return 1;
+        double frequency = Double.isFinite(frequencyMultiplier)
+                ? Math.max(0.1D, Math.min(3.0D, frequencyMultiplier)) : 1.0D;
+        return Math.max(1, (int) Math.round(baseDelayTicks / frequency));
+    }
+
+    /** A watcher freezes only when it is visible and the player is actually looking at it. */
+    public static boolean watcherShouldFreeze(double distanceSquared, double lookDot, boolean lineOfSight) {
+        return lineOfSight && Double.isFinite(distanceSquared) && Double.isFinite(lookDot)
+                && distanceSquared >= 0.0D && distanceSquared <= 1_600.0D && lookDot >= 0.78D;
+    }
+
     /** Deterministic range selection; randomBits should come from the player's RNG. */
     public static int nextEventDelayTicks(long dayTime, double distanceFromSpawn, long randomBits) {
         int tier = pressureTier(dayTime, distanceFromSpawn);

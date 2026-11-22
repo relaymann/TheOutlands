@@ -9,6 +9,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.Level;
 
 import java.util.HashSet;
@@ -57,9 +59,10 @@ public final class StructureEncounterManager {
             double frequency = OutlandsConfig.STRUCTURE_CHANCE_MULTIPLIER.get() * (nightmare ? 2.5D : 1.0D);
             String layout = OutlandsStructureFeature.chooseLayout(seed, distance, forest,
                     minimumDistance, frequency, nightmare);
-            if (layout == null || resolve(level, layout, center, distance, seed)) {
-                RESOLVED_SITES.add(key);
-            }
+            // Resolve each site once. A blocked spawn position must not trigger an
+            // expensive deterministic retry every second for the rest of the session.
+            if (layout != null) resolve(level, layout, center, distance, seed);
+            RESOLVED_SITES.add(key);
         }
     }
 
@@ -124,6 +127,9 @@ public final class StructureEncounterManager {
             if (entity == null) continue;
             entity.moveTo(spawn.getX() + offset[0] + 0.5D, spawn.getY(),
                     spawn.getZ() + offset[1] + 0.5D, yaw, 0.0F);
+            if (entity instanceof Mob mob) {
+                mob.finalizeSpawn(level, level.getCurrentDifficultyAt(spawn), MobSpawnType.EVENT, null);
+            }
             if (level.noCollision(entity) && level.addFreshEntity(entity)) return true;
             entity.discard();
         }

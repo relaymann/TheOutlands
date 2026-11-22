@@ -1,6 +1,7 @@
 package com.relaymann.theoutlands.event;
 
 import com.relaymann.theoutlands.NightmareMode;
+import com.relaymann.theoutlands.OutlandsConfig;
 import com.relaymann.theoutlands.NightmareBalancePolicy;
 import com.relaymann.theoutlands.TheOutlands;
 import com.relaymann.theoutlands.entity.OutlandsEntities;
@@ -17,6 +18,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -82,27 +84,37 @@ public final class NightmareModeManager {
             if (!NightmareMode.isEnabled(level)) continue;
             for (ServerPlayer player : level.players()) {
                 if (!eligible(player)) continue;
-                coordinateNightmarePack(player);
-                migrateNearbyThreats(player);
-                tickActiveStructure(player);
+                if (OutlandsConfig.ENTITY_ECOSYSTEM_ENABLED.get()) {
+                    coordinateNightmarePack(player);
+                    migrateNearbyThreats(player);
+                }
+                if (OutlandsConfig.OUTLANDS_STRUCTURES_ENABLED.get()) tickActiveStructure(player);
+                if (!OutlandsConfig.EVENTS_ENABLED.get()) {
+                    NEXT_EVENT.remove(player.getUUID());
+                    continue;
+                }
                 long now = level.getGameTime();
                 double dx = player.getX() - level.getSharedSpawnPos().getX();
                 double dz = player.getZ() - level.getSharedSpawnPos().getZ();
                 double distanceFromSpawn = Math.sqrt(dx * dx + dz * dz);
                 Long next = NEXT_EVENT.get(player.getUUID());
                 if (next == null) {
-                    int delay = NightmareBalancePolicy.nextEventDelayTicks(
-                            level.getDayTime(), distanceFromSpawn, player.getRandom().nextLong());
+                    int delay = nextEventDelay(player, level.getDayTime(), distanceFromSpawn);
                     NEXT_EVENT.put(player.getUUID(), now + delay);
                     continue;
                 }
                 if (now < next) continue;
                 triggerEvent(player);
-                int delay = NightmareBalancePolicy.nextEventDelayTicks(
-                        level.getDayTime(), distanceFromSpawn, player.getRandom().nextLong());
+                int delay = nextEventDelay(player, level.getDayTime(), distanceFromSpawn);
                 NEXT_EVENT.put(player.getUUID(), now + delay);
             }
         }
+    }
+
+    private static int nextEventDelay(ServerPlayer player, long dayTime, double distanceFromSpawn) {
+        int baseDelay = NightmareBalancePolicy.nextEventDelayTicks(
+                dayTime, distanceFromSpawn, player.getRandom().nextLong());
+        return NightmareBalancePolicy.scaleEventDelayTicks(baseDelay, OutlandsConfig.EVENT_FREQUENCY.get());
     }
 
     private static boolean eligible(ServerPlayer player) {
@@ -166,6 +178,7 @@ public final class NightmareModeManager {
 
     /** Briefly cuts ambient audio, then leaves one distant sign behind. */
     private static void silence(ServerPlayer player) {
+        if (!OutlandsConfig.HORROR_AUDIO_ENABLED.get()) return;
         player.connection.send(new ClientboundStopSoundPacket(null, SoundSource.AMBIENT));
         player.serverLevel().sendParticles(ParticleTypes.ASH, player.getX(), player.getY() + 1.0D,
                 player.getZ(), 12, 0.7D, 0.8D, 0.7D, 0.002D);
@@ -225,6 +238,7 @@ public final class NightmareModeManager {
         Mob mob = type.create(level);
         if (mob == null) return;
         mob.moveTo(x + 0.5D, y, z + 0.5D, player.getRandom().nextFloat() * 360.0F, 0.0F);
+        mob.finalizeSpawn(level, level.getCurrentDifficultyAt(spawn), MobSpawnType.EVENT, null);
         if (!level.noCollision(mob, mob.getBoundingBox())) {
             mob.discard();
             return;
@@ -254,6 +268,7 @@ public final class NightmareModeManager {
 
     private static void play(ServerPlayer player, SoundEvent sound, SoundSource source,
                              float volume, float pitch) {
+        if (!OutlandsConfig.HORROR_AUDIO_ENABLED.get()) return;
         player.connection.send(new ClientboundSoundPacket(
                 BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound), source,
                 player.getX(), player.getY(), player.getZ(), volume, pitch,
@@ -264,10 +279,12 @@ public final class NightmareModeManager {
     private static void coordinateNightmarePack(ServerPlayer player) {
         ServerLevel level = player.serverLevel();
         for (Mob ally : level.getEntitiesOfClass(Mob.class,
-                player.getBoundingBox().inflate(96.0D),
+                player.getBoundingBox().inflate(160.0D),
                 candidate -> candidate.isAlive()
                         && candidate.getTags().contains("theoutlands_nightmare_spawn"))) {
-            if (ally.getTarget() != player) ally.setTarget(player);
+            if (ally.distanceToSqr(player) <= 96.0D * 96.0D && ally.getTarget() != player) {
+                ally.setTarget(player);
+            }
             updatePursuitMemory(ally, player);
         }
     }
@@ -275,20 +292,27 @@ public final class NightmareModeManager {
     private static void updatePursuitMemory(Mob mob, ServerPlayer player) {
         ServerLevel level = player.serverLevel();
         long now = level.getGameTime();
-        if (mob.getTarget() == player) {
+        boolean currentlyVisible = mob.getTarget() == player
+                && mob.hasLineOfSight(player)
+                && mob.distanceToSqr(player) <= 128.0D * 128.0D;
+        if (currentlyVisible) {
             PURSUIT_MEMORY.put(mob.getUUID(), new PursuitMemory(player.getUUID(), level.dimension(),
                     player.blockPosition().immutable(), now, now));
             return;
         }
+
         PursuitMemory memory = PURSUIT_MEMORY.get(mob.getUUID());
+        if (mob.getTarget() == player && memory != null) mob.setTarget(null);
         if (memory == null || !memory.dimension().equals(level.dimension())
                 || now - memory.lastSeen() > 3_600L) {
             PURSUIT_MEMORY.remove(mob.getUUID());
             return;
         }
+
         ServerPlayer remembered = level.getServer().getPlayerList().getPlayer(memory.player());
         if (remembered != null && remembered.serverLevel() == level
-                && mob.distanceToSqr(remembered) <= 128.0D * 128.0D) {
+                && mob.distanceToSqr(remembered) <= 128.0D * 128.0D
+                && mob.hasLineOfSight(remembered)) {
             mob.setTarget(remembered);
             PURSUIT_MEMORY.put(mob.getUUID(), new PursuitMemory(memory.player(), memory.dimension(),
                     remembered.blockPosition().immutable(), now, memory.lastPath()));
@@ -342,6 +366,7 @@ public final class NightmareModeManager {
 
     /** A discovered site becomes progressively more active while it is explored. */
     private static void tickActiveStructure(ServerPlayer player) {
+        if (!OutlandsConfig.OUTLANDS_STRUCTURES_ENABLED.get()) return;
         ServerLevel level = player.serverLevel();
         var start = level.structureManager().getStructureWithPieceAt(player.blockPosition(),
                 holder -> holder.value() instanceof OutlandsStructure);

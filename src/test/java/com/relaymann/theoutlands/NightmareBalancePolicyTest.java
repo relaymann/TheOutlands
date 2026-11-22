@@ -21,6 +21,24 @@ class NightmareBalancePolicyTest {
     }
 
     @Test
+    void configuredEventFrequencyScalesDelaySafely() {
+        int base = 1_200;
+        assertEquals(2_400, NightmareBalancePolicy.scaleEventDelayTicks(base, 0.5D));
+        assertEquals(1_200, NightmareBalancePolicy.scaleEventDelayTicks(base, 1.0D));
+        assertEquals(400, NightmareBalancePolicy.scaleEventDelayTicks(base, 3.0D));
+        assertEquals(12_000, NightmareBalancePolicy.scaleEventDelayTicks(base, 0.0D));
+        assertEquals(1_200, NightmareBalancePolicy.scaleEventDelayTicks(base, Double.NaN));
+    }
+
+    @Test
+    void watcherOnlyFreezesWhenClearlyObserved() {
+        assertTrue(NightmareBalancePolicy.watcherShouldFreeze(100.0D, 0.9D, true));
+        assertFalse(NightmareBalancePolicy.watcherShouldFreeze(100.0D, 0.9D, false));
+        assertFalse(NightmareBalancePolicy.watcherShouldFreeze(100.0D, 0.2D, true));
+        assertFalse(NightmareBalancePolicy.watcherShouldFreeze(1_700.0D, 1.0D, true));
+    }
+
+    @Test
     void eventDelayStaysInsideProgressionBand() {
         for (int tier = 0; tier <= 5; tier++) {
             long age = tier == 0 ? 0L : (long) Math.pow(2, tier + 1) * 24_000L;
