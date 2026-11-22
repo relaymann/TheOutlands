@@ -57,6 +57,16 @@ public final class StructureInteriorDressing {
                     case 2 -> Blocks.COBWEB.defaultBlockState();
                     default -> Blocks.CRACKED_DEEPSLATE_BRICKS.defaultBlockState();
                 };
+                case "forsaken_settlement", "settlement", "last_outpost", "outpost" -> switch (random.nextInt(8)) {
+                    case 0 -> Blocks.CHEST.defaultBlockState();
+                    case 1 -> Blocks.CRAFTING_TABLE.defaultBlockState();
+                    case 2 -> Blocks.CAMPFIRE.defaultBlockState();
+                    case 3 -> Blocks.OAK_FENCE.defaultBlockState();
+                    case 4 -> Blocks.BARREL.defaultBlockState();
+                    case 5 -> Blocks.WHITE_BED.defaultBlockState();
+                    case 6 -> Blocks.FURNACE.defaultBlockState();
+                    default -> Blocks.COBWEB.defaultBlockState();
+                };
                 case "hollow_crypt" -> switch (random.nextInt(4)) {
                     case 0 -> Blocks.BONE_BLOCK.defaultBlockState();
                     case 1 -> Blocks.COBWEB.defaultBlockState();
