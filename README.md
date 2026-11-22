@@ -17,6 +17,22 @@ The current build includes a player-specific horror director, persistent behavio
 - Standalone mod JAR
 - Integrated and dedicated-server compatibility
 
+## Optional Simple Voice Chat integration
+
+The Outlands can optionally integrate with **Simple Voice Chat**. It is not a required dependency: the mod's normal entity AI, environmental sounds, encounters, and survival systems continue to work when Simple Voice Chat is absent.
+
+When Simple Voice Chat is installed and connected:
+
+- A small **VOICE xx%** microphone meter appears immediately above the hotbar. It reflects the local microphone's normalized PCM activity level and returns to 0% after speech stops. Whisper mode is labeled separately.
+- Voice activity, approximate player position, normalized level, and whisper state are used for server-side entity hearing. Raw microphone samples and conversations are never sent to The Outlands' custom network payload or stored by the mod.
+- Different entities have distinct hearing ranges and reactions: Stalkers investigate and stalk, Hunters pursue, Mimics use misleading original creature sounds, Howlers can alert nearby threats, Observers watch, and cave predators react to underground voices.
+- Whispering reduces detection range; louder speech increases it. Walls, rain, thunder, cave depth, and nearby talking players influence detection.
+- Some loud voice events can trigger rare environmental knocks. Entity voice memories can persist briefly after a player stops speaking.
+
+For multiplayer, install a compatible Simple Voice Chat build on both the client and server and configure its voice transport as required by the server host. The Outlands integration is disabled by setting `voiceHorrorEnabled=false` in the common config. Its base hearing range is controlled by `voiceDetectionRange`.
+
+The integration does not transcribe speech, understand arbitrary words, record conversations, or copy a player's voice for imitation. Mimic behavior uses the mod's own creature sounds.
+
 ## Core design
 
 - Preserve normal vanilla world generation and survival gameplay as the foundation.
