@@ -72,12 +72,13 @@ public final class VoicePerceptionManager {
         ACTIVE_VOICES.entrySet().removeIf(entry -> now - entry.getValue().lastPacket() > ACTIVE_PACKET_TTL);
         REPORTED_LEVELS.entrySet().removeIf(entry -> now - entry.getValue().gameTime() > 40L);
 
-        for (var entry : ACTIVE_VOICES.entrySet()) {
+        for (var iterator = ACTIVE_VOICES.entrySet().iterator(); iterator.hasNext();) {
+            var entry = iterator.next();
             VoiceSignal signal = entry.getValue();
             if (!signal.dimension().equals(level.dimension())) continue;
             ServerPlayer player = level.getServer().getPlayerList().getPlayer(entry.getKey());
             if (player == null || !player.isAlive() || player.serverLevel() != level) {
-                ACTIVE_VOICES.remove(entry.getKey());
+                iterator.remove();
                 continue;
             }
             hearVoice(level, player, signal, now);
