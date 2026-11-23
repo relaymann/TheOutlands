@@ -302,7 +302,7 @@ public final class NightmareModeManager {
                 player.getBoundingBox().inflate(160.0D),
                 candidate -> candidate.isAlive()
                         && candidate.getTags().contains("theoutlands_nightmare_spawn"))) {
-            Mob target = ally.getTarget();
+            net.minecraft.world.entity.LivingEntity target = ally.getTarget();
             ServerPlayer targetPlayer = target instanceof ServerPlayer current ? current : null;
             boolean targetUnavailable = NightmareBalancePolicy.shouldReplaceTarget(
                     target != null, target == null || target.isAlive(), targetPlayer != null,
