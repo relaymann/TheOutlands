@@ -46,7 +46,10 @@ def main() -> None:
     for name in ("reinforced_barricade", "reinforced_door", "spike_trap", "perimeter_alarm"):
         state = ROOT / f"src/main/resources/assets/theoutlands/blockstates/{name}.json"
         assert state.exists(), f"Missing blockstate: {name}"
-        json.loads(state.read_text(encoding="utf-8"))
+        state_data = json.loads(state.read_text(encoding="utf-8"))
+        if name == "reinforced_door":
+            models = {entry["model"] for entry in state_data["variants"].values()}
+            assert models == {"minecraft:block/iron_door_bottom", "minecraft:block/iron_door_top"}
     lang = json.loads(read("src/main/resources/assets/theoutlands/lang/en_us.json"))
     for name in assets:
         assert f"item.theoutlands.{name}" in lang, f"Missing localization: {name}"
