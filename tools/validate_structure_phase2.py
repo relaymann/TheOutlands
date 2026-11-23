@@ -18,7 +18,8 @@ BASE_STRUCTURES = {"cabin","tower","bunker","shrine","observatory","archive","re
 "apostle_cathedral","forsaken_settlement","last_outpost","forgotten_station","null_chamber",
 "hollow_crypt","boundary_monument"}
 NIGHTMARE_STRUCTURES = {"nightmare_containment","blood_moon_shrine","nightmare_outpost","black_site","nightmare_signal_hollow"}
-EXPLORATION_STRUCTURES = {"ranger_station","mining_operation","ruined_settlement","observation_tower","subterranean_complex"}\nSTRUCTURES = BASE_STRUCTURES | NIGHTMARE_STRUCTURES | EXPLORATION_STRUCTURES
+EXPLORATION_STRUCTURES = {"ranger_station","mining_operation","ruined_settlement","observation_tower","subterranean_complex"}
+STRUCTURES = BASE_STRUCTURES | NIGHTMARE_STRUCTURES | EXPLORATION_STRUCTURES
 
 def walk(value):
     if isinstance(value, dict):

@@ -46,7 +46,7 @@ public final class InvestigationToolItem extends Item {
                 mob -> mob.isAlive() && mob.getType().builtInRegistryHolder().unwrapKey()
                         .map(key -> key.location().getNamespace().equals(TheOutlands.MOD_ID)).orElse(false));
         if (mode == Mode.MOTION) nearby = nearby.stream()
-                .filter(mob -> mob.getDeltaMovement().horizontalDistanceSqr() > 0.0015D).toList();
+                .filter(mob -> mob.getDeltaMovement().lengthSqr() > 0.0015D).toList();
         float interference = 0.10F;
         if (level.isRainingAt(player.blockPosition())) interference += 0.10F;
         if (player.getY() < 0.0D) interference += 0.12F;
@@ -65,9 +65,13 @@ public final class InvestigationToolItem extends Item {
             }
             return;
         }
-        int limit = Math.min(3, nearby.size());
+        List<Mob> targets = new java.util.ArrayList<>(nearby);
+        int limit = Math.min(3, targets.size());
         for (int i = 0; i < limit; i++) {
-            Mob mob = nearby.get(player.getRandom().nextInt(nearby.size()));
+            int selected = i + player.getRandom().nextInt(targets.size() - i);
+            Mob mob = targets.get(selected);
+            targets.set(selected, targets.get(i));
+            targets.set(i, mob);
             emit(level, mob.blockPosition(), particle(), mode == Mode.CAMERA ? 5 : 2);
         }
         if (mode == Mode.RADIO || mode == Mode.ACOUSTIC || mode == Mode.ALARM)
