@@ -34,6 +34,14 @@ public final class NightmareBalancePolicy {
         return Math.max(1, (int) Math.round(baseDelayTicks / frequency));
     }
 
+    /** Keep a valid existing target; only missing, dead, or invalid player targets may be replaced. */
+    public static boolean shouldReplaceTarget(boolean hasTarget, boolean targetAlive,
+                                              boolean targetIsPlayer, boolean sameLevel,
+                                              boolean creative, boolean spectator) {
+        return !hasTarget || !targetAlive
+                || (targetIsPlayer && (!sameLevel || creative || spectator));
+    }
+
     /** A watcher freezes only when it is visible and the player is actually looking at it. */
     public static boolean watcherShouldFreeze(double distanceSquared, double lookDot, boolean lineOfSight) {
         return lineOfSight && Double.isFinite(distanceSquared) && Double.isFinite(lookDot)

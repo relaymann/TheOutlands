@@ -27,7 +27,7 @@ def main() -> None:
         assert name in items, f"Missing item registration: {name}"
     assert "OutlandsBlocks.BLOCKS.register(modEventBus)" in main_class
     assert "NightmareMode.isEnabled(level)" in ward and "InteractionResultHolder.fail(stack)" in ward
-    assert "hollowEncounter" in nightmare and "NIGHTMARE_FALSE_SURVIVOR" in nightmare
+    assert "hollowEncounter" in nightmare and "NIGHTMARE_FALSE_SURVIVOR" in nightmare\n    assert "NightmareBalancePolicy.shouldReplaceTarget" in nightmare\n    assert "ally.getTarget() != player" not in nightmare
     assert "coordinateNearbyPredators" in creature
     assert '"nightmare_signal_hollow"' in policy and "weights[23]" in policy
     assert 'case "nightmare_signal_hollow"' in feature and '"nightmare_signal_hollow"' in feature

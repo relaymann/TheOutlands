@@ -303,9 +303,12 @@ public final class NightmareModeManager {
                 candidate -> candidate.isAlive()
                         && candidate.getTags().contains("theoutlands_nightmare_spawn"))) {
             Mob target = ally.getTarget();
-            boolean targetUnavailable = target == null || !target.isAlive()
-                    || target instanceof ServerPlayer current
-                    && (current.isCreative() || current.isSpectator() || current.serverLevel() != level);
+            ServerPlayer targetPlayer = target instanceof ServerPlayer current ? current : null;
+            boolean targetUnavailable = NightmareBalancePolicy.shouldReplaceTarget(
+                    target != null, target == null || target.isAlive(), targetPlayer != null,
+                    targetPlayer == null || targetPlayer.serverLevel() == level,
+                    targetPlayer != null && targetPlayer.isCreative(),
+                    targetPlayer != null && targetPlayer.isSpectator());
             if (ally.distanceToSqr(player) <= 96.0D * 96.0D && targetUnavailable) {
                 ally.setTarget(player);
             }
