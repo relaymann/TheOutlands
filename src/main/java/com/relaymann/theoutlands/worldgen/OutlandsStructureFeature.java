@@ -54,10 +54,15 @@ public final class OutlandsStructureFeature {
                 case "blood_moon_shrine" -> bloodMoonShrine(level,coreX,surfaceY,coreZ,random);
                 case "nightmare_outpost" -> nightmareOutpost(level,coreX,surfaceY,coreZ,random);
                 case "black_site" -> blackSite(level,coreX,surfaceY,coreZ,random);
+                case "ranger_station" -> rangerStation(level,coreX,surfaceY,coreZ,random);
+                case "mining_operation" -> miningOperation(level,coreX,surfaceY,coreZ,random);
+                case "ruined_settlement" -> ruinedSettlement(level,coreX,surfaceY,coreZ,random);
+                case "observation_tower" -> observationTower(level,coreX,surfaceY,coreZ,random);
+                case "subterranean_complex" -> subterraneanComplex(level,coreX,surfaceY,coreZ,random);
                 default -> { return; }
             }
             expand(id,level,x,surfaceY,z);
-            hiddenCache(id,level,x,surfaceY,z,random);
+            if (!isNewExplorationSite(id)) hiddenCache(id,level,x,surfaceY,z,random);
             applyVariations(id,level,x,surfaceY,z,random);
             StructureInteriorDressing.apply(id,level,x,surfaceY,z,random,clip);
         } finally {
@@ -196,6 +201,77 @@ public final class OutlandsStructureFeature {
                     p(l,x+q[0],d+1,z+q[1],Blocks.REDSTONE_LAMP.defaultBlockState());
             }
         }
+    }
+
+    private static boolean isNewExplorationSite(String id) {
+        return id.equals("ranger_station") || id.equals("mining_operation")
+                || id.equals("ruined_settlement") || id.equals("observation_tower")
+                || id.equals("subterranean_complex");
+    }
+
+    private static void rangerStation(WorldGenLevel l,int x,int y,int z,RandomSource r) {
+        room(l,x+5,y,z+7,18,14,5,Blocks.SPRUCE_LOG.defaultBlockState(),Blocks.SPRUCE_PLANKS.defaultBlockState(),Blocks.SPRUCE_PLANKS.defaultBlockState());
+        room(l,x+27,y,z+8,12,10,4,Blocks.COBBLESTONE.defaultBlockState(),Blocks.COARSE_DIRT.defaultBlockState(),Blocks.SPRUCE_PLANKS.defaultBlockState());
+        p(l,x+13,y+1,z+7,Blocks.SPRUCE_DOOR.defaultBlockState());
+        p(l,x+9,y+1,z+10,Blocks.CARTOGRAPHY_TABLE.defaultBlockState());
+        p(l,x+18,y+1,z+16,Blocks.CAMPFIRE.defaultBlockState());
+        p(l,x+32,y+1,z+12,Blocks.BARREL.defaultBlockState());
+        watchPost(l,x+23,y,z+23);
+        pathX(l,x+19,y,z+23,15,Blocks.DIRT_PATH.defaultBlockState());
+    }
+
+    private static void miningOperation(WorldGenLevel l,int x,int y,int z,RandomSource r) {
+        int d=y-18;
+        room(l,x+3,d,z+4,18,15,5,Blocks.COBBLED_DEEPSLATE.defaultBlockState(),Blocks.POLISHED_DEEPSLATE.defaultBlockState(),Blocks.DEEPSLATE_BRICKS.defaultBlockState());
+        room(l,x+27,d,z+29,17,14,5,Blocks.DEEPSLATE_BRICKS.defaultBlockState(),Blocks.CRACKED_DEEPSLATE_BRICKS.defaultBlockState(),Blocks.DEEPSLATE_BRICKS.defaultBlockState());
+        hallX(l,x+18,d,z+22,12,Blocks.POLISHED_DEEPSLATE.defaultBlockState());
+        for(int i=0;i<28;i++) { p(l,x+10+i,d+1,z+22,Blocks.RAIL.defaultBlockState()); if(i%7==0) p(l,x+10+i,d+2,z+21,Blocks.CHAIN.defaultBlockState()); }
+        for(int h=1;h<18;h++) { air(l,x+23,y-h,z+23); if(h%2==0) p(l,x+22,y-h,z+23,Blocks.LADDER.defaultBlockState()); }
+        p(l,x+23,y-18,z+23,Blocks.RAIL.defaultBlockState());
+        p(l,x+8,d+1,z+8,Blocks.FURNACE.defaultBlockState());
+        p(l,x+11,d+1,z+8,Blocks.BARREL.defaultBlockState());
+        p(l,x+32,d+1,z+34,Blocks.COBWEB.defaultBlockState());
+        if(r.nextBoolean()) p(l,x+35,d+1,z+36,Blocks.TNT.defaultBlockState());
+    }
+
+    private static void ruinedSettlement(WorldGenLevel l,int x,int y,int z,RandomSource r) {
+        house(l,x+2,y,z+2); house(l,x+34,y,z+3); house(l,x+3,y,z+34);
+        room(l,x+34,y,z+34,10,8,3,Blocks.MOSSY_COBBLESTONE.defaultBlockState(),Blocks.COARSE_DIRT.defaultBlockState(),Blocks.AIR.defaultBlockState());
+        for(int i=0;i<26;i++) {
+            int px=x+4+r.nextInt(40), pz=z+4+r.nextInt(40);
+            if(r.nextBoolean()) p(l,px,y+1,pz,Blocks.COBWEB.defaultBlockState());
+            else p(l,px,y+1,pz,Blocks.MOSSY_COBBLESTONE.defaultBlockState());
+        }
+        well(l,x+21,y,z+21);
+        pathX(l,x+9,y,z+24,30,Blocks.COARSE_DIRT.defaultBlockState());
+        pathZ(l,x+24,y,z+9,30,Blocks.COARSE_DIRT.defaultBlockState());
+    }
+
+    private static void observationTower(WorldGenLevel l,int x,int y,int z,RandomSource r) {
+        for(int h=1;h<=18;h++) p(l,x+23,y+h,z+23,Blocks.SPRUCE_LOG.defaultBlockState().setValue(RotatedPillarBlock.AXIS,Direction.Axis.Y));
+        for(int a=-5;a<=5;a++) for(int b=-5;b<=5;b++) if(a*a+b*b<=25) {
+            p(l,x+23+a,y+12,z+23+b,Blocks.SPRUCE_PLANKS.defaultBlockState());
+            p(l,x+23+a,y+18,z+23+b,Blocks.SPRUCE_PLANKS.defaultBlockState());
+        }
+        for(int h=1;h<18;h++) p(l,x+24,y+h,z+23,Blocks.LADDER.defaultBlockState());
+        p(l,x+23,y+19,z+23,Blocks.BARREL.defaultBlockState());
+        for(int[] q:new int[][]{{-5,-5},{5,-5},{-5,5},{5,5}})
+            for(int h=1;h<=15;h++) p(l,x+23+q[0],y+h,z+23+q[1],Blocks.SPRUCE_LOG.defaultBlockState());
+    }
+
+    private static void subterraneanComplex(WorldGenLevel l,int x,int y,int z,RandomSource r) {
+        int d=y-26;
+        room(l,x+14,d,z+14,20,20,7,Blocks.POLISHED_DEEPSLATE.defaultBlockState(),Blocks.DEEPSLATE_TILES.defaultBlockState(),Blocks.DEEPSLATE_BRICKS.defaultBlockState());
+        room(l,x+2,d,z+17,10,12,5,Blocks.DEEPSLATE_BRICKS.defaultBlockState(),Blocks.CRACKED_DEEPSLATE_BRICKS.defaultBlockState(),Blocks.DEEPSLATE_BRICKS.defaultBlockState());
+        room(l,x+36,d,z+17,10,12,5,Blocks.DEEPSLATE_BRICKS.defaultBlockState(),Blocks.CRACKED_DEEPSLATE_BRICKS.defaultBlockState(),Blocks.DEEPSLATE_BRICKS.defaultBlockState());
+        hallX(l,x+12,d,z+23,24,Blocks.POLISHED_DEEPSLATE.defaultBlockState());
+        hallZ(l,x+23,d,z+12,24,Blocks.POLISHED_DEEPSLATE.defaultBlockState());
+        for(int i=0;i<8;i++) {
+            int px=x+18+r.nextInt(12), pz=z+18+r.nextInt(12);
+            p(l,px,d+1,pz,r.nextBoolean()?Blocks.IRON_BARS.defaultBlockState():Blocks.CHAIN.defaultBlockState());
+        }
+        for(int h=1;h<26;h++) { air(l,x+23,y-h,z+23); if(h%2==0) p(l,x+22,y-h,z+23,Blocks.LADDER.defaultBlockState()); }
+        p(l,x+23,d+1,z+23,Blocks.CRYING_OBSIDIAN.defaultBlockState());
     }
 
     private static void courtyard(WorldGenLevel l,int x,int y,int z,BlockState block) {

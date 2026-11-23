@@ -85,6 +85,11 @@ public final class StructureAmbienceManager {
             case "blood_moon_shrine" -> send(player,OutlandsSounds.STRUCTURE_SHRINE.get(),x,y,z,0.28F,0.42F);
             case "nightmare_outpost" -> send(player,OutlandsSounds.STRUCTURE_OUTPOST.get(),x,y,z,0.28F,0.52F);
             case "black_site" -> send(player,OutlandsSounds.STRUCTURE_NULL_CHAMBER.get(),x,y,z,0.16F,0.30F);
+            case "ranger_station" -> send(player,OutlandsSounds.STRUCTURE_CABIN.get(),x,y,z,0.18F,0.68F);
+            case "mining_operation" -> send(player,OutlandsSounds.STRUCTURE_BUNKER.get(),x,y,z,0.20F,0.38F);
+            case "ruined_settlement" -> send(player,OutlandsSounds.STRUCTURE_SETTLEMENT.get(),x,y,z,0.22F,0.72F);
+            case "observation_tower" -> send(player,OutlandsSounds.STRUCTURE_TOWER.get(),x,y,z,0.16F,0.62F);
+            case "subterranean_complex" -> send(player,OutlandsSounds.STRUCTURE_RESEARCH.get(),x,y,z,0.18F,0.40F);
             default -> { return; }
         }
     }
