@@ -31,6 +31,17 @@ class NightmareBalancePolicyTest {
     }
 
     @Test
+    void packCoordinationKeepsValidTargetsInMultiplayer() {
+        assertTrue(NightmareBalancePolicy.shouldReplaceTarget(false, false, false, true, false, false));
+        assertTrue(NightmareBalancePolicy.shouldReplaceTarget(true, false, true, true, false, false));
+        assertTrue(NightmareBalancePolicy.shouldReplaceTarget(true, true, true, true, true, false));
+        assertTrue(NightmareBalancePolicy.shouldReplaceTarget(true, true, true, false, false, false));
+        assertTrue(NightmareBalancePolicy.shouldReplaceTarget(true, true, true, true, false, true));
+        assertFalse(NightmareBalancePolicy.shouldReplaceTarget(true, true, true, true, false, false));
+        assertFalse(NightmareBalancePolicy.shouldReplaceTarget(true, true, false, true, false, false));
+    }
+
+    @Test
     void watcherOnlyFreezesWhenClearlyObserved() {
         assertTrue(NightmareBalancePolicy.watcherShouldFreeze(100.0D, 0.9D, true));
         assertFalse(NightmareBalancePolicy.watcherShouldFreeze(100.0D, 0.9D, false));
