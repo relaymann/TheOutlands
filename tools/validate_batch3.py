@@ -30,7 +30,7 @@ def main() -> None:
     assert "hollowEncounter" in nightmare and "NIGHTMARE_FALSE_SURVIVOR" in nightmare
     assert "NightmareBalancePolicy.shouldReplaceTarget" in nightmare
     assert "ally.getTarget() != player" not in nightmare
-    assert "NightmareBalancePolicy.shouldReplaceTarget" in nightmare\n    assert "ally.getTarget() != player" not in nightmare
+    assert "NightmareBalancePolicy.shouldReplaceTarget" in nightmare
     assert "coordinateNearbyPredators" in creature
     assert '"nightmare_signal_hollow"' in policy and "weights[23]" in policy
     assert 'case "nightmare_signal_hollow"' in feature and '"nightmare_signal_hollow"' in feature
