@@ -85,7 +85,12 @@ def main():
     assert "StructureEncounterManager.tick(level)" in server_events
     assert "addFreshEntity" not in piece and "StructureEncounterManager" not in piece
     layout_ids=set(re.findall(r'case "([a-z_]+)" ->',feature))
-    assert STRUCTURES<=layout_ids, f"missing layouts: {STRUCTURES-layout_ids}"\n    assert "nightmare_signal_hollow" in ambience and "case \\\"nightmare_signal_hollow\\\"" in ambience\n    for site in EXPLORATION_STRUCTURES | {"nightmare_signal_hollow"}:\n        assert site in feature.split("private static boolean isNewExplorationSite",1)[1].split("}",1)[0], f"{site}: must not receive hidden evidence caches"\n        assert f"case \\\"{site}\\\"" in ambience, f"{site}: missing subtle structure ambience"
+    assert STRUCTURES<=layout_ids, f"missing layouts: {STRUCTURES-layout_ids}"
+    assert 'case "nightmare_signal_hollow"' in ambience
+    for site in EXPLORATION_STRUCTURES | {"nightmare_signal_hollow"}:
+        predicate = feature.split("private static boolean isNewExplorationSite", 1)[1].split("}", 1)[0]
+        assert site in predicate, f"{site}: should not receive hidden evidence caches"
+        assert f'case "{site}"' in ambience, f"{site}: missing structure ambience
     nightmare_manager=(ROOT/"src/main/java/com/relaymann/theoutlands/event/NightmareModeManager.java").read_text(encoding="utf-8")
     assert "bloodMoon(player)" in nightmare_manager and "silence(player)" in nightmare_manager
     assert "unusualActivity(player)" in nightmare_manager and "containmentFailure(player)" in nightmare_manager
@@ -136,6 +141,6 @@ def main():
     assert not any("ocean" in b or b.endswith(":river") or b.endswith(":beach") for b in bt["values"])
     excluded=(":stony_shore",":dripstone_caves",":lush_caves",":deep_dark",":swamp",":mangrove_swamp")
     assert not any(b.endswith(s) for b in bt["values"] for s in excluded)
-    print(f"Validated {len(STRUCTURES)} layouts (including all Batch 2 and Nightmare sites), {len(expected)} loot tables, exploration cache exclusions, ambience, chunk clipping, placement, and encounter safeguards.")
+    print(f"Validated {len(STRUCTURES)} layouts, {len(expected)} loot tables, linked records, shared markings, chunk clipping, placement, ambience, and encounter safeguards.")
 
 if __name__=="__main__": main()
