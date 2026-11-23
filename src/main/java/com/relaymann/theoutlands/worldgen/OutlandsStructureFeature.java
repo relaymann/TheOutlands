@@ -226,7 +226,7 @@ public final class OutlandsStructureFeature {
         room(l,(x-19)+27,d,(z-19)+29,17,14,5,Blocks.DEEPSLATE_BRICKS.defaultBlockState(),Blocks.CRACKED_DEEPSLATE_BRICKS.defaultBlockState(),Blocks.DEEPSLATE_BRICKS.defaultBlockState());
         hallX(l,(x-19)+18,d,(z-19)+22,12,Blocks.POLISHED_DEEPSLATE.defaultBlockState());
         for(int i=0;i<28;i++) { p(l,(x-19)+10+i,d+1,(z-19)+22,Blocks.RAIL.defaultBlockState()); if(i%7==0) p(l,(x-19)+10+i,d+2,(z-19)+21,Blocks.CHAIN.defaultBlockState()); }
-        for(int h=1;h<12;h++) { air(l,(x-19)+23,y-h,(z-19)+23); if(h%2==0) p(l,(x-19)+22,y-h,(z-19)+23,Blocks.LADDER.defaultBlockState()); }
+        for(int h=1;h<18;h++) { air(l,(x-19)+23,y-h,(z-19)+23); if(h%2==0) p(l,(x-19)+22,y-h,(z-19)+23,Blocks.LADDER.defaultBlockState()); }
         p(l,(x-19)+23,y-18,(z-19)+23,Blocks.RAIL.defaultBlockState());
         p(l,(x-19)+8,d+1,(z-19)+8,Blocks.FURNACE.defaultBlockState());
         p(l,(x-19)+11,d+1,(z-19)+8,Blocks.BARREL.defaultBlockState());
@@ -458,7 +458,7 @@ public final class OutlandsStructureFeature {
         // A handful of deterministic signs of age; all writes remain inside the structure clip.
         int floorY=switch(id) {
             case "bunker" -> y-14; case "archive" -> y-27; case "research_facility" -> y-12;
-            case "forgotten_station" -> y-10; case "null_chamber" -> y-20; case "hollow_crypt" -> y-24;
+            case "forgotten_station" -> y-10; case "null_chamber" -> y-20; case "hollow_crypt" -> y-24; case "mining_operation" -> y-18; case "subterranean_complex" -> y-26;
             default -> y;
         };
         for(int i=0;i<5;i++) {
