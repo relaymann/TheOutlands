@@ -90,7 +90,7 @@ def main():
     for site in EXPLORATION_STRUCTURES | {"nightmare_signal_hollow"}:
         predicate = feature.split("private static boolean isNewExplorationSite", 1)[1].split("}", 1)[0]
         assert site in predicate, f"{site}: should not receive hidden evidence caches"
-        assert f'case "{site}"' in ambience, f"{site}: missing structure ambience
+        assert f'case "{site}"' in ambience, f"{site}: missing structure ambience"
     nightmare_manager=(ROOT/"src/main/java/com/relaymann/theoutlands/event/NightmareModeManager.java").read_text(encoding="utf-8")
     assert "bloodMoon(player)" in nightmare_manager and "silence(player)" in nightmare_manager
     assert "unusualActivity(player)" in nightmare_manager and "containmentFailure(player)" in nightmare_manager
