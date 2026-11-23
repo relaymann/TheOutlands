@@ -50,6 +50,10 @@ def main() -> None:
         if name == "reinforced_door":
             models = {entry["model"] for entry in state_data["variants"].values()}
             assert models == {"minecraft:block/iron_door_bottom", "minecraft:block/iron_door_top"}
+    for shield in ("reinforced_shield", "nightmare_ward"):
+        shield_model = json.loads(read(f"src/main/resources/assets/theoutlands/models/item/{shield}.json"))
+        assert shield_model.get("parent") == "builtin/entity", f"{shield}: shield needs the built-in entity model"
+        assert shield_model.get("textures", {}).get("particle") == "minecraft:entity/shield_base_nopattern"
     lang = json.loads(read("src/main/resources/assets/theoutlands/lang/en_us.json"))
     for name in assets:
         assert f"item.theoutlands.{name}" in lang, f"Missing localization: {name}"
