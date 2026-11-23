@@ -302,10 +302,16 @@ public final class NightmareModeManager {
                 player.getBoundingBox().inflate(160.0D),
                 candidate -> candidate.isAlive()
                         && candidate.getTags().contains("theoutlands_nightmare_spawn"))) {
-            if (ally.distanceToSqr(player) <= 96.0D * 96.0D && ally.getTarget() != player) {
+            Mob target = ally.getTarget();
+            boolean targetUnavailable = target == null || !target.isAlive()
+                    || target instanceof ServerPlayer current
+                    && (current.isCreative() || current.isSpectator() || current.serverLevel() != level);
+            if (ally.distanceToSqr(player) <= 96.0D * 96.0D && targetUnavailable) {
                 ally.setTarget(player);
             }
-            updatePursuitMemory(ally, player);
+            if (ally.getTarget() == null || ally.getTarget() == player) {
+                updatePursuitMemory(ally, player);
+            }
         }
     }
 
