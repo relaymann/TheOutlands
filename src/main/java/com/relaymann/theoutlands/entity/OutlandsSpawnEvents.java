@@ -95,11 +95,11 @@ public final class OutlandsSpawnEvents {
         double minimumDistance = profile.minimumDistance();
         int denominator = profile.rarityMultiplier();
         if (nightmare) {
-            double distanceScale = type == OutlandsEntities.DEATH.get() ? 0.25D
-                    : type == OutlandsEntities.FEAR.get() ? 0.22D
-                    : type == OutlandsEntities.COLOSSUS.get() ? 0.15D : 0.10D;
-            minimumDistance *= distanceScale;
-            denominator = Math.max(1, (int) Math.ceil(denominator / 3.0D));
+            // Preserve each creature's intended territory while maintaining a
+            // 900-block opening buffer around world spawn. Nightmare rarity is
+            // intentionally not divided down: doing so caused early mob floods.
+            minimumDistance = com.relaymann.theoutlands.NightmareBalancePolicy
+                    .nightmareMinimumSpawnDistance(minimumDistance);
         }
         if (distance < minimumDistance) return false;
 

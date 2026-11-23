@@ -13,6 +13,16 @@ class NightmareBalancePolicyTest {
     }
 
     @Test
+    void nightmareNaturalSpawnsKeepAnOpeningBufferWithoutErasingTerritoryProgression() {
+        assertEquals(900.0D, NightmareBalancePolicy.nightmareMinimumSpawnDistance(250.0D));
+        assertEquals(1_275.0D, NightmareBalancePolicy.nightmareMinimumSpawnDistance(1_500.0D));
+        assertEquals(12_750.0D, NightmareBalancePolicy.nightmareMinimumSpawnDistance(15_000.0D));
+        assertTrue(NightmareBalancePolicy.canStartNightmareSpawnEvent(900.0D));
+        assertFalse(NightmareBalancePolicy.canStartNightmareSpawnEvent(899.9D));
+        assertFalse(NightmareBalancePolicy.canStartNightmareSpawnEvent(Double.NaN));
+    }
+
+    @Test
     void encounterBudgetsRiseMonotonically() {
         assertTrue(NightmareBalancePolicy.entityCap(0L, 25_000.0D)
                 > NightmareBalancePolicy.entityCap(0L, 0.0D));

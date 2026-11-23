@@ -18,12 +18,24 @@ public final class NightmareBalancePolicy {
         return Math.max(ageTier, distanceTier);
     }
 
+    /** Keep the opening area tense but prevent natural Nightmare spawns at the world start. */
+    public static double nightmareMinimumSpawnDistance(double normalMinimumDistance) {
+        double safeMinimum = Double.isFinite(normalMinimumDistance)
+                ? Math.max(0.0D, normalMinimumDistance) : 0.0D;
+        return Math.max(900.0D, safeMinimum * 0.85D);
+    }
+
+    /** Event director encounters should happen after players have left the starting region. */
+    public static boolean canStartNightmareSpawnEvent(double distanceFromSpawn) {
+        return Double.isFinite(distanceFromSpawn) && distanceFromSpawn >= 900.0D;
+    }
+
     public static int entityCap(long dayTime, double distanceFromSpawn) {
-        return 16 + pressureTier(dayTime, distanceFromSpawn) * 4;
+        return 12 + pressureTier(dayTime, distanceFromSpawn) * 3;
     }
 
     public static int threatBudget(long dayTime, double distanceFromSpawn) {
-        return 28 + pressureTier(dayTime, distanceFromSpawn) * 9;
+        return 24 + pressureTier(dayTime, distanceFromSpawn) * 8;
     }
 
     /** Scale event pacing by the configured frequency while keeping invalid values safe. */

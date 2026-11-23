@@ -228,7 +228,10 @@ public final class NightmareModeManager {
 
     private static void spawnThreats(ServerPlayer player, int count, boolean empowered) {
         List<net.minecraft.world.entity.EntityType<? extends Mob>> threats = threatTypes();
-        for (int i = 0; i < count; i++) {
+        // Keep group encounters dangerous without allowing a single event to dump
+        // a large pack on the player at once.
+        int boundedCount = Math.min(2, Math.max(0, count));
+        for (int i = 0; i < boundedCount; i++) {
             spawnThreat(player, threats.get(player.getRandom().nextInt(threats.size())), empowered);
         }
     }
@@ -237,8 +240,15 @@ public final class NightmareModeManager {
                                     net.minecraft.world.entity.EntityType<? extends Mob> type,
                                     boolean empowered) {
         ServerLevel level = player.serverLevel();
+        double spawnDx = player.getX() - level.getSharedSpawnPos().getX();
+        double spawnDz = player.getZ() - level.getSharedSpawnPos().getZ();
+        double distanceFromSpawn = Math.hypot(spawnDx, spawnDz);
+        if (!NightmareBalancePolicy.canStartNightmareSpawnEvent(distanceFromSpawn)) return;
+
         double angle = player.getRandom().nextDouble() * Math.PI * 2.0D;
-        double distance = 22.0D + player.getRandom().nextDouble() * 15.0D;
+        // Spawn outside immediate combat range so the encounter approaches
+        // instead of materializing almost on top of the player.
+        double distance = 40.0D + player.getRandom().nextDouble() * 16.0D;
         int x = net.minecraft.util.Mth.floor(player.getX() + Math.cos(angle) * distance);
         int z = net.minecraft.util.Mth.floor(player.getZ() + Math.sin(angle) * distance);
         BlockPos column = new BlockPos(x, net.minecraft.util.Mth.floor(player.getY()), z);
@@ -253,7 +263,7 @@ public final class NightmareModeManager {
         int activePack = level.getEntitiesOfClass(Mob.class, player.getBoundingBox().inflate(128.0D),
                 candidate -> candidate.isAlive()
                         && candidate.getTags().contains("theoutlands_nightmare_spawn")).size();
-        if (activePack >= 18) return;
+        if (activePack >= 10) return;
 
         Mob mob = type.create(level);
         if (mob == null) return;

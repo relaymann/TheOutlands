@@ -29,6 +29,11 @@ def main() -> None:
     assert "NightmareMode.isEnabled(level)" in ward and "InteractionResultHolder.fail(stack)" in ward
     assert "hollowEncounter" in nightmare and "NIGHTMARE_FALSE_SURVIVOR" in nightmare
     assert "NightmareBalancePolicy.shouldReplaceTarget" in nightmare
+    assert "NightmareBalancePolicy.canStartNightmareSpawnEvent" in nightmare
+    assert "Math.min(2, Math.max(0, count))" in nightmare
+    balance = read("src/main/java/com/relaymann/theoutlands/NightmareBalancePolicy.java")
+    assert "nightmareMinimumSpawnDistance" in balance
+    assert "return 12 + pressureTier(dayTime, distanceFromSpawn) * 3;" in balance
     assert "ally.getTarget() != player" not in nightmare
     assert "NightmareBalancePolicy.shouldReplaceTarget" in nightmare
     assert "coordinateNearbyPredators" in creature
