@@ -98,4 +98,14 @@ class OutlandsStructureSelectionTest {
         }
         assertTrue(foundNightmareSite, "Expected the NIGHTMARE-only hollow to be selectable");
     }
+
+    @Test
+    void layoutSelectionRejectsInvalidNumericInputs() {
+        assertNull(StructureLayoutPolicy.chooseLayout(1L, Double.NaN, true, 1_000.0D, 1.0D));
+        assertNull(StructureLayoutPolicy.chooseLayout(1L, Double.POSITIVE_INFINITY, true, 1_000.0D, 1.0D));
+        assertNull(StructureLayoutPolicy.chooseLayout(1L, -1.0D, true, 1_000.0D, 1.0D));
+        assertNull(StructureLayoutPolicy.chooseLayout(1L, 5_000.0D, true, Double.NaN, 1.0D));
+        assertNull(StructureLayoutPolicy.chooseLayout(1L, 5_000.0D, true, 1_000.0D, Double.NaN));
+        assertNull(StructureLayoutPolicy.chooseLayout(1L, 5_000.0D, true, 1_000.0D, Double.POSITIVE_INFINITY));
+    }
 }
