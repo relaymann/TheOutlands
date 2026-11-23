@@ -9,7 +9,7 @@ ECOSYSTEM = (ROOT / "src/main/java/com/relaymann/theoutlands/event/OutlandsEcosy
 TRACE = (ROOT / "src/main/java/com/relaymann/theoutlands/event/EntityTraceManager.java").read_text()
 
 for token in ("extends SavedData", "getDataStorage().computeIfAbsent", "MAX_RECORDS",
-              "rememberSighting", "investigateRememberedSite", "shiftTerritoryTowardActivity",
+              "rememberSighting", "investigateRememberedSite", "renderRememberedEvidence", "shiftTerritoryTowardActivity",
               "reactToDoorsLightsTrapsAndDefenses", '"hide"', '"encounter"', '"trap"',
               '"defense"', '"light"', "ENTITY_MEMORY_LIFETIME", "level.isLoaded"):
     assert token in MEMORY, f"Batch 1 world-memory feature missing: {token}"
@@ -24,4 +24,7 @@ for token in ("HunterEntity && b instanceof StalkerEntity",
     assert token in ECOSYSTEM, f"Compatible entity interaction missing: {token}"
 
 assert "NEXT_TRACE" in TRACE and "CRIT" in TRACE and "BlockParticleOption" in TRACE
-print("Batch 1 world memory, hazard awareness, entity cooperation, traces, and rare environmental events validated.")
+DRESSING = (ROOT / "src/main/java/com/relaymann/theoutlands/worldgen/StructureInteriorDressing.java").read_text()
+assert "-> 22" in DRESSING
+assert "CARTOGRAPHY_TABLE" in DRESSING and "COMPOSTER" in DRESSING and "MOSS_CARPET" in DRESSING
+print("Batch 1 world memory, hazard awareness, entity cooperation, traces, structures, and rare environmental events validated.")

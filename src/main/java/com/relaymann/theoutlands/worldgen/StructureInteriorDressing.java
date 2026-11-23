@@ -7,7 +7,7 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 
-/** Small, deterministic interior dressing pass shared by all eighteen sites. */
+/** Deterministic interior dressing that adds lived-in and abandoned detail without changing terrain. */
 public final class StructureInteriorDressing {
     private StructureInteriorDressing() {}
 
@@ -23,7 +23,13 @@ public final class StructureInteriorDressing {
             default -> surfaceY;
         };
 
-        int detailCount = id.equals("forsaken_settlement") || id.equals("last_outpost") ? 12 : 5;
+        int detailCount = switch (id) {
+            case "forsaken_settlement", "last_outpost" -> 22;
+            case "research_facility", "bunker", "forgotten_station" -> 14;
+            case "archive", "hollow_crypt", "apostle_cathedral" -> 12;
+            case "shrine", "null_chamber", "boundary_monument" -> 9;
+            default -> 8;
+        };
         for (int i = 0; i < detailCount; i++) {
             int px = x + 17 + random.nextInt(14);
             int pz = z + 17 + random.nextInt(14);
@@ -33,32 +39,42 @@ public final class StructureInteriorDressing {
                     || !level.getBlockState(pos.below()).isFaceSturdy(level, pos.below(), Direction.UP)) continue;
 
             var detail = switch (id) {
-                case "archive" -> switch (random.nextInt(4)) {
+                case "archive" -> switch (random.nextInt(6)) {
                     case 0 -> Blocks.BOOKSHELF.defaultBlockState();
                     case 1 -> Blocks.LECTERN.defaultBlockState();
                     case 2 -> Blocks.COBWEB.defaultBlockState();
-                    default -> Blocks.BARREL.defaultBlockState();
+                    case 3 -> Blocks.BARREL.defaultBlockState();
+                    case 4 -> Blocks.CANDLE.defaultBlockState();
+                    default -> Blocks.MOSS_CARPET.defaultBlockState();
                 };
-                case "research_facility" -> switch (random.nextInt(4)) {
+                case "research_facility" -> switch (random.nextInt(7)) {
                     case 0 -> Blocks.IRON_BARS.defaultBlockState();
                     case 1 -> Blocks.BARREL.defaultBlockState();
                     case 2 -> Blocks.LECTERN.defaultBlockState();
-                    default -> Blocks.COBWEB.defaultBlockState();
+                    case 3 -> Blocks.COBWEB.defaultBlockState();
+                    case 4 -> Blocks.CAULDRON.defaultBlockState();
+                    case 5 -> Blocks.BLAST_FURNACE.defaultBlockState();
+                    default -> Blocks.CHAIN.defaultBlockState();
                 };
                 case "apostle_cathedral", "shrine", "null_chamber", "boundary_monument" ->
-                        switch (random.nextInt(4)) {
+                        switch (random.nextInt(6)) {
                             case 0 -> Blocks.CRYING_OBSIDIAN.defaultBlockState();
                             case 1 -> Blocks.CHAIN.defaultBlockState();
                             case 2 -> Blocks.SOUL_LANTERN.defaultBlockState();
-                            default -> Blocks.CRACKED_STONE_BRICKS.defaultBlockState();
+                            case 3 -> Blocks.CRACKED_STONE_BRICKS.defaultBlockState();
+                            case 4 -> Blocks.CANDLE.defaultBlockState();
+                            default -> Blocks.MOSSY_STONE_BRICKS.defaultBlockState();
                         };
-                case "bunker", "forgotten_station" -> switch (random.nextInt(4)) {
+                case "bunker", "forgotten_station" -> switch (random.nextInt(7)) {
                     case 0 -> Blocks.IRON_BARS.defaultBlockState();
                     case 1 -> Blocks.BARREL.defaultBlockState();
                     case 2 -> Blocks.COBWEB.defaultBlockState();
-                    default -> Blocks.CRACKED_DEEPSLATE_BRICKS.defaultBlockState();
+                    case 3 -> Blocks.CRACKED_DEEPSLATE_BRICKS.defaultBlockState();
+                    case 4 -> Blocks.CHAIN.defaultBlockState();
+                    case 5 -> Blocks.SMOKER.defaultBlockState();
+                    default -> Blocks.CAULDRON.defaultBlockState();
                 };
-                case "forsaken_settlement", "settlement", "last_outpost", "outpost" -> switch (random.nextInt(12)) {
+                case "forsaken_settlement", "settlement", "last_outpost", "outpost" -> switch (random.nextInt(16)) {
                     case 0 -> Blocks.CHEST.defaultBlockState();
                     case 1 -> Blocks.CRAFTING_TABLE.defaultBlockState();
                     case 2 -> Blocks.CAMPFIRE.defaultBlockState();
@@ -70,19 +86,27 @@ public final class StructureInteriorDressing {
                     case 8 -> Blocks.CRACKED_STONE_BRICKS.defaultBlockState();
                     case 9 -> Blocks.MOSSY_COBBLESTONE.defaultBlockState();
                     case 10 -> Blocks.BONE_BLOCK.defaultBlockState();
-                    default -> Blocks.TORCH.defaultBlockState();
+                    case 11 -> Blocks.TORCH.defaultBlockState();
+                    case 12 -> Blocks.CARTOGRAPHY_TABLE.defaultBlockState();
+                    case 13 -> Blocks.COMPOSTER.defaultBlockState();
+                    case 14 -> Blocks.GRINDSTONE.defaultBlockState();
+                    default -> Blocks.DEAD_BUSH.defaultBlockState();
                 };
-                case "hollow_crypt" -> switch (random.nextInt(4)) {
+                case "hollow_crypt" -> switch (random.nextInt(6)) {
                     case 0 -> Blocks.BONE_BLOCK.defaultBlockState();
                     case 1 -> Blocks.COBWEB.defaultBlockState();
                     case 2 -> Blocks.SOUL_LANTERN.defaultBlockState();
-                    default -> Blocks.CRACKED_DEEPSLATE_BRICKS.defaultBlockState();
+                    case 3 -> Blocks.CRACKED_DEEPSLATE_BRICKS.defaultBlockState();
+                    case 4 -> Blocks.CHAIN.defaultBlockState();
+                    default -> Blocks.DEAD_BUSH.defaultBlockState();
                 };
-                default -> switch (random.nextInt(4)) {
+                default -> switch (random.nextInt(6)) {
                     case 0 -> Blocks.BARREL.defaultBlockState();
                     case 1 -> Blocks.COBWEB.defaultBlockState();
                     case 2 -> Blocks.BOOKSHELF.defaultBlockState();
-                    default -> Blocks.LANTERN.defaultBlockState();
+                    case 3 -> Blocks.LANTERN.defaultBlockState();
+                    case 4 -> Blocks.MOSS_CARPET.defaultBlockState();
+                    default -> Blocks.CANDLE.defaultBlockState();
                 };
             };
             level.setBlock(pos, detail, 2);

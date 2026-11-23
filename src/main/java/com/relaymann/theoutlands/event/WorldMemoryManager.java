@@ -3,6 +3,8 @@ package com.relaymann.theoutlands.event;
 import com.relaymann.theoutlands.OutlandsConfig;
 import com.relaymann.theoutlands.TheOutlands;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -17,7 +19,6 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
@@ -144,6 +145,7 @@ public final class WorldMemoryManager {
                 reactToDoorsLightsTrapsAndDefenses(mob, level, memory);
                 shiftTerritoryTowardActivity(mob, level, memory, now);
             }
+            renderRememberedEvidence(player, level, memory, now);
         }
         if (now % 1_200L == 0L) memory.prune(level.dimension().location().toString(), now);
     }
@@ -163,7 +165,7 @@ public final class WorldMemoryManager {
     }
 
     private static void investigateRememberedSite(Mob mob, ServerLevel level, MemoryData memory, long now) {
-        if (!mob.getNavigation().isDone() || mob.tickCount % 100 != 0) return;
+        if (mob.getTarget() != null || !mob.getNavigation().isDone() || mob.tickCount % 100 != 0) return;
         CompoundTag tag = mob.getPersistentData();
         String dimension = level.dimension().location().toString();
         long lastSeen = tag.getLong(ROOT + "_last_seen");
@@ -187,7 +189,7 @@ public final class WorldMemoryManager {
     }
 
     private static void reactToDoorsLightsTrapsAndDefenses(Mob mob, ServerLevel level, MemoryData memory) {
-        if (!mob.getNavigation().isDone() || mob.tickCount % 60 != 0) return;
+        if (mob.tickCount % 60 != 0) return;
         if (mob.getTarget() != null) {
             Record obstacle = memory.nearest(level, mob.blockPosition(), "trap", 7.0D);
             if (obstacle == null) obstacle = memory.nearest(level, mob.blockPosition(), "defense", 5.0D);
@@ -203,6 +205,7 @@ public final class WorldMemoryManager {
             }
             return;
         }
+        if (!mob.getNavigation().isDone()) return;
         String entityId = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE
                 .getKey(mob.getType()).getPath();
         if (!(entityId.contains("stalker") || entityId.contains("lurker")
@@ -214,6 +217,29 @@ public final class WorldMemoryManager {
         Vec3 shadow = mob.position().add(away.normalize().scale(6.0D));
         if (level.isLoaded(BlockPos.containing(shadow))) {
             mob.getNavigation().moveTo(shadow.x, shadow.y, shadow.z, 0.68D);
+        }
+    }
+
+    private static void renderRememberedEvidence(ServerPlayer player, ServerLevel level, MemoryData memory, long now) {
+        if (now % 200L != 0L || player.getRandom().nextInt(4) != 0) return;
+        Record clue = memory.nearestEvidence(level, player.blockPosition(), 30.0D);
+        if (clue == null) return;
+        if (clue.kind().equals("door")) {
+            level.sendParticles(player, ParticleTypes.CRIT, true,
+                    clue.pos().getX() + 0.5D, clue.pos().getY() + 0.85D, clue.pos().getZ() + 0.5D,
+                    3, 0.18D, 0.12D, 0.18D, 0.01D);
+            return;
+        }
+        BlockPos ground = clue.pos().below();
+        var state = level.getBlockState(ground);
+        if (!state.isAir() && state.getRenderShape() != net.minecraft.world.level.block.RenderShape.INVISIBLE) {
+            level.sendParticles(player, new BlockParticleOption(ParticleTypes.BLOCK, state), true,
+                    clue.pos().getX() + 0.5D, clue.pos().getY() + 0.06D, clue.pos().getZ() + 0.5D,
+                    3, 0.18D, 0.025D, 0.18D, 0.015D);
+        } else {
+            level.sendParticles(player, ParticleTypes.ASH, true,
+                    clue.pos().getX() + 0.5D, clue.pos().getY() + 0.12D, clue.pos().getZ() + 0.5D,
+                    2, 0.16D, 0.04D, 0.16D, 0.001D);
         }
     }
 
@@ -249,13 +275,6 @@ public final class WorldMemoryManager {
     private static void record(ServerLevel level, BlockPos pos, String kind, int strength) {
         data(level).add(level.dimension().location().toString(), pos.immutable(), kind,
                 level.getGameTime(), strength);
-    }
-
-    @SubscribeEvent
-    public static void onLogout(PlayerEvent.PlayerLoggedOutEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
-            player.getPersistentData().remove(ROOT + "_hide_cooldown");
-        }
     }
 
     private record Record(String dimension, BlockPos pos, String kind, long time, int pressure) {}
@@ -301,6 +320,17 @@ public final class WorldMemoryManager {
             double max = range * range;
             return records.stream().filter(record -> record.dimension().equals(dimension)
                             && record.kind().equals(kind) && level.getGameTime() - record.time() <= RECORD_LIFETIME
+                            && record.pos().distSqr(origin) <= max && level.isLoaded(record.pos()))
+                    .min(Comparator.comparingDouble(record -> record.pos().distSqr(origin))).orElse(null);
+        }
+
+        private Record nearestEvidence(ServerLevel level, BlockPos origin, double range) {
+            String dimension = level.dimension().location().toString();
+            double max = range * range;
+            return records.stream().filter(record -> record.dimension().equals(dimension)
+                            && (record.kind().equals("encounter") || record.kind().equals("hide")
+                            || record.kind().equals("door") || record.kind().equals("disturbance"))
+                            && level.getGameTime() - record.time() <= RECORD_LIFETIME
                             && record.pos().distSqr(origin) <= max && level.isLoaded(record.pos()))
                     .min(Comparator.comparingDouble(record -> record.pos().distSqr(origin))).orElse(null);
         }
