@@ -3,8 +3,10 @@ package com.relaymann.theoutlands.event;
 import com.relaymann.theoutlands.OutlandsConfig;
 import com.relaymann.theoutlands.sound.OutlandsSounds;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.game.ClientboundSoundPacket;
+import net.minecraft.network.protocol.game.ClientboundStopSoundPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -16,10 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * Rare, diegetic environmental cues. These are sent only to the affected player:
- * no chat narration, entity spawning, forced movement, block edits, or fake terrain.
- */
+/** Rare, diegetic environmental cues sent only to the affected player. */
 public final class EnvironmentalAnomalyManager {
     private static final int CHECK_INTERVAL = 20;
     private static final int BASE_CHANCE_DENOMINATOR = 240;
@@ -34,18 +33,14 @@ public final class EnvironmentalAnomalyManager {
                 || !OutlandsConfig.AMBIENT_ANOMALIES_ENABLED.get()
                 || !OutlandsConfig.HORROR_AUDIO_ENABLED.get()
                 || level.getGameTime() % CHECK_INTERVAL != 0L) return;
-
         long now = level.getGameTime();
         for (ServerPlayer player : level.players()) {
             if (!eligible(player) || !farEnoughFromSpawn(level, player)) continue;
-
             long nextAllowed = NEXT_ALLOWED.getOrDefault(player.getUUID(), 0L);
             if (now < nextAllowed) continue;
-
             int denominator = Math.max(80, (int) Math.round(
                     BASE_CHANCE_DENOMINATOR / OutlandsConfig.EVENT_FREQUENCY.get()));
             if (player.getRandom().nextInt(denominator) != 0) continue;
-
             playOne(player);
             NEXT_ALLOWED.put(player.getUUID(), now + MIN_COOLDOWN
                     + player.getRandom().nextInt((int) COOLDOWN_VARIANCE));
@@ -71,9 +66,8 @@ public final class EnvironmentalAnomalyManager {
         double x = player.getX() + Math.cos(angle) * distance;
         double z = player.getZ() + Math.sin(angle) * distance;
         double y = player.getY();
-        switch (player.getRandom().nextInt(7)) {
+        switch (player.getRandom().nextInt(9)) {
             case 0 -> {
-                // A short pair of steps, far enough away to invite a look without starting a chase.
                 send(player, SoundEvents.GRAVEL_STEP, SoundSource.BLOCKS, x, y, z,
                         0.16F, 0.62F + player.getRandom().nextFloat() * 0.22F);
                 send(player, SoundEvents.GRASS_STEP, SoundSource.BLOCKS, x + 1.15D, y, z + 0.7D,
@@ -90,24 +84,37 @@ public final class EnvironmentalAnomalyManager {
             case 3 -> send(player, OutlandsSounds.STALKER_BREATH.get(), SoundSource.AMBIENT,
                     x, y + 1.0D, z, 0.075F, 0.62F + player.getRandom().nextFloat() * 0.16F);
             case 4 -> {
-                // A faint scrape several blocks above the listener, most effective in caves.
                 double aboveY = Math.min(player.level().getMaxBuildHeight() - 2.0D, player.getY() + 5.0D);
-                send(player, SoundEvents.GRAVEL_STEP, SoundSource.BLOCKS,
-                        x, aboveY, z, 0.11F, 0.48F);
+                send(player, SoundEvents.GRAVEL_STEP, SoundSource.BLOCKS, x, aboveY, z, 0.11F, 0.48F);
                 send(player, SoundEvents.AMBIENT_CAVE.value(), SoundSource.AMBIENT,
                         x + 1.0D, aboveY, z - 1.0D, 0.07F, 0.52F);
             }
             case 5 -> send(player, OutlandsSounds.DREDGE_CRAWL.get(), SoundSource.AMBIENT,
                     x, y - 1.0D, z, 0.09F, 0.55F);
             case 6 -> {
-                // Two quiet knocks from a single distant direction, not a repeating event loop.
-                send(player, SoundEvents.WOODEN_DOOR_CLOSE, SoundSource.BLOCKS,
-                        x, y, z, 0.12F, 0.72F);
+                send(player, SoundEvents.WOODEN_DOOR_CLOSE, SoundSource.BLOCKS, x, y, z, 0.12F, 0.72F);
                 send(player, SoundEvents.WOODEN_DOOR_CLOSE, SoundSource.BLOCKS,
                         x + 0.28D, y, z + 0.18D, 0.09F, 0.82F);
             }
-            default -> send(player, SoundEvents.GRAVEL_STEP, SoundSource.BLOCKS,
-                    x, y, z, 0.09F, 0.42F);
+            case 7 -> {
+                // A brief, player-local interruption: no world weather or blocks are changed.
+                player.connection.send(new ClientboundStopSoundPacket(null, SoundSource.AMBIENT));
+                player.connection.send(new ClientboundStopSoundPacket(null, SoundSource.WEATHER));
+                player.serverLevel().sendParticles(player, ParticleTypes.ASH, true,
+                        player.getX(), player.getY() + 1.0D, player.getZ(),
+                        8, 0.45D, 0.55D, 0.45D, 0.001D);
+            }
+            case 8 -> {
+                // Distant thunder-like sound suggests a storm without changing server weather.
+                double stormX = player.getX() + Math.cos(angle) * 42.0D;
+                double stormZ = player.getZ() + Math.sin(angle) * 42.0D;
+                send(player, SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.WEATHER,
+                        stormX, y + 12.0D, stormZ, 0.10F, 0.58F);
+                player.serverLevel().sendParticles(player, ParticleTypes.ASH, true,
+                        player.getX(), player.getY() + 2.0D, player.getZ(),
+                        4, 0.35D, 0.45D, 0.35D, 0.001D);
+            }
+            default -> send(player, SoundEvents.GRAVEL_STEP, SoundSource.BLOCKS, x, y, z, 0.09F, 0.42F);
         }
     }
 
@@ -118,11 +125,6 @@ public final class EnvironmentalAnomalyManager {
                 x, y, z, volume, pitch, player.getRandom().nextLong()));
     }
 
-    public static void clear(ServerPlayer player) {
-        NEXT_ALLOWED.remove(player.getUUID());
-    }
-
-    public static void clear() {
-        NEXT_ALLOWED.clear();
-    }
+    public static void clear(ServerPlayer player) { NEXT_ALLOWED.remove(player.getUUID()); }
+    public static void clear() { NEXT_ALLOWED.clear(); }
 }
