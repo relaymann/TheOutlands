@@ -24,7 +24,7 @@ def main() -> None:
     lang = json.loads(read("src/main/resources/assets/theoutlands/lang/en_us.json"))
     for name in names:
         assert f"item.theoutlands.{name}" in lang
-    assert "case Mode.MOTION" in tools and "lengthSqr() > 0.0015D" in tools
+    assert "if (mode == Mode.MOTION)" in tools and "lengthSqr() > 0.0015D" in tools
     assert "new java.util.ArrayList<>(nearby)" in tools
     assert "interference" in tools and "isRainingAt" in tools
     assert "The Outlands" not in tools and "written_book_content" not in tools
