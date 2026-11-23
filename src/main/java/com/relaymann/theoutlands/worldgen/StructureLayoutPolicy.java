@@ -21,7 +21,7 @@ public final class StructureLayoutPolicy {
 
     public static String chooseLayout(long seed, double distance, boolean forest,
                                       double configuredMinimum, double multiplier, boolean nightmare) {
-        if (!Double.isFinite(distance) || distance < configuredMinimum || multiplier <= 0.0D) return null;
+        if (!Double.isFinite(distance) || distance < 0.0D || !Double.isFinite(configuredMinimum)\n                || distance < configuredMinimum || !Double.isFinite(multiplier) || multiplier <= 0.0D) return null;
         double scale = StructurePlacementPolicy.CELL_CHUNKS * StructurePlacementPolicy.CELL_CHUNKS;
         double[] weights = new double[IDS.length];
         weights[0] = forest ? weight(distance, 1_000, 5_500, multiplier, scale) : 0;

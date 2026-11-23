@@ -9,11 +9,11 @@ public final class NightmareBalancePolicy {
         long days = Math.max(0L, dayTime) / 24_000L;
         int ageTier = days >= 56 ? 5 : days >= 28 ? 4 : days >= 14 ? 3
                 : days >= 7 ? 2 : days >= 3 ? 1 : 0;
-        int distanceTier = distanceFromSpawn >= 25_000.0D ? 5
-                : distanceFromSpawn >= 14_000.0D ? 4
-                : distanceFromSpawn >= 7_000.0D ? 3
-                : distanceFromSpawn >= 2_500.0D ? 2
-                : distanceFromSpawn >= 750.0D ? 1 : 0;
+        double safeDistance = Double.isFinite(distanceFromSpawn) ? Math.max(0.0D, distanceFromSpawn) : 0.0D;\n        int distanceTier = safeDistance >= 25_000.0D ? 5
+                : safeDistance >= 14_000.0D ? 4
+                : safeDistance >= 7_000.0D ? 3
+                : safeDistance >= 2_500.0D ? 2
+                : safeDistance >= 750.0D ? 1 : 0;
         return Math.max(ageTier, distanceTier);
     }
 
