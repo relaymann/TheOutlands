@@ -12,5 +12,12 @@
   "item.theoutlands.the_last_page.lore": "No source code. Only a world seed, a time, and one sentence: YOU WERE HERE BEFORE THE WORLD LOADED.",
   "entity.theoutlands.lurker": "The Lurker",
   "entity.theoutlands.howler": "The Howler",
-  "entity.theoutlands.dredge": "The Dredge"
+  "entity.theoutlands.dredge": "The Dredge",
+  "item.theoutlands.motion_detector": "Motion Detector",
+  "item.theoutlands.emf_receiver": "Field EMF Receiver",
+  "item.theoutlands.field_camera": "Field Camera",
+  "item.theoutlands.thermal_viewer": "Thermal Viewer",
+  "item.theoutlands.shortwave_radio": "Shortwave Radio",
+  "item.theoutlands.acoustic_recorder": "Acoustic Recorder",
+  "item.theoutlands.tripwire_alarm": "Tripwire Alarm"
 }

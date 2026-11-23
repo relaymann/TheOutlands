@@ -25,5 +25,21 @@ public final class OutlandsItems {
             () -> new ClueItem(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC),
                     "item.theoutlands.the_last_page.lore"));
 
+
+    public static final DeferredHolder<Item, Item> MOTION_DETECTOR = ITEMS.register("motion_detector",
+            () -> new InvestigationToolItem(InvestigationToolItem.Mode.MOTION, new Item.Properties().stacksTo(1)));
+    public static final DeferredHolder<Item, Item> EMF_RECEIVER = ITEMS.register("emf_receiver",
+            () -> new InvestigationToolItem(InvestigationToolItem.Mode.EMF, new Item.Properties().stacksTo(1)));
+    public static final DeferredHolder<Item, Item> FIELD_CAMERA = ITEMS.register("field_camera",
+            () -> new InvestigationToolItem(InvestigationToolItem.Mode.CAMERA, new Item.Properties().stacksTo(1)));
+    public static final DeferredHolder<Item, Item> THERMAL_VIEWER = ITEMS.register("thermal_viewer",
+            () -> new InvestigationToolItem(InvestigationToolItem.Mode.THERMAL, new Item.Properties().stacksTo(1)));
+    public static final DeferredHolder<Item, Item> SHORTWAVE_RADIO = ITEMS.register("shortwave_radio",
+            () -> new InvestigationToolItem(InvestigationToolItem.Mode.RADIO, new Item.Properties().stacksTo(1)));
+    public static final DeferredHolder<Item, Item> ACOUSTIC_RECORDER = ITEMS.register("acoustic_recorder",
+            () -> new InvestigationToolItem(InvestigationToolItem.Mode.ACOUSTIC, new Item.Properties().stacksTo(1)));
+    public static final DeferredHolder<Item, Item> TRIPWIRE_ALARM = ITEMS.register("tripwire_alarm",
+            () -> new InvestigationToolItem(InvestigationToolItem.Mode.ALARM, new Item.Properties().stacksTo(1)));
+
     private OutlandsItems() {}
 }

@@ -102,6 +102,11 @@ public final class StructureEncounterManager {
                 else { selected = OutlandsEntities.DREDGE.get(); denominator = 38; }
             }
             case "boundary_monument" -> { if (distance >= 18_000) { selected = OutlandsEntities.NULL_APOSTLE.get(); denominator = 100; } }
+            case "ranger_station" -> { selected = OutlandsEntities.OBSERVER.get(); denominator = 48; }
+            case "mining_operation" -> { selected = OutlandsEntities.DREDGE.get(); denominator = 44; }
+            case "ruined_settlement" -> { selected = OutlandsEntities.MIMIC.get(); denominator = 38; }
+            case "observation_tower" -> { selected = OutlandsEntities.OBSERVER.get(); denominator = 52; }
+            case "subterranean_complex" -> { selected = OutlandsEntities.STILLBORN_STATUE.get(); denominator = 60; }
             case "nightmare_containment" -> { selected = OutlandsEntities.NIGHTMARE_WARDENED.get(); denominator = 5; }
             case "blood_moon_shrine" -> { selected = OutlandsEntities.NIGHTMARE_UNBOUND.get(); denominator = 5; }
             case "nightmare_outpost" -> { selected = OutlandsEntities.NIGHTMARE_HOUND.get(); denominator = 4; }

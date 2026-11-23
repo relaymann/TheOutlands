@@ -20,6 +20,8 @@ public final class StructureInteriorDressing {
             case "forgotten_station" -> surfaceY - 10;
             case "null_chamber" -> surfaceY - 20;
             case "hollow_crypt" -> surfaceY - 24;
+            case "mining_operation" -> surfaceY - 18;
+            case "subterranean_complex" -> surfaceY - 26;
             default -> surfaceY;
         };
 
@@ -28,6 +30,8 @@ public final class StructureInteriorDressing {
             case "research_facility", "bunker", "forgotten_station" -> 14;
             case "archive", "hollow_crypt", "apostle_cathedral" -> 12;
             case "shrine", "null_chamber", "boundary_monument" -> 9;
+            case "mining_operation", "subterranean_complex" -> 16;
+            case "ranger_station", "observation_tower", "ruined_settlement" -> 18;
             default -> 8;
         };
         for (int i = 0; i < detailCount; i++) {
@@ -91,6 +95,25 @@ public final class StructureInteriorDressing {
                     case 13 -> Blocks.COMPOSTER.defaultBlockState();
                     case 14 -> Blocks.GRINDSTONE.defaultBlockState();
                     default -> Blocks.DEAD_BUSH.defaultBlockState();
+                };
+                case "mining_operation", "subterranean_complex" -> switch (random.nextInt(7)) {
+                    case 0 -> Blocks.RAIL.defaultBlockState();
+                    case 1 -> Blocks.CHAIN.defaultBlockState();
+                    case 2 -> Blocks.COBWEB.defaultBlockState();
+                    case 3 -> Blocks.BARREL.defaultBlockState();
+                    case 4 -> Blocks.CAULDRON.defaultBlockState();
+                    case 5 -> Blocks.CRACKED_DEEPSLATE_BRICKS.defaultBlockState();
+                    default -> Blocks.SOUL_LANTERN.defaultBlockState();
+                };
+                case "ranger_station", "observation_tower", "ruined_settlement" -> switch (random.nextInt(8)) {
+                    case 0 -> Blocks.BARREL.defaultBlockState();
+                    case 1 -> Blocks.COBWEB.defaultBlockState();
+                    case 2 -> Blocks.CAMPFIRE.defaultBlockState();
+                    case 3 -> Blocks.CARTOGRAPHY_TABLE.defaultBlockState();
+                    case 4 -> Blocks.COMPOSTER.defaultBlockState();
+                    case 5 -> Blocks.MOSS_CARPET.defaultBlockState();
+                    case 6 -> Blocks.DEAD_BUSH.defaultBlockState();
+                    default -> Blocks.LANTERN.defaultBlockState();
                 };
                 case "hollow_crypt" -> switch (random.nextInt(6)) {
                     case 0 -> Blocks.BONE_BLOCK.defaultBlockState();
