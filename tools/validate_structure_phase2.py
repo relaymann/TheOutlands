@@ -31,6 +31,7 @@ def walk(value):
 def main():
     feature, piece, policy = (p.read_text(encoding="utf-8") for p in (FEATURE, PIECE, POLICY))
     ambience, discovery, encounters, structure = (p.read_text(encoding="utf-8") for p in (AMBIENCE, DISCOVERY, ENCOUNTERS, STRUCTURE))
+    assert chr(92) + "n" not in ambience, "literal escaped newline found in Java ambience source"
     refs=set(re.findall(r'theoutlands:structures/([a-z_]+)',feature))
     expected=BASE_STRUCTURES|{"hidden_cache","nightmare_records"}
     assert refs==expected, f"loot references mismatch: missing={expected-refs}, extra={refs-expected}"

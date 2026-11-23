@@ -89,7 +89,8 @@ public final class StructureAmbienceManager {
             case "mining_operation" -> send(player,OutlandsSounds.STRUCTURE_BUNKER.get(),x,y,z,0.20F,0.38F);
             case "ruined_settlement" -> send(player,OutlandsSounds.STRUCTURE_SETTLEMENT.get(),x,y,z,0.22F,0.72F);
             case "observation_tower" -> send(player,OutlandsSounds.STRUCTURE_TOWER.get(),x,y,z,0.16F,0.62F);
-            case "subterranean_complex" -> send(player,OutlandsSounds.STRUCTURE_RESEARCH.get(),x,y,z,0.18F,0.40F);\n            case "nightmare_signal_hollow" -> send(player,OutlandsSounds.STRUCTURE_NULL_CHAMBER.get(),x,y,z,0.12F,0.32F);
+            case "subterranean_complex" -> send(player,OutlandsSounds.STRUCTURE_RESEARCH.get(),x,y,z,0.18F,0.40F);
+            case "nightmare_signal_hollow" -> send(player,OutlandsSounds.STRUCTURE_NULL_CHAMBER.get(),x,y,z,0.12F,0.32F);
             default -> { return; }
         }
     }
