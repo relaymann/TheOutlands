@@ -9,7 +9,8 @@ class OutlandsStructureSelectionTest {
             "cabin", "tower", "bunker", "shrine", "observatory", "archive",
             "research_facility", "apostle_cathedral", "forsaken_settlement",
             "last_outpost", "forgotten_station", "null_chamber", "hollow_crypt",
-            "boundary_monument", "ranger_station", "mining_operation", "ruined_settlement",\n            "observation_tower", "subterranean_complex");
+            "boundary_monument", "ranger_station", "mining_operation", "ruined_settlement",
+            "observation_tower", "subterranean_complex");
 
     @Test
     void minimumDistanceAndDisabledFrequencyRejectSites() {
