@@ -59,6 +59,7 @@ public final class OutlandsStructureFeature {
                 case "ruined_settlement" -> ruinedSettlement(level,coreX,surfaceY,coreZ,random);
                 case "observation_tower" -> observationTower(level,coreX,surfaceY,coreZ,random);
                 case "subterranean_complex" -> subterraneanComplex(level,coreX,surfaceY,coreZ,random);
+                case "nightmare_signal_hollow" -> nightmareSignalHollow(level,coreX,surfaceY,coreZ,random);
                 default -> { return; }
             }
             expand(id,level,x,surfaceY,z);
@@ -206,7 +207,7 @@ public final class OutlandsStructureFeature {
     private static boolean isNewExplorationSite(String id) {
         return id.equals("ranger_station") || id.equals("mining_operation")
                 || id.equals("ruined_settlement") || id.equals("observation_tower")
-                || id.equals("subterranean_complex");
+                || id.equals("subterranean_complex") || id.equals("nightmare_signal_hollow");
     }
 
     private static void rangerStation(WorldGenLevel l,int x,int y,int z,RandomSource r) {
@@ -809,4 +810,21 @@ public final class OutlandsStructureFeature {
     }
 
 
+
+    /** A rare NIGHTMARE-only hollow with a sealed central chamber and no explanatory loot. */
+    private static void nightmareSignalHollow(WorldGenLevel l,int x,int y,int z,RandomSource r) {
+        int ox=x-19, oz=z-19, floor=y-8;
+        room(l,ox+7,floor,oz+7,34,34,6,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState(),
+                Blocks.CRACKED_POLISHED_BLACKSTONE_BRICKS.defaultBlockState(),Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState());
+        ring(l,ox+10,floor+1,oz+10,13,Blocks.BLACKSTONE.defaultBlockState());
+        for(int[] q:new int[][]{{11,11},{35,11},{11,35},{35,35}})
+            obelisk(l,ox+q[0],floor+1,oz+q[1],8,Blocks.CRYING_OBSIDIAN.defaultBlockState());
+        for(int h=1;h<=4;h++) {
+            p(l,ox+22,floor+h,oz+22,Blocks.IRON_BARS.defaultBlockState());
+            p(l,ox+24,floor+h,oz+22,Blocks.IRON_BARS.defaultBlockState());
+        }
+        p(l,ox+23,floor+1,oz+23,Blocks.CRYING_OBSIDIAN.defaultBlockState());
+        p(l,ox+23,floor+2,oz+23,Blocks.SCULK.defaultBlockState());
+        for(int a=17;a<=29;a++) if(a!=23) p(l,ox+a,floor+1,oz+16,Blocks.BLACKSTONE.defaultBlockState());
+    }
 }

@@ -1,0 +1,1 @@
+{"type":"minecraft:crafting_shaped","category":"building","pattern":["III","SWS","III"],"key":{"I":{"item":"minecraft:iron_ingot"},"S":{"item":"minecraft:stick"},"W":{"item":"minecraft:iron_block"}},"result":{"id":"theoutlands:reinforced_barricade","count":4}}

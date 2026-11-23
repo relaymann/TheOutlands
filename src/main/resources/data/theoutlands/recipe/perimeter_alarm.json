@@ -1,0 +1,1 @@
+{"type":"minecraft:crafting_shaped","category":"redstone","pattern":["IRI","RBR","IRI"],"key":{"I":{"item":"minecraft:iron_ingot"},"R":{"item":"minecraft:redstone"},"B":{"item":"minecraft:bell"}},"result":{"id":"theoutlands:perimeter_alarm","count":1}}

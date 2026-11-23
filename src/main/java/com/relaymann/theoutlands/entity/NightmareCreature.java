@@ -105,6 +105,21 @@ public final class NightmareCreature extends Monster {
         } else {
             unboundBehavior(player, distance);
         }
+        if (tickCount % 80 == 0 && (isVariant("nightmare_hound")
+                || isVariant("nightmare_watcher") || isVariant("nightmare_wardened"))) {
+            coordinateNearbyPredators(player);
+        }
+    }
+
+    /** Nearby Nightmare predators converge on a shared sighting without global aggro. */
+    private void coordinateNearbyPredators(Player player) {
+        for (NightmareCreature ally : level().getEntitiesOfClass(NightmareCreature.class,
+                getBoundingBox().inflate(26.0D, 12.0D, 26.0D),
+                candidate -> candidate != this && candidate.isAlive()
+                        && candidate.getTarget() == null
+                        && !candidate.isVariant("nightmare_false_survivor"))) {
+            ally.setTarget(player);
+        }
     }
 
     private void houndBehavior(Player player, double distance) {

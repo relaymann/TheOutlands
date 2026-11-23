@@ -10,7 +10,7 @@ class OutlandsStructureSelectionTest {
             "research_facility", "apostle_cathedral", "forsaken_settlement",
             "last_outpost", "forgotten_station", "null_chamber", "hollow_crypt",
             "boundary_monument", "ranger_station", "mining_operation", "ruined_settlement",
-            "observation_tower", "subterranean_complex");
+            "observation_tower", "subterranean_complex", "nightmare_signal_hollow");
 
     @Test
     void minimumDistanceAndDisabledFrequencyRejectSites() {
@@ -85,5 +85,17 @@ class OutlandsStructureSelectionTest {
             }
         }
         assertTrue(found, "A seeded structure layout should be selectable in the deep Outlands");
+    }
+
+    @Test
+    void nightmareSignalHollowIsExclusiveToNightmareWorlds() {
+        boolean foundNightmareSite = false;
+        for (long seed = 0; seed < 30_000 && !foundNightmareSite; seed++) {
+            assertNotEquals("nightmare_signal_hollow",
+                    StructureLayoutPolicy.chooseLayout(seed, 60_000.0D, true, 1_000.0D, 1.0D, false));
+            foundNightmareSite = "nightmare_signal_hollow".equals(
+                    StructureLayoutPolicy.chooseLayout(seed, 60_000.0D, true, 1_000.0D, 1.0D, true));
+        }
+        assertTrue(foundNightmareSite, "Expected the NIGHTMARE-only hollow to be selectable");
     }
 }

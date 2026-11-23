@@ -131,6 +131,10 @@ public final class NightmareModeManager {
     }
 
     private static void triggerEvent(ServerPlayer player) {
+        if (player.getRandom().nextInt(100) < 3) {
+            hollowEncounter(player);
+            return;
+        }
         if (player.getRandom().nextInt(100) < 5) {
             thePursuit(player);
             return;
@@ -144,6 +148,14 @@ public final class NightmareModeManager {
             case 5 -> migrationSurge(player);
             default -> falseSurvivorEncounter(player);
         }
+    }
+
+    /** A very rare three-form encounter with no announcement or explanatory reward. */
+    private static void hollowEncounter(ServerPlayer player) {
+        play(player, SoundEvents.WARDEN_HEARTBEAT, SoundSource.AMBIENT, 0.14F, 0.36F);
+        spawnThreat(player, OutlandsEntities.NIGHTMARE_WATCHER.get(), true);
+        spawnThreat(player, OutlandsEntities.NIGHTMARE_FALSE_SURVIVOR.get(), true);
+        spawnThreat(player, OutlandsEntities.NIGHTMARE_HOUND.get(), true);
     }
 
     /** A two-minute storm window also raises the natural encounter budget. */

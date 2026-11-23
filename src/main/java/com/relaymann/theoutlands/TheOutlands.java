@@ -2,6 +2,7 @@ package com.relaymann.theoutlands;
 
 import com.mojang.logging.LogUtils;
 import com.relaymann.theoutlands.entity.OutlandsEntities;
+import com.relaymann.theoutlands.block.OutlandsBlocks;
 import com.relaymann.theoutlands.item.OutlandsItems;
 import com.relaymann.theoutlands.sound.OutlandsSounds;
 import net.neoforged.bus.api.IEventBus;
@@ -20,6 +21,7 @@ public final class TheOutlands {
         modContainer.registerConfig(ModConfig.Type.COMMON, OutlandsConfig.SPEC);
         OutlandsGameRules.register();
         OutlandsEntities.ENTITY_TYPES.register(modEventBus);
+        OutlandsBlocks.BLOCKS.register(modEventBus);
         OutlandsItems.ITEMS.register(modEventBus);
         OutlandsSounds.SOUNDS.register(modEventBus);
         com.relaymann.theoutlands.worldgen.OutlandsWorldgen.STRUCTURE_TYPES.register(modEventBus);

@@ -9,7 +9,7 @@ public final class StructureLayoutPolicy {
             "research_facility", "apostle_cathedral", "forsaken_settlement", "last_outpost",
             "forgotten_station", "null_chamber", "hollow_crypt", "boundary_monument",
             "nightmare_containment", "blood_moon_shrine", "nightmare_outpost", "black_site",
-            "ranger_station", "mining_operation", "ruined_settlement", "observation_tower", "subterranean_complex"
+            "ranger_station", "mining_operation", "ruined_settlement", "observation_tower", "subterranean_complex", "nightmare_signal_hollow"
     };
 
     private StructureLayoutPolicy() {}
@@ -45,13 +45,14 @@ public final class StructureLayoutPolicy {
         weights[21] = weight(distance, 4_000, 11_000, multiplier, scale);
         weights[22] = weight(distance, 14_000, 20_000, multiplier, scale);
 
-        // These four identities are never selected in ordinary Survival worlds.
+        // These identities are never selected in ordinary Survival worlds.
         if (nightmare) {
             double nightmareScale = multiplier * 1.8D;
             weights[14] = weight(distance, 250, 4_500, nightmareScale, scale);
             weights[15] = weight(distance, 750, 6_500, nightmareScale, scale);
             weights[16] = forest ? weight(distance, 500, 5_500, nightmareScale, scale) : 0;
             weights[17] = weight(distance, 3_000, 10_000, nightmareScale, scale);
+            weights[23] = weight(distance, 900, 8_000, nightmareScale * 0.35D, scale);
         }
 
         double total = 0.0D;
