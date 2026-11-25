@@ -55,7 +55,7 @@ public final class DredgeEntity extends OutlandsGeoMonster {
                 hasImpulse=true;lungeTicks=12;playHorrorAnimation("lunge");lungeCooldown=115+getRandom().nextInt(65);
                 if(OutlandsConfig.HORROR_AUDIO_ENABLED.get())playSound(OutlandsSounds.DREDGE_LUNGE.get(),.8F,.9F+getRandom().nextFloat()*.15F);
             }
-            setSprinting(d>25&&d<900);
+            setSprinting(getTarget() == player && d>25&&d<900);
         }else if(hasTrail){
             searchTicks++;
             if(searchTicks<=80 && tickCount%12==0){
