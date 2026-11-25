@@ -278,6 +278,15 @@ def audit_once():
         errors.append("Stillborn Statue still treats creative players as visual observers")
     if "search_ticks" not in hunter_source or "Keep the last confirmed trail" not in hunter_source:
         errors.append("Hunter loses its last known position instead of searching after lost sight")
+    dredge_source = read("java/com/relaymann/theoutlands/entity/DredgeEntity.java")
+    nightmare_source = read("java/com/relaymann/theoutlands/entity/NightmareCreature.java")
+    colossus_source = read("java/com/relaymann/theoutlands/entity/ColossusEntity.java")
+    if "search_ticks" not in dredge_source or "ground-level sweep" not in dredge_source:
+        errors.append("Dredge is missing post-sighting trail search")
+    if "nightmare_search_ticks" not in nightmare_source or "last confirmed position" not in nightmare_source:
+        errors.append("Nightmare predators are missing last-seen search behavior")
+    if 'playHorrorAnimation("attack_colossus")' not in colossus_source:
+        errors.append("Colossus ground strike is missing its creature-specific impact animation")
     if "COLOSSUS_WARNING" not in sounds_java or "COLOSSUS_STOMP" not in sounds_java:
         errors.append("Colossus telegraph/impact sounds are not registered")
     if "CEILING_DROP" not in sounds_java or "PILGRIM_STEP" not in sounds_java:
