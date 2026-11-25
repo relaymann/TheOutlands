@@ -33,7 +33,7 @@ Successful melee hits select the matching creature-specific attack. The attack a
 The shared locomotion controller selects the creature's own idle, walk, or sprint clip. Horror movement cues are intentionally low-volume and irregular; existing custom footsteps for Pilgrim and Colossus remain separate to avoid duplicate sounds.
 ## Authoring creature-specific animation
 
-Use Blockbench's GeckoLib model format. Keep shared animation bone names compatible: `root`, `body`, `head`, `jaw`, `spine`, `left_arm`, `right_arm`, `left_leg`, and `right_leg`. Creature-specific geometry may add bones for horns, tendrils, tails, mandibles, eyes, or extra limbs.
+Use Blockbench's GeckoLib model format. Keep shared animation bone names compatible: `root`, `body`, `head`, `jaw`, `spine`, `left_arm`, `right_arm`, `left_leg`, `right_leg`, `eye_left`, `eye_right`, `pupil_left`, and `pupil_right`. Creature-specific geometry may add bones for horns, tendrils, tails, mandibles, eyes, or extra limbs.
 
 When adding or changing a clip:
 1. Add the clip to `outlands_monster.animation.json`.
