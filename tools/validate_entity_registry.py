@@ -244,7 +244,7 @@ def audit_once():
         "double encounterRadius = nightmare ? 112.0D + pressureTier * 8.0D : 72.0D",
         "NightmareBalancePolicy.entityCap(serverLevel.getDayTime(), distance)",
         "NightmareBalancePolicy.threatBudget(serverLevel.getDayTime(), distance)",
-        "minimumDistance *= distanceScale", "NightmareMode.isEnabled(serverLevel)"
+        "NightmareBalancePolicy.nightmareMinimumSpawnDistance(minimumDistance)", "NightmareMode.isEnabled(serverLevel)"
     ]
     for rule in required_spawn_rules:
         if rule not in placements + config:
