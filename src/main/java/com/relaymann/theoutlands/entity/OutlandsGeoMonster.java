@@ -6,6 +6,9 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -36,6 +39,22 @@ public abstract class OutlandsGeoMonster extends Monster implements GeoEntity {
     private static final RawAnimation DEATH_HEAVY = RawAnimation.begin().thenPlay("animation.outlands.death_heavy");
     private static final RawAnimation DEATH_CRAWLER = RawAnimation.begin().thenPlay("animation.outlands.death_crawler");
     private static final RawAnimation DEATH_WATCHER = RawAnimation.begin().thenPlay("animation.outlands.death_watcher");
+    private static final List<String> CREATURE_IDS = List.of(
+            "null", "fear", "death", "almighty", "null_apostle", "cave_jar", "stalker", "observer",
+            "hunter", "burrower", "mimic", "stillborn_statue", "agitated_one", "lurker", "howler",
+            "dredge", "pilgrim", "ceiling_dweller", "colossus", "nightmare_watcher", "nightmare_hound",
+            "nightmare_wardened", "nightmare_false_survivor", "nightmare_unbound");
+    private static Map<String, RawAnimation> buildVariantAnimations(String prefix, boolean looping) {
+        Map<String, RawAnimation> animations = new HashMap<>();
+        for (String id : CREATURE_IDS) {
+            String clip = "animation.outlands." + prefix + "_" + id;
+            animations.put(id, looping ? RawAnimation.begin().thenLoop(clip) : RawAnimation.begin().thenPlay(clip));
+        }
+        return Map.copyOf(animations);
+    }
+    private static final Map<String, RawAnimation> IDLE_VARIANTS = buildVariantAnimations("idle", true);
+    private static final Map<String, RawAnimation> ATTACK_VARIANTS = buildVariantAnimations("attack", false);
+    private static final Map<String, RawAnimation> DEATH_VARIANTS = buildVariantAnimations("death", false);
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
 
     protected OutlandsGeoMonster(EntityType<? extends Monster> type, Level level) {
@@ -49,6 +68,8 @@ public abstract class OutlandsGeoMonster extends Monster implements GeoEntity {
     private RawAnimation movementAnimation(boolean moving) {
         String id = creatureId();
         if (!moving) {
+            RawAnimation individualIdle = IDLE_VARIANTS.get(id);
+            if (individualIdle != null) return individualIdle;
             if (id.equals("fear")) return HOVER;
             if (id.equals("observer") || id.equals("nightmare_watcher")) return WATCH_IDLE;
             if (id.equals("stillborn_statue")) return STATUE_IDLE;
@@ -65,29 +86,18 @@ public abstract class OutlandsGeoMonster extends Monster implements GeoEntity {
     }
 
     private String attackAnimationId() {
-        return switch (creatureId()) {
-            case "death", "stalker", "observer", "nightmare_watcher" -> "attack_stalker";
-            case "burrower", "dredge", "ceiling_dweller", "cave_jar", "nightmare_hound" -> "attack_bite";
-            case "almighty", "colossus", "stillborn_statue" -> "attack_heavy";
-            case "hunter", "lurker", "nightmare_false_survivor", "nightmare_unbound" -> "attack_sweep";
-            default -> "attack";
-        };
+        return ATTACK_VARIANTS.containsKey(creatureId()) ? "attack_" + creatureId() : "attack";
     }
 
     private String deathAnimation() {
-        return switch (creatureId()) {
-            case "death", "stalker", "observer", "nightmare_watcher", "fear" -> "death_watcher";
-            case "almighty", "colossus", "stillborn_statue" -> "death_heavy";
-            case "burrower", "dredge", "ceiling_dweller", "cave_jar", "nightmare_hound" -> "death_crawler";
-            default -> "death";
-        };
+        return DEATH_VARIANTS.containsKey(creatureId()) ? "death_" + creatureId() : "death";
     }
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "locomotion", 4, state ->
                 state.setAndContinue(movementAnimation(state.isMoving()))));
-        controllers.add(new AnimationController<>(this, "combat", 0, state -> PlayState.STOP)
+        AnimationController<OutlandsGeoMonster> combat = new AnimationController<>(this, "combat", 0, state -> PlayState.STOP)
                 .triggerableAnim("attack", ATTACK)
                 .triggerableAnim("attack_stalker", ATTACK_STALKER)
                 .triggerableAnim("attack_bite", ATTACK_BITE)
@@ -106,7 +116,12 @@ public abstract class OutlandsGeoMonster extends Monster implements GeoEntity {
                 .triggerableAnim("death_stalker", DEATH_STALKER)
                 .triggerableAnim("death_heavy", DEATH_HEAVY)
                 .triggerableAnim("death_crawler", DEATH_CRAWLER)
-                .triggerableAnim("death_watcher", DEATH_WATCHER));
+                .triggerableAnim("death_watcher", DEATH_WATCHER);
+        for (String id : CREATURE_IDS) {
+            combat.triggerableAnim("attack_" + id, ATTACK_VARIANTS.get(id));
+            combat.triggerableAnim("death_" + id, DEATH_VARIANTS.get(id));
+        }
+        controllers.add(combat);
     }
 
     /** Starts an authored, creature-specific action on the synchronized GeckoLib controller. */
