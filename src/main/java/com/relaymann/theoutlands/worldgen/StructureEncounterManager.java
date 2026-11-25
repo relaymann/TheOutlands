@@ -64,9 +64,10 @@ public final class StructureEncounterManager {
                 resolvedSites.markResolved(noLayoutKey);
                 continue;
             }
-            // Resolve each eligible site once, even when its deterministic spawn roll fails.
-            resolve(level, layout, center, distance, seed);
-            resolvedSites.markResolved(key);
+            // A failed placement is retried while the site is explored; a completed roll is one-shot.
+            if (resolve(level, layout, center, distance, seed)) {
+                resolvedSites.markResolved(key);
+            }
         }
     }
 
@@ -114,6 +115,12 @@ public final class StructureEncounterManager {
                 selected = random.nextBoolean() ? OutlandsEntities.NIGHTMARE_FALSE_SURVIVOR.get()
                         : OutlandsEntities.NIGHTMARE_WATCHER.get();
                 denominator = 4;
+            }
+            case "nightmare_signal_hollow" -> {
+                if (NightmareMode.isEnabled(level)) {
+                    selected = OutlandsEntities.NIGHTMARE_WATCHER.get();
+                    denominator = 3;
+                }
             }
         }
         if (NightmareMode.isEnabled(level) && denominator > 0) denominator = Math.max(3, denominator / 3);
