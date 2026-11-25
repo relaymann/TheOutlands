@@ -454,12 +454,15 @@ public final class NightmareModeManager {
             return;
         }
         long elapsed = level.getGameTime() - started;
-        int stage = elapsed >= 1_800L ? 3 : elapsed >= 1_200L ? 2 : elapsed >= 600L ? 1 : 0;
         int previous = BLOOD_MOON_STAGE.getOrDefault(level, 0);
-        if (stage <= previous) return;
-        BLOOD_MOON_STAGE.put(level, stage);
+        int stage = NightmareEventPolicy.nextBloodMoonStage(previous, elapsed);
+        if (stage == previous) return;
+
+        // Do not consume an escalation stage while nobody can receive its encounter.
+        // If the world becomes active later, missed stages catch up one at a time.
         ServerPlayer player = level.players().stream().filter(NightmareModeManager::eligible).findFirst().orElse(null);
         if (player == null) return;
+        BLOOD_MOON_STAGE.put(level, stage);
         if (stage == 1) {
             spawnThreat(player, OutlandsEntities.NIGHTMARE_HOUND.get(), true);
         } else if (stage == 2) {
@@ -487,9 +490,12 @@ public final class NightmareModeManager {
 
     @SubscribeEvent
     public static void onGameModeChange(PlayerEvent.PlayerChangeGameModeEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayer player)
-                || !NightmareMode.isEnabled(player.serverLevel())) return;
-        if (player.isAlive() && event.getNewGameMode() != net.minecraft.world.level.GameType.SURVIVAL) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        var targetMode = event.getNewGameMode();
+        boolean creative = targetMode == net.minecraft.world.level.GameType.CREATIVE;
+        boolean spectator = targetMode == net.minecraft.world.level.GameType.SPECTATOR;
+        if (NightmareEventPolicy.shouldBlockGameModeChange(
+                NightmareMode.isEnabled(player.serverLevel()), player.isAlive(), creative, spectator)) {
             event.setCanceled(true);
         }
     }
