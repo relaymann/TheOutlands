@@ -6,7 +6,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib.model.GeoModel;
 
-/** Shared GeckoLib model selector; each registered creature retains its own texture. */
+/** Shared animated rig with texture selection per registered Outlands creature. */
 public final class OutlandsGeoModel<T extends OutlandsGeoMonster> extends GeoModel<T> {
     private static final ResourceLocation MODEL = ResourceLocation.fromNamespaceAndPath(TheOutlands.MOD_ID, "geo/entity/outlands_monster.geo.json");
     private static final ResourceLocation ANIMATIONS = ResourceLocation.fromNamespaceAndPath(TheOutlands.MOD_ID, "animations/entity/outlands_monster.animation.json");
@@ -21,7 +21,6 @@ public final class OutlandsGeoModel<T extends OutlandsGeoMonster> extends GeoMod
         String texture = switch (id) {
             case "cave_jar" -> "agitated_one";
             case "stalker" -> "howler";
-            case "hunter" -> "dredge";
             case "observer" -> "null_apostle";
             case "pilgrim" -> "null";
             case "ceiling_dweller" -> "burrower";

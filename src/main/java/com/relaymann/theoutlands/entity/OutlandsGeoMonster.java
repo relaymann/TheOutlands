@@ -1,5 +1,6 @@
 package com.relaymann.theoutlands.entity;
 
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
@@ -11,10 +12,7 @@ import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-/**
- * Common GeckoLib animation host for all Outlands monsters. Gameplay AI remains
- * server-authoritative in each concrete entity; this base owns only animation state.
- */
+/** Shared GeckoLib animation host. Gameplay AI remains server-authoritative in each concrete creature. */
 public abstract class OutlandsGeoMonster extends Monster implements GeoEntity {
     private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.outlands.idle");
     private static final RawAnimation WALK = RawAnimation.begin().thenLoop("animation.outlands.walk");
@@ -33,11 +31,14 @@ public abstract class OutlandsGeoMonster extends Monster implements GeoEntity {
                 .triggerableAnim("attack", ATTACK));
     }
 
-    /** Call from a creature's server-side attack event to play its attack animation. */
-    public final void playOutlandsAttackAnimation() {
-        if (!level().isClientSide) {
+    /** Starts the attack keyframes only after a real melee hit succeeds. */
+    @Override
+    public boolean doHurtTarget(Entity target) {
+        boolean hit = super.doHurtTarget(target);
+        if (hit) {
             triggerAnim("combat", "attack");
         }
+        return hit;
     }
 
     @Override
