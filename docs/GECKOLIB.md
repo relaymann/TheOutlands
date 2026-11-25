@@ -12,38 +12,30 @@ All 24 registered Outlands creature types use the shared `OutlandsGeoMonster` an
 
 The GeckoLib renderers use a dedicated geometry file for every creature under `assets/theoutlands/geo/entity/`, including all five Nightmare variants. `OutlandsGeoModel` selects each creature's geometry and texture while sharing the animation resource. The Mimic retains its block-disguise rendering until it reveals, and the Almighty retains its oversized rendering treatment.
 
+## Individual creature behavior
+
+The model applies client-side head/gaze tracking using GeckoLib's entity model data, layered additively over the authored head keyframes. Watchers have a wider, slower-looking tracking range; other creatures use a more restrained range. Stalker, Death, and the False Survivor also receive tiny jaw micro-movements to make their idle faces feel less static.
+
+This is head-and-gaze-line tracking, not independently animated eyeball geometry. The current shared creature rigs have no separate eye bones; independent pupils/eyeballs require a dedicated facial-geometry and texture pass rather than invisible placeholder bones.
+
 ## Animation system
 
-The shared animation file currently contains 21 clips:
+The shared animation file contains 29 clips:
 
-| Clip | Purpose |
-|---|---|
-| `idle` | Subtle breathing, head movement, jaw motion, and spine movement |
-| `walk` | Standard biped locomotion |
-| `crawl` | Low, forward-driven movement for crawlers and quadrupeds |
-| `heavy_walk` | Slow, weighty steps for large entities |
-| `hover` | Floating and drifting for stationary manifestations |
-| `stalk_idle` | Restrained, watchful idle pose |
-| `watch_idle` | Delayed, unsettling head movement for watchers |
-| `statue_idle` | Almost motionless pose with a sudden head snap |
-| `sprint` / `crawl_sprint` | Aggressive pursuit locomotion |
-| `attack` | Melee strike, triggered only after a successful hit |
-| `scream` | Howler's territorial call wind-up |
-| `lunge` / `pounce` | Sudden forward attacks |
-| `reveal` | Mimic's disguise break |
-| `burrow` / `emerge` | Burrower's subterranean departure and return |
-| `drop` | Ceiling Dweller's overhead ambush release |
-| `ground_slam` | Colossus' telegraphed heavy strike |
-| `stalk` | Lurker's patient stalking behavior |
-| `death` | Shared creature death pose |
+- **Locomotion and idle:** `idle`, `walk`, `crawl`, `heavy_walk`, `hover`, `stalk_idle`, `watch_idle`, `statue_idle`, `sprint`, `crawl_sprint`
+- **Shared actions:** `attack`, `scream`, `lunge`, `pounce`, `reveal`, `burrow`, `emerge`, `drop`, `ground_slam`, `stalk`, `death`
+- **Creature-specific attacks:** `attack_stalker`, `attack_bite`, `attack_heavy`, `attack_sweep`
+- **Creature-specific deaths:** `death_stalker`, `death_heavy`, `death_crawler`, `death_watcher`
 
-The locomotion controller chooses idle and movement styles by creature archetype and sprint state. The synchronized action controller handles one-shot combat and horror events. AI hooks are server-authoritative and synchronize the resulting animation to tracking clients.
+Successful melee hits select an attack style by creature family: watchful stalkers use a delayed claw strike, crawlers and biters snap forward, heavy entities use a weighty overhead blow, and pouncing hunters use a sweeping strike. Death poses are also selected by archetype: stalkers/watcher entities settle into an unnervingly crooked stillness, heavy entities collapse, and crawlers fold down low.
 
-These clips are presentation-only. They do not change attack timing, movement, hitboxes, damage, spawn rules, or AI authority. The melee attack clip still plays only after a real hit succeeds.
+The synchronized action controller still handles the existing AI events. AI hooks are server-authoritative and synchronize the resulting action animation to tracking clients. Gaze tracking and facial micro-motion are client-side presentation only.
+
+These clips do not change attack timing, movement, hitboxes, damage, spawn rules, or AI authority. Attack animations still play only after a real melee hit succeeds.
 
 ## Authoring creature-specific animation
 
-Use Blockbench's GeckoLib model format. Keep shared animation bone names compatible: `root`, `body`, `head`, `jaw`, `spine`, `left_arm`, `right_arm`, `left_leg`, and `right_leg`. Creature-specific geometry may add bones for horns, tendrils, tails, mandibles, or extra limbs.
+Use Blockbench's GeckoLib model format. Keep shared animation bone names compatible: `root`, `body`, `head`, `jaw`, `spine`, `left_arm`, `right_arm`, `left_leg`, and `right_leg`. Creature-specific geometry may add bones for horns, tendrils, tails, mandibles, eyes, or extra limbs.
 
 When adding or changing a clip:
 1. Add the clip to `outlands_monster.animation.json`.
@@ -54,12 +46,12 @@ When adding or changing a clip:
 
 ## Verification checklist
 
-Automated validation checks all 24 entity registrations, dedicated geometry files, required shared bones, all 21 required clips, and every animated bone reference against every creature rig. It also checks the synchronized AI hooks.
+Automated validation checks all 24 entity registrations, dedicated geometry files, required shared bones, every required animation clip, every animated bone reference against every creature rig, the synchronized AI hooks, and the gaze/facial animation hooks.
 
 - Run `./gradlew clean test build` with Java 21.
 - Verify the packaged JAR contains every geometry, texture, and animation resource.
 - Launch both the client and a dedicated server with GeckoLib 4.9.4 installed.
-- Spawn all 24 entity types and verify each dedicated geo rig, texture, idle, locomotion, melee attack, death, and tracking synchronization.
+- Spawn all 24 entity types and verify each dedicated geo rig, texture, gaze tracking, idle, locomotion, creature-specific attack, death, and tracking synchronization.
 - Test the Mimic's block disguise and reveal, the Almighty's scale, Nightmare variants, and entity unload/reload to ensure animation state does not leak across instances.
 
-The automated build does not replace in-game visual testing; the client and dedicated-server checklist remains a manual verification step.
+The automated build does not replace in-game visual testing; client and dedicated-server rendering checks remain manual.
