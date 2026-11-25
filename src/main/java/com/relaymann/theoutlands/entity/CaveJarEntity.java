@@ -25,14 +25,14 @@ import com.relaymann.theoutlands.OutlandsConfig;
  * Cave.jar is a committed cave predator. It tracks confirmed sightings,
  * searches the last known area, and uses a telegraphed close-range lunge.
  */
-public final class CaveJarEntity extends Monster {
+public final class CaveJarEntity extends OutlandsGeoMonster {
     private static final EntityDataAccessor<Integer> DATA_LUNGE_WINDUP =
             SynchedEntityData.defineId(CaveJarEntity.class, EntityDataSerializers.INT);
     private double memoryX, memoryY, memoryZ;
     private int lostSightTicks, searchTicks, lungeCooldown, lungeWindup;
     private boolean hasMemory;
 
-    public CaveJarEntity(EntityType<? extends Monster> type, Level level) { super(type, level); xpReward = 12; }
+    public CaveJarEntity(EntityType<? extends OutlandsGeoMonster> type, Level level) { super(type, level); xpReward = 12; }
 
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 58.0D)

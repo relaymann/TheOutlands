@@ -16,12 +16,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 /** A territorial sentinel whose warning call alerts nearby Outlands predators. */
-public final class HowlerEntity extends Monster {
+public final class HowlerEntity extends OutlandsGeoMonster {
     private int callCooldown;
     private int windup;
     private boolean calling;
     private int territoryPressure;
-    public HowlerEntity(EntityType<? extends Monster> type, Level level){super(type,level);xpReward=6;}
+    public HowlerEntity(EntityType<? extends OutlandsGeoMonster> type, Level level){super(type,level);xpReward=6;}
     public static AttributeSupplier.Builder createAttributes(){
         return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH,34.0D)
             .add(Attributes.MOVEMENT_SPEED,.25D).add(Attributes.FOLLOW_RANGE,34.0D)

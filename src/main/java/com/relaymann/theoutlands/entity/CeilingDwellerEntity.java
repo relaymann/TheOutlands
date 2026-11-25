@@ -22,13 +22,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 /** A cave ambusher that climbs into overhead cover, braces, and drops when prey comes close. */
-public final class CeilingDwellerEntity extends Monster {
+public final class CeilingDwellerEntity extends OutlandsGeoMonster {
     private static final EntityDataAccessor<Boolean> DATA_BRACED =
             SynchedEntityData.defineId(CeilingDwellerEntity.class, EntityDataSerializers.BOOLEAN);
     private int braceTicks;
     private int dropCooldown;
 
-    public CeilingDwellerEntity(EntityType<? extends Monster> type, Level level) {
+    public CeilingDwellerEntity(EntityType<? extends OutlandsGeoMonster> type, Level level) {
         super(type, level);
         xpReward = 6;
     }

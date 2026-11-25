@@ -17,13 +17,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 /** Low-profile pursuit predator. It follows a confirmed trail and lunges in short bursts. */
-public final class DredgeEntity extends Monster {
+public final class DredgeEntity extends OutlandsGeoMonster {
     private int lungeCooldown;
     private int lostSight;
     private double lastX,lastY,lastZ;
     private boolean hasTrail;
     private int lungeTicks;
-    public DredgeEntity(EntityType<? extends Monster> type,Level level){super(type,level);xpReward=6;}
+    public DredgeEntity(EntityType<? extends OutlandsGeoMonster> type,Level level){super(type,level);xpReward=6;}
     public static AttributeSupplier.Builder createAttributes(){
         return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH,30.0D)
             .add(Attributes.MOVEMENT_SPEED,.31D).add(Attributes.FOLLOW_RANGE,42.0D)

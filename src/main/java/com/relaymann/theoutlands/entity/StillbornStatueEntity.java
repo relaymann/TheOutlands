@@ -19,12 +19,12 @@ import com.relaymann.theoutlands.OutlandsConfig;
 import java.util.EnumSet;
 
 /** A stone sentinel that advances only while its chosen prey cannot see it. */
-public final class StillbornStatueEntity extends Monster {
+public final class StillbornStatueEntity extends OutlandsGeoMonster {
     private static final EntityDataAccessor<Boolean> DATA_STALKING = SynchedEntityData.defineId(StillbornStatueEntity.class, EntityDataSerializers.BOOLEAN);
     private int stillnessTicks;
     private int strikeCooldown;
     private boolean stalking;
-    public StillbornStatueEntity(EntityType<? extends Monster> type, Level level) { super(type, level); xpReward = 10; }
+    public StillbornStatueEntity(EntityType<? extends OutlandsGeoMonster> type, Level level) { super(type, level); xpReward = 10; }
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 58.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.30D).add(Attributes.FOLLOW_RANGE, 42.0D)

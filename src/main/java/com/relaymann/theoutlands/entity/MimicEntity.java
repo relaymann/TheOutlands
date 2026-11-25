@@ -30,7 +30,7 @@ import net.minecraft.world.phys.Vec3;
  * A block-mimicking ambush predator. Before revealing, the client renders the
  * Mimic as a nearby real block state. It never replaces or destroys world blocks.
  */
-public final class MimicEntity extends Monster {
+public final class MimicEntity extends OutlandsGeoMonster {
     private static final EntityDataAccessor<Boolean> DATA_REVEALED =
             SynchedEntityData.defineId(MimicEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> DATA_DISGUISE_STATE =
@@ -44,7 +44,7 @@ public final class MimicEntity extends Monster {
     private double memoryX, memoryY, memoryZ;
     private boolean hasMemory;
 
-    public MimicEntity(EntityType<? extends Monster> type, Level level) {
+    public MimicEntity(EntityType<? extends OutlandsGeoMonster> type, Level level) {
         super(type, level);
         xpReward = 8;
     }

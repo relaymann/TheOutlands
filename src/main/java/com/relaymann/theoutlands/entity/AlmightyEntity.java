@@ -28,12 +28,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 
 /** The Almighty's endgame manifestation, with escalating phases and a persistent ending clue. */
-public final class AlmightyEntity extends Monster {
+public final class AlmightyEntity extends OutlandsGeoMonster {
     private final ServerBossEvent bossEvent = new ServerBossEvent(
             Component.literal("The Almighty"), BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS);
     private int lastPhase = 1;
 
-    public AlmightyEntity(EntityType<? extends Monster> type, Level level) {
+    public AlmightyEntity(EntityType<? extends OutlandsGeoMonster> type, Level level) {
         super(type, level);
         setPersistenceRequired();
         xpReward = 0;

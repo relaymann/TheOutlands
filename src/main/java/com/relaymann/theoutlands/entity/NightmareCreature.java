@@ -19,7 +19,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 /** Five NIGHTMARE-exclusive predators with shared navigation but distinct temperaments. */
-public final class NightmareCreature extends Monster {
+public final class NightmareCreature extends OutlandsGeoMonster {
     private int leapCooldown;
     private int feintCooldown;
     private int flankCooldown;
@@ -29,7 +29,7 @@ public final class NightmareCreature extends Monster {
     private double memoryZ;
     private boolean hasMemory;
 
-    public NightmareCreature(EntityType<? extends Monster> type, Level level) {
+    public NightmareCreature(EntityType<? extends OutlandsGeoMonster> type, Level level) {
         super(type, level);
         xpReward = 8;
     }

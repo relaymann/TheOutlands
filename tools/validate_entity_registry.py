@@ -74,7 +74,12 @@ nightmare_texture_map = {
     "nightmare_unbound": "nightmare/unbound.png",
 }
 layer_fields = set(re.findall(r'event\.registerLayerDefinition\(([A-Za-z0-9_]+)Renderer\.LAYER', renderers))
+geckolib_mode = "OutlandsGeoRenderer::new" in renderers
 for field, entity_id in fields.items():
+    if geckolib_mode:
+        renderer_models[entity_id] = "OutlandsGeoModel"
+        textures[entity_id] = ("nightmare/" + entity_id[len("nightmare_"):] + ".png") if entity_id.startswith("nightmare_") else (entity_id + ".png")
+        continue
     match = re.search(r'registerEntityRenderer\(OutlandsEntities\.' + field + r'\.get\(\),\s*([A-Za-z0-9_]+)::new\)', renderers)
     if not match:
         continue
@@ -94,9 +99,10 @@ for field, entity_id in fields.items():
     if texture_match:
         textures[entity_id] = texture_match.group(1)
 
-for entity_id, texture in nightmare_texture_map.items():
-    renderer_models[entity_id] = "NightmareCreatureModel"
-    textures[entity_id] = texture
+if not geckolib_mode:
+    for entity_id, texture in nightmare_texture_map.items():
+        renderer_models[entity_id] = "NightmareCreatureModel"
+        textures[entity_id] = texture
 
 def audit_once():
     errors = []
@@ -115,17 +121,21 @@ def audit_once():
             if not biomes: errors.append(entity_id + ": missing biome selector in " + path)
 
         model = model_map.get(entity_id)
-        model_path = "java/com/relaymann/theoutlands/client/" + str(model) + ".java"
-        if not model:
-            errors.append(entity_id + ": missing model")
+        if geckolib_mode:
+            if renderer_models.get(entity_id) != "OutlandsGeoModel":
+                errors.append(entity_id + ": GeckoLib renderer/model mismatch")
         else:
-            model_source = read(model_path) if os.path.isfile(os.path.join(ROOT, model_path)) else read("java/com/relaymann/theoutlands/client/NewEntityRenderers.java")
-            if ("class " + str(model)) not in model_source:
-                errors.append(entity_id + ": missing model class")
-            elif "setupAnim" not in model_source:
-                errors.append(entity_id + ": missing animation method")
-        if renderer_models.get(entity_id) != model:
-            errors.append(entity_id + ": renderer/model mismatch")
+            model_path = "java/com/relaymann/theoutlands/client/" + str(model) + ".java"
+            if not model:
+                errors.append(entity_id + ": missing model")
+            else:
+                model_source = read(model_path) if os.path.isfile(os.path.join(ROOT, model_path)) else read("java/com/relaymann/theoutlands/client/NewEntityRenderers.java")
+                if ("class " + str(model)) not in model_source:
+                    errors.append(entity_id + ": missing model class")
+                elif "setupAnim" not in model_source:
+                    errors.append(entity_id + ": missing animation method")
+            if renderer_models.get(entity_id) != model:
+                errors.append(entity_id + ": renderer/model mismatch")
 
         texture = textures.get(entity_id)
         texture_path = os.path.join(ROOT, "resources/assets/theoutlands/textures/entity", texture or "")
@@ -164,9 +174,33 @@ def audit_once():
     new_models = read("java/com/relaymann/theoutlands/client/NewEntityRenderers.java")
     if "LayerDefinition.create(m,64,128)" not in new_models or "LayerDefinition.create(m,128,128)" not in new_models:
         errors.append("Pilgrim/Colossus UV atlas dimensions are not registered")
-    for renderer in ("PilgrimRenderer", "CeilingDwellerRenderer", "ColossusRenderer"):
-        if renderer not in renderers:
-            errors.append(renderer + ": missing renderer registration")
+    if geckolib_mode:
+        if "OutlandsGeoRenderer" not in renderers:
+            errors.append("GeckoLib renderer class is not registered")
+        geo_model = read("java/com/relaymann/theoutlands/client/OutlandsGeoModel.java")
+        geo_entity = read("java/com/relaymann/theoutlands/entity/OutlandsGeoMonster.java")
+        geometry_valid = True
+        for entity_id in fields.values():
+            geometry_path = os.path.join(ROOT, "resources/assets/theoutlands/geo/entity", entity_id + ".geo.json")
+            if not os.path.isfile(geometry_path):
+                geometry_valid = False
+                errors.append(entity_id + ": missing creature-specific GeckoLib geometry")
+                continue
+            creature_geometry = json.load(open(geometry_path, encoding="utf-8"))
+            if not creature_geometry.get("minecraft:geometry"):
+                geometry_valid = False
+                errors.append(entity_id + ": invalid GeckoLib geometry document")
+        animations = json.load(open(os.path.join(ROOT, "resources/assets/theoutlands/animations/entity/outlands_monster.animation.json"), encoding="utf-8"))
+        if "geo/entity/" not in geo_model or "getModelResource" not in geo_model or "getTextureResource" not in geo_model or "getAnimationResource" not in geo_model:
+            errors.append("GeckoLib GeoModel is missing per-creature resource selectors")
+        if "implements GeoEntity" not in geo_entity or "getAnimatableInstanceCache" not in geo_entity:
+            errors.append("shared monster base is missing GeckoLib entity/cache integration")
+        if not geometry_valid or not all(name in animations.get("animations", {}) for name in ("animation.outlands.idle", "animation.outlands.walk", "animation.outlands.attack")):
+            errors.append("GeckoLib creature rigs or required animation clips are missing")
+    else:
+        for renderer in ("PilgrimRenderer", "CeilingDwellerRenderer", "ColossusRenderer"):
+            if renderer not in renderers:
+                errors.append(renderer + ": missing renderer registration")
     if "COLOSSUS_WARNING" not in sounds_java or "COLOSSUS_STOMP" not in sounds_java:
         errors.append("Colossus telegraph/impact sounds are not registered")
     if "CEILING_DROP" not in sounds_java or "PILGRIM_STEP" not in sounds_java:
@@ -189,7 +223,7 @@ def audit_once():
         if part not in nightmare_model:
             errors.append("Nightmare model missing articulated horror anatomy: " + part)
     if len(set(model_map.values())) != EXPECTED - 4: errors.append("shared Nightmare model mapping is inconsistent")
-    if len(layer_fields) != EXPECTED - 4: errors.append("not all entity model layers are registered")
+    if not geckolib_mode and len(layer_fields) != EXPECTED - 4: errors.append("not all entity model layers are registered")
     nightmare_model = read("java/com/relaymann/theoutlands/client/NightmareCreatureModel.java")
     nightmare_renderer = read("java/com/relaymann/theoutlands/client/NightmareCreatureRenderer.java")
     for field in ("NIGHTMARE_WATCHER", "NIGHTMARE_HOUND", "NIGHTMARE_WARDENED",
@@ -220,7 +254,7 @@ def audit_once():
         "double encounterRadius = nightmare ? 112.0D + pressureTier * 8.0D : 72.0D",
         "NightmareBalancePolicy.entityCap(serverLevel.getDayTime(), distance)",
         "NightmareBalancePolicy.threatBudget(serverLevel.getDayTime(), distance)",
-        "minimumDistance *= distanceScale", "NightmareMode.isEnabled(serverLevel)"
+        "nightmareMinimumSpawnDistance(minimumDistance)", "NightmareMode.isEnabled(serverLevel)"
     ]
     for rule in required_spawn_rules:
         if rule not in placements + config:

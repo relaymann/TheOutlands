@@ -13,53 +13,29 @@ public final class OutlandsClientEvents {
 
     @SubscribeEvent
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerEntityRenderer(OutlandsEntities.NULL.get(), NullRenderer::new);
-        event.registerEntityRenderer(OutlandsEntities.FEAR.get(), FearRenderer::new);
-        event.registerEntityRenderer(OutlandsEntities.DEATH.get(), DeathRenderer::new);
-        event.registerEntityRenderer(OutlandsEntities.ALMIGHTY.get(), AlmightyRenderer::new);
-        event.registerEntityRenderer(OutlandsEntities.NULL_APOSTLE.get(), NullApostleRenderer::new);
-        event.registerEntityRenderer(OutlandsEntities.CAVE_JAR.get(), CaveJarRenderer::new);
-        event.registerEntityRenderer(OutlandsEntities.STALKER.get(), StalkerRenderer::new);
-        event.registerEntityRenderer(OutlandsEntities.OBSERVER.get(), ObserverRenderer::new);
-        event.registerEntityRenderer(OutlandsEntities.HUNTER.get(), HunterRenderer::new);
-        event.registerEntityRenderer(OutlandsEntities.BURROWER.get(), BurrowerRenderer::new);
-        event.registerEntityRenderer(OutlandsEntities.MIMIC.get(), MimicRenderer::new);
-        event.registerEntityRenderer(OutlandsEntities.STILLBORN_STATUE.get(), StillbornStatueRenderer::new);
-        event.registerEntityRenderer(OutlandsEntities.AGITATED_ONE.get(), AgitatedOneRenderer::new);
-        event.registerEntityRenderer(OutlandsEntities.LURKER.get(), LurkerRenderer::new);
-        event.registerEntityRenderer(OutlandsEntities.HOWLER.get(), HowlerRenderer::new);
-        event.registerEntityRenderer(OutlandsEntities.DREDGE.get(), DredgeRenderer::new);
-        event.registerEntityRenderer(OutlandsEntities.PILGRIM.get(), PilgrimRenderer::new);
-        event.registerEntityRenderer(OutlandsEntities.CEILING_DWELLER.get(), CeilingDwellerRenderer::new);
-        event.registerEntityRenderer(OutlandsEntities.COLOSSUS.get(), ColossusRenderer::new);
-        event.registerEntityRenderer(OutlandsEntities.NIGHTMARE_WATCHER.get(), ctx -> new NightmareCreatureRenderer(ctx, "watcher"));
-        event.registerEntityRenderer(OutlandsEntities.NIGHTMARE_HOUND.get(), ctx -> new NightmareCreatureRenderer(ctx, "hound"));
-        event.registerEntityRenderer(OutlandsEntities.NIGHTMARE_WARDENED.get(), ctx -> new NightmareCreatureRenderer(ctx, "wardened"));
-        event.registerEntityRenderer(OutlandsEntities.NIGHTMARE_FALSE_SURVIVOR.get(), ctx -> new NightmareCreatureRenderer(ctx, "false_survivor"));
-        event.registerEntityRenderer(OutlandsEntities.NIGHTMARE_UNBOUND.get(), ctx -> new NightmareCreatureRenderer(ctx, "unbound"));
-    }
-
-    @SubscribeEvent
-    public static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event) {
-        event.registerLayerDefinition(NullRenderer.LAYER, NullRenderer::createBodyLayer);
-        event.registerLayerDefinition(FearRenderer.LAYER, FearRenderer::createBodyLayer);
-        event.registerLayerDefinition(DeathRenderer.LAYER, DeathRenderer::createBodyLayer);
-        event.registerLayerDefinition(AlmightyRenderer.LAYER, AlmightyRenderer::createBodyLayer);
-        event.registerLayerDefinition(NullApostleRenderer.LAYER, NullApostleRenderer::createBodyLayer);
-        event.registerLayerDefinition(CaveJarRenderer.LAYER, CaveJarRenderer::createBodyLayer);
-        event.registerLayerDefinition(StalkerRenderer.LAYER, StalkerRenderer::createBodyLayer);
-        event.registerLayerDefinition(ObserverRenderer.LAYER, ObserverRenderer::createBodyLayer);
-        event.registerLayerDefinition(HunterRenderer.LAYER, HunterRenderer::createBodyLayer);
-        event.registerLayerDefinition(BurrowerRenderer.LAYER, BurrowerRenderer::createBodyLayer);
-        event.registerLayerDefinition(MimicRenderer.LAYER, MimicRenderer::createBodyLayer);
-        event.registerLayerDefinition(StillbornStatueRenderer.LAYER, StillbornStatueRenderer::createBodyLayer);
-        event.registerLayerDefinition(AgitatedOneRenderer.LAYER, AgitatedOneRenderer::createBodyLayer);
-        event.registerLayerDefinition(LurkerRenderer.LAYER, LurkerRenderer::createBodyLayer);
-        event.registerLayerDefinition(HowlerRenderer.LAYER, HowlerRenderer::createBodyLayer);
-        event.registerLayerDefinition(DredgeRenderer.LAYER, DredgeRenderer::createBodyLayer);
-        event.registerLayerDefinition(PilgrimRenderer.LAYER, PilgrimRenderer::createBodyLayer);
-        event.registerLayerDefinition(CeilingDwellerRenderer.LAYER, CeilingDwellerRenderer::createBodyLayer);
-        event.registerLayerDefinition(ColossusRenderer.LAYER, ColossusRenderer::createBodyLayer);
-        event.registerLayerDefinition(NightmareCreatureRenderer.LAYER, NightmareCreatureRenderer::createBodyLayer);
+        event.registerEntityRenderer(OutlandsEntities.NULL.get(), OutlandsGeoRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.FEAR.get(), OutlandsGeoRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.DEATH.get(), OutlandsGeoRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.ALMIGHTY.get(), AlmightyGeoRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.NULL_APOSTLE.get(), OutlandsGeoRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.CAVE_JAR.get(), OutlandsGeoRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.STALKER.get(), OutlandsGeoRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.OBSERVER.get(), OutlandsGeoRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.HUNTER.get(), OutlandsGeoRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.BURROWER.get(), OutlandsGeoRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.MIMIC.get(), MimicGeoRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.STILLBORN_STATUE.get(), OutlandsGeoRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.AGITATED_ONE.get(), OutlandsGeoRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.LURKER.get(), OutlandsGeoRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.HOWLER.get(), OutlandsGeoRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.DREDGE.get(), OutlandsGeoRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.PILGRIM.get(), OutlandsGeoRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.CEILING_DWELLER.get(), OutlandsGeoRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.COLOSSUS.get(), OutlandsGeoRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.NIGHTMARE_WATCHER.get(), OutlandsGeoRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.NIGHTMARE_HOUND.get(), OutlandsGeoRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.NIGHTMARE_WARDENED.get(), OutlandsGeoRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.NIGHTMARE_FALSE_SURVIVOR.get(), OutlandsGeoRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.NIGHTMARE_UNBOUND.get(), OutlandsGeoRenderer::new);
     }
 }

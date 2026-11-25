@@ -100,3 +100,8 @@ The built mod JAR is placed in `build/libs/`.
 ## License
 
 All Rights Reserved. No permission to redistribute modified or unmodified builds is granted unless explicitly authorized by the copyright holder.
+
+
+## Animated creatures (GeckoLib)
+
+The Outlands uses GeckoLib 4.9.4+ for animated monster rigs. GeckoLib is a required dependency on both client and dedicated server. See [the GeckoLib integration guide](docs/GECKOLIB.md) for the shared entity animation architecture and asset workflow.

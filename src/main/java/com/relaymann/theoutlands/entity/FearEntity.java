@@ -10,10 +10,10 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
 /** Fear's first manifestation: a silent, hovering witness rather than a combat mob. */
-public final class FearEntity extends Monster {
+public final class FearEntity extends OutlandsGeoMonster {
  private long temporaryExpiresAt = -1L;
  public void setTemporaryExpiresAt(long gameTime) { temporaryExpiresAt = gameTime; }
- public FearEntity(EntityType<? extends Monster> type, Level level) { super(type, level); xpReward=0; setNoGravity(true); }
+ public FearEntity(EntityType<? extends OutlandsGeoMonster> type, Level level) { super(type, level); xpReward=0; setNoGravity(true); }
  public static AttributeSupplier.Builder createAttributes() {
   return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH,100.0D).add(Attributes.MOVEMENT_SPEED,0.0D)
    .add(Attributes.FOLLOW_RANGE,96.0D).add(Attributes.ARMOR,20.0D).add(Attributes.KNOCKBACK_RESISTANCE,1.0D);
