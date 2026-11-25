@@ -236,14 +236,14 @@ public final class NightmareModeManager {
         }
     }
 
-    private static void spawnThreat(ServerPlayer player,
-                                    net.minecraft.world.entity.EntityType<? extends Mob> type,
-                                    boolean empowered) {
+    private static boolean spawnThreat(ServerPlayer player,
+                                       net.minecraft.world.entity.EntityType<? extends Mob> type,
+                                       boolean empowered) {
         ServerLevel level = player.serverLevel();
         double spawnDx = player.getX() - level.getSharedSpawnPos().getX();
         double spawnDz = player.getZ() - level.getSharedSpawnPos().getZ();
         double distanceFromSpawn = Math.hypot(spawnDx, spawnDz);
-        if (!NightmareBalancePolicy.canStartNightmareSpawnEvent(distanceFromSpawn)) return;
+        if (!NightmareBalancePolicy.canStartNightmareSpawnEvent(distanceFromSpawn)) return false;
 
         double angle = player.getRandom().nextDouble() * Math.PI * 2.0D;
         // Spawn outside immediate combat range so the encounter approaches
@@ -252,33 +252,37 @@ public final class NightmareModeManager {
         int x = net.minecraft.util.Mth.floor(player.getX() + Math.cos(angle) * distance);
         int z = net.minecraft.util.Mth.floor(player.getZ() + Math.sin(angle) * distance);
         BlockPos column = new BlockPos(x, net.minecraft.util.Mth.floor(player.getY()), z);
-        if (!level.hasChunkAt(column)) return;
+        if (!level.hasChunkAt(column)) return false;
         int y = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z);
         BlockPos spawn = new BlockPos(x, y, z);
-        if (!level.hasChunkAt(spawn)) return;
+        if (!level.hasChunkAt(spawn)) return false;
         BlockPos floor = spawn.below();
         if (!level.getFluidState(spawn).isEmpty()
-                || !level.getBlockState(floor).isSolidRender(level, floor)) return;
+                || !level.getBlockState(floor).isSolidRender(level, floor)) return false;
 
         int activePack = level.getEntitiesOfClass(Mob.class, player.getBoundingBox().inflate(128.0D),
                 candidate -> candidate.isAlive()
                         && candidate.getTags().contains("theoutlands_nightmare_spawn")).size();
-        if (activePack >= 10) return;
+        if (activePack >= 10) return false;
 
         Mob mob = type.create(level);
-        if (mob == null) return;
+        if (mob == null) return false;
         mob.moveTo(x + 0.5D, y, z + 0.5D, player.getRandom().nextFloat() * 360.0F, 0.0F);
         mob.finalizeSpawn(level, level.getCurrentDifficultyAt(spawn), MobSpawnType.EVENT, null);
         if (!level.noCollision(mob, mob.getBoundingBox())) {
             mob.discard();
-            return;
+            return false;
         }
         if (empowered) empower(mob);
         mob.addTag("theoutlands_nightmare_spawn");
         if (type == OutlandsEntities.STALKER.get()) mob.addTag("theoutlands_nightmare_stalker");
         mob.setPersistenceRequired();
         mob.setTarget(player);
-        if (!level.addFreshEntity(mob)) mob.discard();
+        if (!level.addFreshEntity(mob)) {
+            mob.discard();
+            return false;
+        }
+        return true;
     }
 
     /** NIGHTMARE event-spawned creatures are faster and tougher, not merely more numerous. */
@@ -454,20 +458,25 @@ public final class NightmareModeManager {
             return;
         }
         long elapsed = level.getGameTime() - started;
-        int stage = elapsed >= 1_800L ? 3 : elapsed >= 1_200L ? 2 : elapsed >= 600L ? 1 : 0;
         int previous = BLOOD_MOON_STAGE.getOrDefault(level, 0);
-        if (stage <= previous) return;
-        BLOOD_MOON_STAGE.put(level, stage);
+        int stage = NightmareEventPolicy.nextBloodMoonStage(previous, elapsed);
+        if (stage == previous) return;
+
+        // Do not consume an escalation stage while nobody can receive its encounter.
+        // If the world becomes active later, missed stages catch up one at a time.
         ServerPlayer player = level.players().stream().filter(NightmareModeManager::eligible).findFirst().orElse(null);
         if (player == null) return;
+        boolean spawned;
         if (stage == 1) {
-            spawnThreat(player, OutlandsEntities.NIGHTMARE_HOUND.get(), true);
+            spawned = spawnThreat(player, OutlandsEntities.NIGHTMARE_HOUND.get(), true);
         } else if (stage == 2) {
-            spawnThreat(player, OutlandsEntities.NIGHTMARE_WARDENED.get(), true);
+            spawned = spawnThreat(player, OutlandsEntities.NIGHTMARE_WARDENED.get(), true);
         } else {
-            spawnThreat(player, OutlandsEntities.NIGHTMARE_UNBOUND.get(), true);
-            spawnThreat(player, OutlandsEntities.NIGHTMARE_HOUND.get(), true);
+            boolean unboundSpawned = spawnThreat(player, OutlandsEntities.NIGHTMARE_UNBOUND.get(), true);
+            boolean houndSpawned = spawnThreat(player, OutlandsEntities.NIGHTMARE_HOUND.get(), true);
+            spawned = unboundSpawned || houndSpawned;
         }
+        if (spawned) BLOOD_MOON_STAGE.put(level, stage);
     }
 
     private static void tickAshfall(ServerLevel level) {
@@ -487,9 +496,12 @@ public final class NightmareModeManager {
 
     @SubscribeEvent
     public static void onGameModeChange(PlayerEvent.PlayerChangeGameModeEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayer player)
-                || !NightmareMode.isEnabled(player.serverLevel())) return;
-        if (player.isAlive() && event.getNewGameMode() != net.minecraft.world.level.GameType.SURVIVAL) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        var targetMode = event.getNewGameMode();
+        boolean creative = targetMode == net.minecraft.world.level.GameType.CREATIVE;
+        boolean spectator = targetMode == net.minecraft.world.level.GameType.SPECTATOR;
+        if (NightmareEventPolicy.shouldBlockGameModeChange(
+                NightmareMode.isEnabled(player.serverLevel()), player.isAlive(), creative, spectator)) {
             event.setCanceled(true);
         }
     }
