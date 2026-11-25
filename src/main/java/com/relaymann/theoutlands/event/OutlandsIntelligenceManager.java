@@ -20,6 +20,7 @@ import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 import java.util.*;
 
@@ -37,9 +38,21 @@ public final class OutlandsIntelligenceManager {
     private static final Map<UUID, PlayerPattern> PLAYER_PATTERNS = new HashMap<>();
     private static final Map<UUID, Long> INVESTIGATION_COOLDOWNS = new HashMap<>();
     private static final Map<UUID, Territory> TERRITORIES = new HashMap<>();
+    private static final Map<UUID, SearchState> SEARCHES = new HashMap<>();
     private static long lastCleanup;
 
     private OutlandsIntelligenceManager() {}
+
+    @SubscribeEvent
+    public static void onPlayerTick(PlayerTickEvent.Post event) {
+        Player player = event.getEntity();
+        if (!(player.level() instanceof ServerLevel level) || !eligible(player)
+                || player.isPassenger() || !player.onGround() || player.isCrouching()
+                || player.tickCount % 4 != 0
+                || player.getDeltaMovement().horizontalDistanceSqr() < 0.0016D) return;
+        record(level, player.blockPosition(), player.getUUID(),
+                player.isSprinting() ? "sprint" : "footstep");
+    }
 
     @SubscribeEvent
     public static void onBlockBroken(BlockEvent.BreakEvent event) {
@@ -90,6 +103,7 @@ public final class OutlandsIntelligenceManager {
                     if (processed.add(mob.getUUID())) {
                         maintainTerritory(level, mob);
                         investigateDisturbances(level, mob);
+                        continueSearch(level, mob);
                         adaptPursuit(mob);
                     }
                 }
@@ -115,6 +129,11 @@ public final class OutlandsIntelligenceManager {
                 || mob instanceof AlmightyEntity || mob instanceof LurkerEntity
                 || mob instanceof HowlerEntity || mob instanceof DredgeEntity
                 || mob instanceof NightmareCreature;
+    }
+
+    /** Public hook used by the perimeter alarm block when it detects a creature. */
+    public static void recordAlarm(ServerLevel level, BlockPos pos) {
+        record(level, pos, null, "alarm");
     }
 
     private static void record(ServerLevel level, BlockPos pos, UUID source, String kind) {
@@ -150,14 +169,16 @@ public final class OutlandsIntelligenceManager {
 
         ArrayDeque<Disturbance> records = DISTURBANCES.get(level.dimension());
         if (records == null || records.isEmpty()) return;
-        double bestDistance = 28.0D * 28.0D;
+        double hearingRange = hearingRange(mob);
+        double bestDistance = hearingRange * hearingRange;
         Disturbance best = null;
         for (Iterator<Disturbance> iterator = records.descendingIterator(); iterator.hasNext();) {
             Disturbance disturbance = iterator.next();
             if (now - disturbance.gameTime() > DISTURBANCE_LIFETIME) continue;
-            if (disturbance.source().equals(mob.getUUID())) continue;
+            if (Objects.equals(disturbance.source(), mob.getUUID())) continue;
             double distance = mob.distanceToSqr(Vec3.atCenterOf(disturbance.pos()));
-            if (distance < bestDistance && level.isLoaded(disturbance.pos())) {
+            double sourceRange = disturbanceRange(disturbance.kind());
+            if (distance <= sourceRange * sourceRange && distance < bestDistance && level.isLoaded(disturbance.pos())) {
                 bestDistance = distance;
                 best = disturbance;
             }
@@ -171,7 +192,81 @@ public final class OutlandsIntelligenceManager {
         BlockPos point = best.pos();
         double speed = 0.72D + temperament.boldness() * 0.30D;
         mob.getNavigation().moveTo(point.getX() + 0.5D, point.getY(), point.getZ() + 0.5D, speed);
+        SEARCHES.put(mob.getUUID(), new SearchState(point.immutable(), 0, 0));
+        if (best.source() != null && isSoundPursuer(mob)) {
+            ServerPlayer sourcePlayer = level.getServer().getPlayerList().getPlayer(best.source());
+            if (sourcePlayer != null && sourcePlayer.serverLevel() == level && eligible(sourcePlayer)) {
+                mob.setTarget(sourcePlayer);
+                SEARCHES.remove(mob.getUUID());
+            }
+        }
         INVESTIGATION_COOLDOWNS.put(mob.getUUID(), now + 100L + (long)(temperament.patience() * 180.0D));
+    }
+
+
+    private static double hearingRange(Mob mob) {
+        if (mob instanceof HowlerEntity) return 56.0D;
+        if (mob instanceof ColossusEntity || mob instanceof AlmightyEntity) return 42.0D;
+        if (mob instanceof HunterEntity || mob instanceof StalkerEntity
+                || mob instanceof DeathEntity || mob instanceof DredgeEntity
+                || mob instanceof LurkerEntity || mob instanceof BurrowerEntity) return 38.0D;
+        if (mob instanceof ObserverEntity || mob instanceof NullApostleEntity) return 24.0D;
+        if (mob instanceof StillbornStatueEntity) return 12.0D;
+        if (mob instanceof MimicEntity || mob instanceof CaveJarEntity) return 22.0D;
+        if (mob instanceof NightmareCreature creature) {
+            return switch (creature.getVariantId()) {
+                case "nightmare_hound", "nightmare_wardened", "nightmare_unbound" -> 42.0D;
+                case "nightmare_watcher", "nightmare_false_survivor" -> 22.0D;
+                default -> 28.0D;
+            };
+        }
+        return 28.0D;
+    }
+
+    private static double disturbanceRange(String kind) {
+        return switch (kind) {
+            case "alarm" -> 64.0D;
+            case "sprint", "break", "death" -> 38.0D;
+            case "door" -> 32.0D;
+            case "footstep" -> 20.0D;
+            case "place" -> 24.0D;
+            default -> 28.0D;
+        };
+    }
+
+    private static boolean isSoundPursuer(Mob mob) {
+        return mob instanceof HunterEntity || mob instanceof StalkerEntity
+                || mob instanceof LurkerEntity || mob instanceof DredgeEntity
+                || mob instanceof DeathEntity
+                || mob instanceof NightmareCreature creature
+                && !creature.isVariant("nightmare_false_survivor")
+                && !creature.isVariant("nightmare_watcher");
+    }
+
+    /** Search a widening ring around the last disturbance, probing nearby rooms and terrain. */
+    private static void continueSearch(ServerLevel level, Mob mob) {
+        SearchState state = SEARCHES.get(mob.getUUID());
+        if (state == null) return;
+        if (!mob.isAlive() || mob.getTarget() != null || state.elapsed() >= 150) {
+            SEARCHES.remove(mob.getUUID());
+            return;
+        }
+        int elapsed = state.elapsed() + 10;
+        int phase = state.phase();
+        if (elapsed >= 30 && elapsed % 30 == 0 && phase < 5) {
+            phase++;
+            double radius = 2.5D + phase * 2.0D;
+            double angle = phase * 2.399963229728653D;
+            int x = state.origin().getX() + (int)Math.round(Math.cos(angle) * radius);
+            int z = state.origin().getZ() + (int)Math.round(Math.sin(angle) * radius);
+            BlockPos candidate = new BlockPos(x, state.origin().getY(), z);
+            if (level.hasChunkAt(candidate)) {
+                mob.getNavigation().moveTo(x + 0.5D, candidate.getY(), z + 0.5D,
+                        0.70D + temperament(mob).boldness() * 0.24D);
+            }
+        }
+        SEARCHES.put(mob.getUUID(), new SearchState(state.origin(), elapsed, phase));
+        if (elapsed >= 150) SEARCHES.remove(mob.getUUID());
     }
 
     private static void maintainTerritory(ServerLevel level, Mob mob) {
@@ -298,6 +393,7 @@ public final class OutlandsIntelligenceManager {
             }
         }
         TERRITORIES.keySet().removeIf(id -> !activeMobs.contains(id));
+        SEARCHES.keySet().removeIf(id -> !activeMobs.contains(id));
         INVESTIGATION_COOLDOWNS.keySet().removeIf(id -> !activeMobs.contains(id));
     }
 
@@ -306,6 +402,7 @@ public final class OutlandsIntelligenceManager {
         PLAYER_PATTERNS.clear();
         INVESTIGATION_COOLDOWNS.clear();
         TERRITORIES.clear();
+        SEARCHES.clear();
         lastCleanup = 0L;
     }
 
@@ -314,6 +411,7 @@ public final class OutlandsIntelligenceManager {
         private Territory(BlockPos center, int radius) { this(center, radius, 0L); }
     }
     private record Temperament(float curiosity, float patience, float boldness) {}
+    private record SearchState(BlockPos origin, int elapsed, int phase) {}
 
     private static final class PlayerPattern {
         private int samples;
