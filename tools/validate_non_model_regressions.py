@@ -17,6 +17,9 @@ def main() -> None:
     cooldown_test = read("src/test/java/com/relaymann/theoutlands/block/SurvivalDefensePolicyTest.java")
     encounters = read("src/main/java/com/relaymann/theoutlands/worldgen/StructureEncounterManager.java")
     saved = read("src/main/java/com/relaymann/theoutlands/worldgen/StructureEncounterSavedData.java")
+    nightmare_policy = read("src/main/java/com/relaymann/theoutlands/event/NightmareEventPolicy.java")
+    nightmare_manager = read("src/main/java/com/relaymann/theoutlands/event/NightmareModeManager.java")
+    nightmare_test = read("src/test/java/com/relaymann/theoutlands/event/NightmareEventPolicyTest.java")
 
     require("monster.tickCount % 20" not in trap,
             "trap activation must not depend on global entity tick phase")
@@ -38,6 +41,16 @@ def main() -> None:
             "successful or intentionally skipped encounter rolls must remain one-shot")
     require("extends SavedData" in saved and "setDirty()" in saved,
             "encounter resolution must remain persistent across restarts")
+    require("shouldBlockGameModeChange" in nightmare_manager
+            and "GameType.CREATIVE" in nightmare_manager
+            and "GameType.SPECTATOR" in nightmare_manager,
+            "Nightmare Mode must block only creative and spectator mode changes")
+    require("nextBloodMoonStage" in nightmare_manager
+            and nightmare_manager.index("if (player == null) return;") < nightmare_manager.index("BLOOD_MOON_STAGE.put(level, stage)"),
+            "Blood Moon stages must not be consumed without an eligible player")
+    require("adventureModeRemainsAllowed" in nightmare_test
+            and "missedBloodMoonStagesCatchUpOneAtATime" in nightmare_test,
+            "Nightmare event policy regression tests are missing")
     print("Non-model gameplay regression checks passed.")
 
 if __name__ == "__main__":
