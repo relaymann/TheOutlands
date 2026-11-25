@@ -9,6 +9,9 @@ import net.minecraft.world.level.Level;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.relaymann.theoutlands.OutlandsConfig;
+import com.relaymann.theoutlands.sound.OutlandsSounds;
+import net.minecraft.sounds.SoundEvent;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -53,9 +56,12 @@ public abstract class OutlandsGeoMonster extends Monster implements GeoEntity {
         return Map.copyOf(animations);
     }
     private static final Map<String, RawAnimation> IDLE_VARIANTS = buildVariantAnimations("idle", true);
+    private static final Map<String, RawAnimation> WALK_VARIANTS = buildVariantAnimations("walk", true);
+    private static final Map<String, RawAnimation> SPRINT_VARIANTS = buildVariantAnimations("sprint", true);
     private static final Map<String, RawAnimation> ATTACK_VARIANTS = buildVariantAnimations("attack", false);
     private static final Map<String, RawAnimation> DEATH_VARIANTS = buildVariantAnimations("death", false);
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
+    private int movementSoundCooldown;
 
     protected OutlandsGeoMonster(EntityType<? extends Monster> type, Level level) {
         super(type, level);
@@ -77,9 +83,13 @@ public abstract class OutlandsGeoMonster extends Monster implements GeoEntity {
             return IDLE;
         }
         if (isSprinting()) {
+            RawAnimation individualSprint = SPRINT_VARIANTS.get(id);
+            if (individualSprint != null) return individualSprint;
             if (switch (id) { case "burrower", "dredge", "ceiling_dweller", "nightmare_hound", "lurker" -> true; default -> false; }) return CRAWL_SPRINT;
             return SPRINT;
         }
+        RawAnimation individualWalk = WALK_VARIANTS.get(id);
+        if (individualWalk != null) return individualWalk;
         if (switch (id) { case "burrower", "dredge", "ceiling_dweller", "nightmare_hound", "lurker" -> true; default -> false; }) return CRAWL;
         if (switch (id) { case "almighty", "colossus", "stillborn_statue" -> true; default -> false; }) return HEAVY_WALK;
         return WALK;
@@ -141,6 +151,41 @@ public abstract class OutlandsGeoMonster extends Monster implements GeoEntity {
         boolean hit = super.doHurtTarget(target);
         if (hit && !level().isClientSide) playHorrorAnimation(attackAnimationId());
         return hit;
+    }
+
+    /** Adds quiet, irregular movement tells without duplicating creatures that already own footsteps. */
+    @Override
+    public void tick() {
+        super.tick();
+        if (level().isClientSide || !OutlandsConfig.HORROR_AUDIO_ENABLED.get()) return;
+        if (movementSoundCooldown > 0) movementSoundCooldown--;
+        if (movementSoundCooldown > 0 || !onGround()
+                || getDeltaMovement().horizontalDistanceSqr() < 0.0009D) return;
+
+        SoundEvent step = switch (creatureId()) {
+            case "death" -> OutlandsSounds.DEATH_PRESENCE.get();
+            case "almighty" -> OutlandsSounds.COLOSSUS_STEP.get();
+            case "cave_jar" -> OutlandsSounds.CAVEJAR_STALK.get();
+            case "stalker" -> OutlandsSounds.STALKER_JOINT.get();
+            case "observer" -> OutlandsSounds.OBSERVER_CLICK.get();
+            case "hunter" -> OutlandsSounds.HUNTER_STALK.get();
+            case "mimic" -> OutlandsSounds.MIMIC_REVEAL.get();
+            case "stillborn_statue" -> OutlandsSounds.STILLBORN_STONE.get();
+            case "agitated_one" -> OutlandsSounds.AGITATED_WARNING.get();
+            case "lurker" -> OutlandsSounds.LURKER_BREATH.get();
+            case "howler" -> OutlandsSounds.HOWLER_BREATH.get();
+            case "dredge" -> OutlandsSounds.DREDGE_CRAWL.get();
+            case "nightmare_watcher" -> OutlandsSounds.NIGHTMARE_WATCHER.get();
+            case "nightmare_hound" -> OutlandsSounds.NIGHTMARE_HOUND.get();
+            case "nightmare_wardened" -> OutlandsSounds.NIGHTMARE_WARDENED.get();
+            case "nightmare_false_survivor" -> OutlandsSounds.NIGHTMARE_FALSE_SURVIVOR.get();
+            case "nightmare_unbound" -> OutlandsSounds.NIGHTMARE_UNBOUND.get();
+            default -> null;
+        };
+        if (step == null) return;
+        float volume = creatureId().equals("almighty") ? 0.42F : 0.13F;
+        playSound(step, volume, 0.82F + getRandom().nextFloat() * 0.24F);
+        movementSoundCooldown = 24 + getRandom().nextInt(24);
     }
 
     @Override
