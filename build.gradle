@@ -9,7 +9,7 @@ group = mod_group_id
 base { archivesName = mod_id }
 java { toolchain.languageVersion = JavaLanguageVersion.of(21) }
 sourceSets.main.resources {
-    srcDir('src/generated/resources')
+    setSrcDirs(['src/generated/resources', 'src/main/resources'])
     // Exclude only imported vanilla overrides; never exclude this mod's own assets.
     exclude('assets/minecraft/textures/**')
     exclude('assets/minecraft/sounds/**')
