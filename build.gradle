@@ -40,9 +40,17 @@ repositories {
         url = "https://api.modrinth.com/maven"
         content { includeGroup "maven.modrinth" }
     }
+    // Official GeckoLib Maven repository.
+    maven {
+        name = "GeckoLib"
+        url = "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/"
+    }
 }
 
 dependencies {
+    // GeckoLib is a required runtime and compile dependency for the animated entity roster.
+    implementation "software.bernie.geckolib:geckolib-neoforge-1.21.1:${geckolib_version}"
+
     // Compile against the API without bundling it: Simple Voice Chat remains optional at runtime.
     compileOnly "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
     localRuntime "maven.modrinth:simple-voice-chat:neoforge-${voicechat_mod_version}"
