@@ -9,6 +9,7 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import com.relaymann.theoutlands.entity.CreatureHearingEvents;
 
 /** Simple server-authoritative trap/alarm block with per-entity tick throttling. */
 public final class SurvivalDefenseBlock extends Block {
@@ -31,6 +32,9 @@ public final class SurvivalDefenseBlock extends Block {
             level.playSound(null, pos, SoundEvents.ANVIL_HIT, SoundSource.BLOCKS, 0.28F, 0.72F);
         } else {
             level.playSound(null, pos, SoundEvents.TRIPWIRE_CLICK_ON, SoundSource.BLOCKS, 0.8F, 0.72F);
+            if (level instanceof net.minecraft.server.level.ServerLevel server) {
+                CreatureHearingEvents.alarm(server, pos);
+            }
             if (level instanceof net.minecraft.server.level.ServerLevel server) {
                 server.sendParticles(ParticleTypes.CRIT, pos.getX() + 0.5D, pos.getY() + 0.8D,
                         pos.getZ() + 0.5D, 5, 0.25D, 0.2D, 0.25D, 0.02D);
