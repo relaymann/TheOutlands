@@ -33,7 +33,13 @@ jobs:
           sudo apt-get install -y ffmpeg
 
       - name: Validate entity generators and registry audit
-        run: python3 -m py_compile tools/generate_entity_audio.py tools/generate_entity_textures.py tools/validate_entity_registry.py tools/validate_structure_phase2.py tools/validate_phase3.py tools/validate_voice_integration.py tools/validate_creature_intelligence.py tools/validate_batch1.py tools/audit_ten_passes.py tools/audit_five_passes.py tools/audit_twelve_passes.py tools/validate_batch2.py tools/validate_batch3.py tools/verify_packaged_assets.py
+        run: python3 -m py_compile tools/generate_entity_audio.py tools/generate_entity_textures.py tools/validate_entity_registry.py tools/validate_structure_phase2.py tools/validate_phase3.py tools/validate_voice_integration.py tools/validate_creature_intelligence.py tools/generate_creature_anatomy.py tools/validate_creature_anatomy.py tools/validate_batch1.py tools/audit_ten_passes.py tools/audit_five_passes.py tools/audit_twelve_passes.py tools/validate_batch2.py tools/validate_batch3.py tools/verify_packaged_assets.py
+
+      - name: Generate unique creature anatomy and animation overlays
+        run: python3 tools/generate_creature_anatomy.py
+
+      - name: Run unique creature anatomy regression audit
+        run: python3 tools/validate_creature_anatomy.py
 
       - name: Run advanced creature intelligence regression audit
         run: python3 tools/validate_creature_intelligence.py

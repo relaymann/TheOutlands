@@ -31,6 +31,21 @@ The individual gaits use each creature's silhouette and archetype: crawlers stay
 Successful melee hits select the matching creature-specific attack. The attack animation is still presentation-only and is triggered only after a real hit succeeds. Death poses are synchronized by the server. Existing special action hooks remain in place for Howler calls, Mimic reveals, Burrower burrows/emergence, Ceiling Dweller drops, Dredge lunges, Hunter pounces, Colossus ground slams, and Lurker stalking.
 
 The shared locomotion controller selects the creature's own idle, walk, or sprint clip. Horror movement cues are intentionally low-volume and irregular; existing custom footsteps for Pilgrim and Colossus remain separate to avoid duplicate sounds.
+## Unique creature anatomy generation
+
+Blockbench source rigs remain under `src/main/resources/assets/theoutlands/geo/entity/`. The build runs `tools/generate_creature_anatomy.py` and writes anatomy overlays into `src/generated/resources`, which takes resource precedence without destructively rewriting the source rigs. The Gradle `processResources` task depends on this generator, so local builds and CI package the same generated models.
+
+The generator uses different anatomical families and per-creature additions rather than one humanoid template:
+- Humanoid stalkers and survivors gain brow plates, upper fangs, hand claws, and neck/spinal tendons.
+- Predators gain muzzles, tusks, articulated mandibles, foreclaws, and dorsal spines.
+- Burrowers and jar creatures gain paired mandibles, feelers, carapace ridges, digging claws, and shell ribs.
+- Heavy creatures gain brow armor, tusks, knuckle plates, shoulder tendons, and sternum keels.
+- Eldritch creatures gain asymmetric crowns, split mandibles, hanging tendrils, floating ribs, and optic stalks.
+
+Every anatomy bone is keyed into that creature's own idle, walk, sprint, attack, and death clip. Facial plates, jaws, claws, tendons, and feelers therefore move with the creature instead of remaining static decorations. The overlay preserves existing entity hitboxes, attributes, AI, and combat timing; it is purely visual.
+
+Run `python3 tools/generate_creature_anatomy.py` to regenerate the overlay and `python3 tools/validate_creature_anatomy.py` to audit all 24 rigs and 120 articulated clips.
+
 ## Authoring creature-specific animation
 
 Use Blockbench's GeckoLib model format. Keep shared animation bone names compatible: `root`, `body`, `head`, `jaw`, `spine`, `left_arm`, `right_arm`, `left_leg`, `right_leg`, `eye_left`, `eye_right`, `pupil_left`, and `pupil_right`. Creature-specific geometry may add bones for horns, tendrils, tails, mandibles, eyes, or extra limbs.
