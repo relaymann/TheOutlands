@@ -25,7 +25,15 @@ public final class SurvivalDefenseBlock extends Block {
     public void stepOn(Level level, BlockPos pos, BlockState state, Entity entity) {
         super.stepOn(level, pos, state, entity);
         if (level.isClientSide || !(entity instanceof Monster monster) || !monster.isAlive()) return;
-        if (monster.tickCount % 20 != 0) return;
+        if (!(level instanceof net.minecraft.server.level.ServerLevel server)) return;
+        String cooldownKey = "theoutlands_" + kind.name().toLowerCase(java.util.Locale.ROOT)
+                + "_trap_" + Long.toUnsignedString(pos.asLong());
+        var persistent = monster.getPersistentData();
+        boolean hasPrevious = persistent.contains(cooldownKey);
+        long previous = persistent.getLong(cooldownKey);
+        long now = server.getGameTime();
+        if (!SurvivalDefensePolicy.isReady(hasPrevious, now, previous, 20L)) return;
+        persistent.putLong(cooldownKey, now);
         if (kind == Kind.SPIKES) {
             monster.hurt(level.damageSources().cactus(), 3.0F);
             monster.setDeltaMovement(monster.getDeltaMovement().scale(0.65D));
