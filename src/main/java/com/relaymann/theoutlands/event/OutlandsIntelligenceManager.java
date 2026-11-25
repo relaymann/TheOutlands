@@ -4,6 +4,8 @@ import com.relaymann.theoutlands.TheOutlands;
 import com.relaymann.theoutlands.OutlandsConfig;
 import com.relaymann.theoutlands.entity.*;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -20,6 +22,7 @@ import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 import java.util.*;
 
@@ -37,9 +40,22 @@ public final class OutlandsIntelligenceManager {
     private static final Map<UUID, PlayerPattern> PLAYER_PATTERNS = new HashMap<>();
     private static final Map<UUID, Long> INVESTIGATION_COOLDOWNS = new HashMap<>();
     private static final Map<UUID, Territory> TERRITORIES = new HashMap<>();
+    private static final Map<UUID, SearchState> SEARCHES = new HashMap<>();
     private static long lastCleanup;
 
     private OutlandsIntelligenceManager() {}
+
+    @SubscribeEvent
+    public static void onPlayerTick(PlayerTickEvent.Post event) {
+        Player player = event.getEntity();
+        if (!OutlandsConfig.ENTITY_INTELLIGENCE_ENABLED.get()) return;
+        if (!(player.level() instanceof ServerLevel level) || !eligible(player)
+                || player.isPassenger() || !player.onGround() || player.isCrouching()
+                || player.tickCount % 4 != 0
+                || player.getDeltaMovement().horizontalDistanceSqr() < 0.0016D) return;
+        record(level, player.blockPosition(), player.getUUID(),
+                player.isSprinting() ? "sprint" : "footstep");
+    }
 
     @SubscribeEvent
     public static void onBlockBroken(BlockEvent.BreakEvent event) {
@@ -84,13 +100,36 @@ public final class OutlandsIntelligenceManager {
             for (ServerPlayer player : level.players()) {
                 if (!eligible(player)) continue;
                 var nearby = level.getEntitiesOfClass(Mob.class,
-                        new AABB(player.blockPosition()).inflate(40.0D),
+                        new AABB(player.blockPosition()).inflate(56.0D),
                         mob -> mob.isAlive() && isOutlandsCreature(mob));
                 for (Mob mob : nearby) {
                     if (processed.add(mob.getUUID())) {
                         maintainTerritory(level, mob);
                         investigateDisturbances(level, mob);
+                        continueSearch(level, mob);
                         adaptPursuit(mob);
+                    }
+                }
+            }
+            // Alarm blocks are creature-triggered and can sound when no player is
+            // nearby. Process only recent alarm sites, keeping this query bounded.
+            ArrayDeque<Disturbance> records = DISTURBANCES.get(level.dimension());
+            if (records != null) {
+                int inspected = 0;
+                for (Iterator<Disturbance> it = records.descendingIterator(); it.hasNext() && inspected < 8;) {
+                    Disturbance disturbance = it.next();
+                    if (!"alarm".equals(disturbance.kind())
+                            || level.getGameTime() - disturbance.gameTime() > 100L) continue;
+                    inspected++;
+                    var alerted = level.getEntitiesOfClass(Mob.class,
+                            new AABB(disturbance.pos()).inflate(64.0D),
+                            mob -> mob.isAlive() && isOutlandsCreature(mob));
+                    for (Mob mob : alerted) {
+                        if (processed.add(mob.getUUID())) {
+                            maintainTerritory(level, mob);
+                            investigateDisturbances(level, mob);
+                            continueSearch(level, mob);
+                        }
                     }
                 }
             }
@@ -114,7 +153,13 @@ public final class OutlandsIntelligenceManager {
                 || mob instanceof FearEntity || mob instanceof DeathEntity
                 || mob instanceof AlmightyEntity || mob instanceof LurkerEntity
                 || mob instanceof HowlerEntity || mob instanceof DredgeEntity
-                || mob instanceof NightmareCreature;
+                || mob instanceof NightmareCreature || mob instanceof PilgrimEntity
+                || mob instanceof CeilingDwellerEntity || mob instanceof ColossusEntity;
+    }
+
+    /** Public hook used by the perimeter alarm block when it detects a creature. */
+    public static void recordAlarm(ServerLevel level, BlockPos pos) {
+        record(level, pos, null, "alarm");
     }
 
     private static void record(ServerLevel level, BlockPos pos, UUID source, String kind) {
@@ -131,6 +176,8 @@ public final class OutlandsIntelligenceManager {
             }
             PlayerPattern pattern = PLAYER_PATTERNS.computeIfAbsent(player.getUUID(), ignored -> new PlayerPattern());
             pattern.samples++;
+            pattern.previousPosition = pattern.lastPosition;
+            pattern.lastPosition = player.position();
             if (player.isSprinting()) pattern.sprintSamples++;
             if (player.isCrouching()) pattern.sneakSamples++;
             if (pattern.samples > 200) {
@@ -150,14 +197,16 @@ public final class OutlandsIntelligenceManager {
 
         ArrayDeque<Disturbance> records = DISTURBANCES.get(level.dimension());
         if (records == null || records.isEmpty()) return;
-        double bestDistance = 28.0D * 28.0D;
+        double hearingRange = hearingRange(mob);
+        double bestDistance = hearingRange * hearingRange;
         Disturbance best = null;
         for (Iterator<Disturbance> iterator = records.descendingIterator(); iterator.hasNext();) {
             Disturbance disturbance = iterator.next();
             if (now - disturbance.gameTime() > DISTURBANCE_LIFETIME) continue;
-            if (disturbance.source().equals(mob.getUUID())) continue;
+            if (Objects.equals(disturbance.source(), mob.getUUID())) continue;
             double distance = mob.distanceToSqr(Vec3.atCenterOf(disturbance.pos()));
-            if (distance < bestDistance && level.isLoaded(disturbance.pos())) {
+            double sourceRange = disturbanceRange(disturbance.kind());
+            if (distance <= sourceRange * sourceRange && distance < bestDistance && level.isLoaded(disturbance.pos())) {
                 bestDistance = distance;
                 best = disturbance;
             }
@@ -171,7 +220,104 @@ public final class OutlandsIntelligenceManager {
         BlockPos point = best.pos();
         double speed = 0.72D + temperament.boldness() * 0.30D;
         mob.getNavigation().moveTo(point.getX() + 0.5D, point.getY(), point.getZ() + 0.5D, speed);
+        SEARCHES.put(mob.getUUID(), new SearchState(point.immutable(), 0, 0));
+        if (best.source() != null && isSoundPursuer(mob)) {
+            ServerPlayer sourcePlayer = level.getServer().getPlayerList().getPlayer(best.source());
+            if (sourcePlayer != null && sourcePlayer.serverLevel() == level && eligible(sourcePlayer)) {
+                mob.setTarget(sourcePlayer);
+                SEARCHES.remove(mob.getUUID());
+            }
+        }
         INVESTIGATION_COOLDOWNS.put(mob.getUUID(), now + 100L + (long)(temperament.patience() * 180.0D));
+    }
+
+
+    private static double hearingRange(Mob mob) {
+        if (mob instanceof HowlerEntity) return 56.0D;
+        if (mob instanceof ColossusEntity || mob instanceof AlmightyEntity) return 42.0D;
+        if (mob instanceof PilgrimEntity || mob instanceof CeilingDwellerEntity) return 32.0D;
+        if (mob instanceof HunterEntity || mob instanceof StalkerEntity
+                || mob instanceof DeathEntity || mob instanceof DredgeEntity
+                || mob instanceof LurkerEntity || mob instanceof BurrowerEntity) return 38.0D;
+        if (mob instanceof ObserverEntity || mob instanceof NullApostleEntity) return 24.0D;
+        if (mob instanceof StillbornStatueEntity) return 12.0D;
+        if (mob instanceof MimicEntity || mob instanceof CaveJarEntity) return 22.0D;
+        if (mob instanceof NightmareCreature creature) {
+            return switch (creature.getVariantId()) {
+                case "nightmare_hound", "nightmare_wardened", "nightmare_unbound" -> 42.0D;
+                case "nightmare_watcher", "nightmare_false_survivor" -> 22.0D;
+                default -> 28.0D;
+            };
+        }
+        return 28.0D;
+    }
+
+    private static double disturbanceRange(String kind) {
+        return switch (kind) {
+            case "alarm" -> 64.0D;
+            case "sprint" -> 56.0D;
+            case "break", "death" -> 48.0D;
+            case "door" -> 40.0D;
+            case "footstep" -> 28.0D;
+            case "place" -> 32.0D;
+            default -> 28.0D;
+        };
+    }
+
+    private static boolean isSoundPursuer(Mob mob) {
+        return mob instanceof HunterEntity || mob instanceof StalkerEntity
+                || mob instanceof LurkerEntity || mob instanceof DredgeEntity
+                || mob instanceof DeathEntity
+                || mob instanceof NightmareCreature creature
+                && !creature.isVariant("nightmare_false_survivor")
+                && !creature.isVariant("nightmare_watcher");
+    }
+
+    /** Search a widening ring around the last disturbance, probing nearby rooms and terrain. */
+    private static void continueSearch(ServerLevel level, Mob mob) {
+        SearchState state = SEARCHES.get(mob.getUUID());
+        if (state == null) return;
+        openNearbyWoodDoor(level, mob);
+        if (!mob.isAlive() || mob.getTarget() != null || state.elapsed() >= 150) {
+            SEARCHES.remove(mob.getUUID());
+            return;
+        }
+        int elapsed = state.elapsed() + 10;
+        int phase = state.phase();
+        if (elapsed >= 30 && elapsed % 30 == 0 && phase < 5) {
+            phase++;
+            double radius = 2.5D + phase * 2.0D;
+            double angle = phase * 2.399963229728653D;
+            int x = state.origin().getX() + (int)Math.round(Math.cos(angle) * radius);
+            int z = state.origin().getZ() + (int)Math.round(Math.sin(angle) * radius);
+            BlockPos candidate = new BlockPos(x, state.origin().getY(), z);
+            if (level.hasChunkAt(candidate)) {
+                mob.getNavigation().moveTo(x + 0.5D, candidate.getY(), z + 0.5D,
+                        0.70D + temperament(mob).boldness() * 0.24D);
+            }
+        }
+        SEARCHES.put(mob.getUUID(), new SearchState(state.origin(), elapsed, phase));
+        if (elapsed >= 150) SEARCHES.remove(mob.getUUID());
+    }
+
+
+    /** Hunters and aggressive stalkers can push through ordinary wooden doors while searching. */
+    private static void openNearbyWoodDoor(ServerLevel level, Mob mob) {
+        if (!(mob instanceof HunterEntity || mob instanceof StalkerEntity
+                || mob instanceof LurkerEntity || mob instanceof DredgeEntity
+                || mob instanceof NightmareCreature creature
+                && (creature.isVariant("nightmare_hound") || creature.isVariant("nightmare_wardened")
+                || creature.isVariant("nightmare_unbound")))) return;
+        BlockPos base = mob.blockPosition();
+        for (Direction direction : Direction.values()) {
+            BlockPos doorPos = base.relative(direction);
+            var state = level.getBlockState(doorPos);
+            if (state.is(BlockTags.WOODEN_DOORS) && state.getBlock() instanceof DoorBlock door
+                    && !door.isOpen(state)) {
+                door.setOpen(mob, level, state, doorPos, true);
+                return;
+            }
+        }
     }
 
     private static void maintainTerritory(ServerLevel level, Mob mob) {
@@ -205,6 +351,8 @@ public final class OutlandsIntelligenceManager {
         if (mob instanceof LurkerEntity) return 24;
         if (mob instanceof HowlerEntity) return 52;
         if (mob instanceof DredgeEntity) return 30;
+        if (mob instanceof PilgrimEntity) return 46;
+        if (mob instanceof CeilingDwellerEntity) return 30;
         if (mob instanceof MimicEntity) return 18;
         if (mob instanceof NightmareCreature creature) {
             return switch (creature.getVariantId()) {
@@ -228,7 +376,8 @@ public final class OutlandsIntelligenceManager {
                 || mob instanceof AgitatedOneEntity || mob instanceof NullApostleEntity
                 || mob instanceof ObserverEntity || mob instanceof LurkerEntity
                 || mob instanceof HowlerEntity || mob instanceof DredgeEntity
-                || mob instanceof NightmareCreature;
+                || mob instanceof NightmareCreature || mob instanceof PilgrimEntity
+                || mob instanceof CeilingDwellerEntity || mob instanceof ColossusEntity;
     }
 
     private static void adaptPursuit(Mob mob) {
@@ -246,7 +395,10 @@ public final class OutlandsIntelligenceManager {
                 || mob instanceof LurkerEntity || mob instanceof DredgeEntity)
                 && sprintRatio > 0.52D && temperament.boldness() > 0.35D
                 && mob.distanceToSqr(target) > 100.0D && mob.tickCount % 50 == 0) {
-            Vec3 lead = target.position().add(target.getDeltaMovement().scale(8.0D + temperament.boldness() * 8.0D));
+            Vec3 route = pattern.previousPosition == null || pattern.lastPosition == null
+                    ? target.getDeltaMovement().scale(10.0D)
+                    : pattern.lastPosition.subtract(pattern.previousPosition);
+            Vec3 lead = target.position().add(route.scale(1.2D + temperament.boldness() * 0.6D));
             mob.getNavigation().moveTo(lead.x, lead.y, lead.z, 1.0D + temperament.boldness() * 0.12D);
         } else if (sneakRatio > 0.48D && temperament.patience() > 0.58D
                 && mob.getTarget() == target && mob.tickCount % 80 == 0
@@ -298,6 +450,7 @@ public final class OutlandsIntelligenceManager {
             }
         }
         TERRITORIES.keySet().removeIf(id -> !activeMobs.contains(id));
+        SEARCHES.keySet().removeIf(id -> !activeMobs.contains(id));
         INVESTIGATION_COOLDOWNS.keySet().removeIf(id -> !activeMobs.contains(id));
     }
 
@@ -306,6 +459,7 @@ public final class OutlandsIntelligenceManager {
         PLAYER_PATTERNS.clear();
         INVESTIGATION_COOLDOWNS.clear();
         TERRITORIES.clear();
+        SEARCHES.clear();
         lastCleanup = 0L;
     }
 
@@ -314,8 +468,11 @@ public final class OutlandsIntelligenceManager {
         private Territory(BlockPos center, int radius) { this(center, radius, 0L); }
     }
     private record Temperament(float curiosity, float patience, float boldness) {}
+    private record SearchState(BlockPos origin, int elapsed, int phase) {}
 
     private static final class PlayerPattern {
+        private Vec3 previousPosition;
+        private Vec3 lastPosition;
         private int samples;
         private int sprintSamples;
         private int sneakSamples;

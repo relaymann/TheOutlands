@@ -81,7 +81,7 @@ public final class OutlandsConfig {
 
         BUILDER.push("entitySystems");
         ENTITY_INTELLIGENCE_ENABLED = BUILDER
-                .comment("Enables existing creatures' investigation, memory, pursuit adaptation, and home-range behavior.")
+                .comment("Enables creature hearing (footsteps, doors, alarms, and block actions), investigation, search memory, pursuit adaptation, and home-range behavior.")
                 .define("entityIntelligenceEnabled", true);
         ENTITY_ECOSYSTEM_ENABLED = BUILDER
                 .comment("Enables existing creatures' territorial relationships and rare inter-entity encounters.")
