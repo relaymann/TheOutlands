@@ -18,11 +18,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 /** A patient woodland ambusher: it watches, closes distance, strikes, then breaks contact. */
-public final class LurkerEntity extends Monster {
+public final class LurkerEntity extends OutlandsGeoMonster {
     private int retreatTicks;
     private int ambushCooldown;
     private int stalkTicks;
-    public LurkerEntity(EntityType<? extends Monster> type, Level level) { super(type, level); xpReward=5; }
+    public LurkerEntity(EntityType<? extends OutlandsGeoMonster> type, Level level) { super(type, level); xpReward=5; }
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 26.0D)
             .add(Attributes.MOVEMENT_SPEED, 0.29D).add(Attributes.FOLLOW_RANGE, 30.0D)

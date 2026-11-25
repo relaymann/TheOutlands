@@ -13,12 +13,12 @@ import net.minecraft.world.level.Level;
 import java.util.UUID;
 
 /** A featureless subordinate of Null. It senses its assigned player through Null's Blessing. */
-public final class NullApostleEntity extends Monster {
+public final class NullApostleEntity extends OutlandsGeoMonster {
     private static final String BLESSED_PLAYER_TAG = "NullBlessedPlayer";
     private UUID blessedPlayer;
     private long temporaryExpiresAt = -1L;
     public void setTemporaryExpiresAt(long gameTime) { temporaryExpiresAt = gameTime; }
-    public NullApostleEntity(EntityType<? extends Monster> type, Level level) {
+    public NullApostleEntity(EntityType<? extends OutlandsGeoMonster> type, Level level) {
         super(type, level); setNoGravity(true); xpReward = 0;
         addTag("theoutlands_null_apostle");
     }

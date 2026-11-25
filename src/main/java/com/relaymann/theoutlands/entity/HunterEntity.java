@@ -17,11 +17,11 @@ import com.relaymann.theoutlands.sound.OutlandsSounds;
 import com.relaymann.theoutlands.OutlandsConfig;
 
 /** A pursuit specialist that searches the last place it saw its prey and commits to short ambush lunges. */
-public final class HunterEntity extends Monster {
+public final class HunterEntity extends OutlandsGeoMonster {
     private double memoryX, memoryY, memoryZ;
     private int lostSightTicks, pounceCooldown, searchTicks;
     private boolean hasMemory;
-    public HunterEntity(EntityType<? extends Monster> type, Level level) { super(type, level); xpReward = 9; }
+    public HunterEntity(EntityType<? extends OutlandsGeoMonster> type, Level level) { super(type, level); xpReward = 9; }
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 52.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.32D).add(Attributes.FOLLOW_RANGE, 56.0D)
