@@ -51,7 +51,7 @@ public final class LurkerEntity extends OutlandsGeoMonster {
                 // Hold position and lower its silhouette while it observes the player.
                 getNavigation().stop(); setPose(net.minecraft.world.entity.Pose.CROUCHING);
                 setYRot(getYRot() + net.minecraft.util.Mth.wrapDegrees(player.getYRot() - getYRot()) * 0.035F);
-                if(stalkTicks==0 && getRandom().nextInt(180)==0) { stalkTicks=80; if(OutlandsConfig.HORROR_AUDIO_ENABLED.get()) playSound(OutlandsSounds.LURKER_BREATH.get(),0.45F,0.7F); }
+                if(stalkTicks==0 && getRandom().nextInt(180)==0) { stalkTicks=80; playHorrorAnimation("stalk"); if(OutlandsConfig.HORROR_AUDIO_ENABLED.get()) playSound(OutlandsSounds.LURKER_BREATH.get(),0.45F,0.7F); }
             } else setPose(net.minecraft.world.entity.Pose.STANDING);
             if(getHealth()<getMaxHealth()*0.34F && retreatTicks==0 && ambushCooldown==0) {
                 Vec3 away=position().subtract(player.position()).normalize();
@@ -61,7 +61,7 @@ public final class LurkerEntity extends OutlandsGeoMonster {
             if(d<20 && onGround() && ambushCooldown==0 && hasLineOfSight(player)) {
                 Vec3 toward=player.position().subtract(position()).normalize();
                 setDeltaMovement(getDeltaMovement().add(toward.x*.48D,.22D,toward.z*.48D));
-                hasImpulse=true; ambushCooldown=105;
+                hasImpulse=true; playHorrorAnimation("pounce"); ambushCooldown=105;
             }
         } else if(getPose()==net.minecraft.world.entity.Pose.CROUCHING) setPose(net.minecraft.world.entity.Pose.STANDING);
     }
