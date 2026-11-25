@@ -68,7 +68,7 @@ public final class StillbornStatueEntity extends OutlandsGeoMonster {
     }
     private boolean isWatchedByAnyPlayer() {
         return level().players().stream()
-                .anyMatch(player -> player.isAlive() && !player.isSpectator() && player.hasLineOfSight(this));
+                .anyMatch(player -> player.isAlive() && !player.isCreative() && !player.isSpectator() && player.hasLineOfSight(this));
     }
     public boolean isStalking() { return entityData.get(DATA_STALKING); }
     public float getStiffness(float partialTick) { return stalking ? 0.0F : 1.0F; }
