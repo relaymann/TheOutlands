@@ -42,7 +42,7 @@ public final class HowlerEntity extends OutlandsGeoMonster {
         if(territoryPressure>0)territoryPressure--;
         if(getTarget() instanceof Player player && player.isAlive()){
             double d=distanceToSqr(player);
-            if(d>64 && d<900 && callCooldown==0 && !calling){calling=true;windup=36;getNavigation().stop();territoryPressure=36;}
+            if(d>64 && d<900 && callCooldown==0 && !calling){calling=true;windup=36;playHorrorAnimation("scream");getNavigation().stop();territoryPressure=36;}
             if(calling){
                 getNavigation().stop();
                 if(--windup<=0){callTerritory();calling=false;callCooldown=520+getRandom().nextInt(280);}
