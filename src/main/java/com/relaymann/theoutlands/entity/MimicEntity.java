@@ -104,6 +104,7 @@ public final class MimicEntity extends OutlandsGeoMonster {
             Player visibleApproach = getNearestVisiblePlayer(8.0D);
             if (!revealed && visibleApproach != null) {
                 revealed = true;
+                playHorrorAnimation("reveal");
                 entityData.set(DATA_REVEALED, true);
                 revealCooldown = 120;
                 unseenTicks = 0;
