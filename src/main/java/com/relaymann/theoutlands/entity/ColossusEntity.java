@@ -111,6 +111,7 @@ public final class ColossusEntity extends OutlandsGeoMonster {
     private void performGroundStrike() {
         attackCooldown = 110;
         entityData.set(DATA_WINDING_UP, false);
+        playHorrorAnimation("attack_colossus");
         if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) {
             level().playSound(null, blockPosition(), OutlandsSounds.COLOSSUS_STOMP.get(),
                     SoundSource.HOSTILE, 1.8F, 0.72F);

@@ -433,12 +433,35 @@
     ]
   },
   "stalker_joint": {
-    "sounds": [{"name": "theoutlands:stalker_joint", "volume": 0.62}]
+    "sounds": [
+      {
+        "name": "theoutlands:stalker_joint",
+        "volume": 0.62
+      }
+    ]
   },
   "stalker_lunge": {
-    "sounds": [{"name": "theoutlands:stalker_lunge", "volume": 0.92}]
+    "sounds": [
+      {
+        "name": "theoutlands:stalker_lunge",
+        "volume": 0.92
+      }
+    ]
   },
   "nightmare_screech": {
-    "sounds": [{"name": "theoutlands:nightmare_screech", "volume": 0.82}]
+    "sounds": [
+      {
+        "name": "theoutlands:nightmare_screech",
+        "volume": 0.82
+      }
+    ]
+  },
+  "hunter_pounce": {
+    "sounds": [
+      {
+        "name": "theoutlands:hunter_pounce",
+        "volume": 0.88
+      }
+    ]
   }
 }

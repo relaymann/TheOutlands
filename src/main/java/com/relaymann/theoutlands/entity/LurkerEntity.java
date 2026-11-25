@@ -61,7 +61,10 @@ public final class LurkerEntity extends OutlandsGeoMonster {
             if(d<20 && onGround() && ambushCooldown==0 && hasLineOfSight(player)) {
                 Vec3 toward=player.position().subtract(position()).normalize();
                 setDeltaMovement(getDeltaMovement().add(toward.x*.48D,.22D,toward.z*.48D));
-                hasImpulse=true; playHorrorAnimation("pounce"); ambushCooldown=105;
+                hasImpulse=true; playHorrorAnimation("pounce");
+                if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) playSound(OutlandsSounds.LURKER_HIT.get(),
+                        0.54F, 0.68F + getRandom().nextFloat() * 0.18F);
+                ambushCooldown=105;
             }
         } else if(getPose()==net.minecraft.world.entity.Pose.CROUCHING) setPose(net.minecraft.world.entity.Pose.STANDING);
     }

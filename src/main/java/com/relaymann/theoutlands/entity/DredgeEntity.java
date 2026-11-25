@@ -20,6 +20,7 @@ import net.minecraft.world.phys.Vec3;
 public final class DredgeEntity extends OutlandsGeoMonster {
     private int lungeCooldown;
     private int lostSight;
+    private int searchTicks;
     private double lastX,lastY,lastZ;
     private boolean hasTrail;
     private int lungeTicks;
@@ -41,9 +42,12 @@ public final class DredgeEntity extends OutlandsGeoMonster {
         if(lungeCooldown>0)lungeCooldown--;
         if(lungeTicks>0)lungeTicks--;
         if(getTarget() instanceof Player player && player.isAlive()){
-            if(hasLineOfSight(player)){lastX=player.getX();lastY=player.getY();lastZ=player.getZ();hasTrail=true;lostSight=0;}
+            if(hasLineOfSight(player)){lastX=player.getX();lastY=player.getY();lastZ=player.getZ();hasTrail=true;lostSight=0;searchTicks=0;}
             else if(hasTrail && ++lostSight<140 && tickCount%10==0)getNavigation().moveTo(lastX,lastY,lastZ,1.08D);
-            if(lostSight>=140){hasTrail=false;setTarget(null);}
+            if(lostSight>=140){
+                // Retain the trail and begin a short ground-level sweep after losing direct sight.
+                setTarget(null);getNavigation().stop();lostSight=0;searchTicks=0;
+            }
             double d=distanceToSqr(player);
             if(d>16&&d<144&&lungeCooldown==0&&onGround()&&hasLineOfSight(player)){
                 Vec3 dir=player.position().subtract(position()).normalize();
@@ -51,13 +55,21 @@ public final class DredgeEntity extends OutlandsGeoMonster {
                 hasImpulse=true;lungeTicks=12;playHorrorAnimation("lunge");lungeCooldown=115+getRandom().nextInt(65);
                 if(OutlandsConfig.HORROR_AUDIO_ENABLED.get())playSound(OutlandsSounds.DREDGE_LUNGE.get(),.8F,.9F+getRandom().nextFloat()*.15F);
             }
-            setSprinting(d>25&&d<900);
-        }else if(hasTrail){hasTrail=false;lostSight=0;getNavigation().stop();}
+            setSprinting(getTarget() == player && d>25&&d<900);
+        }else if(hasTrail){
+            searchTicks++;
+            if(searchTicks<=80 && tickCount%12==0){
+                double angle=searchTicks*.78D;
+                double radius=3.0D+searchTicks/12.0D;
+                getNavigation().moveTo(lastX+Math.cos(angle)*radius,lastY,lastZ+Math.sin(angle)*radius,.94D);
+            }
+            if(searchTicks>80){hasTrail=false;searchTicks=0;lostSight=0;getNavigation().stop();setSprinting(false);}
+        }
     }
     public boolean isLunging(){return lungeTicks>0;}
     @Override protected SoundEvent getAmbientSound(){return OutlandsConfig.HORROR_AUDIO_ENABLED.get()?OutlandsSounds.DREDGE_CRAWL.get():null;}
     @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource s){return OutlandsConfig.HORROR_AUDIO_ENABLED.get()?OutlandsSounds.DREDGE_HIT.get():null;}
     @Override protected SoundEvent getDeathSound(){return OutlandsConfig.HORROR_AUDIO_ENABLED.get()?OutlandsSounds.DREDGE_HIT.get():null;}
-    @Override public void addAdditionalSaveData(CompoundTag t){super.addAdditionalSaveData(t);t.putDouble("trail_x",lastX);t.putDouble("trail_y",lastY);t.putDouble("trail_z",lastZ);t.putBoolean("has_trail",hasTrail);t.putInt("lost_sight",lostSight);t.putInt("lunge_cd",lungeCooldown);t.putInt("lunge_ticks",lungeTicks);}
-    @Override public void readAdditionalSaveData(CompoundTag t){super.readAdditionalSaveData(t);lastX=t.getDouble("trail_x");lastY=t.getDouble("trail_y");lastZ=t.getDouble("trail_z");hasTrail=t.getBoolean("has_trail");lostSight=t.getInt("lost_sight");lungeCooldown=t.getInt("lunge_cd");lungeTicks=t.getInt("lunge_ticks");}
+    @Override public void addAdditionalSaveData(CompoundTag t){super.addAdditionalSaveData(t);t.putDouble("trail_x",lastX);t.putDouble("trail_y",lastY);t.putDouble("trail_z",lastZ);t.putBoolean("has_trail",hasTrail);t.putInt("lost_sight",lostSight);t.putInt("search_ticks",searchTicks);t.putInt("lunge_cd",lungeCooldown);t.putInt("lunge_ticks",lungeTicks);}
+    @Override public void readAdditionalSaveData(CompoundTag t){super.readAdditionalSaveData(t);lastX=t.getDouble("trail_x");lastY=t.getDouble("trail_y");lastZ=t.getDouble("trail_z");hasTrail=t.getBoolean("has_trail");lostSight=t.getInt("lost_sight");searchTicks=t.getInt("search_ticks");lungeCooldown=t.getInt("lunge_cd");lungeTicks=t.getInt("lunge_ticks");}
 }

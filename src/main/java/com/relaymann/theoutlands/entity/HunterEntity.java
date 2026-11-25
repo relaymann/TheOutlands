@@ -47,14 +47,23 @@ public final class HunterEntity extends OutlandsGeoMonster {
                 lostSightTicks++;
                 if (hasMemory && lostSightTicks < 100 && tickCount % 12 == 0)
                     getNavigation().moveTo(memoryX, memoryY, memoryZ, 1.12D);
-                if (lostSightTicks >= 100) { hasMemory=false; setTarget(null); getNavigation().stop(); }
+                if (lostSightTicks >= 100) {
+                    // Keep the last confirmed trail and search around it after the target is dropped.
+                    lostSightTicks = 0;
+                    searchTicks = 0;
+                    setTarget(null);
+                    getNavigation().stop();
+                }
             }
             double d=distanceToSqr(player);
             setSprinting(d > 20.0D && d < 1800.0D);
             if (pounceCooldown==0 && d > 16.0D && d < 90.0D && onGround() && hasLineOfSight(player)) {
                 Vec3 dir=player.position().subtract(position()).normalize();
                 setDeltaMovement(getDeltaMovement().add(dir.x*0.72D,0.38D,dir.z*0.72D));
-                hasImpulse=true; playHorrorAnimation("pounce"); pounceCooldown=90+getRandom().nextInt(45);
+                hasImpulse=true; playHorrorAnimation("pounce");
+                if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) playSound(OutlandsSounds.HUNTER_POUNCE.get(),
+                        0.88F, 0.84F + getRandom().nextFloat() * 0.18F);
+                pounceCooldown=90+getRandom().nextInt(45);
             }
         } else if (hasMemory) {
             searchTicks++;
@@ -75,6 +84,6 @@ public final class HunterEntity extends OutlandsGeoMonster {
     @Override protected SoundEvent getAmbientSound(){return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.HUNTER_STALK.get() : null;}
     @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source){return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.HUNTER_STALK.get() : null;}
     @Override protected SoundEvent getDeathSound(){return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.HUNTER_STALK.get() : null;}
-    @Override public void addAdditionalSaveData(CompoundTag tag){super.addAdditionalSaveData(tag);tag.putDouble("hunt_x",memoryX);tag.putDouble("hunt_y",memoryY);tag.putDouble("hunt_z",memoryZ);tag.putBoolean("has_memory",hasMemory);tag.putInt("lost_sight",lostSightTicks);tag.putInt("pounce_cd",pounceCooldown);}
+    @Override public void addAdditionalSaveData(CompoundTag tag){super.addAdditionalSaveData(tag);tag.putDouble("hunt_x",memoryX);tag.putDouble("hunt_y",memoryY);tag.putDouble("hunt_z",memoryZ);tag.putBoolean("has_memory",hasMemory);tag.putInt("lost_sight",lostSightTicks);tag.putInt("search_ticks",searchTicks);tag.putInt("pounce_cd",pounceCooldown);}
     @Override public void readAdditionalSaveData(CompoundTag tag){super.readAdditionalSaveData(tag);memoryX=tag.getDouble("hunt_x");memoryY=tag.getDouble("hunt_y");memoryZ=tag.getDouble("hunt_z");hasMemory=tag.getBoolean("has_memory");lostSightTicks=tag.getInt("lost_sight");pounceCooldown=tag.getInt("pounce_cd");}
 }

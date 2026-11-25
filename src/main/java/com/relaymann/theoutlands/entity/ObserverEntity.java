@@ -68,7 +68,7 @@ public final class ObserverEntity extends OutlandsGeoMonster {
     }
     private boolean isWatchedByAnyPlayer() {
         return level().players().stream()
-                .anyMatch(p -> p.isAlive() && !p.isSpectator() && p.hasLineOfSight(this));
+                .anyMatch(p -> p.isAlive() && !p.isCreative() && !p.isSpectator() && p.hasLineOfSight(this));
     }
     @Override public void tick() {
         super.tick();
