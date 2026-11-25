@@ -31,3 +31,21 @@ Use Blockbench's GeckoLib model format. Keep shared animation bone names compati
 - Launch both the client and a dedicated server with GeckoLib 4.9.4 installed.
 - Spawn all 24 entity types and verify each dedicated geo rig, texture, idle, locomotion, melee attack, death, and tracking synchronization.
 - Test the Mimic's block disguise and reveal, the Almighty's scale, Nightmare variants, and entity unload/reload to ensure animation state does not leak across instances.
+
+
+## Horror personality animation pass
+
+The shared controller now selects movement profiles by creature archetype and sprint state rather than using one generic walk cycle. Stalkers, Hunters, Lurkers, Death, and the False Survivor use restrained, watchful idle poses; the Observer and Nightmare Watcher use delayed head-tracking; the Stillborn Statue uses an almost motionless idle with a sudden head snap. Sprinting uses a separate aggressive cycle, including a lower, faster quadruped/crawler profile.
+
+The synchronized action controller includes:
+- **Scream:** Howler's territorial call wind-up.
+- **Reveal:** Mimic's disguise break.
+- **Burrow / emerge:** Burrower's subterranean departure and surface reveal.
+- **Drop:** Ceiling Dweller's overhead ambush release.
+- **Lunge:** Dredge's short-range leap.
+- **Pounce:** Hunter and Lurker ambush leaps.
+- **Ground slam:** Colossus' telegraphed heavy strike.
+- **Stalk:** Lurker's patient watch behavior.
+- **Death:** a shared creature death pose, triggered server-side and synchronized to tracking clients.
+
+The melee attack clip still plays only after a successful hit. These are presentation-only animation hooks: they do not change attack timing, movement, hitboxes, damage, spawn rules, or AI authority. Shared rig bone names are validated for every creature geometry file, and the entity audit checks both required animation clips and their AI event hooks.

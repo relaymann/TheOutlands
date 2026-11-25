@@ -48,7 +48,7 @@ public final class DredgeEntity extends OutlandsGeoMonster {
             if(d>16&&d<144&&lungeCooldown==0&&onGround()&&hasLineOfSight(player)){
                 Vec3 dir=player.position().subtract(position()).normalize();
                 setDeltaMovement(getDeltaMovement().add(dir.x*.62D,.28D,dir.z*.62D));
-                hasImpulse=true;lungeTicks=12;lungeCooldown=115+getRandom().nextInt(65);
+                hasImpulse=true;lungeTicks=12;playHorrorAnimation("lunge");lungeCooldown=115+getRandom().nextInt(65);
                 if(OutlandsConfig.HORROR_AUDIO_ENABLED.get())playSound(OutlandsSounds.DREDGE_LUNGE.get(),.8F,.9F+getRandom().nextFloat()*.15F);
             }
             setSprinting(d>25&&d<900);

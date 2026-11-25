@@ -187,16 +187,45 @@ def audit_once():
                 errors.append(entity_id + ": missing creature-specific GeckoLib geometry")
                 continue
             creature_geometry = json.load(open(geometry_path, encoding="utf-8"))
-            if not creature_geometry.get("minecraft:geometry"):
+            geometry_docs = creature_geometry.get("minecraft:geometry", [])
+            if not geometry_docs:
                 geometry_valid = False
                 errors.append(entity_id + ": invalid GeckoLib geometry document")
+            else:
+                bone_names = {bone.get("name") for bone in geometry_docs[0].get("bones", [])}
+                required_bones = {"root", "body", "head", "jaw", "spine", "left_arm", "right_arm", "left_leg", "right_leg"}
+                if not required_bones.issubset(bone_names):
+                    geometry_valid = False
+                    errors.append(entity_id + ": GeckoLib rig is missing shared animation bones")
         animations = json.load(open(os.path.join(ROOT, "resources/assets/theoutlands/animations/entity/outlands_monster.animation.json"), encoding="utf-8"))
         if "geo/entity/" not in geo_model or "getModelResource" not in geo_model or "getTextureResource" not in geo_model or "getAnimationResource" not in geo_model:
             errors.append("GeckoLib GeoModel is missing per-creature resource selectors")
         if "implements GeoEntity" not in geo_entity or "getAnimatableInstanceCache" not in geo_entity:
             errors.append("shared monster base is missing GeckoLib entity/cache integration")
-        if not geometry_valid or not all(name in animations.get("animations", {}) for name in ("animation.outlands.idle", "animation.outlands.walk", "animation.outlands.attack")):
-            errors.append("GeckoLib creature rigs or required animation clips are missing")
+        required_clips = (
+            "idle", "walk", "attack", "crawl", "heavy_walk", "hover",
+            "stalk_idle", "watch_idle", "statue_idle", "sprint", "crawl_sprint",
+            "scream", "lunge", "pounce", "reveal", "burrow", "emerge",
+            "drop", "ground_slam", "stalk", "death"
+        )
+        missing_clips = [name for name in required_clips if "animation.outlands." + name not in animations.get("animations", {})]
+        if not geometry_valid or missing_clips:
+            errors.append("GeckoLib rigs or clips are missing: " + ", ".join(missing_clips))
+        action_hooks = {
+            "HowlerEntity.java": 'playHorrorAnimation("scream")',
+            "MimicEntity.java": 'playHorrorAnimation("reveal")',
+            "BurrowerEntity.java": 'playHorrorAnimation("burrow")',
+            "CeilingDwellerEntity.java": 'playHorrorAnimation("drop")',
+            "DredgeEntity.java": 'playHorrorAnimation("lunge")',
+            "HunterEntity.java": 'playHorrorAnimation("pounce")',
+            "ColossusEntity.java": 'playHorrorAnimation("ground_slam")',
+            "LurkerEntity.java": 'playHorrorAnimation("stalk")'
+        }
+        for source_file, hook in action_hooks.items():
+            if hook not in read("java/com/relaymann/theoutlands/entity/" + source_file):
+                errors.append(source_file + ": missing synchronized GeckoLib action hook")
+        if 'triggerableAnim("death"' not in geo_entity or 'playHorrorAnimation("death")' not in geo_entity:
+            errors.append("shared GeckoLib base is missing synchronized death animation")
     else:
         for renderer in ("PilgrimRenderer", "CeilingDwellerRenderer", "ColossusRenderer"):
             if renderer not in renderers:

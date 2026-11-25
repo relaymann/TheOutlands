@@ -91,6 +91,7 @@ public final class ColossusEntity extends OutlandsGeoMonster {
             getNavigation().stop();
             if (attackCooldown == 0) {
                 warningTicks = 28;
+                playHorrorAnimation("ground_slam");
                 entityData.set(DATA_WINDING_UP, true);
                 if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) {
                     level().playSound(null, blockPosition(), OutlandsSounds.COLOSSUS_WARNING.get(),

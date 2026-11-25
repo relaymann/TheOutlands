@@ -126,6 +126,7 @@ public final class CeilingDwellerEntity extends OutlandsGeoMonster {
     }
 
     private void releaseAmbush() {
+        playHorrorAnimation("drop");
         setBraced(false);
         braceTicks = 0;
         setDeltaMovement(0.0D, -0.38D, 0.0D);

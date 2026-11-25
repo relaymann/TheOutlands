@@ -84,6 +84,7 @@ public final class BurrowerEntity extends OutlandsGeoMonster {
     }
 
     private void beginBurrow() {
+        playHorrorAnimation("burrow");
         submerged = true;
         entityData.set(DATA_BURROWING, true);
         burrowTicks = 0;
@@ -180,6 +181,7 @@ public final class BurrowerEntity extends OutlandsGeoMonster {
         noPhysics = false;
         setNoGravity(false);
         submerged = false;
+        playHorrorAnimation("emerge");
         entityData.set(DATA_BURROWING, false);
         refreshDimensions();
         setInvisible(false);
