@@ -54,7 +54,7 @@ public final class HunterEntity extends OutlandsGeoMonster {
             if (pounceCooldown==0 && d > 16.0D && d < 90.0D && onGround() && hasLineOfSight(player)) {
                 Vec3 dir=player.position().subtract(position()).normalize();
                 setDeltaMovement(getDeltaMovement().add(dir.x*0.72D,0.38D,dir.z*0.72D));
-                hasImpulse=true; pounceCooldown=90+getRandom().nextInt(45);
+                hasImpulse=true; playHorrorAnimation("pounce"); pounceCooldown=90+getRandom().nextInt(45);
             }
         } else if (hasMemory) {
             searchTicks++;
