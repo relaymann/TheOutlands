@@ -24,7 +24,7 @@ import net.minecraft.sounds.SoundEvent;
  * A subterranean ambusher. It phases through the existing underground without
  * changing blocks, then finds a collision-safe surface opening before attacking.
  */
-public final class BurrowerEntity extends Monster {
+public final class BurrowerEntity extends OutlandsGeoMonster {
     private static final EntityDataAccessor<Boolean> DATA_BURROWING =
             SynchedEntityData.defineId(BurrowerEntity.class, EntityDataSerializers.BOOLEAN);
 
@@ -34,7 +34,7 @@ public final class BurrowerEntity extends Monster {
     private int blockedEmergenceTicks;
     private double burrowStartX, burrowStartY, burrowStartZ;
 
-    public BurrowerEntity(EntityType<? extends Monster> type, Level level) {
+    public BurrowerEntity(EntityType<? extends OutlandsGeoMonster> type, Level level) {
         super(type, level);
         xpReward = 7;
     }

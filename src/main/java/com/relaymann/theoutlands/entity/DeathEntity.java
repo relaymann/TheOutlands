@@ -20,7 +20,7 @@ import com.relaymann.theoutlands.horror.AlmightyTerritory;
 import java.util.UUID;
 
 /** Death is a persistent hunter bound to the player whose trail he is following. */
-public final class DeathEntity extends Monster {
+public final class DeathEntity extends OutlandsGeoMonster {
     private UUID huntTarget;
     private int farTicks;
     private long pauseUntilGameTime;
@@ -28,7 +28,7 @@ public final class DeathEntity extends Monster {
 
     public void setTemporaryExpiresAt(long gameTime) { temporaryExpiresAt = gameTime; }
 
-    public DeathEntity(EntityType<? extends Monster> type, Level level) {
+    public DeathEntity(EntityType<? extends OutlandsGeoMonster> type, Level level) {
         super(type, level);
         setPersistenceRequired();
         xpReward = 0;

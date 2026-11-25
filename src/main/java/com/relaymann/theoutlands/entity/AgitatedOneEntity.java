@@ -19,7 +19,7 @@ import com.relaymann.theoutlands.sound.OutlandsSounds;
 import com.relaymann.theoutlands.OutlandsConfig;
 
 /** A volatile predator that escalates from twitching vigilance to sustained, telegraphed charges. */
-public final class AgitatedOneEntity extends Monster {
+public final class AgitatedOneEntity extends OutlandsGeoMonster {
     private static final EntityDataAccessor<Integer> DATA_AGITATION = SynchedEntityData.defineId(AgitatedOneEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> DATA_CHARGING = SynchedEntityData.defineId(AgitatedOneEntity.class, EntityDataSerializers.BOOLEAN);
     private int agitation;
@@ -28,7 +28,7 @@ public final class AgitatedOneEntity extends Monster {
     private int chargeTicks;
     private boolean charging;
     private boolean chargeHit;
-    public AgitatedOneEntity(EntityType<? extends Monster> type, Level level) { super(type, level); xpReward = 9; }
+    public AgitatedOneEntity(EntityType<? extends OutlandsGeoMonster> type, Level level) { super(type, level); xpReward = 9; }
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 48.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.28D).add(Attributes.FOLLOW_RANGE, 38.0D)
