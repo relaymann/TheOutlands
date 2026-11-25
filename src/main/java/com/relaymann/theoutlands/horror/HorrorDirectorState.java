@@ -5,10 +5,6 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Runtime-only pacing state for one player. Persistent discoveries and story flags
- * belong in saved player data, not in this transient encounter scheduler.
- */
 public final class HorrorDirectorState {
     static final int RECENT_EVENT_MEMORY = 3;
 

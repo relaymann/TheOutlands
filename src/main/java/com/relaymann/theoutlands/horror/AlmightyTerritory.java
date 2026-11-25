@@ -2,14 +2,6 @@ package com.relaymann.theoutlands.horror;
 
 import com.relaymann.theoutlands.OutlandsConfig;
 
-/**
- * Geometry for the Almighty's exclusive endgame region.
- *
- * <p>The region is measured inward from the configured square world border, not from
- * assumed spawn-relative coordinates. A negative distance means the position is
- * outside the border. The four corners are handled using the nearest edge of the
- * square, so the region follows non-default border centers and sizes correctly.</p>
- */
 public final class AlmightyTerritory {
     public static final double DEFAULT_DEPTH_BLOCKS = 5_000.0D;
 
@@ -32,7 +24,6 @@ public final class AlmightyTerritory {
         return Double.isFinite(distance) && distance >= 0.0D && distance <= depthBlocks;
     }
 
-    /** Reads the live configured border and configured endgame depth from the level. */
     public static boolean contains(net.minecraft.world.level.Level level, double x, double z) {
         var border = level.getWorldBorder();
         return contains(border.getCenterX(), border.getCenterZ(), border.getSize(),

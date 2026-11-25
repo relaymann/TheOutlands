@@ -21,10 +21,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * Rare, close-range Fear/Death manifestations. The normal first meetings remain
- * separate story beats; this manager only adds occasional, short-lived scares.
- */
 public final class AggressiveJumpscareManager {
     private static final long ENTITY_LIFETIME_TICKS = 14L;
     private static final Map<UUID, ActiveScare> ACTIVE = new HashMap<>();
@@ -45,7 +41,6 @@ public final class AggressiveJumpscareManager {
         if (!AggressiveJumpscarePolicy.shouldAttempt(distanceFromSpawn, fearIntroduced, deathIntroduced,
                 false, elapsed, player.getRandom().nextDouble())) return;
 
-        // Death is the harsher encounter, but it cannot appear before his own story introduction.
         boolean useDeath = deathIntroduced && (!fearIntroduced || player.getRandom().nextInt(100) < 62);
         Entity scare = spawnCloseManifestation(player, useDeath);
         if (scare == null) return;
@@ -66,7 +61,6 @@ public final class AggressiveJumpscareManager {
         double sideX = Math.cos(yaw);
         double sideZ = Math.sin(yaw);
 
-        // Try the center first, then slight offsets so a wall does not cancel every scare.
         double[][] offsets = {{0.0D, 2.65D}, {-0.8D, 2.45D}, {0.8D, 2.45D}, {0.0D, 3.2D}};
         for (double[] offset : offsets) {
             double x = player.getX() + forwardX * offset[1] + sideX * offset[0];

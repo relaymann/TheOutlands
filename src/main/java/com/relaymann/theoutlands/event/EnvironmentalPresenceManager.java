@@ -20,10 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * Rare, player-private signs of nearby creatures. These cues do not spawn
- * entities, reveal exact locations, force encounters, or alter the world.
- */
 @EventBusSubscriber(modid = TheOutlands.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public final class EnvironmentalPresenceManager {
     private static final long COOLDOWN = 9_000L;

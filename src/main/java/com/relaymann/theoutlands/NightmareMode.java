@@ -6,7 +6,6 @@ import net.minecraft.world.level.Level;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** Shared, server-authoritative NIGHTMARE world-mode checks. */
 public final class NightmareMode {
     private static final Set<Long> NIGHTMARE_SEEDS = ConcurrentHashMap.newKeySet();
 
@@ -16,7 +15,6 @@ public final class NightmareMode {
         return level != null && level.getGameRules().getBoolean(OutlandsGameRules.NIGHTMARE_MODE);
     }
 
-    /** Structure placement runs from a seed-only generation context. */
     public static boolean isSeedEnabled(long seed) {
         return NIGHTMARE_SEEDS.contains(seed);
     }

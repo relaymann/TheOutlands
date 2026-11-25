@@ -11,7 +11,6 @@ import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.util.Mth;
 
-/** Shared rig with strongly differentiated NIGHTMARE silhouettes and deliberately unstable motion. */
 public final class NightmareCreatureModel extends HumanoidModel<NightmareCreature> {
     private final ModelPart crown, ribCage, mantle, snout, jaw, tail, dorsalSpines;
     private final ModelPart leftHorn, rightHorn, leftHook, rightHook, leftTendril, rightTendril;

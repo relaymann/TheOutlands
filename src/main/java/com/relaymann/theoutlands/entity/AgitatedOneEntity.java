@@ -18,7 +18,6 @@ import net.minecraft.sounds.SoundEvent;
 import com.relaymann.theoutlands.sound.OutlandsSounds;
 import com.relaymann.theoutlands.OutlandsConfig;
 
-/** A volatile predator that escalates from twitching vigilance to sustained, telegraphed charges. */
 public final class AgitatedOneEntity extends OutlandsGeoMonster {
     private static final EntityDataAccessor<Integer> DATA_AGITATION = SynchedEntityData.defineId(AgitatedOneEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> DATA_CHARGING = SynchedEntityData.defineId(AgitatedOneEntity.class, EntityDataSerializers.BOOLEAN);
@@ -76,7 +75,7 @@ public final class AgitatedOneEntity extends OutlandsGeoMonster {
                 }
             }
             if (charging) {
-                // Keep the melee goal from replacing the charge's launch velocity.
+
                 getNavigation().stop();
                 if (!chargeHit && d < 4.0D) { doHurtTarget(p); chargeHit = true; }
                 if (--chargeTicks <= 0) charging = false;

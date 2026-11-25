@@ -24,7 +24,6 @@ import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
 
 import java.util.List;
 
-/** Server-side habitat rules and distance/threat-budget balancing for natural spawns. */
 @EventBusSubscriber(modid = TheOutlands.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public final class OutlandsSpawnEvents {
 
@@ -76,8 +75,7 @@ public final class OutlandsSpawnEvents {
         if (reason != MobSpawnType.NATURAL && reason != MobSpawnType.CHUNK_GENERATION) return true;
 
         ServerLevel serverLevel = level.getLevel();
-        // Almighty has its own End-only rarity rule and is deliberately outside
-        // the Overworld distance progression and encounter budget.
+
         if (!serverLevel.dimension().equals(Level.OVERWORLD) || type == OutlandsEntities.ALMIGHTY.get()) return true;
 
         boolean nightmare = NightmareMode.isEnabled(serverLevel);
@@ -95,21 +93,14 @@ public final class OutlandsSpawnEvents {
         double minimumDistance = profile.minimumDistance();
         int denominator = profile.rarityMultiplier();
         if (nightmare) {
-            // Preserve each creature's intended territory while maintaining a
-            // 900-block opening buffer around world spawn. Nightmare rarity is
-            // intentionally not divided down: doing so caused early mob floods.
+
             minimumDistance = com.relaymann.theoutlands.NightmareBalancePolicy
                     .nightmareMinimumSpawnDistance(minimumDistance);
         }
         if (distance < minimumDistance) return false;
 
-        // Distance is a progression gate, not a second rarity penalty. Once an
-        // entity reaches its intended territory, only its own rarity applies.
         if (denominator > 1 && random.nextInt(denominator) != 0) return false;
 
-        // Budget around the candidate spawn location rather than the nearest
-        // player. This also constrains chunk-generation spawns, which can run
-        // before a player is close enough to be found.
         boolean bloodMoon = nightmare && NightmareModeManager.isBloodMoonActive(serverLevel);
         int pressureTier = nightmare
                 ? com.relaymann.theoutlands.NightmareBalancePolicy.pressureTier(serverLevel.getDayTime(), distance) : 0;
@@ -155,8 +146,7 @@ public final class OutlandsSpawnEvents {
     }
 
     private static SpawnProfile profile(EntityType<?> type) {
-        // Common territorial hunters begin close enough that a normal first
-        // session reliably encounters the mod, without flooding the spawn area.
+
         if (type == OutlandsEntities.LURKER.get() || type == OutlandsEntities.DREDGE.get()
                 || type == OutlandsEntities.STALKER.get()) return new SpawnProfile(250.0D, 1, 1);
         if (type == OutlandsEntities.NIGHTMARE_HOUND.get()) return new SpawnProfile(500.0D, 2, 2);
@@ -239,7 +229,6 @@ public final class OutlandsSpawnEvents {
                 && level.getBrightness(LightLayer.BLOCK, pos) <= 8
                 && pos.getY() <= 80;
     }
-
 
     private static boolean pilgrimSpawn(EntityType<? extends Monster> type, ServerLevelAccessor level, MobSpawnType reason, BlockPos pos, RandomSource random) {
         return Monster.checkMonsterSpawnRules(type, level, reason, pos, random)

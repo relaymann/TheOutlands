@@ -18,7 +18,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import java.util.EnumSet;
 
-/** The Observer advances by pathfinding only while its target cannot see it. No turning-trigger teleportation. */
 public final class ObserverEntity extends OutlandsGeoMonster {
     private static final EntityDataAccessor<Boolean> DATA_ADVANCING = SynchedEntityData.defineId(ObserverEntity.class, EntityDataSerializers.BOOLEAN);
     public ObserverEntity(EntityType<? extends OutlandsGeoMonster> type, Level level) { super(type, level); xpReward = 8; }

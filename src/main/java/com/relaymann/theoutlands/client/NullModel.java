@@ -8,7 +8,7 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-/** Null's familiar silhouette gains a trailing shadow mantle and a broken crown. */
+
 public final class NullModel extends HumanoidModel<NullEntity> {
  private final ModelPart mantle, crown;
  public NullModel(ModelPart root) { super(root); mantle=root.getChild("body").getChild("mantle"); crown=root.getChild("head").getChild("crown"); }

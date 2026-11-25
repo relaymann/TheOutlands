@@ -1,11 +1,5 @@
 package com.relaymann.theoutlands.horror;
 
-/**
- * Metadata used by the horror director to decide which encounter family may be proposed.
- *
- * <p>This class deliberately contains no world effects. An event handler will own the
- * actual presentation and gameplay consequences when that encounter family is implemented.</p>
- */
 public record HorrorEventDefinition(
         String id,
         double minimumDistance,

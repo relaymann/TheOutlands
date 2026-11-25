@@ -18,7 +18,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
-/** Five NIGHTMARE-exclusive predators with shared navigation but distinct temperaments. */
 public final class NightmareCreature extends OutlandsGeoMonster {
     private int leapCooldown;
     private int feintCooldown;
@@ -76,8 +75,7 @@ public final class NightmareCreature extends OutlandsGeoMonster {
         if (!(getTarget() instanceof Player player) || !player.isAlive()
                 || player.isCreative() || player.isSpectator()) {
             setSprinting(false);
-            // A predator that loses its quarry searches the last confirmed position.
-            // The False Survivor is deliberately exempt so it can freeze when watched.
+
             if (hasMemory && !isVariant("nightmare_false_survivor")) {
                 searchTicks++;
                 if (searchTicks <= 90 && tickCount % 12 == 0) {
@@ -129,7 +127,6 @@ public final class NightmareCreature extends OutlandsGeoMonster {
         }
     }
 
-    /** Nearby Nightmare predators converge on a shared sighting without global aggro. */
     private void coordinateNearbyPredators(Player player) {
         for (NightmareCreature ally : level().getEntitiesOfClass(NightmareCreature.class,
                 getBoundingBox().inflate(26.0D, 12.0D, 26.0D),
@@ -167,8 +164,6 @@ public final class NightmareCreature extends OutlandsGeoMonster {
             return;
         }
 
-        // The Watcher advances whenever it is not being watched and becomes
-        // especially dangerous once it has closed the distance.
         setSprinting(distance > 16.0D);
         if (getNavigation().isDone() || tickCount % 12 == 0) {
             getNavigation().moveTo(player, distance > 400.0D ? 1.04D : 1.20D);

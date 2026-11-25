@@ -11,7 +11,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import com.relaymann.theoutlands.event.OutlandsIntelligenceManager;
 
-/** Simple server-authoritative trap/alarm block with per-entity tick throttling. */
 public final class SurvivalDefenseBlock extends Block {
     public enum Kind { SPIKES, ALARM }
     private final Kind kind;

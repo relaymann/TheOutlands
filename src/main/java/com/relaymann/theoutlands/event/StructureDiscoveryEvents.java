@@ -15,7 +15,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
-/** Persists structure discoveries privately when a player opens an Outlands site cache. */
 @EventBusSubscriber(modid = TheOutlands.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public final class StructureDiscoveryEvents {
     private StructureDiscoveryEvents() {}

@@ -19,7 +19,6 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
-/** A distant wilderness giant that gives a clear physical warning before its ground strike. */
 public final class ColossusEntity extends OutlandsGeoMonster {
     private static final EntityDataAccessor<Boolean> DATA_WINDING_UP =
             SynchedEntityData.defineId(ColossusEntity.class, EntityDataSerializers.BOOLEAN);

@@ -8,7 +8,7 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-/** Featureless subordinate silhouette, wrapped in a narrow hood and trailing shroud. */
+
 public final class NullApostleModel extends HumanoidModel<NullApostleEntity> {
  private final ModelPart shroud, hood;
  public NullApostleModel(ModelPart root) { super(root); shroud=root.getChild("body").getChild("shroud"); hood=root.getChild("head").getChild("hood"); }

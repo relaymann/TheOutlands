@@ -3,7 +3,6 @@ package com.relaymann.theoutlands.horror;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Pure policies for bounded encounter history and unique ARG discoveries. */
 public final class HorrorMemoryPolicy {
     private HorrorMemoryPolicy() {
     }

@@ -8,7 +8,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.level.Level;
 
-/** A durable shield whose binding only functions in NIGHTMARE worlds. */
 public final class NightmareWardItem extends ShieldItem {
     public NightmareWardItem(Properties properties) { super(properties); }
 

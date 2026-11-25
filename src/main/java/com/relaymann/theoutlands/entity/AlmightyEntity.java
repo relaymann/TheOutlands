@@ -27,7 +27,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 
-/** The Almighty's endgame manifestation, with escalating phases and a persistent ending clue. */
 public final class AlmightyEntity extends OutlandsGeoMonster {
     private final ServerBossEvent bossEvent = new ServerBossEvent(
             Component.literal("The Almighty"), BossEvent.BossBarColor.PURPLE, BossEvent.BossBarOverlay.PROGRESS);
@@ -53,8 +52,7 @@ public final class AlmightyEntity extends OutlandsGeoMonster {
     }
 
     private boolean isWithinHuntTerritory(Player player) {
-        // The story boss is confined to the configured Overworld borderland.
-        // Its exceptionally rare natural End spawns still need to hunt normally.
+
         return !level().dimension().equals(Level.OVERWORLD)
                 || AlmightyTerritory.contains(level(), player.getX(), player.getZ());
     }
@@ -104,10 +102,10 @@ public final class AlmightyEntity extends OutlandsGeoMonster {
             double dz = player.getZ() - getZ();
             double length = Math.max(0.001D, Math.sqrt(dx * dx + dz * dz));
             if (phase == 2) {
-                // The middle phase drags the player inward before the next melee window.
+
                 player.push(-dx / length * 0.72D, 0.16D, -dz / length * 0.72D);
             } else if (phase == 3) {
-                // The final phase breaks defensive positioning with a wider shockwave.
+
                 player.push(dx / length * 1.35D, 0.48D, dz / length * 1.35D);
             }
             player.hurt(damageSources().mobAttack(this), damage);
@@ -152,7 +150,7 @@ public final class AlmightyEntity extends OutlandsGeoMonster {
                         new AABB(blockPosition()).inflate(128.0D))) {
                     HorrorMemory.recordDiscovery(player, "almighty_defeated");
                     if (dropped) HorrorMemory.recordDiscovery(player, "the_last_page_dropped");
-                    // The ending is conveyed by the dropped page and the world, not narrator chat.
+
                 }
             }
         }

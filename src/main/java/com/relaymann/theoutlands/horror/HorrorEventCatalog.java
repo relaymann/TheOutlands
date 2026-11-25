@@ -2,7 +2,6 @@ package com.relaymann.theoutlands.horror;
 
 import java.util.Set;
 
-/** Pure catalog of encounter IDs; safe to load in the isolated unit-test runtime. */
 public final class HorrorEventCatalog {
     private static final Set<String> IDS = Set.of(
             "ambient_displacement", "false_footsteps", "distant_figure", "unexplained_message",

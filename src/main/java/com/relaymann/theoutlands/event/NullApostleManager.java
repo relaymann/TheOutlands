@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
-/** Rare, player-specific appearances of Null's unnamed apostles. */
 public final class NullApostleManager {
     private static final Map<UUID, ActiveApostle> ACTIVE = new HashMap<>();
     private static final long COOLDOWN = 24_000L;
@@ -57,7 +56,7 @@ public final class NullApostleManager {
             apostle.setBlessedPlayer(player.getUUID());
             apostle.setTemporaryExpiresAt(now + 180L);
             apostle.setNoAi(true);
-            // Apostles are mortal and intentionally fragile compared with Null.
+
             apostle.setInvulnerable(false);
             if (!level.noCollision(apostle, apostle.getBoundingBox()) || !level.addFreshEntity(apostle)) continue;
             positions.add(position);
@@ -94,9 +93,6 @@ public final class NullApostleManager {
                 continue;
             }
 
-            // The blessing lets it sense its assigned player through obstructions.
-            // Ordinary line of sight is only used to decide whether the player has
-            // actually caught it looking at them.
             if (player.hasLineOfSight(apostle) && isLookingAt(player, apostle)) {
                 if (active.lookedAtSince < 0L) active.lookedAtSince = level.getGameTime();
                 if (level.getGameTime() - active.lookedAtSince >= 18L) {

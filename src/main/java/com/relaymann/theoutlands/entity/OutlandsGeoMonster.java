@@ -20,7 +20,6 @@ import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-/** Shared GeckoLib animation host. Gameplay AI remains server-authoritative in each concrete creature. */
 public abstract class OutlandsGeoMonster extends Monster implements GeoEntity {
     private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("animation.outlands.idle");
     private static final RawAnimation WALK = RawAnimation.begin().thenLoop("animation.outlands.walk");
@@ -134,7 +133,6 @@ public abstract class OutlandsGeoMonster extends Monster implements GeoEntity {
         controllers.add(combat);
     }
 
-    /** Starts an authored, creature-specific action on the synchronized GeckoLib controller. */
     public final void playHorrorAnimation(String animation) {
         triggerAnim("combat", animation);
     }
@@ -145,7 +143,6 @@ public abstract class OutlandsGeoMonster extends Monster implements GeoEntity {
         super.die(source);
     }
 
-    /** Starts creature-specific attack keyframes only after a real melee hit succeeds. */
     @Override
     public boolean doHurtTarget(Entity target) {
         boolean hit = super.doHurtTarget(target);
@@ -153,7 +150,6 @@ public abstract class OutlandsGeoMonster extends Monster implements GeoEntity {
         return hit;
     }
 
-    /** Adds quiet, irregular movement tells without duplicating creatures that already own footsteps. */
     @Override
     public void tick() {
         super.tick();

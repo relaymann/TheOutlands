@@ -8,7 +8,7 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
-/** Fear's dedicated humanoid renderer and unique texture. */
+
 public final class FearRenderer extends MobRenderer<FearEntity,FearModel> {
  public static final ModelLayerLocation LAYER=new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(TheOutlands.MOD_ID,"fear"),"main");
  private static final ResourceLocation TEXTURE=ResourceLocation.fromNamespaceAndPath(TheOutlands.MOD_ID,"textures/entity/fear.png");

@@ -12,7 +12,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
 import java.util.UUID;
 
-/** A featureless subordinate of Null. It senses its assigned player through Null's Blessing. */
 public final class NullApostleEntity extends OutlandsGeoMonster {
     private static final String BLESSED_PLAYER_TAG = "NullBlessedPlayer";
     private UUID blessedPlayer;

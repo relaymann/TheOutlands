@@ -17,7 +17,6 @@ import net.neoforged.neoforge.client.event.ScreenEvent;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-/** Adds a persistent NIGHTMARE selector to the vanilla Create World screen. */
 @EventBusSubscriber(modid = TheOutlands.MOD_ID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public final class NightmareModeSelection {
     private static final Map<WorldCreationUiState, Selection> SELECTIONS = new WeakHashMap<>();

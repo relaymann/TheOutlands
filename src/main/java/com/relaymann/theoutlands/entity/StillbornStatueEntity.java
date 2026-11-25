@@ -18,7 +18,6 @@ import com.relaymann.theoutlands.sound.OutlandsSounds;
 import com.relaymann.theoutlands.OutlandsConfig;
 import java.util.EnumSet;
 
-/** A stone sentinel that advances only while its chosen prey cannot see it. */
 public final class StillbornStatueEntity extends OutlandsGeoMonster {
     private static final EntityDataAccessor<Boolean> DATA_STALKING = SynchedEntityData.defineId(StillbornStatueEntity.class, EntityDataSerializers.BOOLEAN);
     private int stillnessTicks;
@@ -53,7 +52,7 @@ public final class StillbornStatueEntity extends OutlandsGeoMonster {
             getLookControl().setLookAt(p, 45.0F, 45.0F);
             if (isWatchedByAnyPlayer()) {
                 stalking = false; entityData.set(DATA_STALKING, false); stillnessTicks++; getNavigation().stop(); setDeltaMovement(0, getDeltaMovement().y, 0);
-                // It does not abandon a nearby watched target; it waits for a genuine loss of sight.
+
                 return;
             }
             stillnessTicks = 0; stalking = true; entityData.set(DATA_STALKING, true);

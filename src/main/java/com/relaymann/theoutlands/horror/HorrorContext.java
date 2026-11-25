@@ -1,6 +1,5 @@
 package com.relaymann.theoutlands.horror;
 
-/** Player-local conditions and remembered history supplied to the Horror Director. */
 public record HorrorContext(String biomeId, boolean night, boolean raining, boolean thundering,
                             int nearbyPlayers, float healthFraction,
                             int previousEncounterCount, boolean hasSeenNull, boolean hasMetFear,
@@ -49,7 +48,7 @@ public record HorrorContext(String biomeId, boolean night, boolean raining, bool
         if ("the_return".equals(id) && hasSeenNull) weight *= 1.6D;
         if ("wrong_sounds".equals(id) && night) weight *= 1.35D;
         if ("observer".equals(id) && biomeId.contains("forest")) weight *= 1.4D;
-        // Isolation and familiar routines make subtle events more likely, not louder or more frequent.
+
         if (nearbyPlayers == 0 && ("wall_knock".equals(id) || "behind_steps".equals(id)
                 || "breathing_presence".equals(id) || "familiar_echo".equals(id))) weight *= 1.22D;
         if (night && ("wall_knock".equals(id) || "door_afterimage".equals(id)

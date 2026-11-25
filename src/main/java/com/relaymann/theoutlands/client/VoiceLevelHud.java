@@ -11,7 +11,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-/** Client-only microphone meter. It renders above the hotbar while voice chat is connected. */
 @EventBusSubscriber(modid = TheOutlands.MOD_ID, value = Dist.CLIENT)
 public final class VoiceLevelHud {
     private static volatile boolean connected;
@@ -34,7 +33,6 @@ public final class VoiceLevelHud {
         }
     }
 
-    /** Receives one unencoded PCM frame from the SVC client API; samples are never retained. */
     public static void acceptAudio(short[] samples, boolean isWhispering) {
         if (!connected || samples == null || samples.length == 0) return;
         int level = VoiceLevelMath.fromPcm(samples);
@@ -42,12 +40,11 @@ public final class VoiceLevelHud {
         whispering = isWhispering;
         lastAudioNanos = System.nanoTime();
 
-        // Four PCM frames per network update is enough for responsive detection without packet spam.
         if (FRAME_COUNTER.incrementAndGet() % 4 == 0) {
             int sentLevel = level;
             Minecraft minecraft = Minecraft.getInstance();
             minecraft.execute(() -> {
-                // A queued microphone frame can outlive a world disconnect.
+
                 if (connected && minecraft.player != null && minecraft.getConnection() != null) {
                     PacketDistributor.sendToServer(new VoiceLevelPayload(sentLevel, isWhispering));
                 }

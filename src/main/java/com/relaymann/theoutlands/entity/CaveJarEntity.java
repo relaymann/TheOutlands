@@ -21,10 +21,6 @@ import net.minecraft.sounds.SoundEvent;
 import com.relaymann.theoutlands.sound.OutlandsSounds;
 import com.relaymann.theoutlands.OutlandsConfig;
 
-/**
- * Cave.jar is a committed cave predator. It tracks confirmed sightings,
- * searches the last known area, and uses a telegraphed close-range lunge.
- */
 public final class CaveJarEntity extends OutlandsGeoMonster {
     private static final EntityDataAccessor<Integer> DATA_LUNGE_WINDUP =
             SynchedEntityData.defineId(CaveJarEntity.class, EntityDataSerializers.INT);
@@ -89,7 +85,6 @@ public final class CaveJarEntity extends OutlandsGeoMonster {
             if (distance < 16.0D && hasLineOfSight(player)) setSprinting(true);
             else if (distance > 36.0D) setSprinting(false);
 
-            // A visible pause gives the player time to dodge the committed lunge.
             if (lungeWindup > 0) {
                 getNavigation().stop();
                 setDeltaMovement(0.0D, getDeltaMovement().y, 0.0D);

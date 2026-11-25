@@ -19,7 +19,6 @@ import net.minecraft.world.level.Level;
 import com.relaymann.theoutlands.horror.AlmightyTerritory;
 import java.util.UUID;
 
-/** Death is a persistent hunter bound to the player whose trail he is following. */
 public final class DeathEntity extends OutlandsGeoMonster {
     private UUID huntTarget;
     private int farTicks;
@@ -57,7 +56,7 @@ public final class DeathEntity extends OutlandsGeoMonster {
         goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 0.72D));
         goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 48.0F));
         goalSelector.addGoal(9, new RandomLookAroundGoal(this));
-        // No nearest-player target goal: Death follows the player whose trail he first picked up.
+
     }
 
     @Override public void tick() {
@@ -65,7 +64,7 @@ public final class DeathEntity extends OutlandsGeoMonster {
         if (level().isClientSide) return;
         if (temporaryExpiresAt >= 0L && level().getGameTime() >= temporaryExpiresAt) { discard(); return; }
         if (huntTarget == null) {
-            // A naturally spawned Death chooses a nearby non-creative player as its first trail.
+
             Player nearest = level().getNearestPlayer(getX(), getY(), getZ(), 72.0D,
                     entity -> entity instanceof Player player && player.isAlive() && !player.isCreative() && !player.isSpectator());
             if (!(nearest instanceof ServerPlayer serverPlayer)) return;
@@ -80,7 +79,7 @@ public final class DeathEntity extends OutlandsGeoMonster {
         }
 
         double distance = distanceToSqr(target);
-        // Death's presence is almost silent: the sound is rare and only reaches a nearby quarry.
+
         if (OutlandsConfig.HORROR_AUDIO_ENABLED.get() && tickCount % 120 == 0
                 && distance <= 36.0D * 36.0D && getRandom().nextInt(3) == 0) {
             level().playSound(null, blockPosition(), OutlandsSounds.DEATH_PRESENCE.get(),
@@ -89,8 +88,6 @@ public final class DeathEntity extends OutlandsGeoMonster {
         if (distance > 100.0D * 100.0D) farTicks++;
         else farTicks = 0;
 
-        // When the player seems to have escaped, Death stops pursuing for a while.
-        // He resumes only if the player is still within a plausible hunting radius.
         if (farTicks >= 60 && pauseUntilGameTime <= level().getGameTime()) {
             pauseUntilGameTime = level().getGameTime() + 100L + getRandom().nextInt(100);
             farTicks = 0;
@@ -103,7 +100,7 @@ public final class DeathEntity extends OutlandsGeoMonster {
         }
 
         setTarget(target);
-        // Death sometimes watches instead of attacking, then resumes without a cue.
+
         if (distance < 24.0D * 24.0D && tickCount % 360 < 64) {
             getNavigation().stop();
             getLookControl().setLookAt(target, 24.0F, 24.0F);

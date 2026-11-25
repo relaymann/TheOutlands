@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-/** Rare, player-private footsteps that finish a beat after the player has stopped. */
 public final class FootstepEchoManager {
     private static final Map<UUID, State> STATES = new HashMap<>();
     private FootstepEchoManager() {}

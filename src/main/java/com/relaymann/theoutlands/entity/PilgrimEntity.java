@@ -18,7 +18,6 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
-/** A wary wanderer that watches from a distance, retreats when approached, and only attacks when provoked. */
 public final class PilgrimEntity extends OutlandsGeoMonster {
     private static final EntityDataAccessor<Boolean> DATA_WATCHING =
             SynchedEntityData.defineId(PilgrimEntity.class, EntityDataSerializers.BOOLEAN);
@@ -91,7 +90,7 @@ public final class PilgrimEntity extends OutlandsGeoMonster {
 
         double distance = distanceToSqr(player);
         if (distance < 36.0D && behaviorCooldown == 0) {
-            // It never teleports: it chooses a reachable retreat point and moves away.
+
             double dx = getX() - player.getX();
             double dz = getZ() - player.getZ();
             double length = Math.max(0.001D, Math.sqrt(dx * dx + dz * dz));

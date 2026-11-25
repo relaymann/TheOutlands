@@ -15,7 +15,6 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.phys.AABB;
 
-/** Sparse environmental behavior for Fear's forest domain; all cues are target-player specific. */
 public final class FearTerritoryManager {
     private FearTerritoryManager() {}
 
@@ -28,12 +27,11 @@ public final class FearTerritoryManager {
                 .getKey(level.getBiome(player.blockPosition()).value());
         if (biomeKey == null || !(biomeKey.getPath().contains("forest")
                 || biomeKey.getPath().equals("fear_forest"))) return;
-        // This method is called on the player's 20-tick progression cadence; use
-        // that same clock so an offset world time cannot suppress the event forever.
+
         if (player.tickCount % 100 != 0) return;
 
         HorrorMemory.recordDiscovery(player, "fear_forest_entered");
-        // Fear disturbs nearby wildlife, not hostile hunters or other Outlands entities.
+
         var nearby = level.getEntitiesOfClass(Mob.class,
                 new AABB(player.blockPosition()).inflate(24.0D),
                 mob -> mob.isAlive() && mob.getType().getCategory() == MobCategory.CREATURE);
@@ -43,7 +41,6 @@ public final class FearTerritoryManager {
             chosen.getLookControl().setLookAt(player, 5.0F, 5.0F);
         }
 
-        // Forest animals occasionally stop behaving naturally, but no mob is forcibly hostile.
         if (player.getRandom().nextInt(9) == 0) {
             for (Mob mob : nearby) {
                 if (mob.getType() == EntityType.WOLF || mob.getType() == EntityType.FOX) {
