@@ -85,6 +85,10 @@ public final class BurrowerEntity extends OutlandsGeoMonster {
 
     private void beginBurrow() {
         playHorrorAnimation("burrow");
+        if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) {
+            playSound(OutlandsSounds.DREDGE_CRAWL.get(), 0.34F,
+                    0.62F + getRandom().nextFloat() * 0.12F);
+        }
         submerged = true;
         entityData.set(DATA_BURROWING, true);
         burrowTicks = 0;
