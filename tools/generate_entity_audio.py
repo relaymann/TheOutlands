@@ -394,6 +394,21 @@ stalker_lunge.sub, stalker_lunge.throat, stalker_lunge.grit = (
     {"lp1": 0.0, "lp2": 0.0}, {"lp1": 0.0, "lp2": 0.0}, {"lp1": 0.0, "lp2": 0.0})
 make("stalker_lunge", 0.88, stalker_lunge)
 
+# Hunter pounce: a wider, forward-rushing breath with a hard jaw snap and gritty landing tail.
+def hunter_pounce(t, d, i, n):
+    sub = noise(t, 32, 240, hunter_pounce.sub)
+    breath = noise(t, 140, 1500, hunter_pounce.breath)
+    grit = noise(t, 1000, 6800, hunter_pounce.grit)
+    snap = 0.0
+    if t < 0.055:
+        snap = 0.52 * math.sin(2 * math.pi * (260 - 120 * t) * t) * math.exp(-t * 25)
+    rush = math.sin(2 * math.pi * (120 * t - 42 * t * t))
+    return snap + 0.30 * sub * math.exp(-t * 3.8) + 0.25 * breath * math.exp(-t * 3.0) + 0.18 * grit * math.exp(-t * 7.0) + 0.16 * rush * math.exp(-t * 4.5)
+hunter_pounce.sub, hunter_pounce.breath, hunter_pounce.grit = (
+    {"lp1": 0.0, "lp2": 0.0}, {"lp1": 0.0, "lp2": 0.0}, {"lp1": 0.0, "lp2": 0.0})
+make("hunter_pounce", 0.98, hunter_pounce)
+
+
 # NIGHTMARE attack sting: a layered throat rupture, not a repeated ambient loop.
 def nightmare_screech(t, d, i, n):
     p = t / d
