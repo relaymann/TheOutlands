@@ -18,16 +18,7 @@ public final class OutlandsGeoModel<T extends OutlandsGeoMonster> extends GeoMod
         if (id.startsWith("nightmare_")) {
             return ResourceLocation.fromNamespaceAndPath(TheOutlands.MOD_ID, "textures/entity/nightmare/" + id.substring("nightmare_".length()) + ".png");
         }
-        String texture = switch (id) {
-            case "cave_jar" -> "agitated_one";
-            case "stalker" -> "howler";
-            case "observer" -> "null_apostle";
-            case "pilgrim" -> "null";
-            case "ceiling_dweller" -> "burrower";
-            case "colossus" -> "almighty";
-            default -> id;
-        };
-        return ResourceLocation.fromNamespaceAndPath(TheOutlands.MOD_ID, "textures/entity/" + texture + ".png");
+        return ResourceLocation.fromNamespaceAndPath(TheOutlands.MOD_ID, "textures/entity/" + id + ".png");
     }
 
     @Override public ResourceLocation getAnimationResource(T entity) { return ANIMATIONS; }
