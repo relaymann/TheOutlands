@@ -46,6 +46,7 @@ public final class OutlandsIntelligenceManager {
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Post event) {
         Player player = event.getEntity();
+        if (!OutlandsConfig.ENTITY_INTELLIGENCE_ENABLED.get()) return;
         if (!(player.level() instanceof ServerLevel level) || !eligible(player)
                 || player.isPassenger() || !player.onGround() || player.isCrouching()
                 || player.tickCount % 4 != 0
@@ -128,7 +129,8 @@ public final class OutlandsIntelligenceManager {
                 || mob instanceof FearEntity || mob instanceof DeathEntity
                 || mob instanceof AlmightyEntity || mob instanceof LurkerEntity
                 || mob instanceof HowlerEntity || mob instanceof DredgeEntity
-                || mob instanceof NightmareCreature;
+                || mob instanceof NightmareCreature || mob instanceof PilgrimEntity
+                || mob instanceof CeilingDwellerEntity || mob instanceof ColossusEntity;
     }
 
     /** Public hook used by the perimeter alarm block when it detects a creature. */
@@ -207,6 +209,7 @@ public final class OutlandsIntelligenceManager {
     private static double hearingRange(Mob mob) {
         if (mob instanceof HowlerEntity) return 56.0D;
         if (mob instanceof ColossusEntity || mob instanceof AlmightyEntity) return 42.0D;
+        if (mob instanceof PilgrimEntity || mob instanceof CeilingDwellerEntity) return 32.0D;
         if (mob instanceof HunterEntity || mob instanceof StalkerEntity
                 || mob instanceof DeathEntity || mob instanceof DredgeEntity
                 || mob instanceof LurkerEntity || mob instanceof BurrowerEntity) return 38.0D;
@@ -300,6 +303,8 @@ public final class OutlandsIntelligenceManager {
         if (mob instanceof LurkerEntity) return 24;
         if (mob instanceof HowlerEntity) return 52;
         if (mob instanceof DredgeEntity) return 30;
+        if (mob instanceof PilgrimEntity) return 46;
+        if (mob instanceof CeilingDwellerEntity) return 30;
         if (mob instanceof MimicEntity) return 18;
         if (mob instanceof NightmareCreature creature) {
             return switch (creature.getVariantId()) {
@@ -323,7 +328,8 @@ public final class OutlandsIntelligenceManager {
                 || mob instanceof AgitatedOneEntity || mob instanceof NullApostleEntity
                 || mob instanceof ObserverEntity || mob instanceof LurkerEntity
                 || mob instanceof HowlerEntity || mob instanceof DredgeEntity
-                || mob instanceof NightmareCreature;
+                || mob instanceof NightmareCreature || mob instanceof PilgrimEntity
+                || mob instanceof CeilingDwellerEntity;
     }
 
     private static void adaptPursuit(Mob mob) {
