@@ -214,6 +214,19 @@ def generate(name, palette, index):
         }
         if name in signatures:
             signatures[name]()
+    # Dedicated eye atlas tiles used by the articulated GeoModel eye shells and pupils.
+    # The tiles are kept at the lower-right of each atlas so they do not reuse head/limb UVs.
+    sclera = palette[4] if name not in ("fear", "null", "null_apostle", "observer") else palette[3]
+    iris = palette[2] if name not in ("observer", "fear") else palette[1]
+    pupil = palette[0]
+    rect(pixels, 48, 56, 51, 59, sclera)
+    rect(pixels, 49, 56, 50, 59, iris)
+    rect(pixels, 49, 57, 50, 58, pupil)
+    pixels[48][48] = palette[4]
+    pixels[48][51] = palette[4]
+    rect(pixels, 56, 56, 59, 59, pupil)
+    rect(pixels, 57, 56, 58, 57, iris)
+    pixels[57][57] = palette[4]
     # Limb and back UVs receive torn edges and bone-like highlights.
     for lx in (1, 17, 40, 56):
         for ly in (24, 28, 32, 36):
