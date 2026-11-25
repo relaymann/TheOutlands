@@ -195,10 +195,14 @@ def audit_once():
             else:
                 bone_names = {bone.get("name") for bone in geometry_docs[0].get("bones", [])}
                 required_bones = {"root", "body", "head", "jaw", "spine", "left_arm", "right_arm", "left_leg", "right_leg"}
+                required_face_bones = {"eye_left", "eye_right", "pupil_left", "pupil_right"}
                 rig_bones_by_entity[entity_id] = bone_names
                 if not required_bones.issubset(bone_names):
                     geometry_valid = False
                     errors.append(entity_id + ": GeckoLib rig is missing shared animation bones")
+                if not required_face_bones.issubset(bone_names):
+                    geometry_valid = False
+                    errors.append(entity_id + ": GeckoLib rig is missing articulated eye/pupil bones")
         animations = json.load(open(os.path.join(ROOT, "resources/assets/theoutlands/animations/entity/outlands_monster.animation.json"), encoding="utf-8"))
         for clip_name, clip in animations.get("animations", {}).items():
             animated_bones = set(clip.get("bones", {}).keys())
@@ -219,6 +223,12 @@ def audit_once():
             "attack_stalker", "attack_bite", "attack_heavy", "attack_sweep",
             "death_stalker", "death_heavy", "death_crawler", "death_watcher"
         )
+        creature_clips = tuple(
+            prefix + "_" + entity_id
+            for entity_id in fields.values()
+            for prefix in ("idle", "walk", "sprint", "attack", "death")
+        )
+        required_clips = required_clips + creature_clips
         missing_clips = [name for name in required_clips if "animation.outlands." + name not in animations.get("animations", {})]
         if not geometry_valid or missing_clips:
             errors.append("GeckoLib rigs or clips are missing: " + ", ".join(missing_clips))
@@ -245,10 +255,29 @@ def audit_once():
             errors.append("GeckoLib model is missing client-side head/gaze tracking")
         if "jaw.setRotX" not in geo_model:
             errors.append("GeckoLib model is missing subtle facial/jaw animation")
+        for eye_hook in ("pupil_left", "pupil_right", "leftEye", "rightEye"):
+            if eye_hook not in geo_model:
+                errors.append("GeckoLib model is missing independent eye tracking: " + eye_hook)
+        for variant_map in ("IDLE_VARIANTS", "WALK_VARIANTS", "SPRINT_VARIANTS", "ATTACK_VARIANTS", "DEATH_VARIANTS"):
+            if variant_map not in geo_entity:
+                errors.append("shared monster base is missing per-creature animation map: " + variant_map)
     else:
         for renderer in ("PilgrimRenderer", "CeilingDwellerRenderer", "ColossusRenderer"):
             if renderer not in renderers:
                 errors.append(renderer + ": missing renderer registration")
+    hunter_source = read("java/com/relaymann/theoutlands/entity/HunterEntity.java")
+    observer_source = read("java/com/relaymann/theoutlands/entity/ObserverEntity.java")
+    statue_source = read("java/com/relaymann/theoutlands/entity/StillbornStatueEntity.java")
+    if "HUNTER_POUNCE" not in sounds_java or "hunter_pounce" not in sound_data or 'make("hunter_pounce"' not in audio_generator:
+        errors.append("Hunter-specific pounce sound is not generated and registered")
+    if "OutlandsSounds.HUNTER_POUNCE.get()" not in hunter_source:
+        errors.append("Hunter pounce AI is missing its creature-specific sound hook")
+    if "!p.isCreative()" not in observer_source:
+        errors.append("Observer still treats creative players as visual observers")
+    if "!player.isCreative()" not in statue_source:
+        errors.append("Stillborn Statue still treats creative players as visual observers")
+    if "search_ticks" not in hunter_source or "Keep the last confirmed trail" not in hunter_source:
+        errors.append("Hunter loses its last known position instead of searching after lost sight")
     if "COLOSSUS_WARNING" not in sounds_java or "COLOSSUS_STOMP" not in sounds_java:
         errors.append("Colossus telegraph/impact sounds are not registered")
     if "CEILING_DROP" not in sounds_java or "PILGRIM_STEP" not in sounds_java:
