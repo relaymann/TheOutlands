@@ -6,6 +6,10 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +66,11 @@ public abstract class OutlandsGeoMonster extends Monster implements GeoEntity {
     private static final Map<String, RawAnimation> DEATH_VARIANTS = buildVariantAnimations("death", false);
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private int movementSoundCooldown;
+    private long lastHeardNoiseId;
+    private int investigationTicks;
+    private int investigationRepath;
+    private double investigationX, investigationY, investigationZ;
+    private boolean investigating;
 
     protected OutlandsGeoMonster(EntityType<? extends Monster> type, Level level) {
         super(type, level);
@@ -157,6 +166,7 @@ public abstract class OutlandsGeoMonster extends Monster implements GeoEntity {
     @Override
     public void tick() {
         super.tick();
+        if (!level().isClientSide && OutlandsConfig.ENTITY_INTELLIGENCE_ENABLED.get()) tickCreatureIntelligence();
         if (level().isClientSide || !OutlandsConfig.HORROR_AUDIO_ENABLED.get()) return;
         if (movementSoundCooldown > 0) movementSoundCooldown--;
         if (movementSoundCooldown > 0 || !onGround()
@@ -186,6 +196,139 @@ public abstract class OutlandsGeoMonster extends Monster implements GeoEntity {
         float volume = creatureId().equals("almighty") ? 0.42F : 0.13F;
         playSound(step, volume, 0.82F + getRandom().nextFloat() * 0.24F);
         movementSoundCooldown = 24 + getRandom().nextInt(24);
+    }
+
+    /**
+     * Shared sensory memory layer. Concrete creatures keep their signature behavior;
+     * this layer only supplies sound investigation when they are not already engaged.
+     */
+    private void tickCreatureIntelligence() {
+        if (!(level() instanceof ServerLevel serverLevel) || !isAlive()) return;
+        String id = creatureId();
+        if (getTarget() != null && getTarget().isAlive()) {
+            if (hasLineOfSight(getTarget())) {
+                investigating = false;
+                investigationTicks = 0;
+            }
+            return;
+        }
+
+        double hearingRange = switch (id) {
+            case "howler", "nightmare_hound", "nightmare_wardened", "nightmare_unbound" -> 38.0D;
+            case "hunter", "stalker", "death", "dredge", "burrower" -> 32.0D;
+            case "colossus", "almighty" -> 30.0D;
+            case "observer", "nightmare_watcher", "stillborn_statue" -> 22.0D;
+            case "mimic", "lurker", "cave_jar", "ceiling_dweller" -> 25.0D;
+            default -> 18.0D;
+        };
+        CreatureNoise.Stimulus stimulus = CreatureNoise.hear(serverLevel, position(), hearingRange, lastHeardNoiseId);
+        if (stimulus != null) {
+            lastHeardNoiseId = stimulus.id();
+            investigationX = stimulus.position().x;
+            investigationY = stimulus.position().y;
+            investigationZ = stimulus.position().z;
+            investigationTicks = 0;
+            investigationRepath = 0;
+            investigating = true;
+
+            // Pursuit specialists can identify and follow a player's sound source,
+            // but never receive a target from an anonymous alarm or block sound.
+            boolean pursuer = switch (id) {
+                case "hunter", "stalker", "lurker", "dredge", "nightmare_hound",
+                        "nightmare_wardened", "nightmare_unbound", "death" -> true;
+                default -> false;
+            };
+            if (pursuer && stimulus.source() != null) {
+                Player source = serverLevel.getPlayerByUUID(stimulus.source());
+                if (source != null && source.isAlive() && !source.isCreative() && !source.isSpectator()) {
+                    setTarget(source);
+                    investigating = false;
+                    return;
+                }
+            }
+        }
+
+        if (!investigating) return;
+        investigationTicks++;
+        if (investigationTicks > investigationDuration(id)) {
+            investigating = false;
+            investigationTicks = 0;
+            getNavigation().stop();
+            return;
+        }
+
+        // Search an expanding ring around the sound origin instead of repeatedly
+        // pathing into one blocked doorway or wall.
+        if (investigationRepath-- <= 0 || getNavigation().isDone()) {
+            investigationRepath = 12 + getRandom().nextInt(9);
+            double radius = Math.min(7.0D, 1.5D + investigationTicks / 18.0D);
+            double angle = investigationTicks * investigationAngularSpeed(id);
+            double x = investigationX + Math.cos(angle) * radius;
+            double z = investigationZ + Math.sin(angle) * radius;
+            double speed = investigationSpeed(id);
+            getNavigation().moveTo(x, investigationY, z, speed);
+        }
+        if (distanceToSqr(investigationX, investigationY, investigationZ) < 3.0D
+                && investigationTicks > 28) {
+            // Pause briefly at the source, as if listening for the next movement.
+            if (investigationTicks > 58) {
+                investigating = false;
+                investigationTicks = 0;
+                getNavigation().stop();
+            }
+        }
+    }
+
+    private static int investigationDuration(String id) {
+        return switch (id) {
+            case "hunter", "stalker", "nightmare_hound", "nightmare_wardened", "nightmare_unbound" -> 150;
+            case "howler", "observer", "nightmare_watcher", "mimic", "stillborn_statue" -> 105;
+            case "colossus", "almighty", "death" -> 90;
+            default -> 120;
+        };
+    }
+
+    private static double investigationSpeed(String id) {
+        return switch (id) {
+            case "hunter", "nightmare_hound", "nightmare_unbound" -> 1.08D;
+            case "stalker", "mimic", "nightmare_watcher", "observer" -> 0.76D;
+            case "colossus", "almighty" -> 0.62D;
+            case "burrower", "dredge", "lurker", "ceiling_dweller" -> 0.88D;
+            default -> 0.82D;
+        };
+    }
+
+    private static double investigationAngularSpeed(String id) {
+        return switch (id) {
+            case "observer", "nightmare_watcher", "stillborn_statue" -> 0.34D;
+            case "hunter", "stalker", "nightmare_hound" -> 0.82D;
+            case "mimic", "cave_jar" -> 0.48D;
+            default -> 0.63D;
+        };
+    }
+
+    @Override
+    public void addAdditionalSaveData(CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        tag.putLong("outlands_last_heard_noise", lastHeardNoiseId);
+        tag.putInt("outlands_investigation_ticks", investigationTicks);
+        tag.putInt("outlands_investigation_repath", investigationRepath);
+        tag.putDouble("outlands_investigation_x", investigationX);
+        tag.putDouble("outlands_investigation_y", investigationY);
+        tag.putDouble("outlands_investigation_z", investigationZ);
+        tag.putBoolean("outlands_investigating", investigating);
+    }
+
+    @Override
+    public void readAdditionalSaveData(CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        lastHeardNoiseId = tag.getLong("outlands_last_heard_noise");
+        investigationTicks = tag.getInt("outlands_investigation_ticks");
+        investigationRepath = tag.getInt("outlands_investigation_repath");
+        investigationX = tag.getDouble("outlands_investigation_x");
+        investigationY = tag.getDouble("outlands_investigation_y");
+        investigationZ = tag.getDouble("outlands_investigation_z");
+        investigating = tag.getBoolean("outlands_investigating");
     }
 
     @Override
