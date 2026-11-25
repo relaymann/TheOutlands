@@ -62,7 +62,8 @@ tasks.withType(Test).configureEach { useJUnitPlatform() }
 def generateCreatureAnatomy = tasks.register('generateCreatureAnatomy', Exec) {
     group = 'theoutlands'
     description = 'Generate per-creature anatomy geometry and articulated animation overlays.'
-    commandLine 'python3', 'tools/generate_creature_anatomy.py'
+    def pythonExecutable = System.getProperty('os.name').toLowerCase().contains('win') ? 'python' : 'python3'
+    commandLine pythonExecutable, 'tools/generate_creature_anatomy.py'
     inputs.files(fileTree('src/main/resources/assets/theoutlands/geo/entity') { include '*.geo.json' },
             file('src/main/resources/assets/theoutlands/animations/entity/outlands_monster.animation.json'),
             file('tools/generate_creature_anatomy.py'))
