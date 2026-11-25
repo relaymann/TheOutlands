@@ -10,29 +10,27 @@ Gradle resolves GeckoLib from the official GeckoLib Cloudsmith Maven repository.
 
 All 24 registered Outlands creature types use the shared `OutlandsGeoMonster` animation host. It preserves the existing `Monster` behavior and centralizes the GeckoLib instance cache and controllers. Each entity retains its own attributes, AI goals, targeting, spawn rules, sounds, and server-side mechanics.
 
-The GeckoLib renderers use a dedicated geometry file for every creature under `assets/theoutlands/geo/entity/`, including all five Nightmare variants. `OutlandsGeoModel` selects each creature's geometry and texture while sharing the animation resource. The Mimic retains its block-disguise rendering until it reveals, and the Almighty retains its oversized rendering treatment.
+The GeckoLib renderers use a dedicated geometry file for every creature under `assets/theoutlands/geo/entity/`, including all five Nightmare variants. `OutlandsGeoModel` selects each creature's geometry and texture while sharing the animation resource. Every creature rig now includes independently animated `eye_left`, `eye_right`, `pupil_left`, and `pupil_right` bones, with dedicated eye/pupil tiles generated into each creature's texture atlas. The Mimic retains its block-disguise rendering until it reveals, and the Almighty retains its oversized rendering treatment.
 
 ## Individual creature behavior
 
-The model applies client-side head/gaze tracking using GeckoLib's entity model data, layered additively over the authored head keyframes. Watchers have a wider, slower-looking tracking range; other creatures use a more restrained range. Stalker, Death, and the False Survivor also receive tiny jaw micro-movements to make their idle faces feel less static.
+The model applies client-side head, eye-shell, and pupil tracking using GeckoLib entity model data. The eye shells move more cautiously than the pupils, so a creature can keep its head still while its eyes shift toward a player. Watchers have a wider tracking range; other creatures use restrained limits. Stalker, Death, and the False Survivor also receive tiny jaw micro-movements.
 
-This is head-and-gaze-line tracking, not independently animated eyeball geometry. The current shared creature rigs have no separate eye bones; independent pupils/eyeballs require a dedicated facial-geometry and texture pass rather than invisible placeholder bones.
+Eye geometry is real, textured geometry: every creature rig has separate eye-shell and pupil bones, and each texture atlas receives dedicated eye and pupil tiles. The render-side tracking is presentation-only and does not change server-side targeting or combat.
 
 ## Animation system
 
-The shared animation file contains 29 clips:
+The shared animation file contains **147 clips**:
 
-- **Locomotion and idle:** `idle`, `walk`, `crawl`, `heavy_walk`, `hover`, `stalk_idle`, `watch_idle`, `statue_idle`, `sprint`, `crawl_sprint`
-- **Shared actions:** `attack`, `scream`, `lunge`, `pounce`, `reveal`, `burrow`, `emerge`, `drop`, `ground_slam`, `stalk`, `death`
-- **Creature-specific attacks:** `attack_stalker`, `attack_bite`, `attack_heavy`, `attack_sweep`
-- **Creature-specific deaths:** `death_stalker`, `death_heavy`, `death_crawler`, `death_watcher`
+- **Shared horror actions:** scream, lunge, pounce, reveal, burrow, emerge, drop, ground slam, and stalk, plus common fallback clips
+- **Creature-specific idle and locomotion:** 24 unique idle clips, 24 unique walk gaits, and 24 unique sprint gaits
+- **Creature-specific combat and death:** 24 unique attack sequences and 24 unique death sequences
 
-Successful melee hits select an attack style by creature family: watchful stalkers use a delayed claw strike, crawlers and biters snap forward, heavy entities use a weighty overhead blow, and pouncing hunters use a sweeping strike. Death poses are also selected by archetype: stalkers/watcher entities settle into an unnervingly crooked stillness, heavy entities collapse, and crawlers fold down low.
+The individual gaits use each creature's silhouette and archetype: crawlers stay low, heavy entities brace and drive their weight forward, stalkers use uneven shoulder/head movement, and the Nightmare variants have separate pacing. Idle clips also animate the eye shells and pupils so they make small independent saccades. Attack and death clips use creature-specific timing, head/jaw movement, arm poses, and collapse styles.
 
-The synchronized action controller still handles the existing AI events. AI hooks are server-authoritative and synchronize the resulting action animation to tracking clients. Gaze tracking and facial micro-motion are client-side presentation only.
+Successful melee hits select the matching creature-specific attack. The attack animation is still presentation-only and is triggered only after a real hit succeeds. Death poses are synchronized by the server. Existing special action hooks remain in place for Howler calls, Mimic reveals, Burrower burrows/emergence, Ceiling Dweller drops, Dredge lunges, Hunter pounces, Colossus ground slams, and Lurker stalking.
 
-These clips do not change attack timing, movement, hitboxes, damage, spawn rules, or AI authority. Attack animations still play only after a real melee hit succeeds.
-
+The shared locomotion controller selects the creature's own idle, walk, or sprint clip. Horror movement cues are intentionally low-volume and irregular; existing custom footsteps for Pilgrim and Colossus remain separate to avoid duplicate sounds.
 ## Authoring creature-specific animation
 
 Use Blockbench's GeckoLib model format. Keep shared animation bone names compatible: `root`, `body`, `head`, `jaw`, `spine`, `left_arm`, `right_arm`, `left_leg`, and `right_leg`. Creature-specific geometry may add bones for horns, tendrils, tails, mandibles, eyes, or extra limbs.
@@ -46,7 +44,7 @@ When adding or changing a clip:
 
 ## Verification checklist
 
-Automated validation checks all 24 entity registrations, dedicated geometry files, required shared bones, every required animation clip, every animated bone reference against every creature rig, the synchronized AI hooks, and the gaze/facial animation hooks.
+Automated validation checks all 24 entity registrations, dedicated geometry files, required shared bones, every required animation clip and every eye/pupil bone, every animated bone reference against every creature rig, the synchronized AI hooks, and the gaze/facial animation hooks.
 
 - Run `./gradlew clean test build` with Java 21.
 - Verify the packaged JAR contains every geometry, texture, and animation resource.
