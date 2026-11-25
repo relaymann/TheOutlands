@@ -180,6 +180,7 @@ def audit_once():
         geo_model = read("java/com/relaymann/theoutlands/client/OutlandsGeoModel.java")
         geo_entity = read("java/com/relaymann/theoutlands/entity/OutlandsGeoMonster.java")
         geometry_valid = True
+        rig_bones_by_entity = {}
         for entity_id in fields.values():
             geometry_path = os.path.join(ROOT, "resources/assets/theoutlands/geo/entity", entity_id + ".geo.json")
             if not os.path.isfile(geometry_path):
@@ -194,10 +195,18 @@ def audit_once():
             else:
                 bone_names = {bone.get("name") for bone in geometry_docs[0].get("bones", [])}
                 required_bones = {"root", "body", "head", "jaw", "spine", "left_arm", "right_arm", "left_leg", "right_leg"}
+                rig_bones_by_entity[entity_id] = bone_names
                 if not required_bones.issubset(bone_names):
                     geometry_valid = False
                     errors.append(entity_id + ": GeckoLib rig is missing shared animation bones")
         animations = json.load(open(os.path.join(ROOT, "resources/assets/theoutlands/animations/entity/outlands_monster.animation.json"), encoding="utf-8"))
+        for clip_name, clip in animations.get("animations", {}).items():
+            animated_bones = set(clip.get("bones", {}).keys())
+            for entity_id, bone_names in rig_bones_by_entity.items():
+                missing_bones = animated_bones - bone_names
+                if missing_bones:
+                    geometry_valid = False
+                    errors.append(entity_id + ": animation " + clip_name + " references missing bones: " + ", ".join(sorted(missing_bones)))
         if "geo/entity/" not in geo_model or "getModelResource" not in geo_model or "getTextureResource" not in geo_model or "getAnimationResource" not in geo_model:
             errors.append("GeckoLib GeoModel is missing per-creature resource selectors")
         if "implements GeoEntity" not in geo_entity or "getAnimatableInstanceCache" not in geo_entity:
