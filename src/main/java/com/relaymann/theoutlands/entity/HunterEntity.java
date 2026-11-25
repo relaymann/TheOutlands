@@ -47,7 +47,13 @@ public final class HunterEntity extends OutlandsGeoMonster {
                 lostSightTicks++;
                 if (hasMemory && lostSightTicks < 100 && tickCount % 12 == 0)
                     getNavigation().moveTo(memoryX, memoryY, memoryZ, 1.12D);
-                if (lostSightTicks >= 100) { hasMemory=false; setTarget(null); getNavigation().stop(); }
+                if (lostSightTicks >= 100) {
+                    // Keep the last confirmed trail and search around it after the target is dropped.
+                    lostSightTicks = 0;
+                    searchTicks = 0;
+                    setTarget(null);
+                    getNavigation().stop();
+                }
             }
             double d=distanceToSqr(player);
             setSprinting(d > 20.0D && d < 1800.0D);
@@ -75,6 +81,6 @@ public final class HunterEntity extends OutlandsGeoMonster {
     @Override protected SoundEvent getAmbientSound(){return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.HUNTER_STALK.get() : null;}
     @Override protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source){return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.HUNTER_STALK.get() : null;}
     @Override protected SoundEvent getDeathSound(){return OutlandsConfig.HORROR_AUDIO_ENABLED.get() ? OutlandsSounds.HUNTER_STALK.get() : null;}
-    @Override public void addAdditionalSaveData(CompoundTag tag){super.addAdditionalSaveData(tag);tag.putDouble("hunt_x",memoryX);tag.putDouble("hunt_y",memoryY);tag.putDouble("hunt_z",memoryZ);tag.putBoolean("has_memory",hasMemory);tag.putInt("lost_sight",lostSightTicks);tag.putInt("pounce_cd",pounceCooldown);}
+    @Override public void addAdditionalSaveData(CompoundTag tag){super.addAdditionalSaveData(tag);tag.putDouble("hunt_x",memoryX);tag.putDouble("hunt_y",memoryY);tag.putDouble("hunt_z",memoryZ);tag.putBoolean("has_memory",hasMemory);tag.putInt("lost_sight",lostSightTicks);tag.putInt("search_ticks",searchTicks);tag.putInt("pounce_cd",pounceCooldown);}
     @Override public void readAdditionalSaveData(CompoundTag tag){super.readAdditionalSaveData(tag);memoryX=tag.getDouble("hunt_x");memoryY=tag.getDouble("hunt_y");memoryZ=tag.getDouble("hunt_z");hasMemory=tag.getBoolean("has_memory");lostSightTicks=tag.getInt("lost_sight");pounceCooldown=tag.getInt("pounce_cd");}
 }
