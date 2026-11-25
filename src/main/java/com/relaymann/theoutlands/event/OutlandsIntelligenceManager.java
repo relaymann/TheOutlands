@@ -4,6 +4,8 @@ import com.relaymann.theoutlands.TheOutlands;
 import com.relaymann.theoutlands.OutlandsConfig;
 import com.relaymann.theoutlands.entity.*;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -274,6 +276,7 @@ public final class OutlandsIntelligenceManager {
     private static void continueSearch(ServerLevel level, Mob mob) {
         SearchState state = SEARCHES.get(mob.getUUID());
         if (state == null) return;
+        openNearbyWoodDoor(level, mob);
         if (!mob.isAlive() || mob.getTarget() != null || state.elapsed() >= 150) {
             SEARCHES.remove(mob.getUUID());
             return;
@@ -294,6 +297,26 @@ public final class OutlandsIntelligenceManager {
         }
         SEARCHES.put(mob.getUUID(), new SearchState(state.origin(), elapsed, phase));
         if (elapsed >= 150) SEARCHES.remove(mob.getUUID());
+    }
+
+
+    /** Hunters and aggressive stalkers can push through ordinary wooden doors while searching. */
+    private static void openNearbyWoodDoor(ServerLevel level, Mob mob) {
+        if (!(mob instanceof HunterEntity || mob instanceof StalkerEntity
+                || mob instanceof LurkerEntity || mob instanceof DredgeEntity
+                || mob instanceof NightmareCreature creature
+                && (creature.isVariant("nightmare_hound") || creature.isVariant("nightmare_wardened")
+                || creature.isVariant("nightmare_unbound")))) return;
+        BlockPos base = mob.blockPosition();
+        for (Direction direction : Direction.values()) {
+            BlockPos doorPos = base.relative(direction);
+            var state = level.getBlockState(doorPos);
+            if (state.is(BlockTags.WOODEN_DOORS) && state.hasProperty(DoorBlock.OPEN)
+                    && !state.getValue(DoorBlock.OPEN)) {
+                level.setBlock(doorPos, state.setValue(DoorBlock.OPEN, true), 3);
+                return;
+            }
+        }
     }
 
     private static void maintainTerritory(ServerLevel level, Mob mob) {
