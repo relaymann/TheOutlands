@@ -15,7 +15,20 @@ for entity in IDS:
     rig=json.loads(path.read_text())["minecraft:geometry"][0]
     names={b["name"] for b in rig["bones"]}
     anatomy={n for n in names if n.startswith("anatomy_"+entity+"_")}
-    if len(anatomy)<6: raise SystemExit("%s has too few anatomical structures (%d)"%(entity,len(anatomy)))
+    if len(anatomy)<14: raise SystemExit("%s has too few anatomical structures (%d)"%(entity,len(anatomy)))
+    def bounds(bone_name):
+        cubes=[c for b in rig["bones"] if b["name"]==bone_name for c in b.get("cubes",[])]
+        if not cubes: raise SystemExit("%s is missing %s geometry"%(entity,bone_name))
+        return (min(c["origin"][1] for c in cubes),max(c["origin"][1]+c["size"][1] for c in cubes))
+    head=bounds("head")
+    body=bounds("body")
+    legs=[bounds(n) for n in ("left_leg","right_leg")]
+    if min(v[0] for v in legs)<-0.01: raise SystemExit("%s feet extend below the ground plane"%entity)
+    if (head[0]+head[1])/2 <= (body[0]+body[1])/2: raise SystemExit("%s head is not above its torso"%entity)
+    if (body[0]+body[1])/2 <= sum((v[0]+v[1])/2 for v in legs)/2: raise SystemExit("%s torso is not above its legs"%entity)
+    for bone in rig["bones"]:
+        for cube_data in bone.get("cubes",[]):
+            if any(value<=0 for value in cube_data["size"]): raise SystemExit("%s has a non-positive cube"%entity)
     sets[entity]=anatomy
     for action in ("idle","walk","sprint","attack","death"):
         clip=animations.get("animation.outlands."+action+"_"+entity)
