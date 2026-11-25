@@ -47,6 +47,19 @@ public final class OutlandsGeoModel<T extends OutlandsGeoMonster> extends GeoMod
             float pitch = Mth.clamp(look.headPitch(), -pitchLimit, pitchLimit);
             head.setRotY(head.getRotY() + yaw * Mth.DEG_TO_RAD * 0.72F);
             head.setRotX(head.getRotX() + pitch * Mth.DEG_TO_RAD * 0.72F);
+
+            GeoBone leftEye = getAnimationProcessor().getBone("eye_left");
+            GeoBone rightEye = getAnimationProcessor().getBone("eye_right");
+            GeoBone leftPupil = getAnimationProcessor().getBone("pupil_left");
+            GeoBone rightPupil = getAnimationProcessor().getBone("pupil_right");
+            float eyeYaw = Mth.clamp(yaw * Mth.DEG_TO_RAD * 0.22F, -0.16F, 0.16F);
+            float eyePitch = Mth.clamp(pitch * Mth.DEG_TO_RAD * 0.18F, -0.11F, 0.11F);
+            float pupilYaw = Mth.clamp(yaw * Mth.DEG_TO_RAD * 0.42F, -0.24F, 0.24F);
+            float pupilPitch = Mth.clamp(pitch * Mth.DEG_TO_RAD * 0.36F, -0.18F, 0.18F);
+            if (leftEye != null) { leftEye.setRotY(leftEye.getRotY() + eyeYaw); leftEye.setRotX(leftEye.getRotX() + eyePitch); }
+            if (rightEye != null) { rightEye.setRotY(rightEye.getRotY() + eyeYaw * 0.94F); rightEye.setRotX(rightEye.getRotX() + eyePitch * 0.92F); }
+            if (leftPupil != null) { leftPupil.setRotY(leftPupil.getRotY() + pupilYaw); leftPupil.setRotX(leftPupil.getRotX() + pupilPitch); }
+            if (rightPupil != null) { rightPupil.setRotY(rightPupil.getRotY() + pupilYaw * 0.96F); rightPupil.setRotX(rightPupil.getRotX() + pupilPitch * 0.94F); }
         }
 
         GeoBone jaw = getAnimationProcessor().getBone("jaw");
