@@ -100,7 +100,7 @@ public final class OutlandsIntelligenceManager {
             for (ServerPlayer player : level.players()) {
                 if (!eligible(player)) continue;
                 var nearby = level.getEntitiesOfClass(Mob.class,
-                        new AABB(player.blockPosition()).inflate(40.0D),
+                        new AABB(player.blockPosition()).inflate(56.0D),
                         mob -> mob.isAlive() && isOutlandsCreature(mob));
                 for (Mob mob : nearby) {
                     if (processed.add(mob.getUUID())) {
@@ -255,10 +255,11 @@ public final class OutlandsIntelligenceManager {
     private static double disturbanceRange(String kind) {
         return switch (kind) {
             case "alarm" -> 64.0D;
-            case "sprint", "break", "death" -> 38.0D;
-            case "door" -> 32.0D;
-            case "footstep" -> 20.0D;
-            case "place" -> 24.0D;
+            case "sprint" -> 56.0D;
+            case "break", "death" -> 48.0D;
+            case "door" -> 40.0D;
+            case "footstep" -> 28.0D;
+            case "place" -> 32.0D;
             default -> 28.0D;
         };
     }
