@@ -215,7 +215,9 @@ def audit_once():
             "idle", "walk", "attack", "crawl", "heavy_walk", "hover",
             "stalk_idle", "watch_idle", "statue_idle", "sprint", "crawl_sprint",
             "scream", "lunge", "pounce", "reveal", "burrow", "emerge",
-            "drop", "ground_slam", "stalk", "death"
+            "drop", "ground_slam", "stalk", "death",
+            "attack_stalker", "attack_bite", "attack_heavy", "attack_sweep",
+            "death_stalker", "death_heavy", "death_crawler", "death_watcher"
         )
         missing_clips = [name for name in required_clips if "animation.outlands." + name not in animations.get("animations", {})]
         if not geometry_valid or missing_clips:
@@ -233,8 +235,16 @@ def audit_once():
         for source_file, hook in action_hooks.items():
             if hook not in read("java/com/relaymann/theoutlands/entity/" + source_file):
                 errors.append(source_file + ": missing synchronized GeckoLib action hook")
-        if 'triggerableAnim("death"' not in geo_entity or 'playHorrorAnimation("death")' not in geo_entity:
-            errors.append("shared GeckoLib base is missing synchronized death animation")
+        for trigger in ("attack_stalker", "attack_bite", "attack_heavy", "attack_sweep",
+                        "death_stalker", "death_heavy", "death_crawler", "death_watcher"):
+            if ('triggerableAnim("%s"' % trigger) not in geo_entity:
+                errors.append("shared GeckoLib base is missing trigger: " + trigger)
+        if "attackAnimationId()" not in geo_entity or "deathAnimation()" not in geo_entity:
+            errors.append("shared GeckoLib base is missing creature-specific attack/death routing")
+        if "setCustomAnimations" not in geo_model or "DataTickets.ENTITY_MODEL_DATA" not in geo_model:
+            errors.append("GeckoLib model is missing client-side head/gaze tracking")
+        if "jaw.setRotX" not in geo_model:
+            errors.append("GeckoLib model is missing subtle facial/jaw animation")
     else:
         for renderer in ("PilgrimRenderer", "CeilingDwellerRenderer", "ColossusRenderer"):
             if renderer not in renderers:
