@@ -179,14 +179,24 @@ def audit_once():
             errors.append("GeckoLib renderer class is not registered")
         geo_model = read("java/com/relaymann/theoutlands/client/OutlandsGeoModel.java")
         geo_entity = read("java/com/relaymann/theoutlands/entity/OutlandsGeoMonster.java")
-        geometry = json.load(open(os.path.join(ROOT, "resources/assets/theoutlands/geo/entity/outlands_monster.geo.json"), encoding="utf-8"))
+        geometry_valid = True
+        for entity_id in fields.values():
+            geometry_path = os.path.join(ROOT, "resources/assets/theoutlands/geo/entity", entity_id + ".geo.json")
+            if not os.path.isfile(geometry_path):
+                geometry_valid = False
+                errors.append(entity_id + ": missing creature-specific GeckoLib geometry")
+                continue
+            creature_geometry = json.load(open(geometry_path, encoding="utf-8"))
+            if not creature_geometry.get("minecraft:geometry"):
+                geometry_valid = False
+                errors.append(entity_id + ": invalid GeckoLib geometry document")
         animations = json.load(open(os.path.join(ROOT, "resources/assets/theoutlands/animations/entity/outlands_monster.animation.json"), encoding="utf-8"))
-        if "getModelResource" not in geo_model or "getTextureResource" not in geo_model or "getAnimationResource" not in geo_model:
-            errors.append("GeckoLib GeoModel is missing resource selectors")
+        if "geo/entity/" not in geo_model or "getModelResource" not in geo_model or "getTextureResource" not in geo_model or "getAnimationResource" not in geo_model:
+            errors.append("GeckoLib GeoModel is missing per-creature resource selectors")
         if "implements GeoEntity" not in geo_entity or "getAnimatableInstanceCache" not in geo_entity:
             errors.append("shared monster base is missing GeckoLib entity/cache integration")
-        if not geometry.get("minecraft:geometry") or not all(name in animations.get("animations", {}) for name in ("animation.outlands.idle", "animation.outlands.walk", "animation.outlands.attack")):
-            errors.append("GeckoLib geo rig or required animation clips are missing")
+        if not geometry_valid or not all(name in animations.get("animations", {}) for name in ("animation.outlands.idle", "animation.outlands.walk", "animation.outlands.attack")):
+            errors.append("GeckoLib creature rigs or required animation clips are missing")
     else:
         for renderer in ("PilgrimRenderer", "CeilingDwellerRenderer", "ColossusRenderer"):
             if renderer not in renderers:
