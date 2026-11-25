@@ -312,7 +312,7 @@ public final class OutlandsIntelligenceManager {
             BlockPos doorPos = base.relative(direction);
             var state = level.getBlockState(doorPos);
             if (state.is(BlockTags.WOODEN_DOORS) && state.getBlock() instanceof DoorBlock door
-                    && !state.getValue(DoorBlock.OPEN)) {
+                    && !door.isOpen(state)) {
                 door.setOpen(mob, level, state, doorPos, true);
                 return;
             }
