@@ -64,13 +64,13 @@ public abstract class OutlandsGeoMonster extends Monster implements GeoEntity {
         return WALK;
     }
 
-    private RawAnimation attackAnimation() {
+    private String attackAnimationId() {
         return switch (creatureId()) {
-            case "death", "stalker", "observer", "nightmare_watcher" -> ATTACK_STALKER;
-            case "burrower", "dredge", "ceiling_dweller", "cave_jar", "nightmare_hound" -> ATTACK_BITE;
-            case "almighty", "colossus", "stillborn_statue" -> ATTACK_HEAVY;
-            case "hunter", "lurker", "nightmare_false_survivor", "nightmare_unbound" -> ATTACK_SWEEP;
-            default -> ATTACK;
+            case "death", "stalker", "observer", "nightmare_watcher" -> "attack_stalker";
+            case "burrower", "dredge", "ceiling_dweller", "cave_jar", "nightmare_hound" -> "attack_bite";
+            case "almighty", "colossus", "stillborn_statue" -> "attack_heavy";
+            case "hunter", "lurker", "nightmare_false_survivor", "nightmare_unbound" -> "attack_sweep";
+            default -> "attack";
         };
     }
 
@@ -124,16 +124,7 @@ public abstract class OutlandsGeoMonster extends Monster implements GeoEntity {
     @Override
     public boolean doHurtTarget(Entity target) {
         boolean hit = super.doHurtTarget(target);
-        if (hit && !level().isClientSide) {
-            String id = switch (attackAnimation()) {
-                case ATTACK_STALKER -> "attack_stalker";
-                case ATTACK_BITE -> "attack_bite";
-                case ATTACK_HEAVY -> "attack_heavy";
-                case ATTACK_SWEEP -> "attack_sweep";
-                default -> "attack";
-            };
-            playHorrorAnimation(id);
-        }
+        if (hit && !level().isClientSide) playHorrorAnimation(attackAnimationId());
         return hit;
     }
 
