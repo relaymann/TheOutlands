@@ -16,14 +16,14 @@ public final class OutlandsClientEvents {
         event.registerEntityRenderer(OutlandsEntities.NULL.get(), OutlandsGeoRenderer::new);
         event.registerEntityRenderer(OutlandsEntities.FEAR.get(), OutlandsGeoRenderer::new);
         event.registerEntityRenderer(OutlandsEntities.DEATH.get(), OutlandsGeoRenderer::new);
-        event.registerEntityRenderer(OutlandsEntities.ALMIGHTY.get(), OutlandsGeoRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.ALMIGHTY.get(), AlmightyGeoRenderer::new);
         event.registerEntityRenderer(OutlandsEntities.NULL_APOSTLE.get(), OutlandsGeoRenderer::new);
         event.registerEntityRenderer(OutlandsEntities.CAVE_JAR.get(), OutlandsGeoRenderer::new);
         event.registerEntityRenderer(OutlandsEntities.STALKER.get(), OutlandsGeoRenderer::new);
         event.registerEntityRenderer(OutlandsEntities.OBSERVER.get(), OutlandsGeoRenderer::new);
         event.registerEntityRenderer(OutlandsEntities.HUNTER.get(), OutlandsGeoRenderer::new);
         event.registerEntityRenderer(OutlandsEntities.BURROWER.get(), OutlandsGeoRenderer::new);
-        event.registerEntityRenderer(OutlandsEntities.MIMIC.get(), OutlandsGeoRenderer::new);
+        event.registerEntityRenderer(OutlandsEntities.MIMIC.get(), MimicGeoRenderer::new);
         event.registerEntityRenderer(OutlandsEntities.STILLBORN_STATUE.get(), OutlandsGeoRenderer::new);
         event.registerEntityRenderer(OutlandsEntities.AGITATED_ONE.get(), OutlandsGeoRenderer::new);
         event.registerEntityRenderer(OutlandsEntities.LURKER.get(), OutlandsGeoRenderer::new);
