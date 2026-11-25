@@ -19,7 +19,7 @@ FAMILY = {
 }
 def part(n, parent, pivot, cubes):
     return {"name":n,"parent":parent,"pivot":pivot,"cubes":cubes}
-def cube(o,s,uv=(0,48)):
+def cube(o,s,uv=(0,40)):
     return {"origin":o,"size":s,"uv":list(uv)}
 def anatomy(e):
     p="anatomy_"+e+"_"; f=FAMILY[e]
