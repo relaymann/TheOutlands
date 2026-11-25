@@ -45,6 +45,12 @@ def main() -> None:
             and "GameType.CREATIVE" in nightmare_manager
             and "GameType.SPECTATOR" in nightmare_manager,
             "Nightmare Mode must block only creative and spectator mode changes")
+    require("targetCreative || targetSpectator" in nightmare_policy
+            and "nightmareEnabled && playerAlive" in nightmare_policy,
+            "Nightmare mode restrictions must be scoped to living players entering bypass modes")
+    require("Math.max(0, Math.min(3, currentStage))" in nightmare_policy
+            and "(current + 1) * 600L" in nightmare_policy,
+            "Blood Moon stage policy must be bounded and advance at 600-tick thresholds")
     require("nextBloodMoonStage" in nightmare_manager
             and nightmare_manager.index("if (player == null) return;") < nightmare_manager.index("BLOOD_MOON_STAGE.put(level, stage)"),
             "Blood Moon stages must not be consumed without an eligible player")
