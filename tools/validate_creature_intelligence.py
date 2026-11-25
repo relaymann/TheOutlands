@@ -18,6 +18,8 @@ required = {
     "sound-specific effective ranges": "disturbanceRange(String kind)",
     "player-source pursuit": "isSoundPursuer(mob)",
     "widening search behavior": "continueSearch(ServerLevel level, Mob mob)",
+    "wooden door interaction": "openNearbyWoodDoor(ServerLevel level, Mob mob)",
+    "vanilla synchronized door opening": "door.setOpen(mob, level, state, doorPos, true)",
     "loaded-chunk safety": "level.hasChunkAt(candidate)",
     "adaptive pursuit": "adaptPursuit(Mob mob)",
     "deterministic temperament": "temperament(Mob mob)",
