@@ -109,6 +109,28 @@ public final class OutlandsIntelligenceManager {
                     }
                 }
             }
+            // Alarm blocks are creature-triggered and can sound when no player is
+            // nearby. Process only recent alarm sites, keeping this query bounded.
+            ArrayDeque<Disturbance> records = DISTURBANCES.get(level.dimension());
+            if (records != null) {
+                int inspected = 0;
+                for (Iterator<Disturbance> it = records.descendingIterator(); it.hasNext() && inspected < 8;) {
+                    Disturbance disturbance = it.next();
+                    if (!"alarm".equals(disturbance.kind())
+                            || level.getGameTime() - disturbance.gameTime() > 100L) continue;
+                    inspected++;
+                    var alerted = level.getEntitiesOfClass(Mob.class,
+                            new AABB(disturbance.pos()).inflate(64.0D),
+                            mob -> mob.isAlive() && isOutlandsCreature(mob));
+                    for (Mob mob : alerted) {
+                        if (processed.add(mob.getUUID())) {
+                            maintainTerritory(level, mob);
+                            investigateDisturbances(level, mob);
+                            continueSearch(level, mob);
+                        }
+                    }
+                }
+            }
         }
         if (event.getServer().getTickCount() - lastCleanup >= 1200) {
             cleanup(event.getServer().getAllLevels());
