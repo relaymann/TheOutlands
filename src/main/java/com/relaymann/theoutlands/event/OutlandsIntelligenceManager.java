@@ -174,6 +174,8 @@ public final class OutlandsIntelligenceManager {
             }
             PlayerPattern pattern = PLAYER_PATTERNS.computeIfAbsent(player.getUUID(), ignored -> new PlayerPattern());
             pattern.samples++;
+            pattern.previousPosition = pattern.lastPosition;
+            pattern.lastPosition = player.position();
             if (player.isSprinting()) pattern.sprintSamples++;
             if (player.isCrouching()) pattern.sneakSamples++;
             if (pattern.samples > 200) {
@@ -351,7 +353,7 @@ public final class OutlandsIntelligenceManager {
                 || mob instanceof ObserverEntity || mob instanceof LurkerEntity
                 || mob instanceof HowlerEntity || mob instanceof DredgeEntity
                 || mob instanceof NightmareCreature || mob instanceof PilgrimEntity
-                || mob instanceof CeilingDwellerEntity;
+                || mob instanceof CeilingDwellerEntity || mob instanceof ColossusEntity;
     }
 
     private static void adaptPursuit(Mob mob) {
@@ -369,7 +371,10 @@ public final class OutlandsIntelligenceManager {
                 || mob instanceof LurkerEntity || mob instanceof DredgeEntity)
                 && sprintRatio > 0.52D && temperament.boldness() > 0.35D
                 && mob.distanceToSqr(target) > 100.0D && mob.tickCount % 50 == 0) {
-            Vec3 lead = target.position().add(target.getDeltaMovement().scale(8.0D + temperament.boldness() * 8.0D));
+            Vec3 route = pattern.previousPosition == null || pattern.lastPosition == null
+                    ? target.getDeltaMovement().scale(10.0D)
+                    : pattern.lastPosition.subtract(pattern.previousPosition);
+            Vec3 lead = target.position().add(route.scale(1.2D + temperament.boldness() * 0.6D));
             mob.getNavigation().moveTo(lead.x, lead.y, lead.z, 1.0D + temperament.boldness() * 0.12D);
         } else if (sneakRatio > 0.48D && temperament.patience() > 0.58D
                 && mob.getTarget() == target && mob.tickCount % 80 == 0
@@ -442,6 +447,8 @@ public final class OutlandsIntelligenceManager {
     private record SearchState(BlockPos origin, int elapsed, int phase) {}
 
     private static final class PlayerPattern {
+        private Vec3 previousPosition;
+        private Vec3 lastPosition;
         private int samples;
         private int sprintSamples;
         private int sneakSamples;
