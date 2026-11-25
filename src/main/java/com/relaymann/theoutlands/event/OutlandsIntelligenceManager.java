@@ -311,9 +311,9 @@ public final class OutlandsIntelligenceManager {
         for (Direction direction : Direction.values()) {
             BlockPos doorPos = base.relative(direction);
             var state = level.getBlockState(doorPos);
-            if (state.is(BlockTags.WOODEN_DOORS) && state.hasProperty(DoorBlock.OPEN)
+            if (state.is(BlockTags.WOODEN_DOORS) && state.getBlock() instanceof DoorBlock door
                     && !state.getValue(DoorBlock.OPEN)) {
-                level.setBlock(doorPos, state.setValue(DoorBlock.OPEN, true), 3);
+                door.setOpen(mob, level, state, doorPos, true);
                 return;
             }
         }
