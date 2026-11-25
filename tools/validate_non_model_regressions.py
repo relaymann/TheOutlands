@@ -54,6 +54,9 @@ def main() -> None:
     require("nextBloodMoonStage" in nightmare_manager
             and nightmare_manager.index("if (player == null) return;") < nightmare_manager.index("BLOOD_MOON_STAGE.put(level, stage)"),
             "Blood Moon stages must not be consumed without an eligible player")
+    require("private static boolean spawnThreat" in nightmare_manager
+            and "if (spawned) BLOOD_MOON_STAGE.put(level, stage)" in nightmare_manager,
+            "Blood Moon stages must retry when every safe spawn attempt fails")
     require("adventureModeRemainsAllowed" in nightmare_test
             and "missedBloodMoonStagesCatchUpOneAtATime" in nightmare_test,
             "Nightmare event policy regression tests are missing")
