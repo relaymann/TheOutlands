@@ -19,11 +19,11 @@ CHECKS = (
 
 def main() -> None:
     for pass_number in range(1, 11):
-        print(f"\\n=== NON-MODEL OUTLANDS AUDIT {pass_number}/10 ===", flush=True)
+        print(f"\n=== NON-MODEL OUTLANDS AUDIT {pass_number}/10 ===", flush=True)
         for description, script in CHECKS:
             print(f"--- {description} ---", flush=True)
             subprocess.run([sys.executable, str(ROOT / script)], cwd=ROOT, check=True)
-    print("\\nAll ten non-model audit passes succeeded.", flush=True)
+    print("\nAll ten non-model audit passes succeeded.", flush=True)
 
 if __name__ == "__main__":
     main()
