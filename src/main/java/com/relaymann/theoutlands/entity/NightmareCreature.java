@@ -24,6 +24,7 @@ public final class NightmareCreature extends OutlandsGeoMonster {
     private int feintCooldown;
     private int flankCooldown;
     private int screechCooldown;
+    private int searchTicks;
     private double memoryX;
     private double memoryY;
     private double memoryZ;
@@ -75,6 +76,22 @@ public final class NightmareCreature extends OutlandsGeoMonster {
         if (!(getTarget() instanceof Player player) || !player.isAlive()
                 || player.isCreative() || player.isSpectator()) {
             setSprinting(false);
+            // A predator that loses its quarry searches the last confirmed position.
+            // The False Survivor is deliberately exempt so it can freeze when watched.
+            if (hasMemory && !isVariant("nightmare_false_survivor")) {
+                searchTicks++;
+                if (searchTicks <= 90 && tickCount % 12 == 0) {
+                    double angle = searchTicks * 0.68D;
+                    double radius = 2.5D + searchTicks / 14.0D;
+                    getNavigation().moveTo(memoryX + Math.cos(angle) * radius, memoryY,
+                            memoryZ + Math.sin(angle) * radius, 0.92D);
+                }
+                if (searchTicks > 90) {
+                    hasMemory = false;
+                    searchTicks = 0;
+                    getNavigation().stop();
+                }
+            }
             return;
         }
 
@@ -90,6 +107,7 @@ public final class NightmareCreature extends OutlandsGeoMonster {
             memoryY = player.getY();
             memoryZ = player.getZ();
             hasMemory = true;
+            searchTicks = 0;
         } else if (hasMemory && tickCount % 12 == 0 && distance > 100.0D) {
             getNavigation().moveTo(memoryX, memoryY, memoryZ, 0.96D);
         }
@@ -231,6 +249,7 @@ public final class NightmareCreature extends OutlandsGeoMonster {
         tag.putInt("nightmare_feint_cooldown", feintCooldown);
         tag.putInt("nightmare_flank_cooldown", flankCooldown);
         tag.putInt("nightmare_screech_cooldown", screechCooldown);
+        tag.putInt("nightmare_search_ticks", searchTicks);
     }
 
     @Override
@@ -244,5 +263,6 @@ public final class NightmareCreature extends OutlandsGeoMonster {
         feintCooldown = tag.getInt("nightmare_feint_cooldown");
         flankCooldown = tag.getInt("nightmare_flank_cooldown");
         screechCooldown = tag.getInt("nightmare_screech_cooldown");
+        searchTicks = Math.max(0, Math.min(91, tag.getInt("nightmare_search_ticks")));
     }
 }
