@@ -15,6 +15,7 @@ required = {
     "perimeter alarm stimulus": 'record(level, pos, null, "alarm")',
     "alarm processing without nearby players": '!"alarm".equals(disturbance.kind())',
     "per-species hearing profiles": "hearingRange(Mob mob)",
+    "hearing scan covers the loudest profile": "inflate(56.0D)",
     "sound-specific effective ranges": "disturbanceRange(String kind)",
     "player-source pursuit": "isSoundPursuer(mob)",
     "widening search behavior": "continueSearch(ServerLevel level, Mob mob)",
