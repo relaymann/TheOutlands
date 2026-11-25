@@ -8,10 +8,10 @@ import software.bernie.geckolib.model.GeoModel;
 
 /** Shared animated rig with texture selection per registered Outlands creature. */
 public final class OutlandsGeoModel<T extends OutlandsGeoMonster> extends GeoModel<T> {
-    private static final ResourceLocation MODEL = ResourceLocation.fromNamespaceAndPath(TheOutlands.MOD_ID, "geo/entity/outlands_monster.geo.json");
+    private static ResourceLocation modelFor(T entity) { String id = BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).getPath(); return ResourceLocation.fromNamespaceAndPath(TheOutlands.MOD_ID, "geo/entity/" + id + ".geo.json"); }
     private static final ResourceLocation ANIMATIONS = ResourceLocation.fromNamespaceAndPath(TheOutlands.MOD_ID, "animations/entity/outlands_monster.animation.json");
 
-    @Override public ResourceLocation getModelResource(T entity) { return MODEL; }
+    @Override public ResourceLocation getModelResource(T entity) { return modelFor(entity); }
 
     @Override public ResourceLocation getTextureResource(T entity) {
         String id = BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).getPath();
