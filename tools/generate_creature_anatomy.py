@@ -113,8 +113,8 @@ def sculpt(e, rig):
     additions = [
         overlay("pectoral_l","body",(center-width*.47,body[1]+height*.17,front-.52,center-width*.025,body[1]+height*.59,front+.12),(0,40)),
         overlay("pectoral_r","body",(center+width*.025,body[1]+height*.17,front-.52,center+width*.47,body[1]+height*.59,front+.12),(28,40)),
-        overlay("abdominal_keel","body",(center-width*.28,body[1]+height*.48,front-.48,center+width*.28,body[1]+height*.94,front+.08),(0,56)),
-        overlay("dorsal_plate","body",(center-width*.36,body[1]+height*.20,rear-.08,center+width*.36,body[1]+height*.76,rear+.58),(28,56))
+        overlay("abdominal_keel","body",(center-width*.28,body[1]+height*.48,front-.48,center+width*.28,body[1]+height*.94,front+.08),(0,40)),
+        overlay("dorsal_plate","body",(center-width*.36,body[1]+height*.20,rear-.08,center+width*.36,body[1]+height*.76,rear+.58),(28,40))
     ]
     for side, arm_name in (("l","left_arm"),("r","right_arm")):
         x0,y0,z0,x1,y1,z1 = bounds(arm_name)
@@ -129,14 +129,14 @@ def sculpt(e, rig):
         h=y1-y0
         d=z1-z0
         additions.append(overlay("thigh_"+side,leg_name,(x0-w*.15,y0+h*.04,z0-d*.12,x1+w*.15,y0+h*.49,z1+d*.12),(0,56)))
-        additions.append(overlay("shin_"+side,leg_name,(x0-w*.10,y0+h*.49,z0-d*.10,x1+w*.10,y0+h*.88,z1+d*.10),(28,56)))
-        additions.append(overlay("talon_boot_"+side,leg_name,(x0-w*.18,y0+h*.82,z0-1.0,x1+w*.18,y1+.6,z1+.2),(44,40)))
+        additions.append(overlay("shin_"+side,leg_name,(x0-w*.10,y0+h*.49,z0-d*.10,x1+w*.10,y0+h*.88,z1+d*.10),(28,40)))
+        additions.append(overlay("talon_boot_"+side,leg_name,(x0-w*.18,y0+h*.82,z0-1.0,x1+w*.18,y1,z1+.2),(44,40)))
     hx0,hy0,hz0,hx1,hy1,hz1=head
     hw=hx1-hx0
     hh=hy1-hy0
     hd=hz1-hz0
-    additions.append(overlay("cheek_l","head",(hx0-hw*.04,hy0+hh*.28,hz0-.34,hx0+hw*.28,hy0+hh*.72,hz0+.22),(44,48)))
-    additions.append(overlay("cheek_r","head",(hx1-hw*.28,hy0+hh*.28,hz0-.34,hx1+hw*.04,hy0+hh*.72,hz0+.22),(44,56)))
+    additions.append(overlay("cheek_l","head",(hx0-hw*.04,hy0+hh*.28,hz0-.34,hx0+hw*.28,hy0+hh*.72,hz0+.22),(44,40)))
+    additions.append(overlay("cheek_r","head",(hx1-hw*.28,hy0+hh*.28,hz0-.34,hx1+hw*.04,hy0+hh*.72,hz0+.22),(44,40)))
     if e == "stalker":
         additions.extend([
             overlay("hunched_mantle","body",(center-width*.70,body[1]-.4,front-.65,center+width*.70,body[1]+height*.42,front+.25),(0,40)),
