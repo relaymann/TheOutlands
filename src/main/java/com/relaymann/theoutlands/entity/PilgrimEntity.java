@@ -19,14 +19,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 /** A wary wanderer that watches from a distance, retreats when approached, and only attacks when provoked. */
-public final class PilgrimEntity extends Monster {
+public final class PilgrimEntity extends OutlandsGeoMonster {
     private static final EntityDataAccessor<Boolean> DATA_WATCHING =
             SynchedEntityData.defineId(PilgrimEntity.class, EntityDataSerializers.BOOLEAN);
     private int behaviorCooldown;
     private int stepCooldown;
     private int watchTicks;
 
-    public PilgrimEntity(EntityType<? extends Monster> type, Level level) {
+    public PilgrimEntity(EntityType<? extends OutlandsGeoMonster> type, Level level) {
         super(type, level);
         xpReward = 2;
     }

@@ -20,7 +20,7 @@ import com.relaymann.theoutlands.OutlandsConfig;
  * The Stalker is a patient pursuit specialist. It remembers confirmed sightings,
  * searches around the last known position, and tries to cut off moving prey.
  */
-public final class StalkerEntity extends Monster {
+public final class StalkerEntity extends OutlandsGeoMonster {
     private double memoryX, memoryY, memoryZ;
     private int lostSightTicks;
     private int searchTicks;
@@ -28,7 +28,7 @@ public final class StalkerEntity extends Monster {
     private int audioCooldown;
     private boolean hasMemory;
 
-    public StalkerEntity(EntityType<? extends Monster> type, Level level) { super(type, level); xpReward = 10; }
+    public StalkerEntity(EntityType<? extends OutlandsGeoMonster> type, Level level) { super(type, level); xpReward = 10; }
 
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes().add(Attributes.MAX_HEALTH, 46.0D)
