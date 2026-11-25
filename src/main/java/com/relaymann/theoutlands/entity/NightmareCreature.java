@@ -129,6 +129,11 @@ public final class NightmareCreature extends OutlandsGeoMonster {
             Vec3 direction = player.position().subtract(position()).normalize();
             setDeltaMovement(getDeltaMovement().add(direction.x * 0.92D, 0.42D, direction.z * 0.92D));
             hasImpulse = true;
+            playHorrorAnimation("pounce");
+            if (OutlandsConfig.HORROR_AUDIO_ENABLED.get()) {
+                playSound(OutlandsSounds.NIGHTMARE_SCREECH.get(), 0.48F,
+                        0.92F + getRandom().nextFloat() * 0.18F);
+            }
             leapCooldown = 65 + getRandom().nextInt(35);
         }
     }
