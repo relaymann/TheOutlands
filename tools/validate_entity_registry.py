@@ -99,9 +99,10 @@ for field, entity_id in fields.items():
     if texture_match:
         textures[entity_id] = texture_match.group(1)
 
-for entity_id, texture in nightmare_texture_map.items():
-    renderer_models[entity_id] = "NightmareCreatureModel"
-    textures[entity_id] = texture
+if not geckolib_mode:
+    for entity_id, texture in nightmare_texture_map.items():
+        renderer_models[entity_id] = "NightmareCreatureModel"
+        textures[entity_id] = texture
 
 def audit_once():
     errors = []
