@@ -31,7 +31,15 @@ for entity in IDS:
         "cave_jar":("jar_rim","shell_bulge","inner_rib_l","inner_rib_r","mandible_l","mandible_r","hooked_tips_l","hooked_tips_r"),
         "ceiling_dweller":("abdomen_sac","mouth_hooks","eye_cluster_l","eye_cluster_r","adhesive_pad_l","adhesive_pad_r","hooked_tarsus_0","hooked_tarsus_1","hooked_tarsus_2","hooked_tarsus_3"),
         "mimic":("split_face_l","split_face_r","inner_teeth","false_rib_cage","wrist_tendrils_l","wrist_tendrils_r","heel_spurs_l","heel_spurs_r"),
-        "death":("hood_shadow","nasal_cavity","jaw_teeth","rib_arch_l","rib_arch_r","bone_sickle_l","bone_sickle_r","robe_tails")
+        "death":("hood_shadow","nasal_cavity","jaw_teeth","rib_arch_l","rib_arch_r","bone_sickle_l","bone_sickle_r","robe_tails"),
+        "almighty":("halo_crown","faceless_mask","shoulder_mantle_l","shoulder_mantle_r","rib_cage_outer","floating_ribs","long_fingers_l","long_fingers_r"),
+        "colossus":("towering_trapezius","layered_chest_plate","boulder_pauldron_l","boulder_pauldron_r","forearm_battering_ram_l","forearm_battering_ram_r","knee_spikes_l","knee_spikes_r","crown_bone"),
+        "fear":("split_cranium_l","split_cranium_r","hollow_face","rib_spines_l","rib_spines_r","hanging_tendril_l","hanging_tendril_r","reverse_elbow_l","reverse_elbow_r"),
+        "null":("void_face","void_eye_l","void_eye_r","floating_rib_l","floating_rib_r","void_aperture","reaching_fingers_l","reaching_fingers_r"),
+        "null_apostle":("apostle_crown","stitched_mask","reliquary_chest","rib_spokes_l","rib_spokes_r","ceremonial_spines","split_hand_l","split_hand_r"),
+        "nightmare_unbound":("fractured_crown_l","fractured_crown_r","open_maw","upper_fang_l","upper_fang_r","back_growth_l","back_growth_r","elongated_forearm_l","elongated_forearm_r","tendril_crown"),
+        "nightmare_wardened":("warden_helm","helm_horns_l","helm_horns_r","layered_cuirass","shield_mantle_l","shield_mantle_r","spiked_gauntlet_l","spiked_gauntlet_r","greaves_l","greaves_r"),
+        "nightmare_watcher":("optic_crown","primary_eye","secondary_eye_l","secondary_eye_r","observer_rib_l","observer_rib_r","watcher_tendrils_l","watcher_tendrils_r","long_fingers_l","long_fingers_r")
     }
     missing={"anatomy_"+entity+"_"+feature for feature in features.get(entity,())}-names
     if missing: raise SystemExit("%s is missing creature-specific anatomy: %s"%(entity,sorted(missing)))
@@ -59,7 +67,7 @@ for entity in IDS:
         if not clip: raise SystemExit("Missing "+action+" clip for "+entity)
         missing=anatomy-set(clip.get("bones",{}))
         if missing: raise SystemExit("%s %s lacks animation for %s"%(entity,action,sorted(missing)))
-        if entity in ("burrower","dredge","howler","nightmare_hound","cave_jar","ceiling_dweller","mimic","death") and action in ("sprint","attack"):
+        if entity in ("burrower","dredge","howler","nightmare_hound","cave_jar","ceiling_dweller","mimic","death","almighty","colossus","fear","null","null_apostle","nightmare_unbound","nightmare_wardened","nightmare_watcher") and action in ("sprint","attack"):
             for bone_name in anatomy:
                 track=clip.get("bones",{}).get(bone_name,{}).get("rotation",{})
                 moving=any(isinstance(value,list) and any(abs(float(v))>0 for v in value[:3]) for value in track.values())
