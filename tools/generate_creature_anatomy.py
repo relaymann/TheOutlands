@@ -480,7 +480,13 @@ def main():
             mid=round(duration*(.34 if action in ("attack","death") else .5),3)
             for b in additions_by_entity[e]:
                 n=b["name"].lower()
-                if e in ("stalker","hunter","lurker","observer","stillborn_statue","nightmare_false_survivor","pilgrim","agitated_one"):
+                if e in ("almighty","colossus","fear","null","null_apostle","nightmare_unbound","nightmare_wardened","nightmare_watcher"):
+                    if action=="idle": amp=5 if any(x in n for x in ("crown","eye","optic","tendril","mantle","shroud")) else 2.4
+                    elif action=="walk": amp=12 if any(x in n for x in ("finger","tendril","mantle","shroud","crown")) else 6
+                    elif action=="sprint": amp=20 if any(x in n for x in ("finger","tendril","mantle","shroud","crown")) else 10
+                    elif action=="attack": amp=48 if any(x in n for x in ("jaw","fang","finger","tendril","gauntlet","forearm","battering")) else 32
+                    else: amp=36 if any(x in n for x in ("tendril","crown","shroud","mantle","robe")) else 20
+                elif e in ("stalker","hunter","lurker","observer","stillborn_statue","nightmare_false_survivor","pilgrim","agitated_one"):
                     if action=="idle": amp=8 if ("eye" in n or "lens" in n) else 2.2 if ("tendon" in n or "tendril" in n or "cable" in n or "cord" in n) else 1.8 if ("mantle" in n or "hood" in n) else .7
                     elif action=="walk": amp=8 if ("claw" in n or "feeler" in n or "finger" in n or "hook" in n or "spur" in n) else 5 if ("mantle" in n or "hood" in n or "cord" in n) else 2
                     elif action=="sprint": amp=14 if ("claw" in n or "finger" in n or "hook" in n or "spur" in n) else 8 if ("mantle" in n or "hood" in n or "cord" in n) else 5
@@ -505,6 +511,18 @@ def main():
                     if action=="idle": vals=([0,-14,0],[0,16,0],[0,-14,0])
                     elif action in ("walk","sprint"): vals=([0,-8,0],[0,10,0],[0,-8,0])
                     elif action=="attack": vals=([0,0,0],[0,22,0],[0,-12,0])
+                if e=="colossus" and action in ("walk","sprint","attack"):
+                    vals=([0,0,0],[amp*.8,0,amp*.2],[-amp*.45,0,-amp*.1])
+                elif e=="almighty" and action=="idle":
+                    vals=([-amp*.7,0,-amp*.5],[amp*.7,0,amp*.5],[-amp*.7,0,-amp*.5])
+                elif e=="fear" and action in ("idle","walk","sprint"):
+                    vals=([amp*.8,0,-amp*.7],[-amp*.8,0,amp*.7],[amp*.8,0,-amp*.7])
+                elif e in ("null","nightmare_unbound") and action in ("idle","walk","sprint"):
+                    vals=([-amp,amp*.35,amp*.6],[amp,-amp*.35,-amp*.6],[-amp,amp*.35,amp*.6])
+                elif e=="nightmare_watcher" and action=="idle" and ("eye" in n or "optic" in n):
+                    vals=([0,-24,0],[0,24,0],[0,-24,0])
+                elif e=="nightmare_wardened" and action=="attack":
+                    vals=([0,0,0],[-amp*.5,0,amp*.8],[amp*.9,0,-amp*.3])
                 clip.setdefault("bones",{})[b["name"]]={"rotation":{"0.0":vals[0],str(mid):vals[1],str(duration):vals[2]}}
     reflect_animations(anim)
     dest=OUT/"animations/entity/outlands_monster.animation.json"
