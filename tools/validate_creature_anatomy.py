@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Validate generated anatomy rigs and all per-creature articulation tracks."""
 import json
 from pathlib import Path
 

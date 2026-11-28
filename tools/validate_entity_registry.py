@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Run fifteen independent integrity passes over all registered Outlands entities."""
 import glob, json, os, re, struct, sys
 
 ROOT = "src/main"
@@ -276,15 +275,15 @@ def audit_once():
         errors.append("Observer still treats creative players as visual observers")
     if "!player.isCreative()" not in statue_source:
         errors.append("Stillborn Statue still treats creative players as visual observers")
-    if "search_ticks" not in hunter_source or "Keep the last confirmed trail" not in hunter_source:
-        errors.append("Hunter loses its last known position instead of searching after lost sight")
+    if any(token not in hunter_source for token in ("search_ticks", "memoryX + offsetX", "memoryZ + offsetZ", "lostSightTicks >= 100")):
+        errors.append("Hunter is missing its timed search around the last seen player position")
     dredge_source = read("java/com/relaymann/theoutlands/entity/DredgeEntity.java")
     nightmare_source = read("java/com/relaymann/theoutlands/entity/NightmareCreature.java")
     colossus_source = read("java/com/relaymann/theoutlands/entity/ColossusEntity.java")
-    if "search_ticks" not in dredge_source or "ground-level sweep" not in dredge_source:
-        errors.append("Dredge is missing post-sighting trail search")
-    if "nightmare_search_ticks" not in nightmare_source or "last confirmed position" not in nightmare_source:
-        errors.append("Nightmare predators are missing last-seen search behavior")
+    if any(token not in dredge_source for token in ("searchTicks<=80", "Math.cos(angle)", "Math.sin(angle)", "hasTrail")):
+        errors.append("Dredge is missing its timed search around the last trail position")
+    if any(token not in nightmare_source for token in ("nightmare_search_ticks", "searchTicks <= 90", "Math.cos(angle)", "Math.sin(angle)", "hasMemory")):
+        errors.append("Nightmare predators are missing their timed search around the last seen position")
     if 'playHorrorAnimation("attack_colossus")' not in colossus_source:
         errors.append("Colossus ground strike is missing its creature-specific impact animation")
     if "COLOSSUS_WARNING" not in sounds_java or "COLOSSUS_STOMP" not in sounds_java:

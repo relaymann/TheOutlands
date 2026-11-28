@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Integrity audit for all Outlands structure content and generation safeguards."""
 from __future__ import annotations
 import json
 import re

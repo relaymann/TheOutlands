@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Guard the optional Simple Voice Chat integration against packaging and privacy regressions."""
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
