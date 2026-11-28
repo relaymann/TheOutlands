@@ -267,15 +267,19 @@ def main():
             mid=round(duration*(.34 if action in ("attack","death") else .5),3)
             for b in additions_by_entity[e]:
                 n=b["name"].lower()
-                if action=="idle": amp=1.4 if ("tendon" in n or "tendril" in n) else .7
-                elif action=="walk": amp=5 if ("claw" in n or "feeler" in n) else 2
-                elif action=="sprint": amp=11 if ("claw" in n or "mandible" in n) else 5
-                elif action=="attack": amp=34 if ("jaw" in n or "fang" in n or "mandible" in n) else 24
-                else: amp=20 if ("tendon" in n or "tendril" in n) else 12
+                if action=="idle": amp=8 if ("eye" in n or "lens" in n) else 2.2 if ("tendon" in n or "tendril" in n or "cable" in n or "cord" in n) else 1.8 if ("mantle" in n or "hood" in n) else .7
+                elif action=="walk": amp=8 if ("claw" in n or "feeler" in n or "finger" in n or "hook" in n or "spur" in n) else 5 if ("mantle" in n or "hood" in n or "cord" in n) else 2
+                elif action=="sprint": amp=14 if ("claw" in n or "finger" in n or "hook" in n or "spur" in n) else 8 if ("mantle" in n or "hood" in n or "cord" in n) else 5
+                elif action=="attack": amp=38 if ("jaw" in n or "fang" in n or "mandible" in n or "hook" in n or "claw" in n) else 24
+                else: amp=24 if ("tendon" in n or "tendril" in n or "cable" in n or "cord" in n) else 12
                 if action in ("idle","walk","sprint"):
                     vals=([ -amp,0,-amp*.25],[amp,0,amp*.25],[-amp,0,-amp*.25])
                 elif action=="attack": vals=([0,0,0],[-amp,0,amp*.25],[amp*.3,0,-amp*.1])
                 else: vals=([0,0,0],[amp,0,amp*.2],[amp*1.6,0,amp*.35])
+                if "eye" in n or "lens" in n:
+                    if action=="idle": vals=([0,-14,0],[0,16,0],[0,-14,0])
+                    elif action in ("walk","sprint"): vals=([0,-8,0],[0,10,0],[0,-8,0])
+                    elif action=="attack": vals=([0,0,0],[0,22,0],[0,-12,0])
                 clip.setdefault("bones",{})[b["name"]]={"rotation":{"0.0":vals[0],str(mid):vals[1],str(duration):vals[2]}}
     reflect_animations(anim)
     dest=OUT/"animations/entity/outlands_monster.animation.json"
