@@ -23,7 +23,15 @@ for entity in IDS:
         "stillborn_statue":("stone_collar","chest_slab","shoulder_pauldron_l","shoulder_pauldron_r","face_mask"),
         "nightmare_false_survivor":("mask_cheek_l","mask_cheek_r","throat_tendons","sternum_ribs","split_fingers_l","split_fingers_r"),
         "pilgrim":("hood_cowl","mantle_l","mantle_r","prayer_cords","sleeve_hands_l","sleeve_hands_r"),
-        "agitated_one":("raised_collar","rib_spurs_l","rib_spurs_r","jaw_hooks","knuckle_bone_l","knuckle_bone_r")
+        "agitated_one":("raised_collar","rib_spurs_l","rib_spurs_r","jaw_hooks","knuckle_bone_l","knuckle_bone_r"),
+        "burrower":("shovel_brow","outer_mandible_l","outer_mandible_r","tooth_row_upper","tooth_row_lower","digging_blade_l","digging_blade_r","tail_segments","carapace_ridges"),
+        "dredge":("angler_jaw_l","angler_jaw_r","needle_teeth","gill_frill_l","gill_frill_r","hook_fingers_l","hook_fingers_r","barbed_tail","sternal_ridges"),
+        "howler":("throat_sac","jaw_hinge_l","jaw_hinge_r","fangs_upper","fangs_lower","forearm_hook_l","forearm_hook_r","hock_l","hock_r"),
+        "nightmare_hound":("upper_jaw_plate","fangs_upper","fangs_lower","cheek_muscle_l","cheek_muscle_r","dewclaw_l","dewclaw_r","haunch_l","haunch_r","tail_spines"),
+        "cave_jar":("jar_rim","shell_bulge","inner_rib_l","inner_rib_r","mandible_l","mandible_r","hooked_tips_l","hooked_tips_r"),
+        "ceiling_dweller":("abdomen_sac","mouth_hooks","eye_cluster_l","eye_cluster_r","adhesive_pad_l","adhesive_pad_r","hooked_tarsus_0","hooked_tarsus_1","hooked_tarsus_2","hooked_tarsus_3"),
+        "mimic":("split_face_l","split_face_r","inner_teeth","false_rib_cage","wrist_tendrils_l","wrist_tendrils_r","heel_spurs_l","heel_spurs_r"),
+        "death":("hood_shadow","nasal_cavity","jaw_teeth","rib_arch_l","rib_arch_r","bone_sickle_l","bone_sickle_r","robe_tails")
     }
     missing={"anatomy_"+entity+"_"+feature for feature in features.get(entity,())}-names
     if missing: raise SystemExit("%s is missing creature-specific anatomy: %s"%(entity,sorted(missing)))
