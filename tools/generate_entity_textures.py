@@ -211,6 +211,61 @@ def generate(name, palette, index):
         if name in signatures:
             signatures[name]()
 
+    if name == "stalker":
+        rect(pixels, 8, 8, 15, 9, palette[0])
+        rect(pixels, 9, 10, 9, 11, palette[4])
+        rect(pixels, 14, 10, 14, 11, palette[3])
+        line(pixels, 10, 12, 13, 15, palette[0])
+        line(pixels, 13, 12, 10, 15, palette[0])
+        for x,y in ((10,13),(12,14),(14,13)): rect(pixels,x,y,x,y,palette[4])
+    elif name == "hunter":
+        line(pixels, 8, 8, 15, 9, palette[0])
+        rect(pixels, 9, 10, 10, 11, palette[4])
+        rect(pixels, 13, 10, 14, 11, palette[4])
+        rect(pixels, 10, 12, 13, 15, palette[0])
+        for x in (10,12,13): rect(pixels,x,12,x,13,palette[4])
+    elif name == "lurker":
+        rect(pixels, 8, 9, 15, 10, palette[0])
+        rect(pixels, 9, 10, 10, 10, palette[4])
+        rect(pixels, 13, 10, 14, 10, palette[4])
+        line(pixels, 11, 11, 12, 16, palette[0])
+        for y in (13,15): rect(pixels,10,y,13,y,palette[4])
+    elif name == "observer":
+        rect(pixels, 8, 8, 15, 12, palette[0])
+        rect(pixels, 9, 9, 10, 11, palette[3])
+        rect(pixels, 12, 9, 14, 11, palette[4])
+        rect(pixels, 11, 10, 12, 11, palette[0])
+        rect(pixels, 10, 13, 13, 15, palette[0])
+        pixels[13][11] = palette[4]
+        pixels[14][12] = palette[3]
+    elif name == "stillborn_statue":
+        rect(pixels, 8, 8, 15, 11, palette[1])
+        line(pixels, 9, 9, 10, 11, palette[4])
+        line(pixels, 14, 9, 13, 11, palette[4])
+        line(pixels, 11, 12, 12, 15, palette[0])
+        line(pixels, 8, 7, 11, 13, palette[3])
+        line(pixels, 15, 8, 12, 14, palette[3])
+    elif name == "nightmare_false_survivor":
+        rect(pixels, 8, 8, 15, 9, palette[1])
+        rect(pixels, 9, 10, 10, 10, palette[4])
+        rect(pixels, 13, 10, 14, 11, palette[0])
+        line(pixels, 9, 13, 15, 14, palette[0])
+        for x in (10,12,14): rect(pixels,x,13,x,14,palette[4])
+        line(pixels, 8, 12, 9, 15, palette[3])
+    elif name == "pilgrim":
+        rect(pixels, 7, 7, 16, 11, palette[0])
+        rect(pixels, 9, 10, 10, 10, palette[4])
+        rect(pixels, 13, 10, 14, 10, palette[4])
+        line(pixels, 11, 11, 12, 15, palette[1])
+        for y in (12,14): rect(pixels,10,y,13,y,palette[3])
+    elif name == "agitated_one":
+        rect(pixels, 8, 8, 15, 9, palette[0])
+        rect(pixels, 9, 9, 10, 11, palette[4])
+        rect(pixels, 13, 9, 14, 11, palette[4])
+        rect(pixels, 9, 13, 14, 15, palette[0])
+        for x in (9,11,13,14): rect(pixels,x,13,x,14,palette[4])
+        line(pixels, 11, 11, 12, 16, palette[0])
+
     sclera = palette[4] if name not in ("fear", "null", "null_apostle", "observer") else palette[3]
     iris = palette[2] if name not in ("observer", "fear") else palette[1]
     pupil = palette[0]
