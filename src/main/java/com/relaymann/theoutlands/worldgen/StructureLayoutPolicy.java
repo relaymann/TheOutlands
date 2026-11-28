@@ -60,7 +60,7 @@ public final class StructureLayoutPolicy {
         for (double weight : weights) total += weight;
         if (total <= 0.0D) return null;
         Random random = new Random(seed);
-        if (random.nextDouble() >= Math.min(0.30D, total)) return null;
+        if (random.nextDouble() >= Math.min(0.18D, total)) return null;
         double pick = random.nextDouble() * total;
         for (int i = 0; i < weights.length; i++) {
             pick -= weights[i];
