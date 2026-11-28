@@ -1,8 +1,6 @@
-### Gradle ###
 .gradle/
 build/
 
-### IDEs ###
 .idea/
 *.iml
 .project
@@ -10,9 +8,7 @@ build/
 .settings/
 .vscode/
 
-### Minecraft ###
 run/
 run-*/
 
-# Generated resources and local build inputs
 src/generated/resources/
