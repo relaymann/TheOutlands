@@ -376,6 +376,44 @@ def sculpt(e, rig):
             overlay("hook_l","left_arm",(bounds("left_arm")[0]-1.0,bounds("left_arm")[4]-.5,bounds("left_arm")[2]-.5,bounds("left_arm")[3]+.9,bounds("left_arm")[4]+3.2,bounds("left_arm")[5]+.5),(44,40)),
             overlay("hook_r","right_arm",(bounds("right_arm")[0]-1.0,bounds("right_arm")[4]-.5,bounds("right_arm")[2]-.5,bounds("right_arm")[3]+.9,bounds("right_arm")[4]+3.8,bounds("right_arm")[5]+.5),(44,48))
         ])
+    boss_shapes = {
+        "almighty": [
+            overlay("divine_shoulder_span_l","left_arm",(center-width*.92,body[1]+height*.18,front-.8,center-width*.38,body[1]+height*.76,rear+.6),(0,64)),
+            overlay("divine_shoulder_span_r","right_arm",(center+width*.38,body[1]+height*.18,front-.8,center+width*.92,body[1]+height*.76,rear+.6),(32,64)),
+            overlay("floating_crown_mass","head",(hx0-hw*.38,hy0-hh*.34,hz0-hd*.12,hx1+hw*.38,hy1+hh*.10,hz1+hd*.12),(0,80))
+        ],
+        "colossus": [
+            overlay("colossus_torso_mass","body",(center-width*.72,body[1]-.8,front-.9,center+width*.72,body[4]+.6,rear+.9),(0,80)),
+            overlay("colossus_forearm_mass_l","left_arm",(bounds("left_arm")[0]-2,bounds("left_arm")[1],bounds("left_arm")[2]-.8,bounds("left_arm")[3]+2,bounds("left_arm")[4],bounds("left_arm")[5]+.8),(0,96)),
+            overlay("colossus_forearm_mass_r","right_arm",(bounds("right_arm")[0]-2,bounds("right_arm")[1],bounds("right_arm")[2]-.8,bounds("right_arm")[3]+2,bounds("right_arm")[4],bounds("right_arm")[5]+.8),(32,96))
+        ],
+        "fear": [
+            overlay("fear_spread_mantle","body",(center-width*.92,body[1]+height*.06,rear-.5,center+width*.92,body[1]+height*.70,rear+1.3),(0,80)),
+            overlay("fear_skull_extension","head",(hx0-hw*.28,hy0-hh*.30,hz0-.5,hx1+hw*.28,hy1+hh*.12,hz1+.5),(32,80))
+        ],
+        "null": [
+            overlay("null_void_cowl","head",(hx0-hw*.34,hy0-hh*.18,hz0-.5,hx1+hw*.34,hy1+hh*.12,hz1+.8),(0,80)),
+            overlay("null_shroud_mass","body",(center-width*.66,body[1]+height*.08,front-.4,center+width*.66,body[4]+height*.18,rear+.8),(32,80))
+        ],
+        "null_apostle": [
+            overlay("apostle_reliquary_mass","body",(center-width*.62,body[1]+height*.12,front-.9,center+width*.62,body[4]+height*.12,rear+.6),(0,80)),
+            overlay("apostle_crown_mass","head",(hx0-hw*.32,hy0-hh*.38,hz0-.4,hx1+hw*.32,hy1+hh*.08,hz1+.6),(32,80))
+        ],
+        "nightmare_unbound": [
+            overlay("unbound_mutation_mass","body",(center-width*.78,body[1]-.5,front-.8,center+width*.78,body[4]+height*.18,rear+1.4),(0,96)),
+            overlay("unbound_skull_mass","head",(hx0-hw*.42,hy0-hh*.36,hz0-.8,hx1+hw*.42,hy1+hh*.15,hz1+.8),(32,96))
+        ],
+        "nightmare_wardened": [
+            overlay("warden_bulwark_torso","body",(center-width*.76,body[1]-.5,front-.9,center+width*.76,body[4]+.4,rear+.8),(0,96)),
+            overlay("warden_shield_l","left_arm",(bounds("left_arm")[0]-2.5,bounds("left_arm")[1]-1,bounds("left_arm")[2]-.9,bounds("left_arm")[3]+2,bounds("left_arm")[4]+1,bounds("left_arm")[5]+.9),(32,96)),
+            overlay("warden_shield_r","right_arm",(bounds("right_arm")[0]-2.5,bounds("right_arm")[1]-1,bounds("right_arm")[2]-.9,bounds("right_arm")[3]+2,bounds("right_arm")[4]+1,bounds("right_arm")[5]+.9),(0,112))
+        ],
+        "nightmare_watcher": [
+            overlay("watcher_eye_crown","head",(hx0-hw*.48,hy0-hh*.22,hz0-.6,hx1+hw*.48,hy1+hh*.24,hz1+.8),(0,80)),
+            overlay("watcher_spread_shroud","body",(center-width*.86,body[1]+height*.06,rear-.4,center+width*.86,body[4]+height*.12,rear+1.4),(32,80))
+        ]
+    }
+    additions.extend(boss_shapes.get(e, []))
     return additions
 
 def reflect_rig(rig):
