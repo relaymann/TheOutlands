@@ -316,6 +316,57 @@ def generate(name, palette, index):
         for x in (9,11,13,15): rect(pixels,x,13,x,14,palette[4])
         line(pixels, 20, 19, 27, 32, palette[3]); line(pixels,27,19,20,32,palette[3])
 
+    if name == "almighty":
+        rect(pixels, 7, 7, 16, 12, palette[0])
+        line(pixels, 8, 8, 15, 8, palette[3])
+        rect(pixels, 10, 9, 13, 10, palette[4])
+        line(pixels, 11, 10, 12, 14, palette[0])
+        for x in (9,12,15): line(pixels,x,12,x+1,16,palette[3])
+        for x in (20,25,30,35): line(pixels,x,18,x+3,31,palette[3])
+    elif name == "colossus":
+        rect(pixels, 6, 7, 17, 12, palette[1])
+        rect(pixels, 8, 9, 10, 10, palette[0]); rect(pixels, 14, 9, 16, 10, palette[0])
+        line(pixels, 8, 13, 15, 13, palette[0])
+        for x in (9,11,13,15): line(pixels,x,13,x,17,palette[4])
+        for y in (20,24,28,32): line(pixels,20,y,35,y+2,palette[3])
+    elif name == "fear":
+        rect(pixels, 7, 7, 16, 12, palette[0])
+        line(pixels, 8, 8, 11, 11, palette[3]); line(pixels,15,8,12,11,palette[3])
+        rect(pixels, 10, 9, 13, 11, palette[0])
+        rect(pixels, 9, 13, 14, 16, palette[3])
+        for x in (9,12,15): line(pixels,x,18,x-2,32,palette[4])
+    elif name == "null":
+        rect(pixels, 7, 7, 16, 12, palette[0])
+        rect(pixels, 9, 9, 10, 11, palette[3]); rect(pixels, 13, 9, 14, 11, palette[3])
+        rect(pixels, 11, 10, 12, 14, palette[0])
+        rect(pixels, 8, 14, 15, 16, palette[0])
+        for x in (9,12,15): line(pixels,x,18,x+2,33,palette[3])
+    elif name == "null_apostle":
+        rect(pixels, 7, 7, 16, 12, palette[1])
+        line(pixels, 8, 8, 15, 8, palette[3])
+        rect(pixels, 9, 10, 10, 11, palette[4]); rect(pixels, 13, 10, 14, 11, palette[4])
+        line(pixels, 11, 12, 12, 15, palette[0])
+        for x in (9,12,15): line(pixels,x,18,x,33,palette[3])
+    elif name == "nightmare_unbound":
+        rect(pixels, 6, 7, 17, 12, palette[0])
+        line(pixels, 7, 8, 10, 5, palette[3]); line(pixels,16,8,13,5,palette[3])
+        rect(pixels, 8, 9, 10, 11, palette[4]); rect(pixels, 13, 9, 15, 11, palette[3])
+        rect(pixels, 9, 13, 14, 16, palette[0])
+        for x in (9,11,13,15): line(pixels,x,13,x+1,17,palette[4])
+        line(pixels, 20, 18, 27, 33, palette[3]); line(pixels,35,18,28,33,palette[2])
+    elif name == "nightmare_wardened":
+        rect(pixels, 6, 7, 17, 12, palette[1])
+        line(pixels, 7, 7, 10, 3, palette[3]); line(pixels,16,7,13,3,palette[3])
+        rect(pixels, 8, 9, 10, 10, palette[4]); rect(pixels, 13, 9, 15, 10, palette[4])
+        line(pixels, 9, 13, 14, 13, palette[0])
+        for x in (8,12,16): line(pixels,x,18,x,34,palette[3])
+    elif name == "nightmare_watcher":
+        rect(pixels, 6, 7, 17, 12, palette[0])
+        for x in (8,11,14,16): rect(pixels,x,8,x+1,10,palette[4])
+        rect(pixels, 9, 12, 14, 14, palette[3])
+        line(pixels, 11, 13, 12, 16, palette[0])
+        for x in (20,25,30,35): line(pixels,x,18,x-2,33,palette[3])
+
     sclera = palette[4] if name not in ("fear", "null", "null_apostle", "observer") else palette[3]
     iris = palette[2] if name not in ("observer", "fear") else palette[1]
     pupil = palette[0]
