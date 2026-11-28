@@ -49,7 +49,7 @@ public final class OutlandsStructure extends Structure {
                     Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,context.heightAccessor(),context.randomState());
             min=Math.min(min,height);max=Math.max(max,height);
         }
-        if(max-min>5) return Optional.empty();
+        if(max-min>8) return Optional.empty();
         int surfaceY=context.chunkGenerator().getFirstOccupiedHeight(x+size/2,z+size/2,
                 Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,context.heightAccessor(),context.randomState());
         if(surfaceY<=context.heightAccessor().getMinBuildHeight()+48
