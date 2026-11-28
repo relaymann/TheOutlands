@@ -8,7 +8,7 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-/** The Almighty's three phases visibly unfold its void halo and trailing mantle. */
+
 public final class AlmightyModel extends HumanoidModel<AlmightyEntity> {
  private final ModelPart halo,mantle;
  public AlmightyModel(ModelPart root){super(root);halo=root.getChild("head").getChild("halo");mantle=root.getChild("body").getChild("mantle");}

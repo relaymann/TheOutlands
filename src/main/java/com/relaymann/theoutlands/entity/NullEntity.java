@@ -12,7 +12,6 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
-/** Null's dedicated humanoid entity. His renderer gives him an ordinary player silhouette. */
 public final class NullEntity extends OutlandsGeoMonster {
     private long temporaryExpiresAt = -1L;
     public void setTemporaryExpiresAt(long gameTime) { temporaryExpiresAt = gameTime; }

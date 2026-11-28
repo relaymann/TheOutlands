@@ -11,7 +11,6 @@ import net.minecraft.world.level.saveddata.SavedData;
 import java.util.HashSet;
 import java.util.Set;
 
-/** Persists which generated Outlands sites have already resolved their one-time encounter. */
 public final class StructureEncounterSavedData extends SavedData {
     private static final String DATA_ID = "theoutlands_structure_encounters";
     private static final String SITES_TAG = "resolved_sites";
@@ -23,7 +22,7 @@ public final class StructureEncounterSavedData extends SavedData {
     private StructureEncounterSavedData() {}
 
     public static StructureEncounterSavedData get(ServerLevel level) {
-        // Structure encounters are Overworld-only, so this data remains attached to its persistent level.
+
         return level.getDataStorage().computeIfAbsent(FACTORY, DATA_ID);
     }
 

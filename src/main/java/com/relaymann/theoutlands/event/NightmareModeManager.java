@@ -37,10 +37,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * NIGHTMARE-only encounter director. Events are diegetic: no chat narration,
- * forced movement, permanent terrain edits, or chunk-forcing spawn attempts.
- */
 @EventBusSubscriber(modid = TheOutlands.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public final class NightmareModeManager {
     private static final Map<UUID, Long> NEXT_EVENT = new ConcurrentHashMap<>();
@@ -51,7 +47,7 @@ public final class NightmareModeManager {
     private static final Map<String, StructureState> ACTIVE_STRUCTURES = new ConcurrentHashMap<>();
     private static final Map<UUID, PursuitMemory> PURSUIT_MEMORY = new ConcurrentHashMap<>();
     private static List<net.minecraft.world.entity.EntityType<? extends Mob>> threatTypes() {
-        // Resolve deferred entity holders only after registries have completed loading.
+
         return List.of(OutlandsEntities.STALKER.get(), OutlandsEntities.HUNTER.get(),
                 OutlandsEntities.LURKER.get(), OutlandsEntities.DREDGE.get(),
                 OutlandsEntities.MIMIC.get(), OutlandsEntities.OBSERVER.get(),
@@ -150,7 +146,6 @@ public final class NightmareModeManager {
         }
     }
 
-    /** A very rare three-form encounter with no announcement or explanatory reward. */
     private static void hollowEncounter(ServerPlayer player) {
         play(player, SoundEvents.WARDEN_HEARTBEAT, SoundSource.AMBIENT, 0.14F, 0.36F);
         spawnThreat(player, OutlandsEntities.NIGHTMARE_WATCHER.get(), true);
@@ -158,7 +153,6 @@ public final class NightmareModeManager {
         spawnThreat(player, OutlandsEntities.NIGHTMARE_HOUND.get(), true);
     }
 
-    /** A two-minute storm window also raises the natural encounter budget. */
     private static void bloodMoon(ServerPlayer player) {
         ServerLevel level = player.serverLevel();
         level.setWeatherParameters(0, 2_400, true, true);
@@ -171,7 +165,6 @@ public final class NightmareModeManager {
         spawnThreats(player, 1, true);
     }
 
-    /** A wind-driven ash front briefly dims the sky and draws watchers into the area. */
     private static void ashfall(ServerPlayer player) {
         ServerLevel level = player.serverLevel();
         level.setWeatherParameters(0, 1_800, true, true);
@@ -182,7 +175,6 @@ public final class NightmareModeManager {
         spawnThreat(player, OutlandsEntities.NIGHTMARE_WATCHER.get(), true);
     }
 
-    /** A migration pulse draws multiple hunting forms in from nearby loaded terrain. */
     private static void migrationSurge(ServerPlayer player) {
         play(player, SoundEvents.WARDEN_ROAR, SoundSource.HOSTILE, 0.22F, 0.7F);
         spawnThreat(player, OutlandsEntities.NIGHTMARE_HOUND.get(), true);
@@ -190,13 +182,11 @@ public final class NightmareModeManager {
         spawnThreats(player, 1, true);
     }
 
-    /** The False Survivor advances only while the player is not watching it. */
     private static void falseSurvivorEncounter(ServerPlayer player) {
         play(player, SoundEvents.WARDEN_HEARTBEAT, SoundSource.AMBIENT, 0.12F, 0.88F);
         spawnThreat(player, OutlandsEntities.NIGHTMARE_FALSE_SURVIVOR.get(), true);
     }
 
-    /** Briefly cuts ambient audio, then leaves one distant sign behind. */
     private static void silence(ServerPlayer player) {
         if (!OutlandsConfig.HORROR_AUDIO_ENABLED.get()) return;
         player.connection.send(new ClientboundStopSoundPacket(null, SoundSource.AMBIENT));
@@ -204,13 +194,11 @@ public final class NightmareModeManager {
                 player.getZ(), 12, 0.7D, 0.8D, 0.7D, 0.002D);
     }
 
-    /** A small hunting party appears at the edge of already-loaded terrain. */
     private static void unusualActivity(ServerPlayer player) {
         play(player, SoundEvents.WARDEN_HEARTBEAT, SoundSource.HOSTILE, 0.24F, 0.55F);
         spawnThreats(player, 2, true);
     }
 
-    /** Rare multi-hunter encounter; the marked Stalkers are the NIGHTMARE-only variant. */
     private static void thePursuit(ServerPlayer player) {
         play(player, SoundEvents.WARDEN_HEARTBEAT, SoundSource.HOSTILE, 0.18F, 0.42F);
         spawnThreat(player, OutlandsEntities.STALKER.get(), true);
@@ -218,7 +206,6 @@ public final class NightmareModeManager {
         spawnThreat(player, OutlandsEntities.HUNTER.get(), true);
     }
 
-    /** A much more dangerous group encounter, exclusive to NIGHTMARE. */
     private static void containmentFailure(ServerPlayer player) {
         play(player, SoundEvents.WARDEN_ROAR, SoundSource.HOSTILE, 0.34F, 0.62F);
         player.serverLevel().sendParticles(ParticleTypes.SMOKE, player.getX(), player.getY() + 1.0D,
@@ -228,8 +215,7 @@ public final class NightmareModeManager {
 
     private static void spawnThreats(ServerPlayer player, int count, boolean empowered) {
         List<net.minecraft.world.entity.EntityType<? extends Mob>> threats = threatTypes();
-        // Keep group encounters dangerous without allowing a single event to dump
-        // a large pack on the player at once.
+
         int boundedCount = Math.min(2, Math.max(0, count));
         for (int i = 0; i < boundedCount; i++) {
             spawnThreat(player, threats.get(player.getRandom().nextInt(threats.size())), empowered);
@@ -246,8 +232,7 @@ public final class NightmareModeManager {
         if (!NightmareBalancePolicy.canStartNightmareSpawnEvent(distanceFromSpawn)) return;
 
         double angle = player.getRandom().nextDouble() * Math.PI * 2.0D;
-        // Spawn outside immediate combat range so the encounter approaches
-        // instead of materializing almost on top of the player.
+
         double distance = 40.0D + player.getRandom().nextDouble() * 16.0D;
         int x = net.minecraft.util.Mth.floor(player.getX() + Math.cos(angle) * distance);
         int z = net.minecraft.util.Mth.floor(player.getZ() + Math.sin(angle) * distance);
@@ -281,7 +266,6 @@ public final class NightmareModeManager {
         if (!level.addFreshEntity(mob)) mob.discard();
     }
 
-    /** NIGHTMARE event-spawned creatures are faster and tougher, not merely more numerous. */
     private static void empower(Mob mob) {
         boolean heavy = mob.getType() == OutlandsEntities.STALKER.get()
                 || mob.getType() == OutlandsEntities.NIGHTMARE_WARDENED.get();
@@ -305,7 +289,6 @@ public final class NightmareModeManager {
                 player.getRandom().nextLong()));
     }
 
-    /** Packs coordinate over a wider radius and retain a finite last-known-position pursuit. */
     private static void coordinateNightmarePack(ServerPlayer player) {
         ServerLevel level = player.serverLevel();
         for (Mob ally : level.getEntitiesOfClass(Mob.class,
@@ -366,7 +349,6 @@ public final class NightmareModeManager {
         }
     }
 
-    /** Loaded mobs migrate toward the player at night without teleporting or loading chunks. */
     private static void migrateNearbyThreats(ServerPlayer player) {
         ServerLevel level = player.serverLevel();
         long clock = Math.floorMod(level.getDayTime(), 24_000L);
@@ -403,7 +385,6 @@ public final class NightmareModeManager {
                 || type == OutlandsEntities.NIGHTMARE_UNBOUND.get();
     }
 
-    /** A discovered site becomes progressively more active while it is explored. */
     private static void tickActiveStructure(ServerPlayer player) {
         if (!OutlandsConfig.OUTLANDS_STRUCTURES_ENABLED.get()) return;
         ServerLevel level = player.serverLevel();

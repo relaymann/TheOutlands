@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-/** Rare, diegetic environmental cues sent only to the affected player. */
 public final class EnvironmentalAnomalyManager {
     private static final int CHECK_INTERVAL = 20;
     private static final int BASE_CHANCE_DENOMINATOR = 240;
@@ -97,7 +96,7 @@ public final class EnvironmentalAnomalyManager {
                         x + 0.28D, y, z + 0.18D, 0.09F, 0.82F);
             }
             case 7 -> {
-                // A brief, player-local interruption: no world weather or blocks are changed.
+
                 player.connection.send(new ClientboundStopSoundPacket(null, SoundSource.AMBIENT));
                 player.connection.send(new ClientboundStopSoundPacket(null, SoundSource.WEATHER));
                 player.serverLevel().sendParticles(player, ParticleTypes.ASH, true,
@@ -105,7 +104,7 @@ public final class EnvironmentalAnomalyManager {
                         8, 0.45D, 0.55D, 0.45D, 0.001D);
             }
             case 8 -> {
-                // Distant thunder-like sound suggests a storm without changing server weather.
+
                 double stormX = player.getX() + Math.cos(angle) * 42.0D;
                 double stormZ = player.getZ() + Math.sin(angle) * 42.0D;
                 send(player, SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.WEATHER,

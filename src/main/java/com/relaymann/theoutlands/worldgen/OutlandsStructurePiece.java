@@ -15,7 +15,6 @@ import net.minecraft.world.level.levelgen.structure.StructurePiece;
 import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceSerializationContext;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 
-/** One persisted multi-chunk piece. Every chunk receives only its intersection of the same layout. */
 public final class OutlandsStructurePiece extends StructurePiece {
     private final int anchorX;
     private final int surfaceY;
@@ -48,7 +47,7 @@ public final class OutlandsStructurePiece extends StructurePiece {
     public void postProcess(WorldGenLevel level,StructureManager structures,ChunkGenerator generator,
                             RandomSource random,BoundingBox box,ChunkPos chunkPos,BlockPos pivot) {
         if(!OutlandsConfig.OUTLANDS_STRUCTURES_ENABLED.get()) return;
-        // Never overwrite another mod or vanilla structure in this chunk.
+
         if(!structures.startsForStructure(chunkPos, candidate -> !(candidate instanceof OutlandsStructure)).isEmpty()) return;
         if(!hasSuitableSurface(level,box,surfaceY)) return;
         BlockPos spawn=level.getLevel().getSharedSpawnPos();
@@ -69,7 +68,6 @@ public final class OutlandsStructurePiece extends StructurePiece {
                 RandomSource.create(seed ^ 0x6A09E667F3BCC909L),box);
     }
 
-    /** Sample real ground below trunks/branches so one tree cannot cancel a whole chunk of the structure. */
     private static boolean hasSuitableSurface(WorldGenLevel level,BoundingBox box,int expectedY) {
         for(int x=box.minX();x<=box.maxX();x+=4) {
             for(int z=box.minZ();z<=box.maxZ();z+=4) {

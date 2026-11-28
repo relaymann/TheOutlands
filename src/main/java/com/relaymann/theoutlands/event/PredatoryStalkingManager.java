@@ -22,11 +22,6 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 import java.util.*;
 
-/**
- * Per-species stalking and settlement pressure. This layer complements (rather
- * than replaces) each entity's own goals: it never teleports creatures, edits
- * terrain, forces a target, or announces an encounter to the player.
- */
 @EventBusSubscriber(modid = TheOutlands.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public final class PredatoryStalkingManager {
     private static final int SAMPLE_INTERVAL = 10;
@@ -50,7 +45,6 @@ public final class PredatoryStalkingManager {
         while (marks.size() > MAX_BUILD_MARKS) marks.removeFirst();
     }
 
-
     @SubscribeEvent
     public static void onDoorUsed(PlayerInteractEvent.RightClickBlock event) {
         if (event.isCanceled() || !(event.getLevel() instanceof ServerLevel level)
@@ -72,7 +66,7 @@ public final class PredatoryStalkingManager {
         if (state == null || state.level() != level
                 || !OutlandsConfig.ENTITY_INTELLIGENCE_ENABLED.get()
                 || level.getGameTime() >= state.expiresAt()) {
-            // The marker survives chunk unloads and server restarts; never strand a mob invisible.
+
             mob.setInvisible(false);
             mob.removeTag(TEMPORARY_DISAPPEARANCE_TAG);
             DISAPPEAR_UNTIL.remove(mob.getUUID());
@@ -114,7 +108,6 @@ public final class PredatoryStalkingManager {
         return player.isAlive() && !player.isCreative() && !player.isSpectator();
     }
 
-    /** Every species has its own tactical profile; special entities keep their own attack goals. */
     private static Personality personality(Mob mob) {
         if (mob instanceof StalkerEntity) return new Personality(Style.SHADOW, 0.84D, 14, 34, 150, true);
         if (mob instanceof HunterEntity) return new Personality(Style.PURSUIT, 1.12D, 0, 56, 80, false);
@@ -189,19 +182,18 @@ public final class PredatoryStalkingManager {
                 if (seen && distance > 64.0D) destination = flankPoint(mob, target, true);
             }
             case PURSUIT, INEVITABLE -> {
-                // Their native goals handle the attack. The director only corrects a
-                // stale route after the player crosses a doorway or changes floors.
+
                 if (!seen && distance > 100.0D) destination = lastKnown(mob);
             }
             case SUBTERRANEAN -> {
                 if (distance > 100.0D && seen) destination = target.position().add(target.getDeltaMovement().scale(5.0D));
             }
             case TERRITORIAL, STATUE, DOMINANT -> {
-                // These entities hold ground unless their own goal has a target.
+
                 if (distance < 196.0D && seen) mob.getNavigation().stop();
             }
             case CHARGE -> {
-                // Preserve the Agitated One's wind-up and charge sequence.
+
                 if (seen && distance > 36.0D) destination = target.position();
             }
             case CALLER -> {
@@ -220,11 +212,6 @@ public final class PredatoryStalkingManager {
         }
     }
 
-    /**
-     * Reads recently used doorways and player-placed obstructions along the
-     * predator's direct approach. It sends the mob to the doorway or around
-     * the barricade; vanilla navigation then calculates a collision-safe path.
-     */
     private static Vec3 routeAwareWaypoint(Mob mob, Player target, ServerLevel level) {
         ArrayDeque<BuildMark> marks = BUILD_MARKS.get(level.dimension());
         if (marks == null || mob.distanceToSqr(target) < 64.0D) return null;
@@ -279,7 +266,6 @@ public final class PredatoryStalkingManager {
         return target.position().add(away.normalize().scale(12.0D));
     }
 
-    /** Follow a player through buildings using the last real sighting, never teleporting. */
     private static void resumeLastKnownRoute(Mob mob, ServerLevel level) {
         Memory memory = MEMORIES.get(mob.getUUID());
         if (memory == null || memory.lastSeen == 0L || mob.getTarget() != null
@@ -294,7 +280,6 @@ public final class PredatoryStalkingManager {
         }
     }
 
-    /** Detect a player-built settlement from recent block placement and patrol its perimeter. */
     private static void pressureSettlement(Mob mob, ServerPlayer player, ServerLevel level) {
         Personality profile = personality(mob);
         if (profile == null || !(profile.style() == Style.SHADOW || profile.style() == Style.OBSERVE
@@ -327,7 +312,6 @@ public final class PredatoryStalkingManager {
         }
     }
 
-    /** Rarely take up a position outside glass, making a creature visible in a window. */
     private static void tryWindowPosition(Mob mob, ServerPlayer player, ServerLevel level) {
         Personality profile = personality(mob);
         if (profile == null || !(profile.style() == Style.SHADOW || profile.style() == Style.OBSERVE
@@ -354,7 +338,6 @@ public final class PredatoryStalkingManager {
         }
     }
 
-    /** Only the Watcher-like species can perform this rare, brief visual disappearance. */
     private static void restoreExpiredDisappearance(Mob mob, ServerLevel level) {
         Disappearance state = DISAPPEAR_UNTIL.get(mob.getUUID());
         if (state != null && state.level() == level && level.getGameTime() >= state.expiresAt()) {
@@ -411,7 +394,7 @@ public final class PredatoryStalkingManager {
                     mob.removeTag(TEMPORARY_DISAPPEARANCE_TAG);
                     iterator.remove();
                 } else if (entity == null && level.getGameTime() > state.expiresAt() + 24_000L) {
-                    // If the entity is unloaded, its saved marker restores it when it is loaded again.
+
                     iterator.remove();
                 }
             }

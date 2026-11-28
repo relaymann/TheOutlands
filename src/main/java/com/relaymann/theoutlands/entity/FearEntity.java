@@ -9,7 +9,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
-/** Fear's first manifestation: a silent, hovering witness rather than a combat mob. */
+
 public final class FearEntity extends OutlandsGeoMonster {
  private long temporaryExpiresAt = -1L;
  public void setTemporaryExpiresAt(long gameTime) { temporaryExpiresAt = gameTime; }
@@ -25,7 +25,7 @@ public final class FearEntity extends OutlandsGeoMonster {
   if (temporaryExpiresAt >= 0L && level().getGameTime() >= temporaryExpiresAt) { discard(); return; }
   setNoGravity(true);
   setDeltaMovement(0.0D,0.0D,0.0D);
-  // Fear remains motionless, but its presence occasionally disturbs the air nearby.
+
   if (OutlandsConfig.HORROR_AUDIO_ENABLED.get() && tickCount % 100 == 0
       && getRandom().nextInt(18) == 0
       && level().getNearestPlayer(this, 26.0D) != null) {

@@ -10,7 +10,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-/** Carries only a normalized microphone level and whisper flag, never audio samples. */
 public record VoiceLevelPayload(int level, boolean whispering) implements CustomPacketPayload {
     public static final Type<VoiceLevelPayload> TYPE = new Type<>(
             ResourceLocation.fromNamespaceAndPath(TheOutlands.MOD_ID, "voice_level"));

@@ -5,7 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
-/** Original non-verbal audio for entities and structure-specific atmospheres. */
+
 public final class OutlandsSounds {
  public static final DeferredRegister<SoundEvent> SOUNDS=DeferredRegister.create(Registries.SOUND_EVENT,TheOutlands.MOD_ID);
  public static final DeferredHolder<SoundEvent,SoundEvent> NULL_PRESENCE=register("null_presence");

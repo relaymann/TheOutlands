@@ -16,7 +16,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
-/** Low-profile pursuit predator. It follows a confirmed trail and lunges in short bursts. */
 public final class DredgeEntity extends OutlandsGeoMonster {
     private int lungeCooldown;
     private int lostSight;
@@ -45,7 +44,7 @@ public final class DredgeEntity extends OutlandsGeoMonster {
             if(hasLineOfSight(player)){lastX=player.getX();lastY=player.getY();lastZ=player.getZ();hasTrail=true;lostSight=0;searchTicks=0;}
             else if(hasTrail && ++lostSight<140 && tickCount%10==0)getNavigation().moveTo(lastX,lastY,lastZ,1.08D);
             if(lostSight>=140){
-                // Retain the trail and begin a short ground-level sweep after losing direct sight.
+
                 setTarget(null);getNavigation().stop();lostSight=0;searchTicks=0;
             }
             double d=distanceToSqr(player);

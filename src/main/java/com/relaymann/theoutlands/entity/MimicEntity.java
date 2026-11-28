@@ -26,10 +26,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.phys.Vec3;
 
-/**
- * A block-mimicking ambush predator. Before revealing, the client renders the
- * Mimic as a nearby real block state. It never replaces or destroys world blocks.
- */
 public final class MimicEntity extends OutlandsGeoMonster {
     private static final EntityDataAccessor<Boolean> DATA_REVEALED =
             SynchedEntityData.defineId(MimicEntity.class, EntityDataSerializers.BOOLEAN);
@@ -100,7 +96,6 @@ public final class MimicEntity extends OutlandsGeoMonster {
                 getNavigation().stop();
             }
 
-            // The block disguise breaks only when the player gets genuinely close.
             Player visibleApproach = getNearestVisiblePlayer(8.0D);
             if (!revealed && visibleApproach != null) {
                 revealed = true;
@@ -160,7 +155,6 @@ public final class MimicEntity extends OutlandsGeoMonster {
         BlockPos origin = blockPosition().below();
         BlockState selected = Blocks.BARREL.defaultBlockState();
 
-        // Prefer an ordinary nearby world block so the disguise fits its surroundings.
         for (int attempt = 0; attempt < 18; attempt++) {
             BlockPos candidate = origin.offset(
                     getRandom().nextInt(7) - 3,
@@ -220,10 +214,10 @@ public final class MimicEntity extends OutlandsGeoMonster {
                         level().registryAccess().lookupOrThrow(Registries.BLOCK),
                         tag.getCompound("disguise_state"));
             } catch (RuntimeException ignored) {
-                // A block removed by another mod/version falls back to a safe visible disguise.
+
             }
         } else if (tag.contains("disguise_state", Tag.TAG_INT)) {
-            // Backward compatibility with worlds saved before blockstate compounds were used.
+
             loadedDisguise = Block.stateById(tag.getInt("disguise_state"));
         }
         if (loadedDisguise.isAir() || loadedDisguise.getRenderShape() != RenderShape.MODEL) {

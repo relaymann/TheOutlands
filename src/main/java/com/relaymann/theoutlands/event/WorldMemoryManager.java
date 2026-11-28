@@ -31,12 +31,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * Persistent, bounded world memory for the Outlands ecosystem.
- * Player activity is stored in Overworld SavedData; each creature stores its
- * own last genuine sighting in entity persistent data so investigations survive
- * chunk unloads and restarts without forced targeting or teleportation.
- */
 @EventBusSubscriber(modid = TheOutlands.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public final class WorldMemoryManager {
     private static final String ROOT = "theoutlands_world_memory";

@@ -7,7 +7,7 @@ import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.util.Mth;
 import com.mojang.blaze3d.vertex.PoseStack;
-/** Lean, asymmetrical creature with an overextended jaw, hooked hands and twitching shoulders. */
+
 public final class AgitatedOneModel extends EntityModel<AgitatedOneEntity> {
  private final ModelPart root,head,body,leftArm,rightArm,leftLeg,rightLeg,jaw,shoulders;
  public AgitatedOneModel(ModelPart root){super(RenderType::entityCutoutNoCull);this.root=root;head=root.getChild("head");body=root.getChild("body");leftArm=root.getChild("left_arm");rightArm=root.getChild("right_arm");leftLeg=root.getChild("left_leg");rightLeg=root.getChild("right_leg");jaw=root.getChild("jaw");shoulders=root.getChild("shoulders");}

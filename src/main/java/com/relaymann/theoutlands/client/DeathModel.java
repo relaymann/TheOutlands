@@ -8,7 +8,7 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-/** Death's charred hunter form, with a torn mantle and crown of bone spurs. */
+
 public final class DeathModel extends HumanoidModel<DeathEntity> {
  private final ModelPart mantle,crown;
  public DeathModel(ModelPart root){super(root);mantle=root.getChild("body").getChild("mantle");crown=root.getChild("head").getChild("crown");}

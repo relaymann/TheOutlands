@@ -11,7 +11,6 @@ import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.util.Mth;
 
-/** An emaciated, asymmetrical pursuit predator with a split jaw and exposed ribs. */
 public final class StalkerModel extends HumanoidModel<StalkerEntity> {
     private final ModelPart jaw, neck, ribs, spines, leftHook, rightHook, leftClaw, rightClaw;
 

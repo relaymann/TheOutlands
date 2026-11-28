@@ -18,10 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * Short-lived physical evidence cues near active predators. Particles are
- * deliberately sparse and never alter blocks, doors, player builds or terrain.
- */
 @EventBusSubscriber(modid = TheOutlands.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public final class EntityTraceManager {
     private static final Map<UUID, Long> NEXT_TRACE = new HashMap<>();
@@ -42,7 +38,7 @@ public final class EntityTraceManager {
 
             Mob source = predators.get(player.getRandom().nextInt(predators.size()));
             BlockPos evidence = source.blockPosition();
-            // A rare scrape against a nearby door gives the impression of claw contact.
+
             boolean emitted = false;
             for (int i = 0; i < 12; i++) {
                 BlockPos candidate = player.blockPosition().offset(
@@ -58,7 +54,7 @@ public final class EntityTraceManager {
                 emitted = true;
                 break;
             }
-            // Otherwise, a tiny burst of block dust suggests disturbed debris near its route.
+
             if (!emitted) {
                 BlockPos ground = evidence.below();
                 var state = level.getBlockState(ground);

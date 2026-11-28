@@ -12,11 +12,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.api.distmarker.Dist;
 
-
-/**
- * Loaded by Simple Voice Chat's plugin discovery only when its API is present.
- * The Outlands core never references this class.
- */
 @ForgeVoicechatPlugin
 public final class OutlandsVoicechatPlugin implements VoicechatPlugin {
     @Override
@@ -26,7 +21,7 @@ public final class OutlandsVoicechatPlugin implements VoicechatPlugin {
 
     @Override
     public void initialize(VoicechatApi api) {
-        // API presence is intentionally detected through its connection event.
+
     }
 
     @Override

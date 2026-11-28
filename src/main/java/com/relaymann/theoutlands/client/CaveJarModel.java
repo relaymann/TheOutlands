@@ -9,7 +9,7 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.util.Mth;
-/** Cave.jar's hunched frame is reinforced by exposed ribs and a hinged predator jaw. */
+
 public final class CaveJarModel extends HumanoidModel<CaveJarEntity> {
  private final ModelPart ribs, jaw;
  public CaveJarModel(ModelPart root){super(root);ribs=root.getChild("body").getChild("ribs");jaw=root.getChild("head").getChild("jaw");}

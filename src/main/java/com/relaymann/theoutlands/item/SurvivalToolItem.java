@@ -11,7 +11,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
-/** Limited-use field utility for creating a brief, visible emergency signal. */
 public final class SurvivalToolItem extends Item {
     public SurvivalToolItem(Properties properties) { super(properties); }
 

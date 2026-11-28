@@ -11,7 +11,6 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 
-/** The Almighty's void-and-violet texture on a towering, phase-reactive model. */
 public final class AlmightyRenderer extends MobRenderer<AlmightyEntity, AlmightyModel> {
     public static final ModelLayerLocation LAYER = new ModelLayerLocation(
             ResourceLocation.fromNamespaceAndPath(TheOutlands.MOD_ID, "almighty"), "main");

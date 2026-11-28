@@ -16,7 +16,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.storage.loot.LootTable;
 
-/** Deterministic, chunk-clipped layout builders used by the native structure piece. */
 public final class OutlandsStructureFeature {
     private OutlandsStructureFeature() {}
 
@@ -301,7 +300,7 @@ public final class OutlandsStructureFeature {
                 if(edge)p(l,x+a,y+v,z+b,wall);else air(l,x+a,y+v,z+b);
             }
         }
-        // Doorways are left open by the room caller where required.
+
     }
     private static void hallX(WorldGenLevel l,int x,int y,int z,int length,BlockState block) {
         for(int a=0;a<length;a++)for(int b=-2;b<=2;b++){
@@ -350,7 +349,7 @@ public final class OutlandsStructureFeature {
         if(l.getBlockEntity(pos) instanceof RandomizableContainerBlockEntity c)
             c.setLootTable(ResourceKey.create(Registries.LOOT_TABLE,ResourceLocation.parse(loot)),r.nextLong());
     }
-    /** Concealed lower service chamber shared by every structure identity. */
+
     private static void hiddenCache(String id,WorldGenLevel l,int x,int surface,int z,RandomSource r) {
         int y=surface-38, rx=x+33, rz=z+2;
         room(l,rx,y,rz,9,7,4,Blocks.CRACKED_DEEPSLATE_BRICKS.defaultBlockState(),Blocks.POLISHED_DEEPSLATE.defaultBlockState(),Blocks.DEEPSLATE_BRICKS.defaultBlockState());
@@ -359,7 +358,7 @@ public final class OutlandsStructureFeature {
         p(l,x+38,surface,z+5,Blocks.MOSS_CARPET.defaultBlockState());
         p(l,rx+2,y+1,rz+2,Blocks.COBWEB.defaultBlockState());p(l,rx+6,y+1,rz+2,Blocks.LECTERN.defaultBlockState());
         p(l,rx+6,y+1,rz+5,Blocks.SOUL_LANTERN.defaultBlockState());
-        // The same three-stroke mark is hidden in every site's lower chamber.
+
         p(l,rx+4,y+2,rz+1,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState());
         p(l,rx+3,y+2,rz+2,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState());
         p(l,rx+5,y+2,rz+2,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState());
@@ -385,8 +384,6 @@ public final class OutlandsStructureFeature {
         chest(l,rx+6,y+1,rz+4,loot,r);
     }
 
-
-    /** Seeded layout variants: optional wings, collapsed sections, debris, and furnishings. */
     private static void applyVariations(String id,WorldGenLevel l,int x,int y,int z,RandomSource r) {
         int variant=r.nextInt(4);
         switch(id) {
@@ -456,7 +453,7 @@ public final class OutlandsStructureFeature {
                 if(variant==2) p(l,x+39,y-26,z+7,Blocks.COBWEB.defaultBlockState());
             }
         }
-        // A handful of deterministic signs of age; all writes remain inside the structure clip.
+
         int floorY=switch(id) {
             case "bunker" -> y-14; case "archive" -> y-27; case "research_facility" -> y-12;
             case "forgotten_station" -> y-10; case "null_chamber" -> y-20; case "hollow_crypt" -> y-24; case "mining_operation" -> y-18; case "subterranean_complex" -> y-26;
@@ -477,7 +474,6 @@ public final class OutlandsStructureFeature {
     private static BlockState log(){return Blocks.SPRUCE_LOG.defaultBlockState()
             .setValue(RotatedPillarBlock.AXIS,Direction.Axis.Y);}
 
-    // A forest cabin with a broken-looking roof, cold hearth and abandoned supplies.
     private static void cabin(WorldGenLevel l,int x,int y,int z,RandomSource r){
         for(int a=0;a<7;a++)for(int b=0;b<7;b++){
             p(l,x+a,y,z+b,Blocks.COBBLESTONE.defaultBlockState());
@@ -502,7 +498,6 @@ public final class OutlandsStructureFeature {
         chest(l,x+4,y+1,z+4,"theoutlands:structures/cabin",r);
     }
 
-    // A narrow timber tower with an observation deck and stored arrows.
     private static void tower(WorldGenLevel l,int x,int y,int z,RandomSource r){
         for(int a=0;a<5;a++)for(int b=0;b<5;b++){
             p(l,x+a,y,z+b,Blocks.STONE_BRICKS.defaultBlockState());
@@ -519,7 +514,6 @@ public final class OutlandsStructureFeature {
         chest(l,x+3,y+8,z+3,"theoutlands:structures/tower",r);
     }
 
-    // A buried bunker with a narrow surface shaft; no blocks outside its footprint are changed.
     private static void bunker(WorldGenLevel l,int x,int surface,int z,RandomSource r){
         int y=surface-14;
         for(int a=0;a<9;a++)for(int b=0;b<7;b++){
@@ -546,7 +540,6 @@ public final class OutlandsStructureFeature {
         chest(l,x+6,y+1,z+4,"theoutlands:structures/bunker",r);
     }
 
-    // A Fear-associated shrine marked by crying obsidian and silent blackstone pillars.
     private static void shrine(WorldGenLevel l,int x,int y,int z,RandomSource r){
         for(int a=0;a<7;a++)for(int b=0;b<7;b++)
             p(l,x+a,y,z+b,(a+b)%3==0?Blocks.CRACKED_STONE_BRICKS.defaultBlockState():Blocks.STONE_BRICKS.defaultBlockState());
@@ -557,7 +550,6 @@ public final class OutlandsStructureFeature {
         chest(l,x+5,y+1,z+3,"theoutlands:structures/shrine",r);
     }
 
-    // A remote Null observatory: a ring, four featureless pillars and no obvious entrance.
     private static void observatory(WorldGenLevel l,int x,int y,int z,RandomSource r){
         for(int a=0;a<9;a++)for(int b=0;b<9;b++){
             int ax=a-4,az=b-4;
@@ -573,7 +565,6 @@ public final class OutlandsStructureFeature {
         chest(l,x+4,y+1,z+6,"theoutlands:structures/observatory",r);
     }
 
-    // A deep Death archive with bookshelves, iron bars and a single cache.
     private static void archive(WorldGenLevel l,int x,int surface,int z,RandomSource r){
         int y=surface-27;
         for(int a=0;a<9;a++)for(int b=0;b<7;b++){
@@ -600,7 +591,7 @@ public final class OutlandsStructureFeature {
         p(l,x+4,surface,z+2,Blocks.IRON_TRAPDOOR.defaultBlockState());
         chest(l,x+4,y+1,z+3,"theoutlands:structures/archive",r);
     }
-    // Research Facility: buried test rooms, glass observation bays and containment cells.
+
     private static void researchFacility(WorldGenLevel l,int x,int surface,int z,RandomSource r){
         int y=surface-12;
         for(int a=0;a<9;a++)for(int b=0;b<7;b++){
@@ -612,7 +603,7 @@ public final class OutlandsStructureFeature {
                 else p(l,x+a,y+h,z+b,(h==2&&(a==0||a==8))?Blocks.GLASS.defaultBlockState():Blocks.IRON_BLOCK.defaultBlockState());
             }
         }
-        // Two containment bays divided by a reinforced central corridor.
+
         for(int h=1;h<=3;h++){p(l,x+4,y+h,z+1,Blocks.IRON_BARS.defaultBlockState());p(l,x+4,y+h,z+5,Blocks.IRON_BARS.defaultBlockState());}
         p(l,x+2,y+1,z+2,Blocks.REDSTONE_LAMP.defaultBlockState());
         p(l,x+6,y+1,z+2,Blocks.REDSTONE_LAMP.defaultBlockState());
@@ -623,7 +614,6 @@ public final class OutlandsStructureFeature {
         chest(l,x+7,y+1,z+3,"theoutlands:structures/research_facility",r);
     }
 
-    // Apostle Cathedral: a compact ruined sanctuary with seven sealed niches around an altar.
     private static void apostleCathedral(WorldGenLevel l,int x,int y,int z,RandomSource r){
         for(int a=0;a<9;a++)for(int b=0;b<9;b++){
             boolean edge=a==0||a==8||b==0||b==8;
@@ -641,15 +631,14 @@ public final class OutlandsStructureFeature {
         chest(l,x+4,y+1,z+2,"theoutlands:structures/apostle_cathedral",r);
     }
 
-    // Forsaken Settlement: a tightly clustered pair of ruined homes around an empty well.
     private static void forsakenSettlement(WorldGenLevel l,int x,int y,int z,RandomSource r){
-        // Shared square of broken road and the dry well at its center.
+
         for(int a=0;a<9;a++)for(int b=0;b<9;b++)if(a==4||b==4)p(l,x+a,y,z+b,Blocks.COBBLESTONE.defaultBlockState());
         for(int a=2;a<=6;a++)for(int b=2;b<=6;b++)if(a==2||a==6||b==2||b==6)
             p(l,x+a,y+1,z+b,Blocks.MOSSY_COBBLESTONE.defaultBlockState());
         for(int h=1;h<=3;h++)p(l,x+4,y+h,z+4,Blocks.COBBLESTONE.defaultBlockState());
         air(l,x+4,y+3,z+4);
-        // Two roofless, partially collapsed houses at opposite corners.
+
         for(int[] o:new int[][]{{0,0},{6,6}}){
             for(int a=0;a<3;a++)for(int b=0;b<3;b++){
                 p(l,x+o[0]+a,y,z+o[1]+b,Blocks.OAK_PLANKS.defaultBlockState());
@@ -664,7 +653,6 @@ public final class OutlandsStructureFeature {
         chest(l,x+2,y+1,z+1,"theoutlands:structures/forsaken_settlement",r);
     }
 
-    // Last Outpost: a barricaded perimeter, lookout corners and an abandoned command post.
     private static void lastOutpost(WorldGenLevel l,int x,int y,int z,RandomSource r){
         for(int a=0;a<9;a++)for(int b=0;b<9;b++){
             if(a==0||a==8||b==0||b==8){
@@ -682,8 +670,6 @@ public final class OutlandsStructureFeature {
         chest(l,x+6,y+1,z+6,"theoutlands:structures/last_outpost",r);
     }
 
-    // Forgotten Station: a buried platform with a short track section that ends at a sealed wall.
-    // Forgotten Station: underground railway stop, waiting room and sealed forbidden tunnel.
     private static void forgottenStation(WorldGenLevel l,int x,int surface,int z,RandomSource r){
         int y=surface-10;
         for(int a=0;a<9;a++)for(int b=0;b<9;b++){
@@ -703,7 +689,6 @@ public final class OutlandsStructureFeature {
         chest(l,x+2,y+1,z+7,"theoutlands:structures/forgotten_station",r);
     }
 
-    // Null Chamber: exceptionally rare, almost empty, with four silent pillars and one marker.
     private static void nullChamber(WorldGenLevel l,int x,int surface,int z,RandomSource r){
         int y=surface-20;
         for(int a=0;a<7;a++)for(int b=0;b<7;b++){
@@ -720,7 +705,6 @@ public final class OutlandsStructureFeature {
         chest(l,x+5,y+1,z+3,"theoutlands:structures/null_chamber",r);
     }
 
-    // Hollow Crypt: connected burial halls, side corridors, empty alcoves and a sealed central tomb.
     private static void hollowCrypt(WorldGenLevel l,int x,int surface,int z,RandomSource r){
         int y=surface-24;
         for(int a=0;a<9;a++)for(int b=0;b<9;b++){
@@ -742,8 +726,6 @@ public final class OutlandsStructureFeature {
         chest(l,x+7,y+1,z+4,"theoutlands:structures/hollow_crypt",r);
     }
 
- 
-    // NIGHTMARE-only identities are distinct sites, not recolors of the ordinary structures.
     private static void nightmareContainment(WorldGenLevel l,int x,int y,int z,RandomSource r) {
         int ox=x-19, oz=z-19;
         for(int[] q:new int[][]{{2,2},{33,2},{2,33},{33,33}})
@@ -791,7 +773,6 @@ public final class OutlandsStructureFeature {
             p(l,ox+q[0],d+1,oz+q[1],Blocks.REDSTONE_LAMP.defaultBlockState());
     }
 
-    // Boundary Monument: towering broken concentric rings and an empty freestanding frame.
     private static void boundaryMonument(WorldGenLevel l,int x,int y,int z,RandomSource r){
         for(int a=0;a<9;a++)for(int b=0;b<9;b++){
             int dx=a-4,dz=b-4,d2=dx*dx+dz*dz;
@@ -809,9 +790,6 @@ public final class OutlandsStructureFeature {
         chest(l,x+2,y+1,z+4,"theoutlands:structures/boundary_monument",r);
     }
 
-
-
-    /** A rare NIGHTMARE-only hollow with a sealed central chamber and no explanatory loot. */
     private static void nightmareSignalHollow(WorldGenLevel l,int x,int y,int z,RandomSource r) {
         int ox=x-19, oz=z-19, floor=y-8;
         room(l,ox+7,floor,oz+7,34,34,6,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState(),

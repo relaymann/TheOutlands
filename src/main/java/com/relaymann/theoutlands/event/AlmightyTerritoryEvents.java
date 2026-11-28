@@ -12,14 +12,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 
-/**
- * Enforces the Almighty's exclusive endgame territory.
- *
- * <p>Players may enter because they are the story's intended visitors. The Almighty
- * is identified by a dedicated entity tag so its future implementation can opt in
- * without coupling this rule to an entity class that does not exist yet. Every other
- * non-item entity is rejected on entry and removed if it crosses into the region later.</p>
- */
 @EventBusSubscriber(modid = TheOutlands.MOD_ID)
 public final class AlmightyTerritoryEvents {
     public static final String ALMIGHTY_ENTITY_TAG = "theoutlands_almighty";
@@ -51,7 +43,7 @@ public final class AlmightyTerritoryEvents {
 
     private static boolean isExempt(Entity entity) {
         if (entity instanceof Player || entity.getTags().contains(ALMIGHTY_ENTITY_TAG)) return true;
-        // Keep player drops and story clues intact inside the boss territory.
+
         if (entity instanceof ItemEntity) return true;
         return false;
     }

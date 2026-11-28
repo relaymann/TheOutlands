@@ -10,7 +10,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import java.util.concurrent.CompletableFuture;
 
-/** Delegates sound playback and ticking while scaling only the effective volume. */
 class ScaledSoundInstance implements SoundInstance {
     private final SoundInstance original;
     private final float scale;

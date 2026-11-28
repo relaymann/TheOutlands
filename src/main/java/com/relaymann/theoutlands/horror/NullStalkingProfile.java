@@ -1,6 +1,5 @@
 package com.relaymann.theoutlands.horror;
 
-/** Bounded adaptation of Null's distance and persistence to prior sightings and player behavior. */
 public record NullStalkingProfile(long lifetimeTicks, long relocationIntervalTicks,
                                   double minimumDistance, double maximumDistance) {
     public static NullStalkingProfile fromPreviousSightings(int previousSightings) {

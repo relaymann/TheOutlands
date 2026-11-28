@@ -1,9 +1,5 @@
 package com.relaymann.theoutlands.horror;
 
-/**
- * The director's result for one evaluation. A selected event is a proposal only;
- * it is not proof that a world effect has already been executed.
- */
 public record HorrorDecision(Reason reason, String eventId, double pressure) {
     public enum Reason {
         OUTSIDE_HORROR_RANGE,

@@ -6,7 +6,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import java.util.List;
 
-/** A quiet ARG artifact; its tooltip is evidence, never an explanation of a live scare. */
 public final class ClueItem extends Item {
     private final String clueKey;
 

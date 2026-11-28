@@ -70,8 +70,7 @@ class HorrorDirectorTest {
 
         var context = new HorrorContext("minecraft:plains", false, false, false, 0, 1, 0, false, false, 0, 0, true);
         boolean selectedInsideTerritory = false;
-        // Weighted selection does not promise the last event is selected at a near-1 roll.
-        // Sweep deterministic rolls to test the territory gate rather than ordering/weight assumptions.
+
         for (int i = 0; i < 10_000 && !selectedInsideTerritory; i++) {
             var inside = new HorrorDirectorState();
             inside.setPressure(50.0D);

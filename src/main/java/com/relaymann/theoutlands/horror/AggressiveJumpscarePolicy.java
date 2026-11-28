@@ -1,6 +1,5 @@
 package com.relaymann.theoutlands.horror;
 
-/** Very sparse, distance-scaled jumpscare pacing for aggressive entities. */
 public final class AggressiveJumpscarePolicy {
     public static final double MINIMUM_DISTANCE = 11_000.0D;
     public static final long COOLDOWN_TICKS = 36_000L;
@@ -11,7 +10,6 @@ public final class AggressiveJumpscarePolicy {
         return Double.isFinite(distance) && distance >= MINIMUM_DISTANCE;
     }
 
-    /** Probability per one-second progression evaluation; capped to keep scares uncommon. */
     public static double chancePerEvaluation(double distance) {
         if (!isUnlocked(distance)) return 0.0D;
         double progress = Math.max(0.0D, Math.min(1.0D,

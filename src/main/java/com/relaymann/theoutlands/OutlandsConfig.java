@@ -2,7 +2,6 @@ package com.relaymann.theoutlands;
 
 import net.neoforged.neoforge.common.ModConfigSpec;
 
-/** Common server-authoritative tuning for horror pacing and story milestones. */
 public final class OutlandsConfig {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 

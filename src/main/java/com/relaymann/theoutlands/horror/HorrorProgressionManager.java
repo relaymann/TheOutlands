@@ -17,7 +17,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** Server-side derived progression, behavioral memory, and player-local encounter state. */
 public final class HorrorProgressionManager {
     private static final Map<UUID, HorrorSnapshot> SNAPSHOTS = new ConcurrentHashMap<>();
     private static final Map<UUID, HorrorDirectorState> STATES = new ConcurrentHashMap<>();

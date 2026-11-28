@@ -15,7 +15,6 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
-/** A territorial sentinel whose warning call alerts nearby Outlands predators. */
 public final class HowlerEntity extends OutlandsGeoMonster {
     private int callCooldown;
     private int windup;
@@ -51,7 +50,7 @@ public final class HowlerEntity extends OutlandsGeoMonster {
     }
     private void callTerritory(){
         if(OutlandsConfig.HORROR_AUDIO_ENABLED.get())playSound(OutlandsSounds.HOWLER_CALL.get(),1.45F,.82F+getRandom().nextFloat()*.12F);
-        // Alert only nearby existing Outlands mobs. No global aggro or entity creation.
+
         for(Monster mob:level().getEntitiesOfClass(Monster.class,getBoundingBox().inflate(32,14,32),
             m -> m!=this && (m instanceof HunterEntity || m instanceof StalkerEntity || m instanceof LurkerEntity || m instanceof DredgeEntity))){
             if(getTarget()!=null && mob.getTarget()==null && mob.hasLineOfSight(this)) mob.setTarget(getTarget());

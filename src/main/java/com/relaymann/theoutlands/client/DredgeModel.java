@@ -1,6 +1,6 @@
 package com.relaymann.theoutlands.client;
 import com.relaymann.theoutlands.entity.DredgeEntity;import net.minecraft.client.model.EntityModel;import net.minecraft.client.model.geom.ModelPart;import net.minecraft.client.model.geom.PartPose;import net.minecraft.client.model.geom.builders.*;import net.minecraft.client.renderer.RenderType;import net.minecraft.util.Mth;import com.mojang.blaze3d.vertex.PoseStack;
-/** Four-limbed crawler with a long spine, low head and jointed rear limbs. */
+
 public final class DredgeModel extends EntityModel<DredgeEntity>{
  private final ModelPart root,head,body,leftFront,rightFront,leftRear,rightRear,spines,tail,mandibles;
  public DredgeModel(ModelPart r){super(RenderType::entityCutoutNoCull);root=r;head=r.getChild("head");body=r.getChild("body");leftFront=r.getChild("left_front");rightFront=r.getChild("right_front");leftRear=r.getChild("left_rear");rightRear=r.getChild("right_rear");spines=r.getChild("spines");tail=r.getChild("tail");mandibles=r.getChild("mandibles");}

@@ -26,12 +26,6 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 import java.util.*;
 
-/**
- * Lightweight server-authoritative intelligence layer shared by the existing
- * roster. It remembers recent physical disturbances and player habits, then
- * lets curious creatures investigate without spawning, teleporting, or
- * modifying blocks. Individual temperaments are stable for each entity UUID.
- */
 @EventBusSubscriber(modid = TheOutlands.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public final class OutlandsIntelligenceManager {
     private static final int DISTURBANCE_LIFETIME = 600;
@@ -75,8 +69,7 @@ public final class OutlandsIntelligenceManager {
     public static void onOutlandsCreatureDeath(LivingDeathEvent event) {
         if (event.isCanceled() || !(event.getEntity().level() instanceof ServerLevel level)
                 || !(event.getEntity() instanceof Mob mob) || !isOutlandsCreature(mob)) return;
-        // Nearby creatures can investigate a real death site. No death message,
-        // fake remains, block edits, or forced encounter is produced.
+
         record(level, mob.blockPosition(), mob.getUUID(), "death");
     }
 
@@ -111,8 +104,7 @@ public final class OutlandsIntelligenceManager {
                     }
                 }
             }
-            // Alarm blocks are creature-triggered and can sound when no player is
-            // nearby. Process only recent alarm sites, keeping this query bounded.
+
             ArrayDeque<Disturbance> records = DISTURBANCES.get(level.dimension());
             if (records != null) {
                 int inspected = 0;
@@ -157,7 +149,6 @@ public final class OutlandsIntelligenceManager {
                 || mob instanceof CeilingDwellerEntity || mob instanceof ColossusEntity;
     }
 
-    /** Public hook used by the perimeter alarm block when it detects a creature. */
     public static void recordAlarm(ServerLevel level, BlockPos pos) {
         record(level, pos, null, "alarm");
     }
@@ -214,8 +205,7 @@ public final class OutlandsIntelligenceManager {
         if (best == null) return;
 
         Temperament temperament = temperament(mob);
-        // A creature's curiosity and patience are deterministic traits, not
-        // random stat rerolls every tick.
+
         if (mob.getRandom().nextFloat() > temperament.curiosity()) return;
         BlockPos point = best.pos();
         double speed = 0.72D + temperament.boldness() * 0.30D;
@@ -230,7 +220,6 @@ public final class OutlandsIntelligenceManager {
         }
         INVESTIGATION_COOLDOWNS.put(mob.getUUID(), now + 100L + (long)(temperament.patience() * 180.0D));
     }
-
 
     private static double hearingRange(Mob mob) {
         if (mob instanceof HowlerEntity) return 56.0D;
@@ -273,7 +262,6 @@ public final class OutlandsIntelligenceManager {
                 && !creature.isVariant("nightmare_watcher");
     }
 
-    /** Search a widening ring around the last disturbance, probing nearby rooms and terrain. */
     private static void continueSearch(ServerLevel level, Mob mob) {
         SearchState state = SEARCHES.get(mob.getUUID());
         if (state == null) return;
@@ -300,8 +288,6 @@ public final class OutlandsIntelligenceManager {
         if (elapsed >= 150) SEARCHES.remove(mob.getUUID());
     }
 
-
-    /** Hunters and aggressive stalkers can push through ordinary wooden doors while searching. */
     private static void openNearbyWoodDoor(ServerLevel level, Mob mob) {
         if (!(mob instanceof HunterEntity || mob instanceof StalkerEntity
                 || mob instanceof LurkerEntity || mob instanceof DredgeEntity
@@ -327,8 +313,6 @@ public final class OutlandsIntelligenceManager {
                 ignored -> new Territory(mob.blockPosition().immutable(), radius));
         if (mob.getTarget() != null) return;
 
-        // Home ranges are virtual ecological territories: they guide patrol and
-        // return behavior but never place, remove, or disguise world blocks.
         double distance = mob.distanceToSqr(Vec3.atCenterOf(territory.center()));
         long now = level.getGameTime();
         if (distance > (double) territory.radius() * territory.radius() * 2.25D
@@ -368,8 +352,7 @@ public final class OutlandsIntelligenceManager {
     }
 
     private static boolean canInvestigate(Mob mob) {
-        // The major supernatural presences retain their own encounter logic.
-        // This shared system is for independent creatures and ordinary apostles.
+
         return mob instanceof CaveJarEntity || mob instanceof StalkerEntity
                 || mob instanceof HunterEntity || mob instanceof BurrowerEntity
                 || mob instanceof MimicEntity || mob instanceof StillbornStatueEntity
@@ -388,9 +371,6 @@ public final class OutlandsIntelligenceManager {
         double sprintRatio = (double) pattern.sprintSamples / pattern.samples;
         double sneakRatio = (double) pattern.sneakSamples / pattern.samples;
 
-        // Persistent sprinters are more likely to be intercepted. Frequent
-        // crouching makes patient hunters favor the last physical disturbance
-        // rather than repeatedly charging the player's current position.
         if ((mob instanceof StalkerEntity || mob instanceof HunterEntity
                 || mob instanceof LurkerEntity || mob instanceof DredgeEntity)
                 && sprintRatio > 0.52D && temperament.boldness() > 0.35D
@@ -441,7 +421,7 @@ public final class OutlandsIntelligenceManager {
         for (ServerLevel level : levels) for (ServerPlayer player : level.players()) online.add(player.getUUID());
         PLAYER_PATTERNS.keySet().removeIf(id -> !online.contains(id));
         INVESTIGATION_COOLDOWNS.entrySet().removeIf(entry -> entry.getValue() < 0L);
-        // Keep per-entity state bounded when creatures despawn or chunks unload.
+
         Set<UUID> activeMobs = new HashSet<>();
         for (ServerLevel level : levels) {
             for (ServerPlayer player : level.players()) {

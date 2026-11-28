@@ -16,7 +16,6 @@ import net.minecraft.sounds.SoundEvent;
 import com.relaymann.theoutlands.sound.OutlandsSounds;
 import com.relaymann.theoutlands.OutlandsConfig;
 
-/** A pursuit specialist that searches the last place it saw its prey and commits to short ambush lunges. */
 public final class HunterEntity extends OutlandsGeoMonster {
     private double memoryX, memoryY, memoryZ;
     private int lostSightTicks, pounceCooldown, searchTicks;
@@ -48,7 +47,7 @@ public final class HunterEntity extends OutlandsGeoMonster {
                 if (hasMemory && lostSightTicks < 100 && tickCount % 12 == 0)
                     getNavigation().moveTo(memoryX, memoryY, memoryZ, 1.12D);
                 if (lostSightTicks >= 100) {
-                    // Keep the last confirmed trail and search around it after the target is dropped.
+
                     lostSightTicks = 0;
                     searchTicks = 0;
                     setTarget(null);
@@ -68,7 +67,7 @@ public final class HunterEntity extends OutlandsGeoMonster {
         } else if (hasMemory) {
             searchTicks++;
             if (searchTicks <= 100 && tickCount % 18 == 0) {
-                // Sweep around the last confirmed position instead of walking into one blocked point.
+
                 double offsetX = getRandom().nextInt(17) - 8;
                 double offsetZ = getRandom().nextInt(17) - 8;
                 getNavigation().moveTo(memoryX + offsetX, memoryY, memoryZ + offsetZ, 0.92D);

@@ -17,7 +17,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.phys.AABB;
 import java.util.List;
 
-/** Imperfect field instruments. They never identify entities, create evidence, or award unlocks. */
 public final class InvestigationToolItem extends Item {
     public enum Mode { MOTION, EMF, CAMERA, THERMAL, RADIO, ACOUSTIC, ALARM }
     private final Mode mode;

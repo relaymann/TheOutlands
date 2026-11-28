@@ -1,6 +1,6 @@
 package com.relaymann.theoutlands.client;
 import com.relaymann.theoutlands.entity.HowlerEntity;import net.minecraft.client.model.EntityModel;import net.minecraft.client.model.geom.ModelPart;import net.minecraft.client.model.geom.PartPose;import net.minecraft.client.model.geom.builders.*;import net.minecraft.client.renderer.RenderType;import net.minecraft.util.Mth;import com.mojang.blaze3d.vertex.PoseStack;
-/** Heavy sentinel with a hinged jaw, broad shoulders and long fingers. */
+
 public final class HowlerModel extends EntityModel<HowlerEntity>{
  private final ModelPart root,head,jaw,body,leftArm,rightArm,leftLeg,rightLeg,throat,shoulders;
  public HowlerModel(ModelPart r){super(RenderType::entityCutoutNoCull);root=r;head=r.getChild("head");jaw=r.getChild("jaw");body=r.getChild("body");leftArm=r.getChild("left_arm");rightArm=r.getChild("right_arm");leftLeg=r.getChild("left_leg");rightLeg=r.getChild("right_leg");throat=r.getChild("throat");shoulders=r.getChild("shoulders");}

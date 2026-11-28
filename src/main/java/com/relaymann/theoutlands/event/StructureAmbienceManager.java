@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-/** Quiet, player-private audio details while exploring an Outlands structure. */
 public final class StructureAmbienceManager {
     private static final Map<UUID,Long> NEXT_CUE=new HashMap<>();
     private StructureAmbienceManager() {}

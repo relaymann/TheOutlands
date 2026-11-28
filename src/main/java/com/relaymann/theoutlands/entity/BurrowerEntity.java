@@ -20,10 +20,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.sounds.SoundEvent;
 
-/**
- * A subterranean ambusher. It phases through the existing underground without
- * changing blocks, then finds a collision-safe surface opening before attacking.
- */
 public final class BurrowerEntity extends OutlandsGeoMonster {
     private static final EntityDataAccessor<Boolean> DATA_BURROWING =
             SynchedEntityData.defineId(BurrowerEntity.class, EntityDataSerializers.BOOLEAN);
@@ -74,8 +70,7 @@ public final class BurrowerEntity extends OutlandsGeoMonster {
 
         if (getTarget() instanceof Player player && player.isAlive()) {
             double distance = distanceToSqr(player);
-            // Commit to a subterranean approach after a confirmed sighting or
-            // when the player breaks sight at medium range.
+
             if (revealCooldown == 0 && distance > 64.0D && distance < 900.0D
                     && (hasLineOfSight(player) || !player.hasLineOfSight(this))) {
                 beginBurrow();
@@ -108,7 +103,7 @@ public final class BurrowerEntity extends OutlandsGeoMonster {
     }
 
     private void tickBurrowTravel() {
-        // The normal melee goal runs in super.tick(); cancel its pathing while phased.
+
         getNavigation().stop();
         setDeltaMovement(Vec3.ZERO);
         Player player = getTarget() instanceof Player p && p.isAlive() ? p : null;
@@ -117,7 +112,6 @@ public final class BurrowerEntity extends OutlandsGeoMonster {
             return;
         }
 
-        // Travel below the target's feet, not directly through its body.
         Vec3 destination = new Vec3(player.getX(), Math.max(level().getMinBuildHeight() + 2,
                 player.getY() - 2.6D), player.getZ());
         Vec3 offset = destination.subtract(position());
@@ -132,7 +126,7 @@ public final class BurrowerEntity extends OutlandsGeoMonster {
         }
 
         Vec3 step = offset.normalize().scale(Math.min(0.22D, offset.length()));
-        // Keep the creature below the target's feet while traversing.
+
         setPos(getX() + step.x, getY() + step.y, getZ() + step.z);
         setDeltaMovement(Vec3.ZERO);
         hasImpulse = true;
@@ -174,7 +168,7 @@ public final class BurrowerEntity extends OutlandsGeoMonster {
             if (safe != null) emergeAt(new Vec3(safe.getX() + 0.5D, safe.getY(), safe.getZ() + 0.5D),
                     getTarget() instanceof Player p ? p : null);
             else if (++blockedEmergenceTicks >= 100) {
-                // Never materialize inside solid blocks; discard rather than remain invisible forever.
+
                 discard();
             }
         }

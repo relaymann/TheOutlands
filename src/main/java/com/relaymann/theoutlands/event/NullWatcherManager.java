@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/** Player-specific Null sightings that adapt to remembered places and observed behavior. */
 public final class NullWatcherManager {
     private static final long EYE_CONTACT_DELAY = 24L;
     private static final double LOOK_DOT_THRESHOLD = 0.965D;
@@ -35,7 +34,7 @@ public final class NullWatcherManager {
 
         int priorSightings = (int) HorrorMemory.recentEncounters(player).stream()
                 .filter(id -> id.equals("distant_figure") || id.equals("the_return") || id.equals("observer")).count();
-        priorSightings = Math.max(0, priorSightings - 1); // The triggering encounter was recorded before spawn().
+        priorSightings = Math.max(0, priorSightings - 1);
         priorSightings += HorrorMemory.nullObservationCount(player) / 3;
         priorSightings += HorrorMemory.nullStalkingCount(player) / 2;
         NullStalkingProfile profile = NullStalkingProfile.fromPlayerHistory(priorSightings,
@@ -115,7 +114,6 @@ public final class NullWatcherManager {
         }
     }
 
-    /** Null may reuse the player's own remembered places, but only in already-loaded chunks. */
     private static BlockPos findRememberedHidingPosition(ServerPlayer player, NullStalkingProfile profile) {
         List<BlockPos> remembered = new ArrayList<>(HorrorMemory.rememberedLocations(player));
         remembered.addAll(HorrorMemory.rememberedSleepLocations(player));

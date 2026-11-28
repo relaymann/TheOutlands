@@ -1,6 +1,5 @@
 package com.relaymann.theoutlands.client;
 
-/** Converts a local 16-bit PCM microphone frame into a stable 0-100 activity meter. */
 public final class VoiceLevelMath {
     private VoiceLevelMath() {}
 

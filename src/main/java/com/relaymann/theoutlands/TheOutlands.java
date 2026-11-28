@@ -11,7 +11,6 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.common.Mod;
 import org.slf4j.Logger;
 
-/** Main entry point for The Outlands. */
 @Mod(TheOutlands.MOD_ID)
 public final class TheOutlands {
     public static final String MOD_ID = "theoutlands";

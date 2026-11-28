@@ -60,7 +60,6 @@ public final class OutlandsEntities {
             ENTITY_TYPES.register("agitated_one", () -> EntityType.Builder.of(AgitatedOneEntity::new, MobCategory.MONSTER)
                     .sized(0.82F, 2.4F).clientTrackingRange(24).updateInterval(2).build("theoutlands:agitated_one"));
 
-
     public static final DeferredHolder<EntityType<?>, EntityType<LurkerEntity>> LURKER =
             ENTITY_TYPES.register("lurker", () -> EntityType.Builder.of(LurkerEntity::new, MobCategory.MONSTER)
                     .sized(0.72F, 2.35F).clientTrackingRange(20).updateInterval(2).build("theoutlands:lurker"));
@@ -70,7 +69,6 @@ public final class OutlandsEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<DredgeEntity>> DREDGE =
             ENTITY_TYPES.register("dredge", () -> EntityType.Builder.of(DredgeEntity::new, MobCategory.MONSTER)
                     .sized(0.95F, 1.15F).clientTrackingRange(20).updateInterval(2).build("theoutlands:dredge"));
-
 
     public static final DeferredHolder<EntityType<?>, EntityType<PilgrimEntity>> PILGRIM = ENTITY_TYPES.register("pilgrim", () -> EntityType.Builder.of(PilgrimEntity::new, MobCategory.MONSTER).sized(.9F,2.5F).clientTrackingRange(24).updateInterval(2).build("theoutlands:pilgrim"));
     public static final DeferredHolder<EntityType<?>, EntityType<CeilingDwellerEntity>> CEILING_DWELLER = ENTITY_TYPES.register("ceiling_dweller", () -> EntityType.Builder.of(CeilingDwellerEntity::new, MobCategory.MONSTER).sized(1.0F,1.4F).clientTrackingRange(20).updateInterval(2).build("theoutlands:ceiling_dweller"));
