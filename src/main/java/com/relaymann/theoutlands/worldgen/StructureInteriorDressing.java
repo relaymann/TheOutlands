@@ -7,7 +7,6 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 
-/** Deterministic interior dressing that adds lived-in and abandoned detail without changing terrain. */
 public final class StructureInteriorDressing {
     private StructureInteriorDressing() {}
 

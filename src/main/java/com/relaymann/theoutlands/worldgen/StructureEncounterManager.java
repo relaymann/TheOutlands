@@ -13,8 +13,6 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.Level;
 
-
-/** Resolves rare encounters on the main server tick when a player explores a site. */
 public final class StructureEncounterManager {
     private static final long ENCOUNTER_SALT = 0x3C6EF372FE94F82BL;
 
@@ -60,11 +58,11 @@ public final class StructureEncounterManager {
             String layout = OutlandsStructureFeature.chooseLayout(seed, distance, forest,
                     minimumDistance, frequency, nightmare);
             if (layout == null) {
-                // A later Nightmare-mode or frequency change may make this site eligible.
+
                 resolvedSites.markResolved(noLayoutKey);
                 continue;
             }
-            // A failed placement is retried while the site is explored; a completed roll is one-shot.
+
             if (resolve(level, layout, center, distance, seed)) {
                 resolvedSites.markResolved(key);
             }

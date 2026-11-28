@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/** Temporary, player-private block-state illusions. No block is ever changed on the server. */
 public final class ClientAfterimageManager {
     private static final Map<UUID, Map<BlockPos, PendingRestore>> PENDING = new HashMap<>();
     private ClientAfterimageManager() {}
@@ -38,7 +37,6 @@ public final class ClientAfterimageManager {
         }
     }
 
-    /** A broken arch/doorway briefly appears in an already-loaded forest clearing. */
     public static void showFalseStructure(ServerPlayer player) {
         ServerLevel level = player.serverLevel();
         double angle = player.getRandom().nextDouble() * Math.PI * 2.0D;
@@ -64,10 +62,6 @@ public final class ClientAfterimageManager {
         if (placed < 5) return;
     }
 
-    /**
-     * Brief player-private Black Room illusion. The room is deliberately open at one side:
-     * it never teleports, cages, or changes the authoritative world.
-     */
     public static void showBlackRoom(ServerPlayer player) {
         ServerLevel level = player.serverLevel();
         BlockPos origin = player.blockPosition();
@@ -77,7 +71,7 @@ public final class ClientAfterimageManager {
         BlockState dark = Blocks.BLACK_CONCRETE.defaultBlockState();
         for (int y = 0; y < 4; y++) {
             for (int offset = -radius; offset <= radius; offset++) {
-                // Leave a broad, obvious opening in the north wall so the illusion is escapable.
+
                 if (y < 3 && Math.abs(offset) <= 1) continue;
                 sendBlackRoomBlock(player, new BlockPos(origin.getX() + offset, baseY + y, origin.getZ() - radius), wall, 100);
                 sendBlackRoomBlock(player, new BlockPos(origin.getX() + offset, baseY + y, origin.getZ() + radius), wall, 100);
@@ -85,7 +79,7 @@ public final class ClientAfterimageManager {
                 sendBlackRoomBlock(player, new BlockPos(origin.getX() + radius, baseY + y, origin.getZ() + offset), wall, 100);
             }
         }
-        // A small, distant black shape gives the eye something to settle on in the empty room.
+
         for (int y = 0; y < 2; y++) {
             sendBlackRoomBlock(player, origin.offset(0, y, radius - 2), dark, 100);
         }
@@ -99,7 +93,6 @@ public final class ClientAfterimageManager {
         sendFake(player, pos, fake, duration);
     }
 
-    /** A rare, oversized horizon figure rendered as a temporary player-only block afterimage. */
     public static void showHorizonGiant(ServerPlayer player) {
         ServerLevel level = player.serverLevel();
         double yaw = Math.toRadians(player.getYRot());
@@ -125,7 +118,6 @@ public final class ClientAfterimageManager {
         }
     }
 
-    /** A distant silhouette occupies the edge of the player's view for less than two seconds. */
     public static void showSilhouette(ServerPlayer player) {
         ServerLevel level = player.serverLevel();
         double yaw = Math.toRadians(player.getYRot());
@@ -143,10 +135,6 @@ public final class ClientAfterimageManager {
         }
     }
 
-    /**
-     * Makes a nearby closed door look open to this player only. Both halves are
-     * restored from the authoritative server state; no world block is changed.
-     */
     public static void showDoorAfterimage(ServerPlayer player) {
         ServerLevel level = player.serverLevel();
         List<BlockPos> candidates = new java.util.ArrayList<>();

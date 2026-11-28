@@ -8,7 +8,6 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
-/** Keeps the Mimic's block disguise intact while using GeckoLib after its reveal. */
 public final class MimicGeoRenderer extends GeoEntityRenderer<MimicEntity> {
     private final BlockRenderDispatcher blockRenderer;
 

@@ -2,7 +2,6 @@ package com.relaymann.theoutlands.worldgen;
 
 import java.util.Random;
 
-/** Pure, seed-stable structure identity selection; intentionally independent of Minecraft runtime classes. */
 public final class StructureLayoutPolicy {
     private static final String[] IDS = {
             "cabin", "tower", "bunker", "shrine", "observatory", "archive",
@@ -46,7 +45,6 @@ public final class StructureLayoutPolicy {
         weights[21] = weight(distance, 4_000, 11_000, multiplier, scale);
         weights[22] = weight(distance, 14_000, 20_000, multiplier, scale);
 
-        // These identities are never selected in ordinary Survival worlds.
         if (nightmare) {
             double nightmareScale = multiplier * 1.8D;
             weights[14] = weight(distance, 250, 4_500, nightmareScale, scale);

@@ -7,7 +7,7 @@ import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.util.Mth;
 import com.mojang.blaze3d.vertex.PoseStack;
-/** Tall false-human frame with a split chest and arms that unfold during the reveal. */
+
 public final class MimicModel extends EntityModel<MimicEntity> {
  private final ModelPart root,head,body,leftArm,rightArm,leftLeg,rightLeg,jaw;
  public MimicModel(ModelPart root){super(RenderType::entityCutoutNoCull);this.root=root;head=root.getChild("head");body=root.getChild("body");leftArm=root.getChild("left_arm");rightArm=root.getChild("right_arm");leftLeg=root.getChild("left_leg");rightLeg=root.getChild("right_leg");jaw=root.getChild("jaw");}

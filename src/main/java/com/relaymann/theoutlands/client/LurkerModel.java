@@ -1,7 +1,7 @@
 package com.relaymann.theoutlands.client;
 import com.relaymann.theoutlands.entity.LurkerEntity;
 import net.minecraft.client.model.EntityModel;import net.minecraft.client.model.geom.ModelPart;import net.minecraft.client.model.geom.PartPose;import net.minecraft.client.model.geom.builders.*;import net.minecraft.client.renderer.RenderType;import net.minecraft.util.Mth;import com.mojang.blaze3d.vertex.PoseStack;
-/** Tall, narrow ambusher with an underslung skull and elongated hooked arms. */
+
 public final class LurkerModel extends EntityModel<LurkerEntity>{
  private final ModelPart root,head,torso,leftArm,rightArm,leftLeg,rightLeg,backSpines;
  public LurkerModel(ModelPart r){super(RenderType::entityCutoutNoCull);root=r;head=r.getChild("head");torso=r.getChild("torso");leftArm=r.getChild("left_arm");rightArm=r.getChild("right_arm");leftLeg=r.getChild("left_leg");rightLeg=r.getChild("right_leg");backSpines=r.getChild("back_spines");}

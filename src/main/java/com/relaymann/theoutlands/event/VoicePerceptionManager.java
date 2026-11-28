@@ -19,11 +19,6 @@ import net.minecraft.world.phys.Vec3;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Server-side voice perception. Only the normalized activity percentage,
- * whisper flag, sender UUID, and current Minecraft position are retained.
- * Raw microphone samples and conversations are never stored or interpreted.
- */
 public final class VoicePerceptionManager {
     private static final int ACTIVE_PACKET_TTL = 14;
     private static final int MEMORY_TTL = 300;
@@ -50,7 +45,6 @@ public final class VoicePerceptionManager {
                 player.serverLevel().dimension(), clamped, whispering, now));
     }
 
-    /** Rate-limits client meter reports before they enter the server work queue. */
     public static synchronized boolean shouldAcceptLevelReport(UUID playerId) {
         long now = System.nanoTime();
         Long previous = LEVEL_REPORT_THROTTLES.get(playerId);
@@ -59,7 +53,6 @@ public final class VoicePerceptionManager {
         return true;
     }
 
-    /** Thread-safe limiter called from the voice-chat packet thread before scheduling server work. */
     public static synchronized boolean shouldAcceptVoicePacket(UUID playerId) {
         long now = System.nanoTime();
         Long previous = PACKET_THROTTLES.get(playerId);
@@ -229,7 +222,6 @@ public final class VoicePerceptionManager {
         moveToward(mob, memory.position(), profile.speed());
     }
 
-    /** Rare knocks from an existing nearby door after an unusually loud call. */
     private static void maybeVoiceKnock(ServerLevel level, ServerPlayer player, VoiceSignal signal, long now) {
         PlayerEventCooldown cooldown = PLAYER_EVENT_COOLDOWNS.get(player.getUUID());
         if (!OutlandsConfig.HORROR_AUDIO_ENABLED.get() || signal.whispering() || signal.level() < 82
@@ -272,7 +264,6 @@ public final class VoicePerceptionManager {
         mob.getNavigation().moveTo(position.x, position.y, position.z, speed);
     }
 
-    /** Continue investigating briefly after the player stops speaking. */
     private static void investigateRemembered(ServerLevel level, long now) {
         for (var entry : ENTITY_MEMORY.entrySet()) {
             VoiceMemory memory = entry.getValue();

@@ -14,7 +14,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
 
-/** Spawns Death as a persistent, target-aware hunter and advances the death.jar clue chain. */
 public final class DeathHuntManager {
     private static final long RESPAWN_DELAY = 12_000L;
     private DeathHuntManager() {}
@@ -91,6 +90,5 @@ public final class DeathHuntManager {
         return death.level().addFreshEntity(clue);
     }
 
-    /** Kept as a lifecycle hook; spawn timing is stored in persistent player data. */
     public static void clear() {}
 }

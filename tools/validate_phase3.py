@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Static regression checks for the Phase 3 feature batch and its exclusions."""
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]

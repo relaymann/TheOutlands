@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Static regression audit for the advanced creature intelligence framework."""
 from pathlib import Path
 
 ROOT = Path("src/main/java/com/relaymann/theoutlands")

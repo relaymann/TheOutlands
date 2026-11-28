@@ -1,9 +1,4 @@
 #!/usr/bin/env python3
-"""Create original, deterministic entity and structure sound effects for The Outlands.
-
-Requires Python 3 and ffmpeg. The script writes mono OGG Vorbis files directly
-into the mod resource tree so CI packages the same sounds as local builds.
-"""
 import math
 import os
 import random
@@ -35,8 +30,7 @@ def make(name, duration, sample_fn):
             for i in range(count):
                 t = i / RATE
                 value = sample_fn(t, duration, i, count)
-                # Give every creature cue a restrained infrasonic body and unstable
-                # throat resonance. Structure ambience is intentionally left untouched.
+
                 if not name.startswith("structure_"):
                     pulse = 0.42 + 0.58 * (0.5 + 0.5 * math.sin(2 * math.pi * 0.73 * t + 0.4))
                     envelope = min(1.0, t / 0.07) * min(1.0, max(0.0, (duration - t) / 0.24))
@@ -57,7 +51,7 @@ def make(name, duration, sample_fn):
             os.remove(wav_path)
 
 def noise(t, low, high, state):
-    # Differenced deterministic noise with a controllable tonal center.
+
     raw = RNG.uniform(-1.0, 1.0)
     state["lp1"] += (raw - state["lp1"]) * min(1.0, high / RATE * 6.0)
     state["lp2"] += (raw - state["lp2"]) * min(1.0, low / RATE * 6.0)
@@ -66,7 +60,6 @@ def noise(t, low, high, state):
 def fade(t, duration, attack=0.04, release=0.2):
     return min(1.0, t / attack) * min(1.0, max(0.0, (duration - t) / release))
 
-# Cave.jar: deep hollow resonance under wet, irregular scraping.
 def cave(t, d, i, n):
     e = fade(t, d, .12, .3)
     low = math.sin(2 * math.pi * (42 - 9*t/d) * t)
@@ -78,7 +71,6 @@ def cave(t, d, i, n):
 cave.state, cave.grit = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
 make("cavejar_stalk", 2.1, cave)
 
-# Stalker: intimate breath pulses, airy inhale and rough exhale.
 def stalker(t, d, i, n):
     phase = 2*math.pi*1.12*t + .35
     inhale = max(0.0, math.sin(phase)) ** 2
@@ -89,7 +81,6 @@ def stalker(t, d, i, n):
 stalker.a, stalker.b = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
 make("stalker_breath", 1.85, stalker)
 
-# Observer: three isolated resonant clicks with short, brittle tails.
 def observer(t, d, i, n):
     result = 0.0
     for at, freq, amp in ((.11, 1760, .68), (.43, 2380, .43), (.91, 1510, .55)):
@@ -100,7 +91,6 @@ def observer(t, d, i, n):
     return result
 make("observer_click", 1.2, observer)
 
-# Stillborn: heavy stone grinding, intermittent brittle fractures.
 def stillborn(t, d, i, n):
     slow = max(0.0, math.sin(2*math.pi*.72*t)) ** 1.7
     a = noise(t, 48, 420, stillborn.a)
@@ -114,7 +104,6 @@ def stillborn(t, d, i, n):
 stillborn.a, stillborn.b = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
 make("stillborn_stone", 2.0, stillborn)
 
-# Stillborn strike: compact bass impact followed by gritty stone fragments.
 def stillborn_hit(t, d, i, n):
     a = noise(t, 60, 1000, stillborn_hit.a)
     b = noise(t, 1000, 6000, stillborn_hit.b)
@@ -122,7 +111,6 @@ def stillborn_hit(t, d, i, n):
 stillborn_hit.a, stillborn_hit.b = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
 make("stillborn_strike", .9, stillborn_hit)
 
-# Agitated One warning: rising dissonant growl with an accelerating pulse.
 def warning(t, d, i, n):
     rise=t/d
     freq=66+94*rise**1.7
@@ -134,7 +122,6 @@ def warning(t, d, i, n):
 warning.a, warning.b = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
 make("agitated_warning", 1.55, warning)
 
-# Agitated One charge: abrupt transient into a rushing, distorted roar.
 def charge(t, d, i, n):
     a=noise(t,80,1250,charge.a)
     b=noise(t,900,6500,charge.b)
@@ -145,8 +132,6 @@ def charge(t, d, i, n):
 charge.a, charge.b, charge.hit = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
 make("agitated_charge", 1.0, charge)
 
-
-# Lurker: close, wet breathing and a short claw scrape.
 def lurker_breath(t, d, i, n):
     s = lurker_breath.state
     air = noise(t, 180, 1450, s)
@@ -163,7 +148,6 @@ def lurker_hit(t, d, i, n):
 lurker_hit.a, lurker_hit.b = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
 make("lurker_hit", .72, lurker_hit)
 
-# Howler: a rising, breathy throat call with a long, uneven harmonic tail.
 def howler_call(t, d, i, n):
     p = t / d
     f = 72 + 112 * p
@@ -190,7 +174,6 @@ def howler_hit(t, d, i, n):
 howler_hit.a, howler_hit.b = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
 make("howler_hit", .8, howler_hit)
 
-# Dredge: low, irregular scraping with a fast attack rush and impact.
 def dredge_crawl(t, d, i, n):
     a = noise(t, 65, 500, dredge_crawl.a)
     b = noise(t, 500, 2200, dredge_crawl.b)
@@ -214,8 +197,6 @@ def dredge_hit(t, d, i, n):
 dredge_hit.a, dredge_hit.b = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
 make("dredge_hit", .7, dredge_hit)
 
-
-# Null's Apostle: close-mic breath through a narrow, hollow resonant filter.
 def apostle_whisper(t, d, i, n):
     a = noise(t, 210, 980, apostle_whisper.a)
     b = noise(t, 1250, 4700, apostle_whisper.b)
@@ -225,7 +206,6 @@ def apostle_whisper(t, d, i, n):
 apostle_whisper.a, apostle_whisper.b = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
 make("null_apostle_whisper", 2.25, apostle_whisper)
 
-# Fear: a thin, distant harmonic presence with a slow, hollow beating pulse.
 def fear_presence(t, d, i, n):
     a = noise(t, 110, 820, fear_presence.a)
     b = noise(t, 900, 3600, fear_presence.b)
@@ -235,7 +215,6 @@ def fear_presence(t, d, i, n):
 fear_presence.a, fear_presence.b = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
 make("fear_presence", 3.2, fear_presence)
 
-# Death: sub-bass pressure and a slow, dry granular scrape; deliberately restrained.
 def death_presence(t, d, i, n):
     a = noise(t, 35, 360, death_presence.a)
     b = noise(t, 420, 1500, death_presence.b)
@@ -245,7 +224,6 @@ def death_presence(t, d, i, n):
 death_presence.a, death_presence.b = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
 make("death_presence", 2.8, death_presence)
 
-# Almighty: three slightly detuned low harmonics with a slow, oppressive swell.
 def almighty_presence(t, d, i, n):
     a = noise(t, 45, 520, almighty_presence.a)
     b = noise(t, 300, 1700, almighty_presence.b)
@@ -256,9 +234,6 @@ def almighty_presence(t, d, i, n):
 almighty_presence.a, almighty_presence.b = {"lp1":0.0,"lp2":0.0}, {"lp1":0.0,"lp2":0.0}
 make("almighty_presence", 3.6, almighty_presence)
 
-
-
-# Structure-specific atmospheres: original procedural cues, not borrowed vanilla sounds.
 def structure_tone(name, duration, base, noise_amount, pulse_rate):
     state_a = {"lp1": 0.0, "lp2": 0.0}
     state_b = {"lp1": 0.0, "lp2": 0.0}
@@ -293,7 +268,6 @@ structure_tone("structure_boundary_monument", 3, 64, 0.17, 0.26)
 
 print("Generated original Outlands entity and structure sound effects in", OUT)
 
-# Three new original entity sound palettes.
 def pilgrim_breath(t,d,i,n):
  a=noise(t,90,520,pilgrim_breath.a);b=noise(t,620,2100,pilgrim_breath.b);p=max(0,math.sin(2*math.pi*.38*t+.4))**2
  return fade(t,d,.2,.45)*(.28*a*p+.09*b*p+.035*math.sin(2*math.pi*58*t))
@@ -311,7 +285,6 @@ colossus_step.a,colossus_step.b={"lp1":0.,"lp2":0.},{"lp1":0.,"lp2":0.};make("co
 def colossus_hurt(t,d,i,n): return .42*noise(t,25,260,colossus_hurt.a)*math.exp(-t*4)+.2*noise(t,240,1200,colossus_hurt.b)*math.exp(-t*11)
 colossus_hurt.a,colossus_hurt.b={"lp1":0.,"lp2":0.},{"lp1":0.,"lp2":0.};make("colossus_hurt",1.7,colossus_hurt)
 
-# Additional close-range cues for the three new entities.
 def pilgrim_step(t,d,i,n):
     low=noise(t,45,260,pilgrim_step.low); grit=noise(t,280,1800,pilgrim_step.grit)
     return fade(t,d,.002,.11)*(.34*low*math.exp(-t*20)+.16*grit*math.exp(-t*30))
@@ -344,7 +317,6 @@ def colossus_rumble(t,d,i,n):
 colossus_rumble.low,colossus_rumble.mid={"lp1":0.,"lp2":0.},{"lp1":0.,"lp2":0.}
 make("colossus_rumble",2.8,colossus_rumble)
 
-# NIGHTMARE-only vocal identities: five distinct, original procedural signatures.
 def nightmare_voice(name, base, duration, roughness, pulse_rate):
     state = {"lp1": 0.0, "lp2": 0.0}
     grit = {"lp1": 0.0, "lp2": 0.0}
@@ -366,8 +338,6 @@ nightmare_voice("nightmare_wardened", 43, 2.8, 0.38, 0.42)
 nightmare_voice("nightmare_false_survivor", 176, 2.1, 0.31, 0.84)
 nightmare_voice("nightmare_unbound", 92, 2.35, 0.58, 1.15)
 
-
-# Stalker close-range tells: wet cartilage clicks before a sudden lunge.
 def stalker_joint(t, d, i, n):
     low = noise(t, 55, 420, stalker_joint.low)
     crack = noise(t, 900, 6200, stalker_joint.crack)
@@ -394,7 +364,6 @@ stalker_lunge.sub, stalker_lunge.throat, stalker_lunge.grit = (
     {"lp1": 0.0, "lp2": 0.0}, {"lp1": 0.0, "lp2": 0.0}, {"lp1": 0.0, "lp2": 0.0})
 make("stalker_lunge", 0.88, stalker_lunge)
 
-# Hunter pounce: a wider, forward-rushing breath with a hard jaw snap and gritty landing tail.
 def hunter_pounce(t, d, i, n):
     sub = noise(t, 32, 240, hunter_pounce.sub)
     breath = noise(t, 140, 1500, hunter_pounce.breath)
@@ -408,8 +377,6 @@ hunter_pounce.sub, hunter_pounce.breath, hunter_pounce.grit = (
     {"lp1": 0.0, "lp2": 0.0}, {"lp1": 0.0, "lp2": 0.0}, {"lp1": 0.0, "lp2": 0.0})
 make("hunter_pounce", 0.98, hunter_pounce)
 
-
-# NIGHTMARE attack sting: a layered throat rupture, not a repeated ambient loop.
 def nightmare_screech(t, d, i, n):
     p = t / d
     f = 190 - 105 * p + 22 * math.sin(2 * math.pi * 7.0 * t)

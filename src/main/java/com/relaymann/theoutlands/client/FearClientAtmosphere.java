@@ -15,7 +15,6 @@ import net.neoforged.neoforge.client.event.sound.PlaySoundEvent;
 import net.minecraft.world.level.material.FogType;
 import net.minecraft.world.level.Level;
 
-/** Client-only Fear territory atmosphere. It never changes server state or other players' audio. */
 @EventBusSubscriber(modid = TheOutlands.MOD_ID, value = Dist.CLIENT)
 public final class FearClientAtmosphere {
     private FearClientAtmosphere() {}
@@ -49,7 +48,6 @@ public final class FearClientAtmosphere {
                 : new ScaledSoundInstance(sound, scale));
     }
 
-    /** Weather, biome, depth and nearby territorial presence gently layer onto the existing Fear fog. */
     private static double environmentalStrength(LocalPlayer player) {
         if (player == null || player.level() == null || !player.isAlive()
                 || player.isCreative() || player.isSpectator()) return 0.0D;
@@ -84,7 +82,7 @@ public final class FearClientAtmosphere {
         event.setRed(event.getRed() * (1.0F - blend) + 0.035F * blend);
         event.setGreen(event.getGreen() * (1.0F - blend) + 0.045F * blend);
         event.setBlue(event.getBlue() * (1.0F - blend) + 0.055F * blend);
-        // A very brief, low-amplitude light instability in dark, threatening places.
+
         if (player.level().getSkyDarken() > 8 && player.level().getGameTime() % 173L < 2L
                 && player.level().getMaxLocalRawBrightness(player.blockPosition()) > 7) {
             float flicker = 0.975F + (float) ((player.blockPosition().asLong() & 3L) * 0.004D);

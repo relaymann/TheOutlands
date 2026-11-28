@@ -11,7 +11,6 @@ import net.minecraft.server.level.ServerPlayer;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Persistent, server-authoritative, per-player encounter, behavior, and place memory. */
 public final class HorrorMemory {
     private static final String ROOT = "theoutlands_memory";
     private static final String ENCOUNTERS = "encounters";
@@ -85,10 +84,6 @@ public final class HorrorMemory {
         return readStringList(getMemory(player.getPersistentData()), DISCOVERIES);
     }
 
-    /**
-     * Records a coarse 32-block cell. Returns true when the player has visited it
-     * before. The bounded list deliberately avoids storing a trail of exact coordinates.
-     */
     public static boolean recordLocation(ServerPlayer player) {
         CompoundTag data = player.getPersistentData();
         CompoundTag memory = getMemory(data);
@@ -117,7 +112,6 @@ public final class HorrorMemory {
         return List.copyOf(positions);
     }
 
-    /** Samples only once per progression interval; tracks pauses, sharp look-backs and flight. */
     public static void recordBehaviorSample(ServerPlayer player) {
         CompoundTag data = player.getPersistentData();
         CompoundTag memory = getMemory(data);
@@ -133,7 +127,7 @@ public final class HorrorMemory {
             memory.putInt("pause_samples", Math.min(10_000, memory.getInt("pause_samples") + 1));
         } else if (speed > 0.0009D && player.isSprinting()) {
             memory.putInt("sprint_samples", Math.min(10_000, memory.getInt("sprint_samples") + 1));
-            // Preserve the legacy counter so existing Null stalking profiles keep their behavior.
+
             memory.putInt("flight_samples", Math.min(10_000, memory.getInt("flight_samples") + 1));
         } else if (speed > 0.0009D) {
             memory.putInt("walk_samples", Math.min(10_000, memory.getInt("walk_samples") + 1));
@@ -150,12 +144,10 @@ public final class HorrorMemory {
         return getMemory(player.getPersistentData()).getInt("pause_samples");
     }
 
-    /** Number of sampled walking intervals, capped at 10,000 in persistent memory. */
     public static int walkCount(ServerPlayer player) {
         return getMemory(player.getPersistentData()).getInt("walk_samples");
     }
 
-    /** Number of sampled sprinting intervals, with a legacy fallback for existing worlds. */
     public static int sprintCount(ServerPlayer player) {
         CompoundTag memory = getMemory(player.getPersistentData());
         return memory.contains("sprint_samples")
@@ -201,7 +193,6 @@ public final class HorrorMemory {
                 ? memory.getLong("last_aggressive_jumpscare") : -36_000L;
     }
 
-    /** Existing worlds get a quiet grace period when this feature is first introduced. */
     public static boolean initializeAggressiveJumpscareCooldown(ServerPlayer player, long gameTime) {
         CompoundTag data = player.getPersistentData();
         CompoundTag memory = getMemory(data);
@@ -228,7 +219,6 @@ public final class HorrorMemory {
     private static final String HAUNTED_CELLS = "haunted_cells";
     private static final int MAX_HAUNTED_CELLS = 16;
 
-    /** Marks a coarse visited cell as haunted; returns true if it was already marked. */
     public static boolean markHauntedLocation(ServerPlayer player, BlockPos position) {
         CompoundTag data = player.getPersistentData();
         CompoundTag memory = getMemory(data);
@@ -264,7 +254,6 @@ public final class HorrorMemory {
         return getMemory(player.getPersistentData()).getInt("null_observations");
     }
 
-    /** Records a completed watcher appearance without storing exact player coordinates. */
     public static void recordNullStalking(ServerPlayer player, long gameTime) {
         CompoundTag data = player.getPersistentData();
         CompoundTag memory = getMemory(data);
@@ -328,8 +317,7 @@ public final class HorrorMemory {
         CompoundTag memory = getMemory(data);
         long packed = cellFor(position).asLong();
         ListTag old = memory.getList(key, Tag.TAG_LONG);
-        // Refresh recency when a known bed/base cell is used again. Repeated samples
-        // in the same most-recent cell are a no-op, keeping NBT writes bounded.
+
         if (!old.isEmpty() && ((LongTag) old.get(old.size() - 1)).getAsLong() == packed) return;
         List<Long> retainedRecent = new ArrayList<>(MAX_CONTEXT_CELLS - 1);
         for (int i = old.size() - 1; i >= 0 && retainedRecent.size() < MAX_CONTEXT_CELLS - 1; i--) {

@@ -9,7 +9,7 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.util.Mth;
-/** Rigid watcher with a single eye-lens and a narrow hanging veil. */
+
 public final class ObserverModel extends HumanoidModel<ObserverEntity> {
  private final ModelPart eye,veil;
  public ObserverModel(ModelPart root){super(root);eye=root.getChild("head").getChild("eye");veil=root.getChild("body").getChild("veil");}

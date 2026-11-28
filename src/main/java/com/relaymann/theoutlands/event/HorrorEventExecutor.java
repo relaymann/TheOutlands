@@ -16,7 +16,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.phys.AABB;
 
-/** Executes player-local horror cues without narrating events or changing server-world blocks. */
 public final class HorrorEventExecutor {
     private HorrorEventExecutor() {}
 
@@ -143,7 +142,7 @@ public final class HorrorEventExecutor {
             }
             case "direct_intervention" -> {
                 sound(player, SoundEvents.WARDEN_ROAR, SoundSource.HOSTILE, 0.3F, 0.55F);
-                // Keep horror diegetic: do not explain or narrate events in chat.
+
                 particles(player, ParticleTypes.PORTAL, player.getX(), player.getY() + 1.0D, player.getZ(), 12, 0.45D, 0.65D, 0.45D, 0.01D);
             }
             case "familiar_echo" -> executeFamiliarPlaceDistortion(player);
@@ -172,7 +171,7 @@ public final class HorrorEventExecutor {
                         0.11F, 0.42F, x - 18.0D, y + 2.0D, z + 18.0D);
             }
             case "black_room_echo" -> {
-                // Audio-only breadcrumb toward an uncanny, unmarked place; no chat or coordinates.
+
                 double doorAngle = random.nextDouble() * Math.PI * 2.0D;
                 double doorDistance = 32.0D + random.nextDouble() * 48.0D;
                 double dx = player.getX() + Math.cos(doorAngle) * doorDistance;

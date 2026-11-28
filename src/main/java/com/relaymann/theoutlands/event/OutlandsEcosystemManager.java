@@ -15,7 +15,6 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import java.util.HashSet;
 import java.util.Set;
 
-/** Server-authoritative ecology: factions, territory and rare emergent encounters. */
 @EventBusSubscriber(modid = TheOutlands.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public final class OutlandsEcosystemManager {
     private OutlandsEcosystemManager() {}
@@ -76,64 +75,45 @@ public final class OutlandsEcosystemManager {
         if (a instanceof FearEntity) hesitateNearFear(b, a);
         if (b instanceof FearEntity) hesitateNearFear(a, b);
 
-        // Death retains its assigned-player hunt. Almighty exclusion remains governed
-        // by AlmightyTerritoryEvents; neither joins ordinary creature rivalries.
         if (a instanceof DeathEntity || b instanceof DeathEntity
                 || a instanceof AlmightyEntity || b instanceof AlmightyEntity) return;
 
-        // Hunter and Stalker cooperate only after one has actually acquired a player.
         if (a instanceof HunterEntity && b instanceof StalkerEntity) shareTarget(a, b);
         if (b instanceof HunterEntity && a instanceof StalkerEntity) shareTarget(b, a);
 
-        // Howler calls create a temporary hunting alliance: nearby trackers converge
-        // only on a player already acquired by the Howler, never on arbitrary mobs.
         if (a instanceof HowlerEntity && (b instanceof HunterEntity || b instanceof StalkerEntity)) shareTarget(a, b);
         if (b instanceof HowlerEntity && (a instanceof HunterEntity || a instanceof StalkerEntity)) shareTarget(b, a);
 
-        // Lurkers are opportunists: they shadow a Howler's territory, but retreat
-        // from the Dredge's low, aggressive hunting route.
         if (a instanceof HowlerEntity && b instanceof LurkerEntity) shadowHowler((LurkerEntity)b, a);
         if (b instanceof HowlerEntity && a instanceof LurkerEntity) shadowHowler((LurkerEntity)a, b);
         if (a instanceof DredgeEntity && b instanceof LurkerEntity) yieldTerritory(a, b);
         if (b instanceof DredgeEntity && a instanceof LurkerEntity) yieldTerritory(b, a);
 
-        // Dredges and Lurkers recognize the old cave sentinels as dominant.
         if (a instanceof CaveJarEntity && (b instanceof DredgeEntity || b instanceof LurkerEntity)) yieldTerritory(a, b);
         if (b instanceof CaveJarEntity && (a instanceof DredgeEntity || a instanceof LurkerEntity)) yieldTerritory(b, a);
         if (a instanceof StillbornStatueEntity && (b instanceof DredgeEntity || b instanceof LurkerEntity)) yieldTerritory(a, b);
         if (b instanceof StillbornStatueEntity && (a instanceof DredgeEntity || a instanceof LurkerEntity)) yieldTerritory(b, a);
 
-        // Cave.jar holds its ground; Burrowers yield instead of mob-vs-mob brawling.
         if (a instanceof CaveJarEntity && b instanceof BurrowerEntity) yieldTerritory(a, b);
         if (b instanceof CaveJarEntity && a instanceof BurrowerEntity) yieldTerritory(b, a);
 
-        // Cave.jar dominates narrow cave routes. Hunters and unrevealed Mimics
-        // avoid contesting its immediate hunting ground rather than starting
-        // artificial mob-vs-mob combat.
         if (a instanceof CaveJarEntity && b instanceof HunterEntity) yieldTerritory(a, b);
         if (b instanceof CaveJarEntity && a instanceof HunterEntity) yieldTerritory(b, a);
         if (a instanceof CaveJarEntity && b instanceof MimicEntity mimic && !mimic.isRevealed()) yieldTerritory(a, b);
         if (b instanceof CaveJarEntity && a instanceof MimicEntity mimic && !mimic.isRevealed()) yieldTerritory(b, a);
 
-        // Stillborn territory is avoided by subterranean travelers; the statue
-        // remains a stationary threat instead of chasing unrelated creatures.
         if (a instanceof StillbornStatueEntity && b instanceof BurrowerEntity) yieldTerritory(a, b);
         if (b instanceof StillbornStatueEntity && a instanceof BurrowerEntity) yieldTerritory(b, a);
 
-        // Two sentinels avoid crowding the same narrow approach.
         if (a instanceof StillbornStatueEntity && b instanceof ObserverEntity) giveSpace(a, b);
         if (b instanceof StillbornStatueEntity && a instanceof ObserverEntity) giveSpace(b, a);
 
-        // Very rarely, an Observer shadows an active predator from a distance.
         if (a instanceof ObserverEntity && isPredator(b)) studyHunt((ObserverEntity) a, b);
         if (b instanceof ObserverEntity && isPredator(a)) studyHunt((ObserverEntity) b, a);
 
-        // Agitated One defends its immediate territory against intruders when a
-        // legitimate player is present, but never attacks other Outlands entities.
         if (a instanceof AgitatedOneEntity && isPredator(b)) defendPlayerSpace((AgitatedOneEntity)a, witness);
         if (b instanceof AgitatedOneEntity && isPredator(a)) defendPlayerSpace((AgitatedOneEntity)b, witness);
 
-        // Nightmare Hounds and Unbound can inherit an active hunting target from established trackers.
         if (a instanceof NightmareCreature nightmare && (nightmare.isVariant("nightmare_hound")
                 || nightmare.isVariant("nightmare_unbound"))
                 && (b instanceof HunterEntity || b instanceof StalkerEntity || b instanceof HowlerEntity)) {
@@ -144,13 +124,12 @@ public final class OutlandsEcosystemManager {
                 && (a instanceof HunterEntity || a instanceof StalkerEntity || a instanceof HowlerEntity)) {
             shareTarget(a, b);
         }
-        // A Wardened presence is a territorial anchor; ordinary intruders give its chamber space.
+
         if (a instanceof NightmareCreature nightmare && nightmare.isVariant("nightmare_wardened")
                 && isPredator(b)) yieldTerritory(a, b);
         if (b instanceof NightmareCreature nightmare && nightmare.isVariant("nightmare_wardened")
                 && isPredator(a)) yieldTerritory(b, a);
 
-        // A rare encounter: Hunters occasionally investigate a dormant Mimic.
         if (a instanceof HunterEntity && b instanceof MimicEntity) investigateMimic(a, b);
         if (b instanceof HunterEntity && a instanceof MimicEntity) investigateMimic(b, a);
     }
@@ -208,7 +187,6 @@ public final class OutlandsEcosystemManager {
         Vec3 shadowPoint = predator.position().subtract(direction.normalize().scale(6.0D));
         observer.getNavigation().moveTo(shadowPoint.x, shadowPoint.y, shadowPoint.z, 0.72D);
     }
-
 
     private static void shadowHowler(LurkerEntity lurker, Mob howler) {
         if (lurker.getTarget() != null || lurker.tickCount % 80 != 0

@@ -10,7 +10,6 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 
-/** Death's charred-bone texture on a custom animated hunter model. */
 public final class DeathRenderer extends MobRenderer<DeathEntity, DeathModel> {
     public static final ModelLayerLocation LAYER = new ModelLayerLocation(
             ResourceLocation.fromNamespaceAndPath(TheOutlands.MOD_ID, "death"), "main");

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Integrity audit for all Outlands structure content and generation safeguards."""
 from __future__ import annotations
 import json
 import re
@@ -53,7 +52,10 @@ def main():
     forbidden={"theoutlands:death_jar","theoutlands:death_manifest","theoutlands:the_last_page","theoutlands:almighty_fragment"}
     assert not any(item in serialized for item in forbidden), "progression artifact leaked into structure loot"
     assert "hiddenCache(id,level,x,surfaceY,z,random)" in feature and "private static void hiddenCache(String id" in feature
-    assert "three-stroke mark" in feature
+    assert all(mark in feature for mark in (
+        "p(l,rx+4,y+2,rz+1,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState())",
+        "p(l,rx+3,y+2,rz+2,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState())",
+        "p(l,rx+5,y+2,rz+2,Blocks.POLISHED_BLACKSTONE_BRICKS.defaultBlockState())"))
     assert "new BoundingBox(x,y-40,z" in piece
     assert "StructureEncounterManager.tick(level)" in (ROOT/"src/main/java/com/relaymann/theoutlands/event/ServerHorrorEvents.java").read_text(encoding="utf-8")
     assert "void tick(ServerLevel level)" in encounters and "StructureEncounterSavedData.get(level)" in encounters

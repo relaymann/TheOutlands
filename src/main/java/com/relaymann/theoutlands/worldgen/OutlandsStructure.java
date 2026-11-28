@@ -15,7 +15,6 @@ import net.minecraft.world.level.levelgen.structure.pieces.StructurePiecesBuilde
 
 import java.util.Optional;
 
-/** One data-driven structure set whose starts are expanded into chunk-safe native pieces. */
 public final class OutlandsStructure extends Structure {
     public static final MapCodec<OutlandsStructure> CODEC = RecordCodecBuilder.mapCodec(instance ->
             instance.group(Structure.settingsCodec(instance),

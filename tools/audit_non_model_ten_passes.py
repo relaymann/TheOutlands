@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Run ten repeated audits of non-model Outlands gameplay systems."""
 from __future__ import annotations
 import subprocess
 import sys

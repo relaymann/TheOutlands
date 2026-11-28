@@ -10,7 +10,6 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 
-/** A silent hovering witness, with a ragged trailing veil and restrained idle motion. */
 public final class FearModel extends HumanoidModel<FearEntity> {
     private final ModelPart veil;
     private final ModelPart crown;

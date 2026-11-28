@@ -11,7 +11,6 @@ import software.bernie.geckolib.constant.DataTickets;
 import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.model.data.EntityModelData;
 
-/** Shared animated rig with per-creature resources, gaze tracking, and subtle facial motion. */
 public final class OutlandsGeoModel<T extends OutlandsGeoMonster> extends GeoModel<T> {
     private ResourceLocation modelFor(T entity) {
         String id = BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).getPath();
@@ -31,7 +30,6 @@ public final class OutlandsGeoModel<T extends OutlandsGeoMonster> extends GeoMod
 
     @Override public ResourceLocation getAnimationResource(T entity) { return ANIMATIONS; }
 
-    /** Adds restrained, client-side gaze tracking on top of authored animation keyframes. */
     @Override
     public void setCustomAnimations(T entity, long instanceId, AnimationState<T> animationState) {
         super.setCustomAnimations(entity, instanceId, animationState);

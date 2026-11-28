@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Five complete static audits across every project subsystem after Batches 1-3."""
 from __future__ import annotations
 import subprocess
 import sys

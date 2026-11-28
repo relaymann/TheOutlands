@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/** Owns Fear's first meeting and bounded, player-specific manifestations. */
 public final class FearEncounterManager {
     private static final String INTRODUCTION_DISCOVERY = "fear_first_introduction";
     private static final long LIFETIME_TICKS = 160L;
@@ -44,7 +43,6 @@ public final class FearEncounterManager {
         FearEntity fear = spawnManifestation(player);
         if (fear == null) return;
 
-        // The first manifestation is a shared story beat for everyone who can witness it.
         List<ServerPlayer> audience = new ArrayList<>();
         for (ServerPlayer candidate : player.serverLevel().players()) {
             if (candidate.isAlive() && !candidate.isSpectator() && !candidate.isCreative()
@@ -54,24 +52,16 @@ public final class FearEncounterManager {
             audience.add(player);
         }
 
-        // The first meeting is communicated entirely through the manifestation and
-        // environment. Horror events must never narrate themselves in chat.
         for (ServerPlayer witness : audience) {
             HorrorMemory.recordDiscovery(witness, INTRODUCTION_DISCOVERY);
             HorrorMemory.setLastAggressiveJumpscare(witness, witness.serverLevel().getGameTime());
         }
     }
 
-    /** Reuses Fear's registered entity for later presence events without replaying the introduction. */
     public static void showPresence(ServerPlayer player) {
         spawnManifestation(player);
     }
 
-    /**
-     * Fear appears several blocks ahead and above the target, facing down toward them.
-     * The location is only accepted inside an already-loaded chunk and if the entity
-     * has a collision-free bounding box; this never causes chunk generation.
-     */
     private static FearEntity spawnManifestation(ServerPlayer player) {
         ServerLevel level = player.serverLevel();
         UUID playerId = player.getUUID();

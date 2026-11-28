@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Static Batch 3 survival, defense, Nightmare exclusivity, and asset audit."""
 from pathlib import Path
 import json
 

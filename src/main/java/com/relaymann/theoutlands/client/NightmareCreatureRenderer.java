@@ -8,7 +8,6 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 
-/** Texture-selecting renderer for the five NIGHTMARE-exclusive silhouettes. */
 public final class NightmareCreatureRenderer extends MobRenderer<NightmareCreature, NightmareCreatureModel> {
     public static final ModelLayerLocation LAYER = new ModelLayerLocation(
             ResourceLocation.fromNamespaceAndPath(TheOutlands.MOD_ID, "nightmare_creature"), "main");

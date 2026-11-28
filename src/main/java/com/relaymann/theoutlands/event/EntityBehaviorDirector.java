@@ -17,10 +17,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * Adds low-frequency, entity-specific decisions on top of each creature's own
- * goals. It never assigns arbitrary targets, teleports mobs, or changes blocks.
- */
 @EventBusSubscriber(modid = TheOutlands.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public final class EntityBehaviorDirector {
     private static final Set<UUID> PROCESSED = new HashSet<>();
@@ -53,8 +49,6 @@ public final class EntityBehaviorDirector {
         double distance = lurker.distanceToSqr(target);
         if (distance < 64.0D || distance > 625.0D) return;
 
-        // Move laterally and slightly behind the player's facing direction.
-        // The Lurker keeps a real path and can be spotted during the maneuver.
         double yaw = Math.toRadians(target.getYRot());
         double forwardX = -Math.sin(yaw);
         double forwardZ = Math.cos(yaw);

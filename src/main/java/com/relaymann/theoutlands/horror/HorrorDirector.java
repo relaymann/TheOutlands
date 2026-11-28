@@ -3,7 +3,6 @@ package com.relaymann.theoutlands.horror;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Pacing and weighted event selection from distance, pressure, and local context. */
 public final class HorrorDirector {
     public static final double EVENT_PRESSURE_THRESHOLD = 10.0D;
     public static final long MINIMUM_QUIET_TICKS = 240L, MAXIMUM_QUIET_TICKS = 730L;
@@ -72,7 +71,7 @@ public final class HorrorDirector {
         }
         if (state.lastEncounterGameTime() == Long.MIN_VALUE) state.setLastEncounterGameTime(time);
         updatePressure(state, time, snapshot.escalationValue(), true, settings.intensity());
-        // High tiers never eliminate the quiet interval; its slight jitter prevents predictable cadence.
+
         long quiet = minimumQuietPeriod(snapshot.escalationTier());
         quiet = quiet + (long) (quiet * 0.18D * (Math.max(0.0D, Math.min(1.0D, roll))));
         if (time - state.lastEncounterGameTime() < quiet)

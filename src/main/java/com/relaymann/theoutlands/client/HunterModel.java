@@ -10,7 +10,7 @@ import net.minecraft.world.entity.Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-/** Custom narrow predator silhouette with a ribbed torso, hooked forearms and angular skull. */
+
 public final class HunterModel extends EntityModel<HunterEntity> {
  private final ModelPart root,head,torso,leftArm,rightArm,leftLeg,rightLeg,spine;
  public HunterModel(ModelPart root){super(RenderType::entityCutoutNoCull);this.root=root;head=root.getChild("head");torso=root.getChild("torso");leftArm=root.getChild("left_arm");rightArm=root.getChild("right_arm");leftLeg=root.getChild("left_leg");rightLeg=root.getChild("right_leg");spine=root.getChild("spine");}

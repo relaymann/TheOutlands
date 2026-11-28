@@ -10,7 +10,6 @@ base { archivesName = mod_id }
 java { toolchain.languageVersion = JavaLanguageVersion.of(21) }
 sourceSets.main.resources {
     setSrcDirs(['src/generated/resources', 'src/main/resources'])
-    // Exclude only imported vanilla overrides; never exclude this mod's own assets.
     exclude('assets/minecraft/textures/**')
     exclude('assets/minecraft/sounds/**')
     exclude('**/*.bbmodel')
@@ -40,7 +39,6 @@ repositories {
         url = "https://api.modrinth.com/maven"
         content { includeGroup "maven.modrinth" }
     }
-    // Official GeckoLib Maven repository.
     maven {
         name = "GeckoLib"
         url = "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/"
@@ -48,10 +46,8 @@ repositories {
 }
 
 dependencies {
-    // GeckoLib is a required runtime and compile dependency for the animated entity roster.
     implementation "software.bernie.geckolib:geckolib-neoforge-1.21.1:${geckolib_version}"
 
-    // Compile against the API without bundling it: Simple Voice Chat remains optional at runtime.
     compileOnly "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
     localRuntime "maven.modrinth:simple-voice-chat:neoforge-${voicechat_mod_version}"
     testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
@@ -72,7 +68,6 @@ def generateCreatureAnatomy = tasks.register('generateCreatureAnatomy', Exec) {
 }
 tasks.named('processResources').configure {
     dependsOn(generateCreatureAnatomy)
-    // Generated anatomy resources are ordered before source fallbacks above.
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 def generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {

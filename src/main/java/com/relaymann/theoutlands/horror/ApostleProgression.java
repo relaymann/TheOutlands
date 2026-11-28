@@ -1,9 +1,5 @@
 package com.relaymann.theoutlands.horror;
 
-/**
- * Canonical distance milestones for the apostle storyline.
- * These are story gates, not a cap on general horror escalation.
- */
 public final class ApostleProgression {
     public static final double FEAR_FIRST_APPEARANCE_DISTANCE = 15_000.0D;
     public static final double DEATH_FIRST_APPEARANCE_DISTANCE = 50_000.0D;

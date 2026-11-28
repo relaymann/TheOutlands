@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""Generate deterministic 64x64 pixel-art skins for every Outlands creature.
-Uses only the Python standard library so local and CI builds produce identical assets.
-"""
 import math, os, random, struct, zlib
 
 OUT = os.path.join("src", "main", "resources", "assets", "theoutlands", "textures", "entity")
@@ -77,7 +74,7 @@ def generate(name, palette, index):
             line(pixels,x,y,x+rng.randrange(-3,4),y+rng.randrange(2,9),c)
         else:
             rect(pixels,x,y,x+rng.randrange(1,3),y+rng.randrange(1,4),c)
-    # Standard 64x64 humanoid face UV: front panel is x=8..15, y=8..15.
+
     if name not in ("burrower",):
         eye = palette[3] if name in ("null","null_apostle","almighty") else palette[4]
         rect(pixels,8,9,9,10,eye); rect(pixels,13,9,14,10,eye)
@@ -85,7 +82,7 @@ def generate(name, palette, index):
             rect(pixels,10,13,13,14,palette[0])
         else:
             line(pixels,10,14,13,14,palette[0])
-    # Individual signature marks in torso/limb UV space.
+
     marks = {
       "death":((27,22,24,30),(29,34,25,39)),
       "fear":((25,19,28,24),(26,29,31,35)),
@@ -107,7 +104,7 @@ def generate(name, palette, index):
     for coords in marks.get(name, ()):
         x0,y0,x1,y1=coords
         line(pixels,x0,y0,x1,y1,palette[4] if name not in ("null","null_apostle") else palette[3])
-    # Strong readable details on humanoid front-face and torso UVs.
+
     if name in ("stalker", "nightmare_watcher", "nightmare_hound",
                 "nightmare_wardened", "nightmare_false_survivor", "nightmare_unbound"):
         eye, shadow, mid = palette[4], palette[0], palette[2]
@@ -143,7 +140,7 @@ def generate(name, palette, index):
             line(pixels, 20, 20, 27, 31, palette[3]); line(pixels, 27, 20, 20, 31, palette[1])
 
     if name == "observer":
-        # The single unblinking eye mark.
+
         rect(pixels,29,24,34,25,palette[4])
     if name == "cave_jar":
         for x in (25,30,35): line(pixels,x,20,x-2,37,palette[3])
@@ -166,16 +163,15 @@ def generate(name, palette, index):
         for x, y in ((32, 28), (78, 46), (54, 83), (96, 101)):
             line(pixels, x, y, x+7, y+11, palette[4])
             line(pixels, x+7, y+11, x+13, y+15, palette[3])
-    # Second-pass horror detailing: deliberately asymmetric faces, damaged flesh,
-    # exposed rib marks and entity-specific silhouettes readable at Minecraft scale.
+
     if name not in ("burrower", "dredge", "colossus"):
-        # Deep eye sockets and uneven, light-catching pupils.
+
         rect(pixels, 8, 8, 15, 11, palette[0])
         left_eye = palette[4] if name not in ("fear", "null", "null_apostle", "observer") else palette[3]
         right_eye = palette[3] if name in ("death", "hunter", "lurker", "howler", "mimic") else palette[4]
         rect(pixels, 9, 9, 10, 10, left_eye)
         rect(pixels, 13, 9, 14, 11, right_eye)
-        # Jagged mouths are intentionally not centered or perfectly symmetrical.
+
         if name in ("mimic", "howler", "agitated_one", "cave_jar", "stalker",
                     "death", "hunter", "lurker", "nightmare_hound", "nightmare_unbound"):
             line(pixels, 9, 13, 14, 14, palette[0])
@@ -183,23 +179,23 @@ def generate(name, palette, index):
                 rect(pixels, tx, ty, tx, ty+1, palette[4])
         elif name in ("fear", "null", "null_apostle", "observer", "nightmare_watcher"):
             line(pixels, 10, 14, 13, 13, palette[1])
-        # Torn tissue / robe folds / scar lines across the chest UV.
+
         if name in ("fear", "death", "null", "null_apostle", "observer", "pilgrim",
                     "almighty", "nightmare_false_survivor", "nightmare_watcher"):
             line(pixels, 21, 20, 23, 30, palette[3])
             line(pixels, 26, 22, 24, 31, palette[1])
             line(pixels, 20, 25, 27, 27, palette[2])
-        # Visible rib cage, each creature gets a different rib spacing.
+
         if name in ("stalker", "hunter", "agitated_one", "cave_jar", "lurker",
                     "howler", "nightmare_hound", "nightmare_unbound"):
             for ry in (22, 25, 28, 31):
                 line(pixels, 20, ry, 27, ry + (1 if ry % 2 else 0), palette[3])
             line(pixels, 23, 21, 23, 32, palette[4])
-        # Mineral fractures and old cracks rather than clean decorative striping.
+
         if name in ("stillborn_statue", "burrower", "dredge", "ceiling_dweller", "colossus"):
             for sx, sy, ex, ey in ((20,20,24,26),(27,22,23,29),(21,31,26,35),(29,30,25,36)):
                 line(pixels, sx, sy, ex, ey, palette[3])
-        # Distinctive entity marks: one-sided wounds, extra eyes, or unnatural seams.
+
         signatures = {
             "null": lambda: (line(pixels, 11, 7, 12, 16, palette[3]), rect(pixels, 8, 23, 9, 28, palette[1])),
             "null_apostle": lambda: (line(pixels, 11, 6, 11, 16, palette[3]), rect(pixels, 22, 20, 26, 21, palette[1])),
@@ -214,8 +210,163 @@ def generate(name, palette, index):
         }
         if name in signatures:
             signatures[name]()
-    # Dedicated eye atlas tiles used by the articulated GeoModel eye shells and pupils.
-    # The tiles are kept at the lower-right of each atlas so they do not reuse head/limb UVs.
+
+    if name == "stalker":
+        rect(pixels, 8, 8, 15, 9, palette[0])
+        rect(pixels, 9, 10, 9, 11, palette[4])
+        rect(pixels, 14, 10, 14, 11, palette[3])
+        line(pixels, 10, 12, 13, 15, palette[0])
+        line(pixels, 13, 12, 10, 15, palette[0])
+        for x,y in ((10,13),(12,14),(14,13)): rect(pixels,x,y,x,y,palette[4])
+    elif name == "hunter":
+        line(pixels, 8, 8, 15, 9, palette[0])
+        rect(pixels, 9, 10, 10, 11, palette[4])
+        rect(pixels, 13, 10, 14, 11, palette[4])
+        rect(pixels, 10, 12, 13, 15, palette[0])
+        for x in (10,12,13): rect(pixels,x,12,x,13,palette[4])
+    elif name == "lurker":
+        rect(pixels, 8, 9, 15, 10, palette[0])
+        rect(pixels, 9, 10, 10, 10, palette[4])
+        rect(pixels, 13, 10, 14, 10, palette[4])
+        line(pixels, 11, 11, 12, 16, palette[0])
+        for y in (13,15): rect(pixels,10,y,13,y,palette[4])
+    elif name == "observer":
+        rect(pixels, 8, 8, 15, 12, palette[0])
+        rect(pixels, 9, 9, 10, 11, palette[3])
+        rect(pixels, 12, 9, 14, 11, palette[4])
+        rect(pixels, 11, 10, 12, 11, palette[0])
+        rect(pixels, 10, 13, 13, 15, palette[0])
+        pixels[13][11] = palette[4]
+        pixels[14][12] = palette[3]
+    elif name == "stillborn_statue":
+        rect(pixels, 8, 8, 15, 11, palette[1])
+        line(pixels, 9, 9, 10, 11, palette[4])
+        line(pixels, 14, 9, 13, 11, palette[4])
+        line(pixels, 11, 12, 12, 15, palette[0])
+        line(pixels, 8, 7, 11, 13, palette[3])
+        line(pixels, 15, 8, 12, 14, palette[3])
+    elif name == "nightmare_false_survivor":
+        rect(pixels, 8, 8, 15, 9, palette[1])
+        rect(pixels, 9, 10, 10, 10, palette[4])
+        rect(pixels, 13, 10, 14, 11, palette[0])
+        line(pixels, 9, 13, 15, 14, palette[0])
+        for x in (10,12,14): rect(pixels,x,13,x,14,palette[4])
+        line(pixels, 8, 12, 9, 15, palette[3])
+    elif name == "pilgrim":
+        rect(pixels, 7, 7, 16, 11, palette[0])
+        rect(pixels, 9, 10, 10, 10, palette[4])
+        rect(pixels, 13, 10, 14, 10, palette[4])
+        line(pixels, 11, 11, 12, 15, palette[1])
+        for y in (12,14): rect(pixels,10,y,13,y,palette[3])
+    elif name == "agitated_one":
+        rect(pixels, 8, 8, 15, 9, palette[0])
+        rect(pixels, 9, 9, 10, 11, palette[4])
+        rect(pixels, 13, 9, 14, 11, palette[4])
+        rect(pixels, 9, 13, 14, 15, palette[0])
+        for x in (9,11,13,14): rect(pixels,x,13,x,14,palette[4])
+        line(pixels, 11, 11, 12, 16, palette[0])
+
+    if name == "burrower":
+        rect(pixels, 7, 8, 16, 10, palette[1])
+        rect(pixels, 9, 10, 10, 11, palette[4]); rect(pixels, 13, 10, 14, 11, palette[4])
+        line(pixels, 8, 12, 15, 15, palette[0])
+        for x in (9,11,13,15): line(pixels,x,12,x+1,15,palette[4])
+        for y in (20,23,26,29): line(pixels,20,y,28,y+2,palette[3])
+    elif name == "dredge":
+        rect(pixels, 7, 8, 16, 11, palette[0])
+        rect(pixels, 9, 9, 10, 10, palette[3]); rect(pixels, 13, 9, 14, 10, palette[4])
+        line(pixels, 8, 13, 15, 14, palette[0])
+        for x in (9,11,13,15): line(pixels,x,12,x-1,16,palette[4])
+        for y in (19,22,25,28): line(pixels,20,y,27,y+3,palette[2])
+    elif name == "howler":
+        rect(pixels, 8, 8, 15, 10, palette[0])
+        rect(pixels, 9, 10, 10, 11, palette[4]); rect(pixels, 13, 10, 14, 11, palette[4])
+        rect(pixels, 9, 12, 14, 16, palette[0])
+        for x in (9,11,13,14): line(pixels,x,12,x,15,palette[4])
+        rect(pixels, 10, 22, 13, 31, palette[2])
+    elif name == "nightmare_hound":
+        rect(pixels, 7, 8, 16, 11, palette[0])
+        rect(pixels, 8, 10, 10, 11, palette[4]); rect(pixels, 13, 10, 15, 11, palette[4])
+        rect(pixels, 9, 12, 14, 16, palette[0])
+        for x in (9,11,13,14): line(pixels,x,12,x,16,palette[4])
+        line(pixels, 20, 18, 27, 30, palette[3]); line(pixels,27,18,20,30,palette[3])
+    elif name == "cave_jar":
+        rect(pixels, 7, 7, 16, 10, palette[1])
+        line(pixels, 8, 8, 15, 8, palette[4])
+        rect(pixels, 9, 11, 10, 12, palette[4]); rect(pixels, 13, 11, 14, 12, palette[4])
+        line(pixels, 10, 13, 13, 15, palette[0])
+        for x in (21,25,29,33): line(pixels,x,18,x+2,34,palette[3])
+    elif name == "ceiling_dweller":
+        rect(pixels, 7, 8, 16, 11, palette[0])
+        for x in (8,11,14): rect(pixels,x,9,x+1,10,palette[4])
+        line(pixels, 9, 13, 14, 15, palette[0])
+        for x in (9,11,13,15): line(pixels,x,13,x,16,palette[4])
+        for x in (20,25,30,35): line(pixels,x,20,x-3,31,palette[3])
+    elif name == "mimic":
+        rect(pixels, 8, 8, 15, 10, palette[0])
+        line(pixels, 9, 9, 14, 11, palette[4])
+        line(pixels, 14, 9, 9, 11, palette[3])
+        line(pixels, 8, 13, 15, 15, palette[0])
+        for x in (9,11,13,15): rect(pixels,x,13,x,15,palette[4])
+        line(pixels, 20, 20, 27, 31, palette[3]); line(pixels,27,20,20,31,palette[2])
+    elif name == "death":
+        rect(pixels, 7, 7, 16, 10, palette[0])
+        rect(pixels, 9, 10, 10, 11, palette[3]); rect(pixels, 13, 10, 14, 11, palette[3])
+        line(pixels, 11, 11, 12, 15, palette[0])
+        for x in (9,11,13,15): rect(pixels,x,13,x,14,palette[4])
+        line(pixels, 20, 19, 27, 32, palette[3]); line(pixels,27,19,20,32,palette[3])
+
+    if name == "almighty":
+        rect(pixels, 7, 7, 16, 12, palette[0])
+        line(pixels, 8, 8, 15, 8, palette[3])
+        rect(pixels, 10, 9, 13, 10, palette[4])
+        line(pixels, 11, 10, 12, 14, palette[0])
+        for x in (9,12,15): line(pixels,x,12,x+1,16,palette[3])
+        for x in (20,25,30,35): line(pixels,x,18,x+3,31,palette[3])
+    elif name == "colossus":
+        rect(pixels, 6, 7, 17, 12, palette[1])
+        rect(pixels, 8, 9, 10, 10, palette[0]); rect(pixels, 14, 9, 16, 10, palette[0])
+        line(pixels, 8, 13, 15, 13, palette[0])
+        for x in (9,11,13,15): line(pixels,x,13,x,17,palette[4])
+        for y in (20,24,28,32): line(pixels,20,y,35,y+2,palette[3])
+    elif name == "fear":
+        rect(pixels, 7, 7, 16, 12, palette[0])
+        line(pixels, 8, 8, 11, 11, palette[3]); line(pixels,15,8,12,11,palette[3])
+        rect(pixels, 10, 9, 13, 11, palette[0])
+        rect(pixels, 9, 13, 14, 16, palette[3])
+        for x in (9,12,15): line(pixels,x,18,x-2,32,palette[4])
+    elif name == "null":
+        rect(pixels, 7, 7, 16, 12, palette[0])
+        rect(pixels, 9, 9, 10, 11, palette[3]); rect(pixels, 13, 9, 14, 11, palette[3])
+        rect(pixels, 11, 10, 12, 14, palette[0])
+        rect(pixels, 8, 14, 15, 16, palette[0])
+        for x in (9,12,15): line(pixels,x,18,x+2,33,palette[3])
+    elif name == "null_apostle":
+        rect(pixels, 7, 7, 16, 12, palette[1])
+        line(pixels, 8, 8, 15, 8, palette[3])
+        rect(pixels, 9, 10, 10, 11, palette[4]); rect(pixels, 13, 10, 14, 11, palette[4])
+        line(pixels, 11, 12, 12, 15, palette[0])
+        for x in (9,12,15): line(pixels,x,18,x,33,palette[3])
+    elif name == "nightmare_unbound":
+        rect(pixels, 6, 7, 17, 12, palette[0])
+        line(pixels, 7, 8, 10, 5, palette[3]); line(pixels,16,8,13,5,palette[3])
+        rect(pixels, 8, 9, 10, 11, palette[4]); rect(pixels, 13, 9, 15, 11, palette[3])
+        rect(pixels, 9, 13, 14, 16, palette[0])
+        for x in (9,11,13,15): line(pixels,x,13,x+1,17,palette[4])
+        line(pixels, 20, 18, 27, 33, palette[3]); line(pixels,35,18,28,33,palette[2])
+    elif name == "nightmare_wardened":
+        rect(pixels, 6, 7, 17, 12, palette[1])
+        line(pixels, 7, 7, 10, 3, palette[3]); line(pixels,16,7,13,3,palette[3])
+        rect(pixels, 8, 9, 10, 10, palette[4]); rect(pixels, 13, 9, 15, 10, palette[4])
+        line(pixels, 9, 13, 14, 13, palette[0])
+        for x in (8,12,16): line(pixels,x,18,x,34,palette[3])
+    elif name == "nightmare_watcher":
+        rect(pixels, 6, 7, 17, 12, palette[0])
+        for x in (8,11,14,16): rect(pixels,x,8,x+1,10,palette[4])
+        rect(pixels, 9, 12, 14, 14, palette[3])
+        line(pixels, 11, 13, 12, 16, palette[0])
+        for x in (20,25,30,35): line(pixels,x,18,x-2,33,palette[3])
+
     sclera = palette[4] if name not in ("fear", "null", "null_apostle", "observer") else palette[3]
     iris = palette[2] if name not in ("observer", "fear") else palette[1]
     pupil = palette[0]
@@ -227,13 +378,12 @@ def generate(name, palette, index):
     rect(pixels, 56, 56, 59, 59, pupil)
     rect(pixels, 57, 56, 58, 57, iris)
     pixels[57][57] = palette[4]
-    # Limb and back UVs receive torn edges and bone-like highlights.
+
     for lx in (1, 17, 40, 56):
         for ly in (24, 28, 32, 36):
             if lx < width and ly < height and (lx + ly + index) % 3 == 0:
                 pixels[ly][lx] = palette[3]
 
-    # Give each NIGHTMARE identity its own generated skin file.
     target_dir = os.path.join(OUT, "nightmare") if name.startswith("nightmare_") else OUT
     os.makedirs(target_dir, exist_ok=True)
     filename = name.removeprefix("nightmare_") if name.startswith("nightmare_") else name

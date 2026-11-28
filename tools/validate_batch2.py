@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Regression audit for Batch 2 investigation equipment and exploration sites."""
 from pathlib import Path
 import json
 

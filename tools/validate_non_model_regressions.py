@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Regression checks for non-model gameplay, encounter, and survival systems."""
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]

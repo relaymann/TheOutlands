@@ -1,6 +1,5 @@
 package com.relaymann.theoutlands.worldgen;
 
-/** Seed-stable spacing policy for additive Outlands structure features. */
 public final class StructurePlacementPolicy {
     public static final int CELL_CHUNKS = 8;
     private static final long X_SALT = 0x9E3779B97F4A7C15L;
@@ -8,14 +7,12 @@ public final class StructurePlacementPolicy {
 
     private StructurePlacementPolicy() {}
 
-    /** Prevents structure footprints from overlapping even when config spacing is set too low. */
     public static int minimumSpacingForFootprint(int configuredSpacingChunks, int footprintSizeBlocks) {
         if (footprintSizeBlocks < 1) throw new IllegalArgumentException("footprintSizeBlocks must be positive");
         int footprintChunks = (footprintSizeBlocks + 15) / 16;
         return Math.max(Math.max(1, configuredSpacingChunks), footprintChunks);
     }
 
-    /** Allows small terrain variation but rejects chunks whose actual ground is too far from the anchor height. */
     public static boolean isWithinSurfaceTolerance(int sampledSurfaceY, int expectedSurfaceY, int tolerance) {
         return tolerance >= 0
                 && Math.abs((long) sampledSurfaceY - expectedSurfaceY) <= tolerance;
@@ -25,7 +22,6 @@ public final class StructurePlacementPolicy {
         return isSpacedAnchor(seed, chunkX, chunkZ, minimumSpacing, CELL_CHUNKS);
     }
 
-    /** NIGHTMARE uses smaller deterministic placement cells without changing vanilla world generation. */
     public static boolean isSpacedAnchor(long seed, int chunkX, int chunkZ,
                                          int minimumSpacing, int cellChunks) {
         if (cellChunks < 1 || (cellChunks & (cellChunks - 1)) != 0)
@@ -68,7 +64,6 @@ public final class StructurePlacementPolicy {
         return new int[] {(int) (cellX * cellChunks + offsetX), (int) (cellZ * cellChunks + offsetZ)};
     }
 
-    /** Evenly samples a footprint and always includes its final block coordinate. */
     public static int[] surfaceSampleOffsets(int size, int step) {
         if (size < 1 || step < 1) throw new IllegalArgumentException("size and step must be positive");
         int last = size - 1;
@@ -80,7 +75,6 @@ public final class StructurePlacementPolicy {
         return offsets;
     }
 
-    /** Inclusive block clipping shared by every piece write and its tests. */
     public static boolean containsBlock(int minX, int minY, int minZ,
                                         int maxX, int maxY, int maxZ,
                                         int x, int y, int z) {

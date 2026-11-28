@@ -17,7 +17,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
-/** A patient woodland ambusher: it watches, closes distance, strikes, then breaks contact. */
 public final class LurkerEntity extends OutlandsGeoMonster {
     private int retreatTicks;
     private int ambushCooldown;
@@ -48,7 +47,7 @@ public final class LurkerEntity extends OutlandsGeoMonster {
         if(getTarget() instanceof Player player && player.isAlive()) {
             double d=distanceToSqr(player);
             if(d>100 && d<625 && hasLineOfSight(player)) {
-                // Hold position and lower its silhouette while it observes the player.
+
                 getNavigation().stop(); setPose(net.minecraft.world.entity.Pose.CROUCHING);
                 setYRot(getYRot() + net.minecraft.util.Mth.wrapDegrees(player.getYRot() - getYRot()) * 0.035F);
                 if(stalkTicks==0 && getRandom().nextInt(180)==0) { stalkTicks=80; playHorrorAnimation("stalk"); if(OutlandsConfig.HORROR_AUDIO_ENABLED.get()) playSound(OutlandsSounds.LURKER_BREATH.get(),0.45F,0.7F); }

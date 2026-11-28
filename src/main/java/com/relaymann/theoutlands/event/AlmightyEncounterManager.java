@@ -13,7 +13,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.AABB;
 
-/** Starts the one-time endgame encounter when a player enters the Almighty's borderland. */
 public final class AlmightyEncounterManager {
     private AlmightyEncounterManager() {}
 

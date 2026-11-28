@@ -1,6 +1,5 @@
 package com.relaymann.theoutlands.block;
 
-/** Pure per-entity trap cooldown policy, independent of global entity age. */
 public final class SurvivalDefensePolicy {
     private SurvivalDefensePolicy() {}
 

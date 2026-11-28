@@ -7,7 +7,7 @@ import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.util.Mth;
 import com.mojang.blaze3d.vertex.PoseStack;
-/** Custom fractured stone effigy with layered shoulders, carved mask and articulated limbs. */
+
 public final class StillbornStatueModel extends EntityModel<StillbornStatueEntity> {
  private final ModelPart root,head,body,leftArm,rightArm,leftLeg,rightLeg,crackCrown;
  public StillbornStatueModel(ModelPart root){super(RenderType::entityCutoutNoCull);this.root=root;head=root.getChild("head");body=root.getChild("body");leftArm=root.getChild("left_arm");rightArm=root.getChild("right_arm");leftLeg=root.getChild("left_leg");rightLeg=root.getChild("right_leg");crackCrown=root.getChild("crown");}

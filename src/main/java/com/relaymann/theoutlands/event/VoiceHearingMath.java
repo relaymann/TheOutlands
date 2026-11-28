@@ -1,6 +1,5 @@
 package com.relaymann.theoutlands.event;
 
-/** Pure acoustic range calculation shared by voice perception and its unit tests. */
 public final class VoiceHearingMath {
     private VoiceHearingMath() {}
 

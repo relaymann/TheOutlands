@@ -16,10 +16,6 @@ import net.minecraft.sounds.SoundEvent;
 import com.relaymann.theoutlands.sound.OutlandsSounds;
 import com.relaymann.theoutlands.OutlandsConfig;
 
-/**
- * The Stalker is a patient pursuit specialist. It remembers confirmed sightings,
- * searches around the last known position, and tries to cut off moving prey.
- */
 public final class StalkerEntity extends OutlandsGeoMonster {
     private double memoryX, memoryY, memoryZ;
     private int lostSightTicks;
@@ -48,8 +44,7 @@ public final class StalkerEntity extends OutlandsGeoMonster {
     @Override public void tick() {
         super.tick();
         if (level().isClientSide) return;
-        // Players must not be able to neutralize the Stalker by seating it in
-        // a boat or minecart. It immediately dismounts and resumes its hunt.
+
         if (isPassenger()) stopRiding();
         if (interceptCooldown > 0) interceptCooldown--;
         if (audioCooldown > 0) audioCooldown--;
@@ -72,8 +67,6 @@ public final class StalkerEntity extends OutlandsGeoMonster {
                 memoryX = player.getX(); memoryY = player.getY(); memoryZ = player.getZ();
                 hasMemory = true; lostSightTicks = 0; searchTicks = 0;
 
-                // Periodically aim ahead of a moving target, attempting to intercept
-                // rather than following the exact trail of the player.
                 if (interceptCooldown == 0 && distance > 100.0D && distance < 2500.0D
                         && player.getDeltaMovement().horizontalDistanceSqr() > 0.012D) {
                     Vec3 lead = player.position().add(player.getDeltaMovement().scale(12.0D));
@@ -85,8 +78,7 @@ public final class StalkerEntity extends OutlandsGeoMonster {
                 if (hasMemory && lostSightTicks < 120 && tickCount % 10 == 0)
                     getNavigation().moveTo(memoryX, memoryY, memoryZ, 1.05D);
                 if (lostSightTicks >= 120) {
-                    // Keep the memory briefly and search around it instead of
-                    // immediately dropping the hunt when a corner breaks sight.
+
                     searchTicks++;
                     if (searchTicks < 90 && tickCount % 16 == 0) {
                         double radius = 3.0D + (searchTicks / 12.0D);
@@ -105,8 +97,7 @@ public final class StalkerEntity extends OutlandsGeoMonster {
             }
 
             setSprinting(distance > 25.0D && distance < 1600.0D);
-            // At close range it briefly slows to circle and pressure the player,
-            // then commits again; this avoids a permanently straight-line chase.
+
             if (distance < 100.0D && distance > 20.0D && tickCount % 65 == 0) {
                 Vec3 side = player.position().subtract(position()).normalize()
                         .yRot((getRandom().nextBoolean() ? 1.0F : -1.0F) * 0.85F);
