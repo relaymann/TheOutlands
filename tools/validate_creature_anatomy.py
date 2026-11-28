@@ -15,6 +15,23 @@ for entity in IDS:
     names={b["name"] for b in rig["bones"]}
     anatomy={n for n in names if n.startswith("anatomy_"+entity+"_")}
     if len(anatomy)<14: raise SystemExit("%s has too few anatomical structures (%d)"%(entity,len(anatomy)))
+    features={
+        "stalker":("skull_ridge","finger_hooks_l","finger_hooks_r"),
+        "hunter":("neck_trapezius","rib_l","rib_r","hooked_fingers_l","hooked_fingers_r"),
+        "lurker":("hump","rib_l","rib_r","wrist_spurs_l","wrist_spurs_r"),
+        "observer":("outer_eye_l","outer_eye_r","central_lens","neck_cables","crown_spines"),
+        "stillborn_statue":("stone_collar","chest_slab","shoulder_pauldron_l","shoulder_pauldron_r","face_mask"),
+        "nightmare_false_survivor":("mask_cheek_l","mask_cheek_r","throat_tendons","sternum_ribs","split_fingers_l","split_fingers_r"),
+        "pilgrim":("hood_cowl","mantle_l","mantle_r","prayer_cords","sleeve_hands_l","sleeve_hands_r"),
+        "agitated_one":("raised_collar","rib_spurs_l","rib_spurs_r","jaw_hooks","knuckle_bone_l","knuckle_bone_r")
+    }
+    missing={"anatomy_"+entity+"_"+feature for feature in features.get(entity,())}-names
+    if missing: raise SystemExit("%s is missing creature-specific anatomy: %s"%(entity,sorted(missing)))
+    parents={b["name"]:b.get("parent") for b in rig["bones"]}
+    for bone_name,parent in parents.items():
+        if parent is not None and parent not in parents: raise SystemExit("%s has an invalid parent on %s"%(entity,bone_name))
+        if bone_name.startswith("anatomy_"+entity+"_") and not next(b for b in rig["bones"] if b["name"]==bone_name).get("cubes"):
+            raise SystemExit("%s has empty creature-specific geometry on %s"%(entity,bone_name))
     def bounds(bone_name):
         cubes=[c for b in rig["bones"] if b["name"]==bone_name for c in b.get("cubes",[])]
         if not cubes: raise SystemExit("%s is missing %s geometry"%(entity,bone_name))
