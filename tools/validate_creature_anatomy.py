@@ -59,6 +59,11 @@ for entity in IDS:
         if not clip: raise SystemExit("Missing "+action+" clip for "+entity)
         missing=anatomy-set(clip.get("bones",{}))
         if missing: raise SystemExit("%s %s lacks animation for %s"%(entity,action,sorted(missing)))
+        if entity in ("burrower","dredge","howler","nightmare_hound","cave_jar","ceiling_dweller","mimic","death") and action in ("sprint","attack"):
+            for bone_name in anatomy:
+                track=clip.get("bones",{}).get(bone_name,{}).get("rotation",{})
+                moving=any(isinstance(value,list) and any(abs(float(v))>0 for v in value[:3]) for value in track.values())
+                if not moving: raise SystemExit("%s %s has a static beast anatomy bone: %s"%(entity,action,bone_name))
 if len({tuple(sorted(v)) for v in sets.values()})!=len(IDS):
     raise SystemExit("Creature anatomy signatures are not individually distinct")
 print("Anatomy audit passed: 24 unique rigs, %d anatomical bones, 120 fully articulated creature clips."%sum(map(len,sets.values())))
