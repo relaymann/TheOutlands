@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Run ten independent repeat passes of the entity and structure integrity audits."""
 from __future__ import annotations
 import subprocess
 import sys

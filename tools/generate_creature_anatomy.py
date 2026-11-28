@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Build distinct creature anatomy and anatomy-aware GeckoLib motion overlays."""
 import json
 from pathlib import Path
 

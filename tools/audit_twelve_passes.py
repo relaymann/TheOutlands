@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Run twelve complete independent project audits across Batches 1-3."""
 from __future__ import annotations
 import subprocess
 import sys

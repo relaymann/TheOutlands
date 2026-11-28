@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""Generate deterministic 64x64 pixel-art skins for every Outlands creature.
-Uses only the Python standard library so local and CI builds produce identical assets.
-"""
 import math, os, random, struct, zlib
 
 OUT = os.path.join("src", "main", "resources", "assets", "theoutlands", "textures", "entity")
@@ -77,7 +74,7 @@ def generate(name, palette, index):
             line(pixels,x,y,x+rng.randrange(-3,4),y+rng.randrange(2,9),c)
         else:
             rect(pixels,x,y,x+rng.randrange(1,3),y+rng.randrange(1,4),c)
-    # Standard 64x64 humanoid face UV: front panel is x=8..15, y=8..15.
+
     if name not in ("burrower",):
         eye = palette[3] if name in ("null","null_apostle","almighty") else palette[4]
         rect(pixels,8,9,9,10,eye); rect(pixels,13,9,14,10,eye)
@@ -85,7 +82,7 @@ def generate(name, palette, index):
             rect(pixels,10,13,13,14,palette[0])
         else:
             line(pixels,10,14,13,14,palette[0])
-    # Individual signature marks in torso/limb UV space.
+
     marks = {
       "death":((27,22,24,30),(29,34,25,39)),
       "fear":((25,19,28,24),(26,29,31,35)),
@@ -107,7 +104,7 @@ def generate(name, palette, index):
     for coords in marks.get(name, ()):
         x0,y0,x1,y1=coords
         line(pixels,x0,y0,x1,y1,palette[4] if name not in ("null","null_apostle") else palette[3])
-    # Strong readable details on humanoid front-face and torso UVs.
+
     if name in ("stalker", "nightmare_watcher", "nightmare_hound",
                 "nightmare_wardened", "nightmare_false_survivor", "nightmare_unbound"):
         eye, shadow, mid = palette[4], palette[0], palette[2]
@@ -143,7 +140,7 @@ def generate(name, palette, index):
             line(pixels, 20, 20, 27, 31, palette[3]); line(pixels, 27, 20, 20, 31, palette[1])
 
     if name == "observer":
-        # The single unblinking eye mark.
+
         rect(pixels,29,24,34,25,palette[4])
     if name == "cave_jar":
         for x in (25,30,35): line(pixels,x,20,x-2,37,palette[3])
@@ -166,16 +163,15 @@ def generate(name, palette, index):
         for x, y in ((32, 28), (78, 46), (54, 83), (96, 101)):
             line(pixels, x, y, x+7, y+11, palette[4])
             line(pixels, x+7, y+11, x+13, y+15, palette[3])
-    # Second-pass horror detailing: deliberately asymmetric faces, damaged flesh,
-    # exposed rib marks and entity-specific silhouettes readable at Minecraft scale.
+
     if name not in ("burrower", "dredge", "colossus"):
-        # Deep eye sockets and uneven, light-catching pupils.
+
         rect(pixels, 8, 8, 15, 11, palette[0])
         left_eye = palette[4] if name not in ("fear", "null", "null_apostle", "observer") else palette[3]
         right_eye = palette[3] if name in ("death", "hunter", "lurker", "howler", "mimic") else palette[4]
         rect(pixels, 9, 9, 10, 10, left_eye)
         rect(pixels, 13, 9, 14, 11, right_eye)
-        # Jagged mouths are intentionally not centered or perfectly symmetrical.
+
         if name in ("mimic", "howler", "agitated_one", "cave_jar", "stalker",
                     "death", "hunter", "lurker", "nightmare_hound", "nightmare_unbound"):
             line(pixels, 9, 13, 14, 14, palette[0])
@@ -183,23 +179,23 @@ def generate(name, palette, index):
                 rect(pixels, tx, ty, tx, ty+1, palette[4])
         elif name in ("fear", "null", "null_apostle", "observer", "nightmare_watcher"):
             line(pixels, 10, 14, 13, 13, palette[1])
-        # Torn tissue / robe folds / scar lines across the chest UV.
+
         if name in ("fear", "death", "null", "null_apostle", "observer", "pilgrim",
                     "almighty", "nightmare_false_survivor", "nightmare_watcher"):
             line(pixels, 21, 20, 23, 30, palette[3])
             line(pixels, 26, 22, 24, 31, palette[1])
             line(pixels, 20, 25, 27, 27, palette[2])
-        # Visible rib cage, each creature gets a different rib spacing.
+
         if name in ("stalker", "hunter", "agitated_one", "cave_jar", "lurker",
                     "howler", "nightmare_hound", "nightmare_unbound"):
             for ry in (22, 25, 28, 31):
                 line(pixels, 20, ry, 27, ry + (1 if ry % 2 else 0), palette[3])
             line(pixels, 23, 21, 23, 32, palette[4])
-        # Mineral fractures and old cracks rather than clean decorative striping.
+
         if name in ("stillborn_statue", "burrower", "dredge", "ceiling_dweller", "colossus"):
             for sx, sy, ex, ey in ((20,20,24,26),(27,22,23,29),(21,31,26,35),(29,30,25,36)):
                 line(pixels, sx, sy, ex, ey, palette[3])
-        # Distinctive entity marks: one-sided wounds, extra eyes, or unnatural seams.
+
         signatures = {
             "null": lambda: (line(pixels, 11, 7, 12, 16, palette[3]), rect(pixels, 8, 23, 9, 28, palette[1])),
             "null_apostle": lambda: (line(pixels, 11, 6, 11, 16, palette[3]), rect(pixels, 22, 20, 26, 21, palette[1])),
@@ -214,8 +210,7 @@ def generate(name, palette, index):
         }
         if name in signatures:
             signatures[name]()
-    # Dedicated eye atlas tiles used by the articulated GeoModel eye shells and pupils.
-    # The tiles are kept at the lower-right of each atlas so they do not reuse head/limb UVs.
+
     sclera = palette[4] if name not in ("fear", "null", "null_apostle", "observer") else palette[3]
     iris = palette[2] if name not in ("observer", "fear") else palette[1]
     pupil = palette[0]
@@ -227,13 +222,12 @@ def generate(name, palette, index):
     rect(pixels, 56, 56, 59, 59, pupil)
     rect(pixels, 57, 56, 58, 57, iris)
     pixels[57][57] = palette[4]
-    # Limb and back UVs receive torn edges and bone-like highlights.
+
     for lx in (1, 17, 40, 56):
         for ly in (24, 28, 32, 36):
             if lx < width and ly < height and (lx + ly + index) % 3 == 0:
                 pixels[ly][lx] = palette[3]
 
-    # Give each NIGHTMARE identity its own generated skin file.
     target_dir = os.path.join(OUT, "nightmare") if name.startswith("nightmare_") else OUT
     os.makedirs(target_dir, exist_ok=True)
     filename = name.removeprefix("nightmare_") if name.startswith("nightmare_") else name

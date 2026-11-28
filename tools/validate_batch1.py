@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Static integrity checks for Batch 1 world memory and environmental horror."""
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
