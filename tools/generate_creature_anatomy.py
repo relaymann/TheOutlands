@@ -360,6 +360,12 @@ def main():
                     elif action=="sprint": amp=14 if ("claw" in n or "finger" in n or "hook" in n or "spur" in n) else 8 if ("mantle" in n or "hood" in n or "cord" in n) else 5
                     elif action=="attack": amp=38 if ("jaw" in n or "fang" in n or "mandible" in n or "hook" in n or "claw" in n) else 24
                     else: amp=24 if ("tendon" in n or "tendril" in n or "cable" in n or "cord" in n) else 12
+                elif e in ("burrower","dredge","howler","nightmare_hound","cave_jar","ceiling_dweller","mimic","death"):
+                    if action=="idle": amp=3.8 if any(x in n for x in ("tendril","gill","sac","robe","tail","feeler")) else 1.2
+                    elif action=="walk": amp=10 if any(x in n for x in ("claw","hook","tarsus","blade","dewclaw","sickle")) else 6 if any(x in n for x in ("tail","gill","tendril","robe")) else 3
+                    elif action=="sprint": amp=18 if any(x in n for x in ("claw","hook","tarsus","blade","dewclaw","sickle")) else 11 if any(x in n for x in ("tail","gill","tendril","robe")) else 6
+                    elif action=="attack": amp=42 if any(x in n for x in ("jaw","fang","tooth","mandible","sickle","hook","blade")) else 28
+                    else: amp=28 if any(x in n for x in ("jaw","fang","tooth","mandible","tendril","gill","tail","robe")) else 14
                 elif action=="idle": amp=1.4 if ("tendon" in n or "tendril" in n) else .7
                 elif action=="walk": amp=5 if ("claw" in n or "feeler" in n) else 2
                 elif action=="sprint": amp=11 if ("claw" in n or "mandible" in n) else 5
@@ -369,7 +375,7 @@ def main():
                     vals=([ -amp,0,-amp*.25],[amp,0,amp*.25],[-amp,0,-amp*.25])
                 elif action=="attack": vals=([0,0,0],[-amp,0,amp*.25],[amp*.3,0,-amp*.1])
                 else: vals=([0,0,0],[amp,0,amp*.2],[amp*1.6,0,amp*.35])
-                if "eye" in n or "lens" in n:
+                if ("eye" in n or "lens" in n) and e in ("observer","ceiling_dweller","burrower","dredge","nightmare_hound","cave_jar","howler","mimic","death"):
                     if action=="idle": vals=([0,-14,0],[0,16,0],[0,-14,0])
                     elif action in ("walk","sprint"): vals=([0,-8,0],[0,10,0],[0,-8,0])
                     elif action=="attack": vals=([0,0,0],[0,22,0],[0,-12,0])
