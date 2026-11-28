@@ -108,4 +108,18 @@ class OutlandsStructureSelectionTest {
         assertNull(StructureLayoutPolicy.chooseLayout(1L, 5_000.0D, true, 1_000.0D, Double.NaN));
         assertNull(StructureLayoutPolicy.chooseLayout(1L, 5_000.0D, true, 1_000.0D, Double.POSITIVE_INFINITY));
     }
+    @Test
+    void structureFrequencyIsNoticeableWithoutFillingEveryCandidateSite() {
+        int earlyForest = 0;
+        int establishedOutlands = 0;
+        for (long seed = 0; seed < 20_000; seed++) {
+            if (StructureLayoutPolicy.chooseLayout(seed, 1_000.0D, true, 1_000.0D, 1.0D) != null) earlyForest++;
+            if (StructureLayoutPolicy.chooseLayout(seed, 3_000.0D, false, 1_000.0D, 1.0D) != null) establishedOutlands++;
+        }
+        assertTrue(earlyForest > 700 && earlyForest < 1_200,
+                "Early forest structures should remain uncommon but discoverable");
+        assertTrue(establishedOutlands > 2_200 && establishedOutlands < 2_900,
+                "Established Outlands structures should be more frequent without saturating candidate sites");
+    }
+
 }

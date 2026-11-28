@@ -23,7 +23,7 @@ public final class StructureLayoutPolicy {
                                       double configuredMinimum, double multiplier, boolean nightmare) {
         if (!Double.isFinite(distance) || distance < 0.0D || !Double.isFinite(configuredMinimum)
                 || distance < configuredMinimum || !Double.isFinite(multiplier) || multiplier <= 0.0D) return null;
-        double scale = StructurePlacementPolicy.CELL_CHUNKS * StructurePlacementPolicy.CELL_CHUNKS;
+        double scale = StructurePlacementPolicy.CELL_CHUNKS * StructurePlacementPolicy.CELL_CHUNKS * 4.0D;
         double[] weights = new double[IDS.length];
         weights[0] = forest ? weight(distance, 1_000, 5_500, multiplier, scale) : 0;
         weights[1] = weight(distance, 1_800, 7_000, multiplier, scale);
@@ -60,7 +60,7 @@ public final class StructureLayoutPolicy {
         for (double weight : weights) total += weight;
         if (total <= 0.0D) return null;
         Random random = new Random(seed);
-        if (random.nextDouble() >= Math.min(1.0D, total)) return null;
+        if (random.nextDouble() >= Math.min(0.18D, total)) return null;
         double pick = random.nextDouble() * total;
         for (int i = 0; i < weights.length; i++) {
             pick -= weights[i];

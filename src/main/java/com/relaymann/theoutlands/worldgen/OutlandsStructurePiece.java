@@ -89,7 +89,7 @@ public final class OutlandsStructurePiece extends StructurePiece {
                 }
                 int sampledSurfaceY = groundY + 1;
                 if (groundY <= level.getMinBuildHeight()
-                        || !StructurePlacementPolicy.isWithinSurfaceTolerance(sampledSurfaceY, expectedY, 5)) {
+                        || !StructurePlacementPolicy.isWithinSurfaceTolerance(sampledSurfaceY, expectedY, 8)) {
                     return false;
                 }
             }
