@@ -128,7 +128,7 @@ def main():
     assert sj["size"]==48 and sj["terrain_adaptation"]=="none"
     assert isinstance(sj.get("spawn_overrides"), dict), "structure codec requires spawn_overrides object"
     assert ss["placement"]["spacing"]==1 and ss["placement"]["separation"]==0
-    assert ss["placement"]["exclusion_zone"]=={"other_set":"minecraft:villages","chunk_count":8}
+    assert ss["placement"]["exclusion_zone"]=={"other_set":"minecraft:villages","chunk_count":4}
     assert "startsForStructure(chunkPos, candidate -> !(candidate instanceof OutlandsStructure))" in piece
     assert "hasSuitableSurface(level,box,surfaceY)" in piece
     assert "Heightmap.Types.MOTION_BLOCKING_NO_LEAVES" in piece and "BlockTags.LOGS" in piece
