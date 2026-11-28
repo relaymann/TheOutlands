@@ -62,6 +62,94 @@ def anatomy(e):
           part(p+"split_jaw_r","jaw",[1,0,-1], [cube([.5,.2,-2.8],[1.8,1,1.8])]),
           part(p+"tendril_l","body",[-2,3,1], [cube([-2.4,3,1],[.55,8,.55])]),
           part(p+"tendril_r","body",[2,3,1], [cube([1.85,3,1],[.55,6,.55])])]
+    elif e == "almighty":
+        a += [
+          part(p+"halo_crown","head",[0,-9,0], [cube([-6,-10,-1],[12,1.2,2],(0,48)),cube([-1,-13,-.6],[2,3,.8],(16,48))]),
+          part(p+"faceless_mask","head",[0,-4,-2], [cube([-4,-5,-4.8],[8,4,1.2],(24,48))]),
+          part(p+"shoulder_mantle_l","left_arm",[0,1,0], [cube([4,1,-4],[6,6,8],(32,48))]),
+          part(p+"shoulder_mantle_r","right_arm",[0,1,0], [cube([-10,1,-4],[6,6,8],(32,48))]),
+          part(p+"rib_cage_outer","body",[0,5,-2], [cube([-5,4,-3.5],[1.4,9,1.2],(40,48)),cube([3.6,4,-3.5],[1.4,9,1.2],(40,48))]),
+          part(p+"floating_ribs","body",[0,8,-2], [cube([-4,8,-4],[8,1,1],(48,48)),cube([-3.5,11,-4],[7,1,1],(48,48))]),
+          part(p+"long_fingers_l","left_arm",[0,20,-1], [cube([6,19,-2.5],[.7,5,.7],(0,56)),cube([7,19,-2.5],[.7,4,.7],(8,56))]),
+          part(p+"long_fingers_r","right_arm",[0,20,-1], [cube([-6.7,19,-2.5],[.7,5,.7],(0,56)),cube([-7.7,19,-2.5],[.7,4,.7],(8,56))])]
+    elif e == "colossus":
+        a += [
+          part(p+"towering_trapezius","body",[0,1,0], [cube([-8,1,-4],[16,7,8],(0,48))]),
+          part(p+"layered_chest_plate","body",[0,7,-2], [cube([-7,6,-5],[14,8,2],(16,48)),cube([-5.5,13,-5],[11,2,2],(32,48))]),
+          part(p+"boulder_pauldron_l","left_arm",[0,1,0], [cube([5,1,-4],[7,8,8],(40,48))]),
+          part(p+"boulder_pauldron_r","right_arm",[0,1,0], [cube([-12,1,-4],[7,8,8],(40,48))]),
+          part(p+"forearm_battering_ram_l","left_arm",[0,13,-1], [cube([6,12,-4],[4,7,8],(0,56))]),
+          part(p+"forearm_battering_ram_r","right_arm",[0,13,-1], [cube([-10,12,-4],[4,7,8],(0,56))]),
+          part(p+"knee_spikes_l","left_leg",[0,10,0], [cube([1,9,-3],[3,4,6],(16,56))]),
+          part(p+"knee_spikes_r","right_leg",[0,10,0], [cube([-4,9,-3],[3,4,6],(16,56))]),
+          part(p+"crown_bone","head",[0,-6,0], [cube([-5,-8,-3],[10,2,6],(32,56))])]
+    elif e == "fear":
+        a += [
+          part(p+"split_cranium_l","head",[-2,-5,-1], [cube([-4,-7,-3],[3.5,5,5],(0,48))]),
+          part(p+"split_cranium_r","head",[2,-5,1], [cube([.5,-8,-2],[3.5,6,4],(12,48))]),
+          part(p+"hollow_face","head",[0,-3,-3], [cube([-2.5,-4,-5],[5,3,.8],(24,48))]),
+          part(p+"rib_spines_l","body",[-3,5,-1], [cube([-5,4,-3],[1,8,1],(32,48)),cube([-5.5,8,-3],[1,6,1],(40,48))]),
+          part(p+"rib_spines_r","body",[3,5,-1], [cube([4,4,-3],[1,8,1],(32,48)),cube([4.5,8,-3],[1,6,1],(40,48))]),
+          part(p+"hanging_tendril_l","body",[-4,11,1], [cube([-4.5,11,1],[.7,9,.7],(0,56))]),
+          part(p+"hanging_tendril_r","body",[4,10,1], [cube([3.8,10,1],[.7,11,.7],(8,56))]),
+          part(p+"reverse_elbow_l","left_arm",[0,9,0], [cube([5,8,-2],[2,3,4],(16,56))]),
+          part(p+"reverse_elbow_r","right_arm",[0,9,0], [cube([-7,8,-2],[2,3,4],(16,56))])]
+    elif e == "null":
+        a += [
+          part(p+"void_face","head",[0,-4,-3], [cube([-4,-6,-5],[8,4,.8],(0,48))]),
+          part(p+"void_eye_l","head",[-2,-4,-4], [cube([-3,-5,-5.2],[1.4,1.5,.6],(12,48))]),
+          part(p+"void_eye_r","head",[2,-4,-4], [cube([1.6,-5,-5.2],[1.4,1.5,.6],(12,48))]),
+          part(p+"floating_rib_l","body",[-3,5,-1], [cube([-4.5,4,-3],[1,7,1],(24,48))]),
+          part(p+"floating_rib_r","body",[3,5,-1], [cube([3.5,4,-3],[1,7,1],(24,48))]),
+          part(p+"void_aperture","body",[0,7,-2], [cube([-2,6,-3.8],[4,5,.8],(32,48))]),
+          part(p+"reaching_fingers_l","left_arm",[0,20,-1], [cube([6,19,-2],[.7,5,.7],(40,48)),cube([7,19,-2],[.7,4,.7],(48,48))]),
+          part(p+"reaching_fingers_r","right_arm",[0,20,-1], [cube([-6.7,19,-2],[.7,5,.7],(40,48)),cube([-7.7,19,-2],[.7,4,.7],(48,48))])]
+    elif e == "null_apostle":
+        a += [
+          part(p+"apostle_crown","head",[0,-8,0], [cube([-4,-9,-1],[8,2,2],(0,48)),cube([-1,-12,-.6],[2,3,1.2],(12,48))]),
+          part(p+"stitched_mask","head",[0,-4,-2], [cube([-3.8,-5,-4.5],[7.6,3,.9],(24,48))]),
+          part(p+"reliquary_chest","body",[0,5,-2], [cube([-4.5,4,-4],[9,8,1.2],(32,48))]),
+          part(p+"rib_spokes_l","body",[-3,7,-1], [cube([-5,6,-3],[1.1,7,1],(40,48)),cube([-4.5,10,-3],[1.1,6,1],(48,48))]),
+          part(p+"rib_spokes_r","body",[3,7,-1], [cube([3.9,6,-3],[1.1,7,1],(40,48)),cube([3.4,10,-3],[1.1,6,1],(48,48))]),
+          part(p+"ceremonial_spines","body",[0,1,2], [cube([-3,1,2],[.8,8,.8],(0,56)),cube([2.2,1,2],[.8,10,.8],(8,56))]),
+          part(p+"split_hand_l","left_arm",[0,20,-1], [cube([6,19,-2],[.7,5,.7],(16,56)),cube([7,19,-2],[.7,4,.7],(24,56))]),
+          part(p+"split_hand_r","right_arm",[0,20,-1], [cube([-6.7,19,-2],[.7,5,.7],(16,56)),cube([-7.7,19,-2],[.7,4,.7],(24,56))])]
+    elif e == "nightmare_unbound":
+        a += [
+          part(p+"fractured_crown_l","head",[-3,-7,0], [cube([-5,-10,-1],[2,5,2],(0,48))]),
+          part(p+"fractured_crown_r","head",[3,-7,0], [cube([3,-11,-1],[2,6,2],(8,48))]),
+          part(p+"open_maw","jaw",[0,0,-2], [cube([-3,0,-4],[6,3,1],(16,48))]),
+          part(p+"upper_fang_l","head",[-2,-2,-3], [cube([-2.8,-2,-4.2],[.8,3,.8],(24,48))]),
+          part(p+"upper_fang_r","head",[2,-2,-3], [cube([2,-2,-4.2],[.8,3,.8],(24,48))]),
+          part(p+"back_growth_l","body",[-4,4,2], [cube([-6,3,2],[2,8,2],(32,48)),cube([-6,8,3],[1.5,7,1.5],(40,48))]),
+          part(p+"back_growth_r","body",[4,4,2], [cube([4,3,2],[2,8,2],(32,48)),cube([4.5,8,3],[1.5,7,1.5],(40,48))]),
+          part(p+"elongated_forearm_l","left_arm",[0,16,-1], [cube([5,15,-3],[2,7,4],(0,56))]),
+          part(p+"elongated_forearm_r","right_arm",[0,16,-1], [cube([-7,15,-3],[2,7,4],(0,56))]),
+          part(p+"tendril_crown","head",[0,-8,0], [cube([-.4,-12,1],[.8,4,.8],(48,56))])]
+    elif e == "nightmare_wardened":
+        a += [
+          part(p+"warden_helm","head",[0,-7,-1], [cube([-5,-8,-4],[10,3,6],(0,48))]),
+          part(p+"helm_horns_l","head",[-4,-6,0], [cube([-6,-10,-.8],[1.4,4,1.6],(12,48))]),
+          part(p+"helm_horns_r","head",[4,-6,0], [cube([4.6,-10,-.8],[1.4,4,1.6],(12,48))]),
+          part(p+"layered_cuirass","body",[0,5,-2], [cube([-6,4,-4],[12,8,1.5],(24,48)),cube([-5,10,-4.5],[10,3,1.5],(32,48))]),
+          part(p+"shield_mantle_l","left_arm",[0,2,0], [cube([4,2,-4],[6,7,8],(40,48))]),
+          part(p+"shield_mantle_r","right_arm",[0,2,0], [cube([-10,2,-4],[6,7,8],(40,48))]),
+          part(p+"spiked_gauntlet_l","left_arm",[0,15,-1], [cube([6,14,-3],[3,5,6],(0,56)),cube([8,15,-3],[1,4,1],(8,56))]),
+          part(p+"spiked_gauntlet_r","right_arm",[0,15,-1], [cube([-9,14,-3],[3,5,6],(0,56)),cube([-9,15,-3],[1,4,1],(8,56))]),
+          part(p+"greaves_l","left_leg",[0,16,0], [cube([.2,15,-3],[3,6,6],(16,56))]),
+          part(p+"greaves_r","right_leg",[0,16,0], [cube([-3.2,15,-3],[3,6,6],(16,56))])]
+    elif e == "nightmare_watcher":
+        a += [
+          part(p+"optic_crown","head",[0,-8,0], [cube([-4,-9,-2],[8,2,4],(0,48))]),
+          part(p+"primary_eye","head",[0,-4,-3], [cube([-2,-5,-5],[4,2,.8],(12,48))]),
+          part(p+"secondary_eye_l","head",[-2,-3,-3], [cube([-4,-4,-4.8],[1.5,1.5,.8],(20,48))]),
+          part(p+"secondary_eye_r","head",[2,-3,-3], [cube([2.5,-4,-4.8],[1.5,1.5,.8],(20,48))]),
+          part(p+"observer_rib_l","body",[-3,5,-1], [cube([-4.5,4,-3],[1,8,1],(28,48))]),
+          part(p+"observer_rib_r","body",[3,5,-1], [cube([3.5,4,-3],[1,8,1],(28,48))]),
+          part(p+"watcher_tendrils_l","body",[-4,10,1], [cube([-4.5,10,1],[.7,8,.7],(36,48))]),
+          part(p+"watcher_tendrils_r","body",[4,10,1], [cube([3.8,10,1],[.7,10,.7],(36,48))]),
+          part(p+"long_fingers_l","left_arm",[0,20,-1], [cube([6,19,-2],[.7,5,.7],(44,48)),cube([7,19,-2],[.7,4,.7],(48,48))]),
+          part(p+"long_fingers_r","right_arm",[0,20,-1], [cube([-6.7,19,-2],[.7,5,.7],(44,48)),cube([-7.7,19,-2],[.7,4,.7],(48,48))])]
     if e == "stalker":
         a += [
           part(p+"skull_ridge","head",[0,-6,-1], [cube([-1.8,-7,-2.3],[3.6,1.2,2.8],(0,48))]),
