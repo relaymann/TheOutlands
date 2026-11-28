@@ -115,7 +115,7 @@ def main():
     assert "nightmare_records" in feature
     assert "applyVariations(id,level,x,surfaceY,z,random)" in feature
     assert "StructurePlacementPolicy.containsBlock" in feature and "public static boolean containsBlock" in policy
-    assert "StructurePlacementPolicy.isSpacedAnchor" in structure and "max-min>5" in structure
+    assert "StructurePlacementPolicy.isSpacedAnchor" in structure and "max-min>8" in structure
     assert "int configuredSpacing = nightmare ? 3" in structure
     assert "minimumSpacingForFootprint(configuredSpacing, size)" in structure
     assert "minimumSpacingForFootprint" in policy
